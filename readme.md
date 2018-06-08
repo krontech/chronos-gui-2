@@ -1,10 +1,9 @@
-## Camera User Interface
+# Camera User Interface
 
-cam-ui is a Python3 replacement for the c++11-based camApp GUI. The original
-camApp was designed as a monolith, and is being broken apart into two
-pieces – an API and a GUI – which have clearer responsibilities.
+cam-ui is a Python3 replacement for the c++11-based camApp GUI. The original camApp was designed as a monolith, and is being broken apart into two pieces – an API and a GUI – which have clearer responsibilities.
 
-### Project Overview
+
+## Project Overview
 There are five major components to the Chronos project. From lowest level
 to highest, we have:
 
@@ -16,6 +15,7 @@ to highest, we have:
 
 This repository contains the back of camera interface.
 
+
 ### Historical Context
 Why did we decide to rewrite our firmware?
 
@@ -25,6 +25,7 @@ In the summer of 2018, it became apparent that we would be switching operating s
 
 Running Debian also means we can compile modern libraries for our use, which was effectively impossible under Arago. To this end, as we were [planning a redesign of the user interface](http://forum.krontech.ca/index.php?topic=135.0) anyway, we decided to take the opportunity to upgrade our GUI library to Qt 5 from Qt 4, and from C++ to Python. This repository contains the "vanilla" Qt 5 Python port. (A Qt Quick 5 Python port is also in the works. One will be chosen as the winner at some point, when we have more experience with both of them.)
 
+
 ### Design Considerations
 - We have the UI .xml files available to us from the original app.
   - We will use those files to get us up and running.
@@ -32,7 +33,23 @@ Running Debian also means we can compile modern libraries for our use, which was
 - The new UI needs to respond to updates from the web app.
 - Performance and memory overhead budgets must be respected - the Chronos 1.4 has 1GB memory available to the CPU, which must be shared between the API, the back-of-camera interface, the web server, Debian itself, and Krontech's development tooling.
 
+
+## Setup and Running
+
+### Setup
+On your camera, or in a virtual machine, set up Python 3.6.5 and QT 5.10 on Debian 7. After configuring your environment to your liking and installing any missing imports required by `src/cam-ui.py`, you can start the UI with `python3 src/cam-ui.py`. If you have some trouble with this, don't worry! This is normal. It took me about 150 discreet steps and two to three weeks to get everything working properly.
+
+
+### Running
+#### Basic
+- Run `python3 src/cam-ui.py` on the camera, from the root folder of this project.
+#### Dev Mode
+- Run `util/watch-host.sh` on your development computer. (You may need to check the source to make sure it's uploading to the right location.)
+- Run `util/watch-guest.sh src/cam-ui.py` on your camera or virtual machine.
+It is strongly encouraged to set your favourite editor up with some sort of Python integration, such as [Anaconda](http://damnwidget.github.io/anaconda), if it does not already support Python. Any editor or IDE on any operating system may be used.
+
+
 ### Contributing
-Before submitting a pull request, it's a good idea to tell us what you're up to on [the forums](http://forum.krontech.ca/). Communication is the key to effective contribution.
+Before submitting a pull request, it's a good idea to tell us what you're up to on [the forums](http://forum.krontech.ca/). Communication is key to effective contribution.
 
 Have a supersonic day! 🙂
