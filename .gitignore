@@ -1,0 +1,4 @@
+## Ignore common temporary files.
+.DS_Store
+*\~
+.directory
