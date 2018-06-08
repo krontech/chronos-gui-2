@@ -23,7 +23,7 @@ In early 2018, our initial implementation of the Chronos 1.4 camera software was
 
 In the summer of 2018, it became apparent that we would be switching operating systems from Arago Linux to Debian Linux. To enable wifi on the camera, a WIFI dongle can be plugged into the USB port. However, as Arago Linux seems to have ceased development in in 2013, none of the dongles available in 2018 have supported drivers. Running Debian, driver support is much better.  
 
-Running Debian also means we can compile modern libraries for our use, which we couldn't figure out how to do under Arago. To this end, as we were [planning a redesign of the user interface](http://forum.krontech.ca/index.php?topic=135.0) anyway, we decided to take the opportunity to upgrade our GUI library to Qt 5 from Qt 4, and from C++ to Python. This repository contains the "vanilla" Qt 5 Python port. (A Qt Quick 5 Python port is also in the works. One will be chosen as the winner at some point, when we have more experience with both of them.)
+Running Debian also means we can compile modern libraries for our use, which was effectively impossible under Arago. To this end, as we were [planning a redesign of the user interface](http://forum.krontech.ca/index.php?topic=135.0) anyway, we decided to take the opportunity to upgrade our GUI library to Qt 5 from Qt 4, and from C++ to Python. This repository contains the "vanilla" Qt 5 Python port. (A Qt Quick 5 Python port is also in the works. One will be chosen as the winner at some point, when we have more experience with both of them.)
 
 ### Design Considerations
 - We have the UI .xml files available to us from the original app.
