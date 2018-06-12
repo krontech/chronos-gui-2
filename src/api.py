@@ -7,19 +7,10 @@ print(api.control('get_video_settings'))
 """
 
 import sys
-import pdb
+# from debugger import dbg, brk
 
 from PyQt5.QtDBus import QDBusConnection, QDBusInterface, QDBusReply
 
-
-@pdb.hideframe
-def brk():
-	from PyQt5 import QtCore
-	QtCore.pyqtRemoveInputHook() #Prevent pyqt5 from printing a lot of errors when we take control away from it with pdb. Unfortunately, this means the app stops responding to things.
-	pdb.set_trace()
-	# QtCore.pyqtRestoreInputHook() #Hm, can't restore input here - since we hid this frame, I think execution continues until the end of the function.
-	# os.system('stty sane') #restore console after pdb is done with it
-dbg = brk #I keep using one or the other. Either should probably work, let's make debugging easy on ourselves.
 
 
 
