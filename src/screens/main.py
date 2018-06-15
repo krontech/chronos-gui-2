@@ -1,7 +1,7 @@
 from PyQt5 import uic, QtWidgets, QtCore
 
 from debugger import dbg, brk
-import api
+import api_mock as api
 
 
 class Main(QtWidgets.QDialog):

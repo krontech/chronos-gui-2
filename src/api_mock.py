@@ -1,29 +1,59 @@
 """
-Wrapper around qt's dbus interface providing, primarily, error checking.
+Mock for api.py's wrapper around control and video dbus interfaces to allow for
+easier development of the QT interface.
+
+Remarks:
+The service provider component can be extracted if interaction with the HTTP
+api is desired. While there is a C-based mock, in chronos-cli, it is
+exceptionally hard to add new calls to it.
 
 Usage:
-import api
+import api_mock as api
 print(api.control('get_video_settings'))
 """
 
 import sys
-from debugger import dbg, brk
+from debugger import dbg, brk; dbg, brk
 
+from PyQt5.QtCore import pyqtSlot, QObject
 from PyQt5.QtDBus import QDBusConnection, QDBusInterface, QDBusReply
 
 
-
-
-# Set up d-bus interface. Connect to system buses. Check everything's working.
-if not QDBusConnection.sessionBus().isConnected():
+# Set up d-bus interface. Connect to mock system buses. Check everything's working.
+if not QDBusConnection.systemBus().isConnected():
 	print("Error: Can not connect to D-Bus. Is D-Bus itself running?", file=sys.stderr)
 	sys.exit(-1)
 
 
+##############################################
+#    Set up mock dbus interface provider.    #
+##############################################
+
+class Pong(QObject):
+	@pyqtSlot(str, result=str)
+	def ping(self, arg):
+		print(f'ping received {arg}')
+		return 'pong'
+
+
+if not QDBusConnection.systemBus().registerService('com.krontech.chronos.control.mock'):
+	sys.stderr.write("Could not register service: %s\n" % QDBusConnection.systemBus().lastError().message())
+	sys.exit(2)
+
+pong = Pong() #This absolutely, positively can't be inlined or it throws error "No such object path '/'".
+QDBusConnection.systemBus().registerObject('/', pong, QDBusConnection.ExportAllSlots)
+
+
+
+
+#######################
+#    Use the mock.    #
+#######################
+
 cameraControlAPI = QDBusInterface(
-	'com.krontech.chronos.control', #Service
-	'/com/krontech/chronos/control', #Path
-	'com.krontech.chronos.control', #Interface
+	'com.krontech.chronos.control.mock', #Service
+	'/', #Path
+	'', #Interface
 	QDBusConnection.systemBus() )
 cameraVideoAPI = QDBusInterface(
 	'com.krontech.chronos.video', #Service
@@ -64,8 +94,6 @@ def control(*args, **kwargs):
 	See README.md at https://github.com/krontech/chronos-cli/tree/master/src/daemon for API documentation.
 	"""
 	
-	dbg()
-	
 	msg = QDBusReply(cameraControlAPI.call(*args, **kwargs))
 	if not msg.isValid():
 		raise DBusException("%s: %s" % (msg.error().name(), msg.error().message()))
@@ -90,7 +118,7 @@ def video(*args, **kwargs):
 __all__ = [control, video]
 
 
-if __name__ == '__main__':
-	print("Self-test: Retrieving camera exposure.")
-	print("exposure is %ins" % control('get_video_settings')["exposureNsec"])
+if True or __name__ == '__main__':
+	print("Self-test: Retrieving mock camera exposure.")
+	print(f"sent ping got {control('ping', 'test str')}")
 	print("Self-test passed. Have a nice day.")

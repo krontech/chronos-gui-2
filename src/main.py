@@ -30,8 +30,6 @@ settings = QtCore.QSettings('Krontech', 'back-of-camera interface')
 
 
 
-
-
 class Window():
 	"""Controls the "app" we run on the the back of the camera.
 	
