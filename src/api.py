@@ -15,7 +15,7 @@ from PyQt5.QtDBus import QDBusConnection, QDBusInterface, QDBusReply
 
 
 # Set up d-bus interface. Connect to system buses. Check everything's working.
-if not QDBusConnection.sessionBus().isConnected():
+if not QDBusConnection.systemBus().isConnected():
 	print("Error: Can not connect to D-Bus. Is D-Bus itself running?", file=sys.stderr)
 	sys.exit(-1)
 
@@ -63,8 +63,6 @@ def control(*args, **kwargs):
 	See https://github.com/krontech/chronos-cli/tree/master/src/api for implementation details about the API being called.
 	See README.md at https://github.com/krontech/chronos-cli/tree/master/src/daemon for API documentation.
 	"""
-	
-	dbg()
 	
 	msg = QDBusReply(cameraControlAPI.call(*args, **kwargs))
 	if not msg.isValid():

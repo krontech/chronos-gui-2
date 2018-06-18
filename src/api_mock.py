@@ -2,14 +2,20 @@
 Mock for api.py's wrapper around control and video dbus interfaces to allow for
 easier development of the QT interface.
 
-Remarks:
-The service provider component can be extracted if interaction with the HTTP
-api is desired. While there is a C-based mock, in chronos-cli, it is
-exceptionally hard to add new calls to it.
+This mock is less "complete" than the C-based mock, as this mock only returns
+values sensible enough to develop the UI with. Currently the C-based mock is
+used for the camera API, and this mock is used for the control api. Note that
+this mock is still available for external programs to use via the dbus
+interface.
 
 Usage:
 import api_mock as api
 print(api.control('get_video_settings'))
+
+Remarks:
+The service provider component can be extracted if interaction with the HTTP
+api is desired. While there is a more complete C-based mock, in chronos-cli, it
+is exceptionally hard to add new calls to.
 """
 
 import sys
@@ -29,19 +35,83 @@ if not QDBusConnection.systemBus().isConnected():
 #    Set up mock dbus interface provider.    #
 ##############################################
 
-class Pong(QObject):
-	@pyqtSlot(str, result=str)
-	def ping(self, arg):
-		print(f'ping received {arg}')
-		return 'pong'
+class ControlMock(QObject):
+	def __init__(self):
+		super(ControlMock, self).__init__()
+		self._state = {
+			"recordingGeometry": {
+				"hres": 200,
+				"vres": 300,
+				"hoffset": 800,
+				"voffset": 480,
+			},
+			"recordingExposure": 85000,
+			"recordingPeriod": 40000,
+			"analogGain": 2,
+			
+			
+		}
+		
+	@pyqtSlot(result='QVariantMap')
+	def get_camera_data(self):
+		return {
+			"model": "Mock Camera 1.4",
+			"apiVersion": "1.0",
+			"fpgaVersion": "3.14",
+			"memoryGB": "16",
+			"serial": "Captain Crunch",
+		}	
+		
+	@pyqtSlot(result='QVariantMap')
+	def get_video_settings(self):
+		return {k: self._state[k] for k in ("recordingGeometry", "recordingExposure", "recordingPeriod", "analogGain")}
+	
+	@pyqtSlot('QVariantMap')
+	def set_video_settings(self, data):
+		for k in ("recordingGeometry", "recordingExposure", "recordingPeriod", "analogGain"):
+			self._state[k] = data[k]
+	
+	@pyqtSlot(result='QVariantMap')
+	def get_sensor_data(self):
+		return {
+			"name": "acme9001",
+			"hMax": 1920,
+			"vMax": 1080,
+			"hMin": 256,
+			"vMin": 64,
+			"hIncrement": 2,
+			"vIncrement": 32,
+			"pixelRate": 1920 * 1080 * 1000,
+			"pixelFormat": "BYR2",
+			"framerateMax": 1000,
+			"quantizeTiming": 250,
+			"maxExposure": int(1e9),
+			"minExposure": 1000,
+			"maxShutterAngle": 330,
+		}
+	
+	@pyqtSlot(result='QVariantMap')
+	def get_timing_limits(self):
+		return {
+			"tMaxPeriod": sys.maxsize,
+			"tMinPeriod": (self._state['recordingGeometry']['hres'] * self._state['recordingGeometry']['vres'] * int(1e9)) / self.get_sensor_data()['pixelRate'],
+			"tMinExposure": int(1e3),
+			"tMaxExposure": int(1e9),
+			"tExposureDelay": 1000, 
+			"tMaxShutterAngle": 330,
+			"fQuantization": 1e9 / self.get_sensor_data()['quantizeTiming'],
+		}
+
+
+
 
 
 if not QDBusConnection.systemBus().registerService('com.krontech.chronos.control.mock'):
-	sys.stderr.write("Could not register service: %s\n" % QDBusConnection.systemBus().lastError().message())
+	sys.stderr.write(f"Could not register service: {QDBusConnection.systemBus().lastError().message() or '(no message)'}\n")
 	sys.exit(2)
 
-pong = Pong() #This absolutely, positively can't be inlined or it throws error "No such object path '/'".
-QDBusConnection.systemBus().registerObject('/', pong, QDBusConnection.ExportAllSlots)
+controlMock = ControlMock() #This absolutely, positively can't be inlined or it throws error "No such object path '/'".
+QDBusConnection.systemBus().registerObject('/', controlMock, QDBusConnection.ExportAllSlots)
 
 
 
@@ -118,7 +188,12 @@ def video(*args, **kwargs):
 __all__ = [control, video]
 
 
-if True or __name__ == '__main__':
-	print("Self-test: Retrieving mock camera exposure.")
-	print(f"sent ping got {control('ping', 'test str')}")
-	print("Self-test passed. Have a nice day.")
+if __name__ == '__main__':
+	from PyQt5.QtCore import QCoreApplication
+	app = QCoreApplication(sys.argv)
+	
+	print("Self-test: echo service")
+	print(f"min recording period: {control('get_timing_limits')['tMinPeriod']}")
+	print("Self-test passed. Python mock API is running.")
+	
+	sys.exit(app.exec_())
