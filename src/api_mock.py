@@ -39,17 +39,88 @@ class ControlMock(QObject):
 	def __init__(self):
 		super(ControlMock, self).__init__()
 		self._state = {
-			"recordingGeometry": {
+			"recording": {
 				"hres": 200,
 				"vres": 300,
 				"hoffset": 800,
 				"voffset": 480,
+				"exposureNs": 85000,
+				"periodNs": 40000,
+				"analogGain": 2,
 			},
-			"recordingExposure": 85000,
-			"recordingPeriod": 40000,
-			"analogGain": 2,
 			
-			
+			"blackCalRecommended": False,
+			"currentVideoOutput": 'viwefinder', #eg, 'viewfinder', 'playback', etc.
+			"currentCameraState": 'normal', #Can also be 'saving' or 'recording'. When saving, the API is unresponsive?
+			"focusPeakingColor": 0x0000ff, #currently presented as red, blue, green, etc.
+			"focusPeakingEnabled": True,
+			"focusPeakingIntensity": 0.5, #1=max, 0=off
+			"zebraStripesEnabled": False,
+			"savedVidFramerate": 60,
+			"savedVidBitsPerPixel": 0.70,
+			"savedVidH256Profile": 'high',
+			"savedVidH256Level": 51,
+			"savedVidFilenameTemplate": "Vid_%date%_%time%_%mark%",
+			"savedVidFormat": "mp4",
+			"savedVidMaxBitrate": 40,
+			"connectionTime": "2018-06-19T02:05:52.664Z", #To use this, add however many seconds ago the request was made. Time should pass roughly the same for the camera as for the client.
+			"markedRegions": [(100, 200), (300, 310)],
+			"savedRegions": [(150, 200)],
+			"recordedSegments": [{ #Each entry in this list a segment of recorded video. Although currently resolution/framerate is always the same, having it in this data will make it easier to fix this in the future if we do.
+				"start": 0,
+				"end": 1000,
+				"hres": 200,
+				"vres": 300,
+				"timestamp": "2018-06-19T02:05:52.664Z",
+			}],
+			"triggerDelayNs": int(1e9),
+			"triggers": {
+				"trig1": {
+					"action": "none",
+					"threshold": 2.50,
+					"invertInput": False,
+					"invertOutput": False,
+					"debounce": True,
+					"pullup1ma": False,
+					"pullup20ma": True,
+				},
+				"trig2": {
+					"action": "none",
+					"threshold": 2.75,
+					"invertInput": True,
+					"invertOutput": False,
+					"debounce": True,
+					"pullup1ma": False,
+					"pullup20ma": False,
+				},
+				"trig3": {
+					"action": "none",
+					"threshold": 2.50,
+					"invertInput": False,
+					"invertOutput": False,
+					"debounce": False,
+					"pullup1ma": True,
+					"pullup20ma": True,
+				},
+				"~a1": {
+					"action": "record end",
+					"threshold": 2.50,
+					"invertInput": False,
+					"invertOutput": False,
+					"debounce": True,
+					"pullup1ma": False,
+					"pullup20ma": True,
+				},
+				"~a2": {
+					"action": "none",
+					"threshold": 2.50,
+					"invertInput": False,
+					"invertOutput": False,
+					"debounce": True,
+					"pullup1ma": False,
+					"pullup20ma": True,
+				},
+			},
 		}
 		
 	@pyqtSlot(result='QVariantMap')
@@ -64,11 +135,11 @@ class ControlMock(QObject):
 		
 	@pyqtSlot(result='QVariantMap')
 	def get_video_settings(self):
-		return {k: self._state[k] for k in ("recordingGeometry", "recordingExposure", "recordingPeriod", "analogGain")}
+		return self._state['recording']
 	
 	@pyqtSlot('QVariantMap')
 	def set_video_settings(self, data):
-		for k in ("recordingGeometry", "recordingExposure", "recordingPeriod", "analogGain"):
+		for k in ("recordingGeometry", "recordingExposureNs", "recordingPeriodNs", "analogGain"):
 			self._state[k] = data[k]
 	
 	@pyqtSlot(result='QVariantMap')
@@ -84,22 +155,57 @@ class ControlMock(QObject):
 			"pixelRate": 1920 * 1080 * 1000,
 			"pixelFormat": "BYR2",
 			"framerateMax": 1000,
-			"quantizeTiming": 250,
-			"maxExposure": int(1e9),
-			"minExposure": 1000,
+			"quantizeTimingNs": 250,
+			"maxExposureNs": int(1e9),
+			"minExposureNs": 1000,
 			"maxShutterAngle": 330,
 		}
 	
 	@pyqtSlot(result='QVariantMap')
 	def get_timing_limits(self):
 		return {
-			"tMaxPeriod": sys.maxsize,
-			"tMinPeriod": (self._state['recordingGeometry']['hres'] * self._state['recordingGeometry']['vres'] * int(1e9)) / self.get_sensor_data()['pixelRate'],
-			"tMinExposure": int(1e3),
-			"tMaxExposure": int(1e9),
-			"tExposureDelay": 1000, 
-			"tMaxShutterAngle": 330,
-			"fQuantization": 1e9 / self.get_sensor_data()['quantizeTiming'],
+			"maxPeriod": sys.maxsize,
+			"minPeriod": (self._state['recordingGeometry']['hres'] * self._state['recordingGeometry']['vres'] * int(1e9)) / self.get_sensor_data()['pixelRate'],
+			"minExposureNs": int(1e3),
+			"maxExposureNs": int(1e9),
+			"exposureDelayNs": 1000, 
+			"maxShutterAngle": 330,
+			"quantization": 1e9 / self.get_sensor_data()['quantizeTimingNs'], #DDR 2018-06-18: What is this? It's pulled from the C API's constraints.f_quantization value.
+		}
+	
+	@pyqtSlot(result='QVariantMap')
+	def get_trigger_data(self):
+		return {
+			"trig1": {
+				"thresholdMin": 0.,
+				"thresholdMax": 7200.,
+				"pullup1ma": True,
+				"pullup20ma": True,
+			},
+			"trig2": {
+				"thresholdMin": 0.,
+				"thresholdMax": 7200.,
+				"pullup1ma": False,
+				"pullup20ma": True,
+			},
+			"trig3": {
+				"thresholdMin": 0.,
+				"thresholdMax": 7200.,
+				"pullup1ma": False,
+				"pullup20ma": False,
+			},
+			"~a1": { #DDR 2018-06-18: I don't know what the analog input settings will be like.
+				"thresholdMin": 0.,
+				"thresholdMax": 7200.,
+				"pullup1ma": False,
+				"pullup20ma": False,
+			},
+			"~a2": {
+				"thresholdMin": 0.,
+				"thresholdMax": 7200.,
+				"pullup1ma": False,
+				"pullup20ma": False,
+			},
 		}
 
 
