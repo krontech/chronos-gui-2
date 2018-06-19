@@ -24,4 +24,4 @@ class Main(QtWidgets.QDialog):
 	
 	# @pyqtSlot() is not strictly needed - see http://pyqt.sourceforge.net/Docs/PyQt5/signals_slots.html#the-pyqtslot-decorator for details. (import with `from PyQt5.QtCore import pyqtSlot`)
 	def printExposureNs(self) -> None:
-		print("exposure is %ins" % api.control('get_video_settings')["exposureNsec"])
+		print("exposure is %ins" % api.control('get_video_settings')["exposureNs"])

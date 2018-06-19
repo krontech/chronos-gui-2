@@ -22,7 +22,7 @@ import sys
 from debugger import dbg, brk; dbg, brk
 
 from PyQt5.QtCore import pyqtSlot, QObject
-from PyQt5.QtDBus import QDBusConnection, QDBusInterface, QDBusReply
+from PyQt5.QtDBus import QDBusConnection, QDBusInterface, QDBusReply, QDBusMessage
 
 
 # Set up d-bus interface. Connect to mock system buses. Check everything's working.
@@ -49,23 +49,13 @@ class ControlMock(QObject):
 				"analogGain": 2,
 			},
 			
-			"blackCalRecommended": False,
-			"currentVideoOutput": 'viwefinder', #eg, 'viewfinder', 'playback', etc.
+			"currentVideoState": 'viwefinder', #eg, 'viewfinder', 'playback', etc.
 			"currentCameraState": 'normal', #Can also be 'saving' or 'recording'. When saving, the API is unresponsive?
-			"focusPeakingColor": 0x0000ff, #currently presented as red, blue, green, etc.
-			"focusPeakingEnabled": True,
+			"focusPeakingColor": 0x0000ff, #currently presented as red, blue, green, alpha. - 0x000000 is off
 			"focusPeakingIntensity": 0.5, #1=max, 0=off
 			"zebraStripesEnabled": False,
-			"savedVidFramerate": 60,
-			"savedVidBitsPerPixel": 0.70,
-			"savedVidH256Profile": 'high',
-			"savedVidH256Level": 51,
-			"savedVidFilenameTemplate": "Vid_%date%_%time%_%mark%",
-			"savedVidFormat": "mp4",
-			"savedVidMaxBitrate": 40,
 			"connectionTime": "2018-06-19T02:05:52.664Z", #To use this, add however many seconds ago the request was made. Time should pass roughly the same for the camera as for the client.
-			"markedRegions": [(100, 200), (300, 310)],
-			"savedRegions": [(150, 200)],
+			"disableRingBuffer": False, #In segmented mode, disable overwriting earlier recorded ring buffer segments. DDR 2018-06-19: Loial figures this was fixed, but neither of us know why it's hidden in the old UI.
 			"recordedSegments": [{ #Each entry in this list a segment of recorded video. Although currently resolution/framerate is always the same, having it in this data will make it easier to fix this in the future if we do.
 				"start": 0,
 				"end": 1000,
@@ -73,6 +63,7 @@ class ControlMock(QObject):
 				"vres": 300,
 				"timestamp": "2018-06-19T02:05:52.664Z",
 			}],
+			"whiteBalance": [1., 1., 1.],
 			"triggerDelayNs": int(1e9),
 			"triggers": {
 				"trig1": {
@@ -140,7 +131,7 @@ class ControlMock(QObject):
 	@pyqtSlot('QVariantMap')
 	def set_video_settings(self, data):
 		for k in ("recordingGeometry", "recordingExposureNs", "recordingPeriodNs", "analogGain"):
-			self._state[k] = data[k]
+			self._state['recording'][k] = data[k]
 	
 	@pyqtSlot(result='QVariantMap')
 	def get_sensor_data(self):
@@ -175,38 +166,78 @@ class ControlMock(QObject):
 	
 	@pyqtSlot(result='QVariantMap')
 	def get_trigger_data(self):
-		return {
-			"trig1": {
-				"thresholdMin": 0.,
-				"thresholdMax": 7200.,
-				"pullup1ma": True,
-				"pullup20ma": True,
-			},
-			"trig2": {
-				"thresholdMin": 0.,
-				"thresholdMax": 7200.,
-				"pullup1ma": False,
-				"pullup20ma": True,
-			},
-			"trig3": {
-				"thresholdMin": 0.,
-				"thresholdMax": 7200.,
-				"pullup1ma": False,
-				"pullup20ma": False,
-			},
-			"~a1": { #DDR 2018-06-18: I don't know what the analog input settings will be like.
-				"thresholdMin": 0.,
-				"thresholdMax": 7200.,
-				"pullup1ma": False,
-				"pullup20ma": False,
-			},
-			"~a2": {
-				"thresholdMin": 0.,
-				"thresholdMax": 7200.,
-				"pullup1ma": False,
-				"pullup20ma": False,
-			},
-		}
+		return [{                     # internal id
+			"name": "Trigger 1 (BNC)", # full name (human-readable label)
+			"label": "TRIG1",          # short name (as printed on the case)
+			"thresholdMinV": 0.,
+			"thresholdMaxV": 7.2,
+			"pullup1ma": True,
+			"pullup20ma": True,
+			"enabled": True,
+			"outputCapable": True,
+		}, {
+			"name": "Trigger 2",
+			"label": "TRIG2",
+			"thresholdMinV": 0.,
+			"thresholdMaxV": 7.2,
+			"pullup1ma": False,
+			"pullup20ma": True,
+			"enabled": True,
+			"outputCapable": True,
+		}, {
+			"name": "Trigger 3 (isolated)",
+			"label": "TRIG3",
+			"thresholdMinV": 0.,
+			"thresholdMaxV": 7.2,
+			"pullup1ma": False,
+			"pullup20ma": False,
+			"enabled": True,
+			"outputCapable": False,
+		}, { #DDR 2018-06-18: I don't know what the analog input settings will be like.
+			"name": "Analog 1",
+			"label": "~A1",
+			"thresholdMinV": 0.,
+			"thresholdMaxV": 7.2,
+			"pullup1ma": False,
+			"pullup20ma": False,
+			"enabled": False,
+			"outputCapable": False,
+		}, {
+			"name": "Analog 2",
+			"label": "~A2",
+			"thresholdMinV": 0.,
+			"thresholdMaxV": 7.2,
+			"pullup1ma": False,
+			"pullup20ma": False,
+			"enabled": False,
+			"outputCapable": False,
+		}]
+	
+	
+	@pyqtSlot(QDBusMessage)
+	def get(self, keys):
+		retval = {}
+		
+		for key in keys:
+			if key not in self._state:
+				return QDBusMessage.createErrorReply('unknownValue', f"The value '{key}' is not known. Valid keys are: {self._state.keys()}")
+			retval[key] = self._state[key]
+		
+		return retval
+	
+	
+	@pyqtSlot('QVariantMap')
+	def set(self, data):
+		
+		# Check all errors first to avoid partially applying an update.
+		for key, value in data.items():
+			if key not in self._state:
+				return self.sendErrorReply('unknownValue', f"The value '{key}' is not known. Valid keys are: {self._state.keys()}")
+			if not isinstance(value, type(self._state[key])):
+				return QDBusMessage.createErrorReply('wrongType', f"Can not set '{key}' to {value}. (Previously {self._state[key]}.) Expected {type(self._state[key])}, got {type(value)}.")	
+		
+		for key, value in data.items():
+			self._state[key] = value
 
 
 
