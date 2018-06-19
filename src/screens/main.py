@@ -1,6 +1,6 @@
 from PyQt5 import uic, QtWidgets, QtCore
 
-from debugger import dbg, brk
+from debugger import dbg, brk; dbg, brk
 import api_mock as api
 
 
@@ -11,13 +11,13 @@ class Main(QtWidgets.QDialog):
 		
 		# Panel init.
 		self.move(0, 0)
-		self.setWindowOpacity(0.5)
 		self.setAttribute(QtCore.Qt.WA_NoSystemBackground, True)
 		self.setWindowFlags(QtCore.Qt.FramelessWindowHint)
 		self.setAttribute(QtCore.Qt.WA_TranslucentBackground, True)
 		
 		# Button binding.
 		self.cmdDebugWnd.clicked.connect(self.printExposureNs)
+		self.cmdClose.clicked.connect(QtWidgets.QApplication.closeAllWindows)
 		self.cmdRecSettings.clicked.connect(lambda: window.show('recording settings'))
 		self.cmdIOSettings.clicked.connect(lambda: window.show('trigger settings'))
 		self.cmdUtil.clicked.connect(lambda: window.show('settings'))

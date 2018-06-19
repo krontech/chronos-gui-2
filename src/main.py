@@ -12,7 +12,7 @@ See readme.md for more details.
 # General imports
 import sys
 import pdb
-from debugger import dbg, brk
+from debugger import dbg, brk; dbg, brk
 
 # QT-specific imports
 from PyQt5 import QtWidgets, QtCore
@@ -61,6 +61,13 @@ class Window():
 			'settings': Settings(self),
 		}
 		
+		
+		screens = QtWidgets.QStackedLayout()
+		for screen in self._screens.values():
+			screens.addWidget(screen)
+		
+		
+		
 		# Set the initial screen. If in dev mode, due to the frequent restarts,
 		# reopen the previous screen. If in the hands of an end-user, always
 		# open the main screen when rebooting to provide an escape route for a
@@ -91,7 +98,6 @@ class Window():
 
 
 app = QtWidgets.QApplication(sys.argv)
-app.setAttribute(QtCore.Qt.AA_EnableHighDpiScaling, True)
 
 window = Window()
 

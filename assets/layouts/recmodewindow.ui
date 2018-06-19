@@ -535,7 +535,7 @@ QSpinBox::down-button { subcontrol-position: right; width: 40px; height: 35px;}<
 }</string>
     </property>
     <property name="text">
-     <string>Normal</string>
+     <string>&amp;Normal</string>
     </property>
     <property name="checked">
      <bool>false</bool>
@@ -562,7 +562,7 @@ QSpinBox::down-button { subcontrol-position: right; width: 40px; height: 35px;}<
 }</string>
     </property>
     <property name="text">
-     <string>Gated Burst</string>
+     <string>&amp;Gated Burst</string>
     </property>
     <property name="checked">
      <bool>true</bool>
@@ -589,7 +589,7 @@ QSpinBox::down-button { subcontrol-position: right; width: 40px; height: 35px;}<
 }</string>
     </property>
     <property name="text">
-     <string>Segmented</string>
+     <string>Seg&amp;mented</string>
     </property>
     <property name="checked">
      <bool>false</bool>
@@ -602,9 +602,9 @@ QSpinBox::down-button { subcontrol-position: right; width: 40px; height: 35px;}<
    </property>
    <property name="geometry">
     <rect>
-     <x>590</x>
+     <x>600</x>
      <y>190</y>
-     <width>181</width>
+     <width>161</width>
      <height>41</height>
     </rect>
    </property>
