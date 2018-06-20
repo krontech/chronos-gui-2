@@ -11,10 +11,7 @@ class Settings(QtWidgets.QDialog):
 		
 		# Panel init.
 		self.move(0, 0)
-		self.setWindowOpacity(0.5)
-		self.setAttribute(QtCore.Qt.WA_NoSystemBackground, True)
 		self.setWindowFlags(QtCore.Qt.FramelessWindowHint)
-		self.setAttribute(QtCore.Qt.WA_TranslucentBackground, True)
 		
 		# Button binding.
 		self.cmdClose.clicked.connect(lambda: window.show('main'))

@@ -47,11 +47,19 @@ class Window():
 	case) in to a frame (a QWidget) which can be loaded into a
 	QStackedLayout. The QDialogs just pop up as their own window when in
 	the QStackedWidget.
-	As to why each screen is a QDialog? All our dialogs were ported forward
-	from before I got here, so it's just historic cruft at this point. I
-	can't figure out what would be better to port them to anyway, since we
-	can't seem to use a QMainWindow with a QStackedLayout unless we combine
-	everything into one .ui file.
+	
+		Maybe try something with setAttribute Qt::WA_DontShowOnScreen True
+	or False? Perhaps that would remove the flicker that currently occurs
+	during screen switches. I think that currently there's no flicker in
+	the C++ app because the screen below is never closed. However, this
+	won't work any more in a sane manner because of the introduction of
+	more transparency to the UI.
+	
+		As to why each screen is a QDialog? All our dialogs were ported
+	forwardfrom before I got here, so it's just historic cruft at this
+	point. I can't figure out what would be better to port them to anyway,
+	since we can't seem to use a QMainWindow with a QStackedLayout unless
+	we combine everything into one .ui file.
 	
 	Methods:
 		show(string id): Switch the currently open screen. Similar to
@@ -93,12 +101,11 @@ class Window():
 	
 	def show(self, screen):
 		"""Switch between the screens of the back-of-camera interface."""
-		
+		self._screens[screen].show()
 		self._screens[self.currentScreen].hide()
 		# TODO: DDR 2018-06-11 Also hide the keyboard and anything else that needs cleanup.
 		
 		self.currentScreen = screen
-		self._screens[screen].show()
 		settings.setValue('current screen', screen) #Only set the setting value after, so we don't accidentally restore to a non-existent window.
 
 

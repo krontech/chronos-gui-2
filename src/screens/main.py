@@ -11,7 +11,6 @@ class Main(QtWidgets.QDialog):
 		
 		# Panel init.
 		self.move(0, 0)
-		self.setAttribute(QtCore.Qt.WA_NoSystemBackground, True)
 		self.setWindowFlags(QtCore.Qt.FramelessWindowHint)
 		self.setAttribute(QtCore.Qt.WA_TranslucentBackground, True)
 		
