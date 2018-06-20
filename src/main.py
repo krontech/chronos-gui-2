@@ -31,12 +31,27 @@ settings = QtCore.QSettings('Krontech', 'back-of-camera interface')
 
 
 class Window():
-	"""Controls the "app" we run on the the back of the camera.
+	"""Metacontrols (screen switching) for the back of camera interface.
 	
 	This class provides a high-level API to control the running application.
 	Currently, that means controlling which screen is currently displayed. It
 	also provides some convenience for developing the application by restoring
 	the last displayed screen.
+	
+	History:
+		The current method of screen switching is pretty dumb, as it does
+	not use the built-in QT switcher (QStackedLayout) and it relies on
+	opening and closing qDialogs which aren't meant for long-term displays
+	such as the main window. It is difficult to change, however, since it's
+	hard-to- impossible to get the contents of a window (a QDialog in this
+	case) in to a frame (a QWidget) which can be loaded into a
+	QStackedLayout. The QDialogs just pop up as their own window when in
+	the QStackedWidget.
+	As to why each screen is a QDialog? All our dialogs were ported forward
+	from before I got here, so it's just historic cruft at this point. I
+	can't figure out what would be better to port them to anyway, since we
+	can't seem to use a QMainWindow with a QStackedLayout unless we combine
+	everything into one .ui file.
 	
 	Methods:
 		show(string id): Switch the currently open screen. Similar to
@@ -60,13 +75,6 @@ class Window():
 			'trigger settings': TriggerSettings(self),
 			'settings': Settings(self),
 		}
-		
-		
-		screens = QtWidgets.QStackedLayout()
-		for screen in self._screens.values():
-			screens.addWidget(screen)
-		
-		
 		
 		# Set the initial screen. If in dev mode, due to the frequent restarts,
 		# reopen the previous screen. If in the hands of an end-user, always
