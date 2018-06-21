@@ -193,10 +193,7 @@
   </property>
   <property name="styleSheet">
    <string notr="true">
-    #CamMainWindow { 
-      background: transparent; 
-      color:white;
-    }
+    /* This style sheet and string tag must exist, or else buttons don't get their backgrounds drawn. ¯\_(ツ)_/¯ */
    </string>
   </property>
   <widget class="QPushButton" name="cmdClose">
@@ -371,7 +368,7 @@ Settings</string>
     </font>
    </property>
    <property name="autoFillBackground">
-    <bool>false</bool>
+    <bool>true</bool>
    </property>
    <property name="styleSheet">
     <string notr="true">QCheckBox::indicator {
