@@ -84,6 +84,13 @@ class Window():
 			'settings': Settings(self),
 		}
 		
+		for screen in self._screens.values():
+			fontTweak = """
+				* {
+					font-family: "DejaVu Sans";
+				} """
+			screen.setStyleSheet(screen.styleSheet() + fontTweak)
+		
 		# Set the initial screen. If in dev mode, due to the frequent restarts,
 		# reopen the previous screen. If in the hands of an end-user, always
 		# open the main screen when rebooting to provide an escape route for a

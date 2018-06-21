@@ -192,7 +192,12 @@
    <string>Dialog</string>
   </property>
   <property name="styleSheet">
-   <string notr="true">background: transparent; color:white</string>
+   <string notr="true">
+    #CamMainWindow { 
+      background: transparent; 
+      color:white;
+    }
+   </string>
   </property>
   <widget class="QPushButton" name="cmdClose">
    <property name="geometry">

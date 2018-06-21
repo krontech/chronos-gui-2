@@ -124,6 +124,8 @@ I hope it works.
 			Port 50681
 	> gsettings set org.gnome.settings-daemon.plugins.power active false #disable screensaver
 	- .bashrc: add `export DISPLAY=:0`, so that running the camapp via remote ssh pops it up on the virtualbox display
+		- Try :1 if this doesn't work. Sometimes the display seems to get changed, but it seems to usually go back after a reboot.
+	> xrdb -merge <(echo 'Xft.dpi: 72') #Set the font size of the VM to that of the camera. The camera is 187dpi, not 72dpi mind you, but such is life. All our layouts are in 72dpi. ¯\_(ツ)_/¯
 	
 - API Mock (D-Bus API)
 	- Build chronos-cli
