@@ -19,9 +19,10 @@ is exceptionally hard to add new calls to.
 """
 
 import sys
+import random
 from debugger import dbg, brk; dbg, brk
 
-from PyQt5.QtCore import pyqtSlot, QObject
+from PyQt5.QtCore import pyqtSlot, QObject, QTimer
 from PyQt5.QtDBus import QDBusConnection, QDBusInterface, QDBusReply, QDBusMessage
 
 
@@ -36,83 +37,81 @@ if not QDBusConnection.systemBus().isConnected():
 ##############################################
 
 class ControlMock(QObject):
-	def __init__(self):
-		super(ControlMock, self).__init__()
-		self._state = {
-			"recording": {
-				"hres": 200,
-				"vres": 300,
-				"hoffset": 800,
-				"voffset": 480,
-				"exposureNs": 85000,
-				"periodNs": 40000,
-				"analogGain": 2,
+	_state = {
+		"recording": {
+			"hres": 200,
+			"vres": 300,
+			"hoffset": 800,
+			"voffset": 480,
+			"exposureNs": 85000,
+			"periodNs": 40000,
+			"analogGain": 2,
+		},
+		
+		"currentVideoState": 'viwefinder', #eg, 'viewfinder', 'playback', etc.
+		"currentCameraState": 'normal', #Can also be 'saving' or 'recording'. When saving, the API is unresponsive?
+		"focusPeakingColor": 0x0000ff, #currently presented as red, blue, green, alpha. - 0x000000 is off
+		"focusPeakingIntensity": 0.5, #1=max, 0=off
+		"zebraStripesEnabled": False,
+		"connectionTime": "2018-06-19T02:05:52.664Z", #To use this, add however many seconds ago the request was made. Time should pass roughly the same for the camera as for the client.
+		"disableRingBuffer": False, #In segmented mode, disable overwriting earlier recorded ring buffer segments. DDR 2018-06-19: Loial figures this was fixed, but neither of us know why it's hidden in the old UI.
+		"recordedSegments": [{ #Each entry in this list a segment of recorded video. Although currently resolution/framerate is always the same, having it in this data will make it easier to fix this in the future if we do.
+			"start": 0,
+			"end": 1000,
+			"hres": 200,
+			"vres": 300,
+			"timestamp": "2018-06-19T02:05:52.664Z",
+		}],
+		"whiteBalance": [1., 1., 1.],
+		"triggerDelayNs": int(1e9),
+		"triggers": {
+			"trig1": {
+				"action": "none",
+				"threshold": 2.50,
+				"invertInput": False,
+				"invertOutput": False,
+				"debounce": True,
+				"pullup1ma": False,
+				"pullup20ma": True,
 			},
-			
-			"currentVideoState": 'viwefinder', #eg, 'viewfinder', 'playback', etc.
-			"currentCameraState": 'normal', #Can also be 'saving' or 'recording'. When saving, the API is unresponsive?
-			"focusPeakingColor": 0x0000ff, #currently presented as red, blue, green, alpha. - 0x000000 is off
-			"focusPeakingIntensity": 0.5, #1=max, 0=off
-			"zebraStripesEnabled": False,
-			"connectionTime": "2018-06-19T02:05:52.664Z", #To use this, add however many seconds ago the request was made. Time should pass roughly the same for the camera as for the client.
-			"disableRingBuffer": False, #In segmented mode, disable overwriting earlier recorded ring buffer segments. DDR 2018-06-19: Loial figures this was fixed, but neither of us know why it's hidden in the old UI.
-			"recordedSegments": [{ #Each entry in this list a segment of recorded video. Although currently resolution/framerate is always the same, having it in this data will make it easier to fix this in the future if we do.
-				"start": 0,
-				"end": 1000,
-				"hres": 200,
-				"vres": 300,
-				"timestamp": "2018-06-19T02:05:52.664Z",
-			}],
-			"whiteBalance": [1., 1., 1.],
-			"triggerDelayNs": int(1e9),
-			"triggers": {
-				"trig1": {
-					"action": "none",
-					"threshold": 2.50,
-					"invertInput": False,
-					"invertOutput": False,
-					"debounce": True,
-					"pullup1ma": False,
-					"pullup20ma": True,
-				},
-				"trig2": {
-					"action": "none",
-					"threshold": 2.75,
-					"invertInput": True,
-					"invertOutput": False,
-					"debounce": True,
-					"pullup1ma": False,
-					"pullup20ma": False,
-				},
-				"trig3": {
-					"action": "none",
-					"threshold": 2.50,
-					"invertInput": False,
-					"invertOutput": False,
-					"debounce": False,
-					"pullup1ma": True,
-					"pullup20ma": True,
-				},
-				"~a1": {
-					"action": "record end",
-					"threshold": 2.50,
-					"invertInput": False,
-					"invertOutput": False,
-					"debounce": True,
-					"pullup1ma": False,
-					"pullup20ma": True,
-				},
-				"~a2": {
-					"action": "none",
-					"threshold": 2.50,
-					"invertInput": False,
-					"invertOutput": False,
-					"debounce": True,
-					"pullup1ma": False,
-					"pullup20ma": True,
-				},
+			"trig2": {
+				"action": "none",
+				"threshold": 2.75,
+				"invertInput": True,
+				"invertOutput": False,
+				"debounce": True,
+				"pullup1ma": False,
+				"pullup20ma": False,
 			},
-		}
+			"trig3": {
+				"action": "none",
+				"threshold": 2.50,
+				"invertInput": False,
+				"invertOutput": False,
+				"debounce": False,
+				"pullup1ma": True,
+				"pullup20ma": True,
+			},
+			"~a1": {
+				"action": "record end",
+				"threshold": 2.50,
+				"invertInput": False,
+				"invertOutput": False,
+				"debounce": True,
+				"pullup1ma": False,
+				"pullup20ma": True,
+			},
+			"~a2": {
+				"action": "none",
+				"threshold": 2.50,
+				"invertInput": False,
+				"invertOutput": False,
+				"debounce": True,
+				"pullup1ma": False,
+				"pullup20ma": True,
+			},
+		},
+	}
 		
 	@pyqtSlot(result='QVariantMap')
 	def get_camera_data(self):
@@ -212,6 +211,14 @@ class ControlMock(QObject):
 			"enabled": False,
 			"outputCapable": False,
 		}]
+		
+	@pyqtSlot(result='QVariantMap')
+	def get_power_status(self):
+		return {
+			"externallyPowered": True,
+			"batteryCharge": 1., #0. to 1. inclusive
+			"batteryVoltage": random.choice((12.38, 12.38, 12.39, 12.39, 12.40)),
+		}
 	
 	
 	@pyqtSlot(QDBusMessage)
@@ -220,7 +227,9 @@ class ControlMock(QObject):
 		
 		for key in keys:
 			if key not in self._state:
-				return QDBusMessage.createErrorReply('unknownValue', f"The value '{key}' is not known. Valid keys are: {self._state.keys()}")
+				return cameraControlAPI.send(
+					QDBusMessage.createErrorReply('unknownValue', f"The value '{key}' is not known. Valid keys are: {self._state.keys()}")
+				)
 			retval[key] = self._state[key]
 		
 		return retval
@@ -228,17 +237,34 @@ class ControlMock(QObject):
 	
 	@pyqtSlot('QVariantMap')
 	def set(self, data):
-		
 		# Check all errors first to avoid partially applying an update.
 		for key, value in data.items():
 			if key not in self._state:
-				return self.sendErrorReply('unknownValue', f"The value '{key}' is not known. Valid keys are: {self._state.keys()}")
+				# return self.sendErrorReply('unknownValue', f"The value '{key}' is not known. Valid keys are: {self._state.keys()}")
+				cameraControlAPI.send(
+					QDBusMessage.createErrorReply('unknownValue', f"The value '{key}' is not known. Valid keys are: {self._state.keys()}") )
 			if not isinstance(value, type(self._state[key])):
-				return QDBusMessage.createErrorReply('wrongType', f"Can not set '{key}' to {value}. (Previously {self._state[key]}.) Expected {type(self._state[key])}, got {type(value)}.")	
+				return cameraControlAPI.send(
+					QDBusMessage.createErrorReply('wrongType', f"Can not set '{key}' to {value}. (Previously {self._state[key]}.) Expected {type(self._state[key])}, got {type(value)}.")
+				)
 		
 		for key, value in data.items():
 			self._state[key] = value
-
+	
+	
+	def __init__(self):
+		super(ControlMock, self).__init__()
+		
+		self._timer = QTimer()
+		self._timer.timeout.connect(self.test)
+		self._timer.setSingleShot(True)
+		self._timer.start(500) #ms
+			
+	def test(self):
+		signal = QDBusMessage.createSignal('/', 'com.krontech.chronos.control.mock', 'test')
+		signal << 'payload'
+		print('test1')
+		QDBusConnection.systemBus().send(signal)
 
 
 
@@ -305,6 +331,23 @@ def control(*args, **kwargs):
 	if not msg.isValid():
 		raise DBusException("%s: %s" % (msg.error().name(), msg.error().message()))
 	return msg.value()
+
+
+def subscribe(apiValue, thing):
+	"""
+	Subscribe something to a value change.
+	
+	Accepts Qt Objects, such as text fields or numeric inputs, and functions.
+	
+	Note: Some frequently updated values (> 10/sec) are only available via
+		polling due to flooding concerns. This is documented in the API.
+	"""
+	
+	print('test2', apiValue, thing)
+	QDBusConnection.systemBus().connect('com.krontech.chronos.control.mock', '/', '',
+		apiValue, thing)
+	# QDBusConnection::sessionBus().connect("org.gnome.SessionManager", "/org/gnome/SessionManager/Presence", "org.gnome.SessionManager.Presence" ,"StatusChanged", this, SLOT(MySlot(uint))); 
+
 
 
 def video(*args, **kwargs):

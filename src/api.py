@@ -70,6 +70,20 @@ def control(*args, **kwargs):
 	return msg.value()
 
 
+def subscribe(apiValue, thing):
+	"""
+	Subscribe something to a value change.
+	
+	Accepts Qt Objects, such as text fields or numeric inputs, and functions.
+	
+	Note: Some frequently updated values (> 10/sec) are only available via
+		polling due to flooding concerns. This is documented in the API.
+	"""
+	
+	pass #TODO: Implement subscribe(key, object).
+	# QDBusConnection::sessionBus().connect("org.gnome.SessionManager", "/org/gnome/SessionManager/Presence", "org.gnome.SessionManager.Presence" ,"StatusChanged", this, SLOT(MySlot(uint))); 
+
+
 def video(*args, **kwargs):
 	"""
 	Call the camera video DBus API. First arg is the function name.
@@ -85,7 +99,7 @@ def video(*args, **kwargs):
 
 
 # Only export the functions we will use. Keep it simple. (This can be complicated later as the need arises.)
-__all__ = [control, video]
+__all__ = [control, subscribe, video]
 
 
 if __name__ == '__main__':

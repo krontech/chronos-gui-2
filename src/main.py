@@ -110,8 +110,6 @@ class Window():
 
 
 
-
-
 app = QtWidgets.QApplication(sys.argv)
 app.setFont(QtGui.QFont("DejaVu Sans", 12)) #Fix fonts being just a little smaller by default than in Creator. This probably only applies to the old camApp .ui files.
 
