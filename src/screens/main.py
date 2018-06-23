@@ -3,6 +3,9 @@ from PyQt5.QtCore import pyqtSlot
 
 from debugger import dbg, brk; dbg, brk
 import api_mock as api
+from state import State
+
+print('exposure', State.exposure)
 
 
 class Main(QtWidgets.QDialog):
@@ -28,7 +31,7 @@ class Main(QtWidgets.QDialog):
 		self._timer.start(500) #ms
 		
 		# Subscribe to API updates.
-		api.subscribe('test', self.testUpdate)
+		api.observe('recordingExposureNs', self.updateExposureNs)
 	
 	# @pyqtSlot() is not strictly needed - see http://pyqt.sourceforge.net/Docs/PyQt5/signals_slots.html#the-pyqtslot-decorator for details. (import with `from PyQt5.QtCore import pyqtSlot`)
 	def printExposureNs(self):
@@ -52,9 +55,10 @@ class Main(QtWidgets.QDialog):
 			f"Exp 660.6µs (100%)",
 		]))
 		
-	@pyqtSlot(str)
-	def testUpdate(self, data):
-		print('got', data)
+	@pyqtSlot(int)
+	def updateExposureNs(self, newExposureNs):
+		self.expSlider.setValue(newExposureNs / (1e9/100) ) #hack in the limit from the API, replace with a proper queried constant when we have state
+		
 	
 	# ~Emit to signal:
 	# https://doc.qt.io/qt-5/qdbusmessage.html#createSignal

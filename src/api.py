@@ -9,7 +9,9 @@ print(api.control('get_video_settings'))
 import sys
 from debugger import dbg, brk; dbg, brk
 
+from PyQt5.QtCore import pyqtSlot, QObject
 from PyQt5.QtDBus import QDBusConnection, QDBusInterface, QDBusReply
+from typing import Callable, Any
 
 
 
@@ -55,6 +57,20 @@ class DBusException(Exception):
 	pass
 
 
+def video(*args, **kwargs):
+	"""
+	Call the camera video DBus API. First arg is the function name.
+	
+	See http://doc.qt.io/qt-5/qdbusabstractinterface.html#call for details about calling.
+	See https://github.com/krontech/chronos-cli/tree/master/src/api for implementation details about the API being called.
+	See README.md at https://github.com/krontech/chronos-cli/tree/master/src/daemon for API documentation.
+	"""
+	msg = QDBusReply(cameraVideoAPI.call(*args, **kwargs))
+	if not msg.isValid():
+		raise DBusException("%s: %s" % (msg.error().name(), msg.error().message()))
+	return msg.value()
+
+
 def control(*args, **kwargs):
 	"""
 	Call the camera control DBus API. First arg is the function name.
@@ -70,36 +86,96 @@ def control(*args, **kwargs):
 	return msg.value()
 
 
-def subscribe(apiValue, thing):
-	"""
-	Subscribe something to a value change.
+
+
+
+# State for observe().
+_camState = control('get', [
+	"recording",
+	"recordingExposureNs",
+	"recordingPeriodNs",
+	"currentVideoState",
+	"currentCameraState",
+	"focusPeakingColor",
+	"focusPeakingIntensity",
+	"zebraStripesEnabled",
+	"connectionTime",
+	"disableRingBuffer",
+	"recordedSegments",
+	"whiteBalance",
+	"triggerDelayNs",
+	"triggers",
+])
+
+# Keep observe()'s state up-to-date.
+# TODO DDR 2018-06-22: This is broken currently, as connect() never returns here.
+# We're going to ignore the fact that this doesn't work for now, as it will only matter if we reinitialize something in the camApp from this cache. 😒
+__wrappers = [] #Keep a reference to the wrapper objects around. Might be needed so they don't get GC'd.
+for key in _camState.keys():
+	class Wrapper(QObject):
+		def __init__(self):
+			super(Wrapper, self).__init__()
+			
+			return # DDR 2018-06-22: The following function never returns, so everything is broken.
+			QDBusConnection.systemBus().connect('com.krontech.chronos.control.mock', '/', '',
+				key, self.updateKey)
+		
+		@pyqtSlot('QDBusMessage')
+		def updateKey(self, msg):
+			_camState[key] = msg.arguments()[0]
+			
+	__wrappers += [Wrapper()]
+
+
+def observe(name: str, callback: Callable[[Any], None]) -> None:
+	"""Observe changes in a state value.
 	
-	Accepts Qt Objects, such as text fields or numeric inputs, and functions.
+	Args:
+		name: ID of the state variable. "exposure", "focusPeakingColor", etc.
+		callback: Function called when the state updates and upon subscription.
+			Called with one parameter, the new value. Called when registered
+			and when the value updates.
 	
 	Note: Some frequently updated values (> 10/sec) are only available via
-		polling due to flooding concerns. This is documented in the API.
+		polling due to flooding concerns. They can not be observed, as they're
+		assumed to *always* be changed. See the API docs for more details.
+	
+	
+	Rationale:
+	It is convenient and less error-prone if we only have one callback that
+	handles the initialization and update of values. The API provides separate
+	initialization and update methods, so we'll store the initialization and
+	use it to perform the initial call to the observe() callback.
+	
+	In addition, this means we only have to query the initial state once,
+	retrieving a blob of all the data available, rather than retrieving each
+	key one syscall at a time as we instantiate each Qt control.
+	
+	
+	Allegory:
+	A man asked D-Bus API what was new. After some time, D-Bus replied, "a bird
+	has flown by". The man, nonplussed, thanked D-Bus and went on his way.
+	
+	Another man, knowing D-Bus's reputation for being literal, asked api.py
+	what was new. api.py immediately responded that someone was giving away
+	money in the town square! (api.py remembered D-Bus had said this earlier.)
+	Quickly, the man hurried down to the square and was greatly enrinched. Some
+	time later, a bird flew by.
+	
+	This is why we wrote this shim. We do not want to always remember to ask
+	D-Bus what has happened AND what will happen. Sometimes we will forget and
+	it will be hard to track down.
 	"""
 	
-	pass #TODO: Implement subscribe(key, object).
-	# QDBusConnection::sessionBus().connect("org.gnome.SessionManager", "/org/gnome/SessionManager/Presence", "org.gnome.SessionManager.Presence" ,"StatusChanged", this, SLOT(MySlot(uint))); 
+	callback(_camState[name])
+	QDBusConnection.systemBus().connect('com.krontech.chronos.control.mock', '/', '',
+		name, callback)
 
 
-def video(*args, **kwargs):
-	"""
-	Call the camera video DBus API. First arg is the function name.
-	
-	See http://doc.qt.io/qt-5/qdbusabstractinterface.html#call for details about calling.
-	See https://github.com/krontech/chronos-cli/tree/master/src/api for implementation details about the API being called.
-	See README.md at https://github.com/krontech/chronos-cli/tree/master/src/daemon for API documentation.
-	"""
-	msg = QDBusReply(cameraVideoAPI.call(*args, **kwargs))
-	if not msg.isValid():
-		raise DBusException("%s: %s" % (msg.error().name(), msg.error().message()))
-	return msg.value()
 
 
 # Only export the functions we will use. Keep it simple. (This can be complicated later as the need arises.)
-__all__ = [control, subscribe, video]
+__all__ = ['control', 'video', 'observe'] #This doesn't work. Why?
 
 
 if __name__ == '__main__':

@@ -24,6 +24,7 @@ from debugger import dbg, brk; dbg, brk
 
 from PyQt5.QtCore import pyqtSlot, QObject, QTimer
 from PyQt5.QtDBus import QDBusConnection, QDBusInterface, QDBusReply, QDBusMessage
+from typing import Callable, Any
 
 
 # Set up d-bus interface. Connect to mock system buses. Check everything's working.
@@ -38,15 +39,15 @@ if not QDBusConnection.systemBus().isConnected():
 
 class ControlMock(QObject):
 	_state = {
-		"recording": {
+		"recording": { #Hack around video pipeline reconstruction being very slow.
 			"hres": 200,
 			"vres": 300,
 			"hoffset": 800,
 			"voffset": 480,
-			"exposureNs": 85000,
-			"periodNs": 40000,
 			"analogGain": 2,
 		},
+		"recordingExposureNs": int(8.5e8), #These don't have to have the pipeline torn down, so they don't need the hack where we set video settings atomically.
+		"recordingPeriodNs": int(4e4),
 		
 		"currentVideoState": 'viwefinder', #eg, 'viewfinder', 'playback', etc.
 		"currentCameraState": 'normal', #Can also be 'saving' or 'recording'. When saving, the API is unresponsive?
@@ -146,8 +147,8 @@ class ControlMock(QObject):
 			"pixelFormat": "BYR2",
 			"framerateMax": 1000,
 			"quantizeTimingNs": 250,
+			"minExposureNs": int(1e3),
 			"maxExposureNs": int(1e9),
-			"minExposureNs": 1000,
 			"maxShutterAngle": 330,
 		}
 	
@@ -156,8 +157,8 @@ class ControlMock(QObject):
 		return {
 			"maxPeriod": sys.maxsize,
 			"minPeriod": (self._state['recordingGeometry']['hres'] * self._state['recordingGeometry']['vres'] * int(1e9)) / self.get_sensor_data()['pixelRate'],
-			"minExposureNs": int(1e3),
-			"maxExposureNs": int(1e9),
+			"minExposureNs": self.get_sensor_data()["minExposureNs"],
+			"maxExposureNs": self.get_sensor_data()["maxExposureNs"],
 			"exposureDelayNs": 1000, 
 			"maxShutterAngle": 330,
 			"quantization": 1e9 / self.get_sensor_data()['quantizeTimingNs'], #DDR 2018-06-18: What is this? It's pulled from the C API's constraints.f_quantization value.
@@ -221,13 +222,14 @@ class ControlMock(QObject):
 		}
 	
 	
-	@pyqtSlot(QDBusMessage)
-	def get(self, keys):
+	@pyqtSlot(QDBusMessage, result='QVariantMap')
+	def get(self, msg):
+		keys = msg.arguments()[0]
 		retval = {}
 		
 		for key in keys:
 			if key not in self._state:
-				return cameraControlAPI.send(
+				return cameraControlAPI.send( #Todo: This isn't how you return errors.
 					QDBusMessage.createErrorReply('unknownValue', f"The value '{key}' is not known. Valid keys are: {self._state.keys()}")
 				)
 			retval[key] = self._state[key]
@@ -255,16 +257,40 @@ class ControlMock(QObject):
 	def __init__(self):
 		super(ControlMock, self).__init__()
 		
-		self._timer = QTimer()
-		self._timer.timeout.connect(self.test)
-		self._timer.setSingleShot(True)
-		self._timer.start(500) #ms
+		# Inject some fake update events.
+		def test1():
+			self._state["recordingExposureNs"] = int(8e8)
+			signal = QDBusMessage.createSignal('/', 'com.krontech.chronos.control.mock', 'recordingExposureNs')
+			signal << self._state["recordingExposureNs"]
+			QDBusConnection.systemBus().send(signal)
 			
-	def test(self):
-		signal = QDBusMessage.createSignal('/', 'com.krontech.chronos.control.mock', 'test')
-		signal << 'payload'
-		print('test1')
-		QDBusConnection.systemBus().send(signal)
+		self._timer1 = QTimer()
+		self._timer1.timeout.connect(test1)
+		self._timer1.setSingleShot(True)
+		self._timer1.start(1000) #ms
+		
+		def test2():
+			self._state["recordingExposureNs"] = int(2e8)
+			signal = QDBusMessage.createSignal('/', 'com.krontech.chronos.control.mock', 'recordingExposureNs')
+			signal << self._state["recordingExposureNs"]
+			QDBusConnection.systemBus().send(signal)
+			
+		self._timer2 = QTimer()
+		self._timer2.timeout.connect(test2)
+		self._timer2.setSingleShot(True)
+		self._timer2.start(2000) #ms
+		
+		def test3():
+			self._state["recordingExposureNs"] = int(8.5e8)
+			signal = QDBusMessage.createSignal('/', 'com.krontech.chronos.control.mock', 'recordingExposureNs')
+			signal << self._state["recordingExposureNs"]
+			QDBusConnection.systemBus().send(signal)
+			
+		self._timer3 = QTimer()
+		self._timer3.timeout.connect(test3)
+		self._timer3.setSingleShot(True)
+		self._timer3.start(3000) #ms
+			
 
 
 
@@ -318,6 +344,20 @@ class DBusException(Exception):
 	pass
 
 
+def video(*args, **kwargs):
+	"""
+	Call the camera video DBus API. First arg is the function name.
+	
+	See http://doc.qt.io/qt-5/qdbusabstractinterface.html#call for details about calling.
+	See https://github.com/krontech/chronos-cli/tree/master/src/api for implementation details about the API being called.
+	See README.md at https://github.com/krontech/chronos-cli/tree/master/src/daemon for API documentation.
+	"""
+	msg = QDBusReply(cameraVideoAPI.call(*args, **kwargs))
+	if not msg.isValid():
+		raise DBusException("%s: %s" % (msg.error().name(), msg.error().message()))
+	return msg.value()
+
+
 def control(*args, **kwargs):
 	"""
 	Call the camera control DBus API. First arg is the function name.
@@ -333,39 +373,96 @@ def control(*args, **kwargs):
 	return msg.value()
 
 
-def subscribe(apiValue, thing):
-	"""
-	Subscribe something to a value change.
+
+
+
+# State for observe().
+_camState = control('get', [
+	"recording",
+	"recordingExposureNs",
+	"recordingPeriodNs",
+	"currentVideoState",
+	"currentCameraState",
+	"focusPeakingColor",
+	"focusPeakingIntensity",
+	"zebraStripesEnabled",
+	"connectionTime",
+	"disableRingBuffer",
+	"recordedSegments",
+	"whiteBalance",
+	"triggerDelayNs",
+	"triggers",
+])
+
+# Keep observe()'s state up-to-date.
+# TODO DDR 2018-06-22: This is broken currently, as connect() never returns here.
+# We're going to ignore the fact that this doesn't work for now, as it will only matter if we reinitialize something in the camApp from this cache. 😒
+__wrappers = [] #Keep a reference to the wrapper objects around. Might be needed so they don't get GC'd.
+for key in _camState.keys():
+	class Wrapper(QObject):
+		def __init__(self):
+			super(Wrapper, self).__init__()
+			
+			return # DDR 2018-06-22: The following function never returns, so everything is broken.
+			QDBusConnection.systemBus().connect('com.krontech.chronos.control.mock', '/', '',
+				key, self.updateKey)
+		
+		@pyqtSlot('QDBusMessage')
+		def updateKey(self, msg):
+			_camState[key] = msg.arguments()[0]
+			
+	__wrappers += [Wrapper()]
+
+
+def observe(name: str, callback: Callable[[Any], None]) -> None:
+	"""Observe changes in a state value.
 	
-	Accepts Qt Objects, such as text fields or numeric inputs, and functions.
+	Args:
+		name: ID of the state variable. "exposure", "focusPeakingColor", etc.
+		callback: Function called when the state updates and upon subscription.
+			Called with one parameter, the new value. Called when registered
+			and when the value updates.
 	
 	Note: Some frequently updated values (> 10/sec) are only available via
-		polling due to flooding concerns. This is documented in the API.
+		polling due to flooding concerns. They can not be observed, as they're
+		assumed to *always* be changed. See the API docs for more details.
+	
+	
+	Rationale:
+	It is convenient and less error-prone if we only have one callback that
+	handles the initialization and update of values. The API provides separate
+	initialization and update methods, so we'll store the initialization and
+	use it to perform the initial call to the observe() callback.
+	
+	In addition, this means we only have to query the initial state once,
+	retrieving a blob of all the data available, rather than retrieving each
+	key one syscall at a time as we instantiate each Qt control.
+	
+	
+	Allegory:
+	A man asked D-Bus API what was new. After some time, D-Bus replied, "a bird
+	has flown by". The man, nonplussed, thanked D-Bus and went on his way.
+	
+	Another man, knowing D-Bus's reputation for being literal, asked api.py
+	what was new. api.py immediately responded that someone was giving away
+	money in the town square! (api.py remembered D-Bus had said this earlier.)
+	Quickly, the man hurried down to the square and was greatly enrinched. Some
+	time later, a bird flew by.
+	
+	This is why we wrote this shim. We do not want to always remember to ask
+	D-Bus what has happened AND what will happen. Sometimes we will forget and
+	it will be hard to track down.
 	"""
 	
-	print('test2', apiValue, thing)
+	callback(_camState[name])
 	QDBusConnection.systemBus().connect('com.krontech.chronos.control.mock', '/', '',
-		apiValue, thing)
-	# QDBusConnection::sessionBus().connect("org.gnome.SessionManager", "/org/gnome/SessionManager/Presence", "org.gnome.SessionManager.Presence" ,"StatusChanged", this, SLOT(MySlot(uint))); 
+		name, callback)
 
 
-
-def video(*args, **kwargs):
-	"""
-	Call the camera video DBus API. First arg is the function name.
-	
-	See http://doc.qt.io/qt-5/qdbusabstractinterface.html#call for details about calling.
-	See https://github.com/krontech/chronos-cli/tree/master/src/api for implementation details about the API being called.
-	See README.md at https://github.com/krontech/chronos-cli/tree/master/src/daemon for API documentation.
-	"""
-	msg = QDBusReply(cameraVideoAPI.call(*args, **kwargs))
-	if not msg.isValid():
-		raise DBusException("%s: %s" % (msg.error().name(), msg.error().message()))
-	return msg.value()
 
 
 # Only export the functions we will use. Keep it simple. (This can be complicated later as the need arises.)
-__all__ = [control, video]
+__all__ = ['control', 'video', 'observe'] #This doesn't work. Why?
 
 
 if __name__ == '__main__':
