@@ -3,9 +3,6 @@ from PyQt5.QtCore import pyqtSlot
 
 from debugger import dbg, brk; dbg, brk
 import api_mock as api
-from state import State
-
-print('exposure', State.exposure)
 
 
 class Main(QtWidgets.QDialog):
@@ -19,7 +16,7 @@ class Main(QtWidgets.QDialog):
 		self.setAttribute(QtCore.Qt.WA_TranslucentBackground, True)
 		
 		# Button binding.
-		self.cmdDebugWnd.clicked.connect(self.printExposureNs)
+		self.cmdDebugWnd.clicked.connect(self.printAnalogGain)
 		self.cmdClose.clicked.connect(QtWidgets.QApplication.closeAllWindows)
 		self.cmdRecSettings.clicked.connect(lambda: window.show('recording settings'))
 		self.cmdIOSettings.clicked.connect(lambda: window.show('trigger settings'))
@@ -34,8 +31,8 @@ class Main(QtWidgets.QDialog):
 		api.observe('recordingExposureNs', self.updateExposureNs)
 	
 	# @pyqtSlot() is not strictly needed - see http://pyqt.sourceforge.net/Docs/PyQt5/signals_slots.html#the-pyqtslot-decorator for details. (import with `from PyQt5.QtCore import pyqtSlot`)
-	def printExposureNs(self):
-		print("exposure is %ins" % api.control('get_video_settings')["exposureNs"])
+	def printAnalogGain(self):
+		print("Analog gain is %ins." % api.control('get_video_settings')["analogGain"])
 		
 	battery = {
 		"charge": 0.,

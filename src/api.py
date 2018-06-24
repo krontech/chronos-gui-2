@@ -150,21 +150,6 @@ def observe(name: str, callback: Callable[[Any], None]) -> None:
 	In addition, this means we only have to query the initial state once,
 	retrieving a blob of all the data available, rather than retrieving each
 	key one syscall at a time as we instantiate each Qt control.
-	
-	
-	Allegory:
-	A man asked D-Bus API what was new. After some time, D-Bus replied, "a bird
-	has flown by". The man, nonplussed, thanked D-Bus and went on his way.
-	
-	Another man, knowing D-Bus's reputation for being literal, asked api.py
-	what was new. api.py immediately responded that someone was giving away
-	money in the town square! (api.py remembered D-Bus had said this earlier.)
-	Quickly, the man hurried down to the square and was greatly enrinched. Some
-	time later, a bird flew by.
-	
-	This is why we wrote this shim. We do not want to always remember to ask
-	D-Bus what has happened AND what will happen. Sometimes we will forget and
-	it will be hard to track down.
 	"""
 	
 	callback(_camState[name])
