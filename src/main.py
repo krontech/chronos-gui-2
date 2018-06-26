@@ -11,6 +11,7 @@ See readme.md for more details.
 
 # General imports
 import sys
+import os
 import pdb
 from debugger import dbg, brk; dbg, brk
 
@@ -23,6 +24,8 @@ sys.excepthook = lambda t, v, tb: (
 	pdb.traceback.print_exception(t, v, tb),
 	pdb.post_mortem(t=tb)
 )
+
+sys.path.append('src/components') #Add the components' path to import, because — since pyQt5 calculates the import path outside of our control — we can't import them from a subfolder like with the screens.
 
 QtWidgets.QApplication.setAttribute(QtCore.Qt.AA_EnableHighDpiScaling, True)
 

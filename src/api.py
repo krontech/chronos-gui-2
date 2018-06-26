@@ -14,8 +14,6 @@ from PyQt5.QtDBus import QDBusConnection, QDBusInterface, QDBusReply
 from typing import Callable, Any
 
 
-
-
 # Set up d-bus interface. Connect to system buses. Check everything's working.
 if not QDBusConnection.systemBus().isConnected():
 	print("Error: Can not connect to D-Bus. Is D-Bus itself running?", file=sys.stderr)

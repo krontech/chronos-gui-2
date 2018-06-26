@@ -47,9 +47,8 @@ On your camera, or in a virtual machine, set up Python 3.6.5 and QT 5.10 on Debi
 - Run `util/watch-host.sh` on your development computer. (You may need to check the source to make sure it's uploading to the right location.)
 - Run `util/watch-guest.sh src/cam-ui.py` on your camera or virtual machine.
 It is strongly encouraged to set your favourite editor up with some sort of Python integration, such as [Anaconda](http://damnwidget.github.io/anaconda), if it does not already support Python. Any editor or IDE on any operating system may be used.
+- Run `util/designer.sh` on your development computer to open Qt Designer with the Chronos widgets loaded.
 
 
 ### Contributing
-Before submitting a pull request, it's a good idea to tell us what you're up to on [the forums](http://forum.krontech.ca/). Communication is key to effective contribution.
-
-Have a supersonic day! 🙂
+Contributions are welcome! Thank you! Before diving in and changing things, it's a good idea to tell us what you'd like to do on [the forums](http://forum.krontech.ca/). Since we are familiar with the codebase, we can help get you started in the right direction. 🙂
