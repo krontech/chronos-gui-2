@@ -8,7 +8,7 @@ import api_mock as api
 class Main(QtWidgets.QDialog):
 	def __init__(self, window):
 		super(Main, self).__init__()
-		uic.loadUi('assets/layouts/cammainwindow.ui', self) #Maybe load f"assets/layouts/{self.__module__}.ui" in the future? Right now, it is clearer to load the files as named by the original camApp because we will need to reference them in both places.
+		uic.loadUi('src/screens/cammainwindow.ui', self) #Maybe load f"assets/layouts/{self.__module__}.ui" in the future? Right now, it is clearer to load the files as named by the original camApp because we will need to reference them in both places.
 		
 		# Panel init.
 		self.move(0, 0)
