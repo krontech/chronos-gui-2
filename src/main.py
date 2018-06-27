@@ -11,7 +11,6 @@ See readme.md for more details.
 
 # General imports
 import sys
-import os
 import pdb
 from debugger import dbg, brk; dbg, brk
 

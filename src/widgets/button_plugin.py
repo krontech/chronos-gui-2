@@ -28,7 +28,7 @@ class ButtonPlugin(QPyDesignerCustomWidgetPlugin):
 		return "Chronos"
 
 	def icon(self):
-		return QIcon(QPixmap("../assets/images/qt_creator_icons/button.svg"))
+		return QIcon(QPixmap("../../assets/images/qt_creator_icons/button.svg"))
 
 	def toolTip(self):
 		return "chronos standard button"
