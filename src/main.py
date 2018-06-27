@@ -25,7 +25,7 @@ sys.excepthook = lambda t, v, tb: (
 	pdb.post_mortem(t=tb)
 )
 
-sys.path.append('src/components') #Add the components' path to import, because — since pyQt5 calculates the import path outside of our control — we can't import them from a subfolder like with the screens.
+sys.path.append('src/widgets') #Add the components' path to import, because — since pyQt5 calculates the import path outside of our control — we can't import them from a subfolder like with the screens.
 
 QtWidgets.QApplication.setAttribute(QtCore.Qt.AA_EnableHighDpiScaling, True)
 
@@ -77,6 +77,7 @@ class Window():
 		from screens.trigger_delay import TriggerDelay
 		from screens.trigger_settings import TriggerSettings
 		from screens.settings import Settings
+		from screens.led_test import LedTest
 		
 		self._screens = {
 			'main': Main(self),
@@ -85,6 +86,7 @@ class Window():
 			'trigger delay': TriggerDelay(self),
 			'trigger settings': TriggerSettings(self),
 			'settings': Settings(self),
+			'led_test': LedTest(self),
 		}
 		
 		# Set the initial screen. If in dev mode, due to the frequent restarts,

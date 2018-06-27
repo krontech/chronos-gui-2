@@ -2,3 +2,6 @@
 .DS_Store
 *\~
 .directory
+
+## Ignore Designer's temporary files.
+**/__pycache__/

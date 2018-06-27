@@ -5,11 +5,11 @@ from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 
 
-class LedWidget(QWidget):
+class Led(QWidget):
 
     def __init__(self, parent=None):
 
-        super(LedWidget, self).__init__(parent)
+        super(Led, self).__init__(parent)
 
         self._diamX = 0
         self._diamY = 0
@@ -147,6 +147,6 @@ if __name__ == "__main__":
     import sys
 
     app = QApplication(sys.argv)
-    led = LedWidget()
+    led = Led()
     led.show()
     sys.exit(app.exec_())

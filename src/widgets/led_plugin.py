@@ -1,9 +1,11 @@
 #!/usr/bin/python3
 
+# Originally from https://www.ics.com/blog/integrating-python-based-custom-widget-qt-designer
+
 from PyQt5.QtGui import QIcon
 from PyQt5.QtDesigner import QPyDesignerCustomWidgetPlugin
 
-from ledwidget import LedWidget
+from led import Led
 
 
 class LedPlugin(QPyDesignerCustomWidgetPlugin):
@@ -23,13 +25,13 @@ class LedPlugin(QPyDesignerCustomWidgetPlugin):
         return self.initialized
 
     def createWidget(self, parent):
-        return LedWidget(parent)
+        return Led(parent)
 
     def name(self):
-        return "LedWidget"
+        return "Led"
 
     def group(self):
-        return "ICS Custom Widgets"
+        return "Chronos"
 
     def icon(self):
         return QIcon()
@@ -58,4 +60,4 @@ class LedPlugin(QPyDesignerCustomWidgetPlugin):
     #            '</widget>\n'
 
     def includeFile(self):
-        return "ledwidget"
+        return "led"
