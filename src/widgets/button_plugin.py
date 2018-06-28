@@ -19,7 +19,7 @@ class ButtonPlugin(QPyDesignerCustomWidgetPlugin):
 		return self.initialized
 
 	def createWidget(self, parent):
-		return Button(parent)
+		return Button(parent, inEditor=True)
 
 	def name(self):
 		return "Button"

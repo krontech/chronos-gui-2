@@ -10,6 +10,11 @@ class Main(QtWidgets.QDialog):
 		super(Main, self).__init__()
 		uic.loadUi('src/screens/cammainwindow.ui', self) #Maybe load f"assets/layouts/{self.__module__}.ui" in the future? Right now, it is clearer to load the files as named by the original camApp because we will need to reference them in both places.
 		
+		self.battery = {
+			"charge": 0.,
+			"voltage": 0.,
+		}
+		
 		# Panel init.
 		self.move(0, 0)
 		self.setWindowFlags(QtCore.Qt.FramelessWindowHint)
@@ -33,11 +38,6 @@ class Main(QtWidgets.QDialog):
 	# @pyqtSlot() is not strictly needed - see http://pyqt.sourceforge.net/Docs/PyQt5/signals_slots.html#the-pyqtslot-decorator for details. (import with `from PyQt5.QtCore import pyqtSlot`)
 	def printAnalogGain(self):
 		print("Analog gain is %ins." % api.control('get_video_settings')["analogGain"])
-		
-	battery = {
-		"charge": 0.,
-		"voltage": 0.,
-	}
 	
 	def updateBatteryStatus(self):
 		powerStatus = api.control('get_power_status')

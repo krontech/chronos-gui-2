@@ -17,7 +17,6 @@ from debugger import dbg, brk; dbg, brk
 # QT-specific imports
 from PyQt5 import QtWidgets, QtCore, QtGui
 
-
 sys.excepthook = lambda t, v, tb: (
 	QtCore.pyqtRemoveInputHook(),
 	pdb.traceback.print_exception(t, v, tb),
@@ -76,7 +75,7 @@ class Window():
 		from screens.trigger_delay import TriggerDelay
 		from screens.trigger_settings import TriggerSettings
 		from screens.settings import Settings
-		from screens.led_test import LedTest
+		from screens.led_test import LedTest #Responsible for "QFont::setPointSize: Point size <= 0 (-1), must be greater than 0"
 		
 		self._screens = {
 			'main': Main(self),
@@ -92,6 +91,9 @@ class Window():
 		# reopen the previous screen. If in the hands of an end-user, always
 		# open the main screen when rebooting to provide an escape route for a
 		# confusing or broken screen.
+		
+		# settings.setValue('current screen', 'led_test')
+		
 		if settings.value('development mode', True):
 			self.currentScreen = settings.value('current screen', 'main')
 		else:

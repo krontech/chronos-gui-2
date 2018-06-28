@@ -49,19 +49,23 @@
   <widget class="Button" name="button">
    <property name="geometry">
     <rect>
-     <x>260</x>
-     <y>310</y>
+     <x>300</x>
+     <y>330</y>
      <width>181</width>
      <height>81</height>
     </rect>
    </property>
-   <property name="font">
-    <font>
-     <pointsize>-1</pointsize>
-    </font>
-   </property>
    <property name="text">
-    <string>Test</string>
+    <string>Toast</string>
+   </property>
+   <property name="clickMarginRightSetter" stdset="0">
+    <enum>Button::half</enum>
+   </property>
+   <property name="clickMarginTopSetter" stdset="0">
+    <enum>Button::full</enum>
+   </property>
+   <property name="clickMarginBottomSetter" stdset="0">
+    <enum>Button::none</enum>
    </property>
   </widget>
  </widget>
