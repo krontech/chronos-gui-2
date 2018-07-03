@@ -2,6 +2,8 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 
+from debugger import dbg, brk; dbg, brk
+
 from random import randint
 
 
@@ -69,10 +71,6 @@ class Button(QPushButton):
 		
 	def sizeHint(self):
 		return QSize(181, 81)
-		
-	def getClickMarginLeft(self):
-		return self.clickMargin['left']
-
 
 
 	@pyqtProperty(MarginWidth)

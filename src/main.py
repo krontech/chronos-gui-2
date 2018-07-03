@@ -11,17 +11,10 @@ See readme.md for more details.
 
 # General imports
 import sys
-import pdb
 from debugger import dbg, brk; dbg, brk
 
 # QT-specific imports
 from PyQt5 import QtWidgets, QtCore, QtGui
-
-sys.excepthook = lambda t, v, tb: (
-	QtCore.pyqtRemoveInputHook(),
-	pdb.traceback.print_exception(t, v, tb),
-	pdb.post_mortem(t=tb)
-)
 
 sys.path.append('src/widgets') #Add the components' path to import, because — since pyQt5 calculates the import path outside of our control — we can't import them from a subfolder like with the screens.
 

@@ -8,11 +8,19 @@ Example:
 	dbg()
 """
 
+import sys
 import pdb
 from PyQt5 import QtCore
 
 
-@pdb.hideframe
+sys.excepthook = lambda t, v, tb: (
+	QtCore.pyqtRemoveInputHook(),
+	pdb.traceback.print_exception(t, v, tb),
+	pdb.post_mortem(t=tb)
+)
+
+
+@pdb.hideframe #Provided by pdbpp, which also gives colour and nice tab-completion.
 def brk():
 	"""Start debugging at the callsite."""
 	

@@ -192,12 +192,16 @@ I hope it works.
 		- Assets in /data
 	- Fix QT Creator moving whole window on widget drag (Linux/KDE only)
 		- System Settings->Application Style->Widget Style->Configure->(General->)Windows' drag mode->Titlebar only
-	- Debugging (guest) using pdb
-		> sudo pip install pdbpp (optional? for a better debugger, adds tab-completion)
+	- Debugging (guest)
+		> sudo pip install pdbpp #upgrade pdb so it is nice and does tab completion and colours
 		- add the following to ~/.pdbrc:
 			import os
 			os.system("stty sane") #refresh the terminal - entr disables keyboard echoing
 		- darken the yellow colour in terminal, it's hard to read otherwise
+	- Debugging (host, Ubuntu 18.04)
+		- This allows us to debug custom elements in Qt Designer when run from the command line.
+		> sudo apt install python3-pip
+		> sudo pip3 install pdbpp #upgrade pdb so it is nice and does tab completion and colours
 	- Stop guest Debian from turning off the virtual monitor (blanking the screen). Add to .xinitrc and (if desired) log out and in again to reload the settings.
 		xset dpms 0 0 0    # disable DPMS (Energy Star) features.
 		xset s off         # don't activate screensaver
