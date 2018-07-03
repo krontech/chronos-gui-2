@@ -1,6 +1,6 @@
 from PyQt5 import uic, QtWidgets, QtCore
 
-from debugger import dbg, brk; dbg, brk
+from debugger import *; dbg
 #import api
 
 

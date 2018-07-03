@@ -2,7 +2,7 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 
-from debugger import dbg, brk; dbg, brk
+from debugger import *; dbg
 
 from random import randint
 

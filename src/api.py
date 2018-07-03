@@ -7,7 +7,7 @@ print(api.control('get_video_settings'))
 """
 
 import sys
-from debugger import dbg, brk; dbg, brk
+from debugger import *; dbg
 
 from PyQt5.QtCore import pyqtSlot, QObject
 from PyQt5.QtDBus import QDBusConnection, QDBusInterface, QDBusReply

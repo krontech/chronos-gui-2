@@ -11,7 +11,7 @@ See readme.md for more details.
 
 # General imports
 import sys
-from debugger import dbg, brk; dbg, brk
+from debugger import *; dbg
 
 # QT-specific imports
 from PyQt5 import QtWidgets, QtCore, QtGui

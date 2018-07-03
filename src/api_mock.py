@@ -20,7 +20,7 @@ is exceptionally hard to add new calls to.
 
 import sys
 import random
-from debugger import dbg, brk; dbg, brk
+from debugger import *; dbg
 
 from PyQt5.QtCore import pyqtSlot, QObject, QTimer
 from PyQt5.QtDBus import QDBusConnection, QDBusInterface, QDBusReply, QDBusMessage

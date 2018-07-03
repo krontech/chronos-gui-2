@@ -1,4 +1,4 @@
-from debugger import dbg, brk; dbg, brk
+from debugger import *; dbg
 
 from PyQt5 import QtWidgets
 
