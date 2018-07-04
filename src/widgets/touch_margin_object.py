@@ -5,7 +5,11 @@ from random import randint
 from debugger import dbg, brk; dbg, brk
 
 
-class TouchMarginObject(object):
+class MarginWidth:
+		none, half, full = range(3)
+
+
+class TouchMarginObject(MarginWidth):
 	"""Add 20px margins to a Qt Widget.
 	
 	This makes it much easier to press the widget on a touchscreen.
@@ -21,26 +25,19 @@ class TouchMarginObject(object):
 		
 	"""
 	
-	class MarginWidth:
-		none, half, full = range(3)
-		
 	Q_ENUMS(MarginWidth)
 	
-	none, half, full = range(3) #Must duplicate MarginWidth because QT Designer produces files which try to load it off the base Button.
-	
 	def __init__(self, inEditor=False):
-		print('super called', self, inEditor)
-		
 		self.inEditor = inEditor
 		self._originalStyleSheet = self.styleSheet()
 		
 		# Invisible margin to make clicking on buttons easier. When placing
 		# buttons, it's important to make sure the margin isn't on top of other
 		# elements.
-		self._clickMarginLeft = TouchMarginObject.MarginWidth.full
-		self._clickMarginRight = TouchMarginObject.MarginWidth.full
-		self._clickMarginTop = TouchMarginObject.MarginWidth.full
-		self._clickMarginBottom = TouchMarginObject.MarginWidth.full
+		self._clickMarginLeft = MarginWidth.full
+		self._clickMarginRight = MarginWidth.full
+		self._clickMarginTop = MarginWidth.full
+		self._clickMarginBottom = MarginWidth.full
 		
 		self._clickMarginColor = f"rgba({randint(0, 32)}, {randint(0, 32)}, {randint(128, 255)}, {randint(32,96)})"
 		

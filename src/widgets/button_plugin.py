@@ -31,10 +31,15 @@ class ButtonPlugin(QPyDesignerCustomWidgetPlugin):
 		return QIcon(QPixmap("../../assets/images/qt_creator_icons/button.svg"))
 
 	def toolTip(self):
-		return "chronos standard button"
+		return """A button with adjustable margins.
+		
+Margins are displayed in Qt Designer so we can work with them. They
+are hidden in the app itself, but they are still clickable. This is
+important to maximize touch area, which makes the buttons much more
+clickable."""
 
 	def whatsThis(self):
-		return self.toolTip() # ¯\_(ツ)_/¯
+		return self.toolTip() # ¯\_(ツ)_/¯ I have no idea how to trigger this.
 
 	def isContainer(self):
 		return False

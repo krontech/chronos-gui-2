@@ -4,15 +4,11 @@ from PyQt5.QtWidgets import *
 
 from debugger import *; dbg
 
-from touch_margin_object import TouchMarginObject
+from touch_margin_object import TouchMarginObject, MarginWidth
 
 
 class Button(QPushButton, TouchMarginObject):
-	
-	class MarginWidth:
-		none, half, full = range(3)
-		
-	Q_ENUMS(MarginWidth)
+	Q_ENUMS(MarginWidth) #This is needed here. I don't know why the definition in the TouchMarginObject doesn't work.
 	
 	def __init__(self, parent=None, inEditor=False):
 		super().__init__(parent, inEditor=inEditor)
