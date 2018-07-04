@@ -7,7 +7,7 @@ from button import Button
 class ButtonPlugin(QPyDesignerCustomWidgetPlugin):
 
 	def __init__(self, parent=None):
-		super(ButtonPlugin, self).__init__(parent)
+		super().__init__(parent)
 
 		self.initialized = False
 
