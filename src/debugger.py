@@ -4,7 +4,7 @@ Both the provided dbg() and brk() calls are the same, calling up an interactive
 command line.
 
 Example:
-	from debugger import *; dbgdbg, brk
+	from debugger import *; dbg
 	dbg()
 """
 
@@ -21,7 +21,6 @@ sys.excepthook = lambda t, v, tb: (
 )
 
 
-@pdb.hideframe #Provided by pdbpp, which also gives colour and nice tab-completion.
 def brk():
 	"""Start an interactive debugger at the callsite."""
 	
@@ -29,6 +28,10 @@ def brk():
 	pdb.set_trace()
 	# QtCore.pyqtRestoreInputHook() #Hm, can't restore input here - since we hid this frame, I think execution continues until the end of the function. Perhaps we can subclass and call setup()? Just run it manually for now.
 
+# @pdb.hideframe #Provided by pdbpp, which also gives colour and nice tab-completion.
+# pdbpp segfaults Designer on my desktop computer, but works on my laptop so we'll only use it if available.
+if hasattr(pdb, 'hideframe'):
+	brk = pdb.hideframe(brk)
 
 dbg = brk #I keep using one or the other. Either should probably work, let's make debugging easy on ourselves.
 
