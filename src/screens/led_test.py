@@ -8,7 +8,7 @@ from debugger import *; dbg
 class LedTest(QtWidgets.QDialog):
 	def __init__(self, window):
 		super(LedTest, self).__init__()
-		uic.loadUi('src/screens/led_test.ui', self) #Maybe load f"assets/layouts/{self.__module__}.ui" in the future? Right now, it is clearer to load the files as named by the original camApp because we will need to reference them in both places.
+		uic.loadUi('src/screens/widget_test.ui', self) #Maybe load f"assets/layouts/{self.__module__}.ui" in the future? Right now, it is clearer to load the files as named by the original camApp because we will need to reference them in both places.
 		
 		# Panel init.
 		self.move(0, 0)

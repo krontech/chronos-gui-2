@@ -1,0 +1,231 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Form</class>
+ <widget class="QWidget" name="Form">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>800</width>
+    <height>480</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <widget class="White" name="white">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>181</width>
+     <height>481</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="HeaderLabel" name="headerlabel">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>10</y>
+     <width>141</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Test Screen</string>
+   </property>
+  </widget>
+  <widget class="Button" name="button">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>60</y>
+     <width>181</width>
+     <height>81</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>A Button</string>
+   </property>
+  </widget>
+  <widget class="CheckBox" name="checkbox">
+   <property name="geometry">
+    <rect>
+     <x>180</x>
+     <y>60</y>
+     <width>181</width>
+     <height>81</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>A Checkbox</string>
+   </property>
+  </widget>
+  <widget class="DecimalSpinBox" name="decimalspinbox">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>140</y>
+     <width>181</width>
+     <height>81</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="SpinBox" name="spinbox">
+   <property name="geometry">
+    <rect>
+     <x>180</x>
+     <y>140</y>
+     <width>181</width>
+     <height>81</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="Label" name="label">
+   <property name="geometry">
+    <rect>
+     <x>200</x>
+     <y>40</y>
+     <width>141</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>just a label</string>
+   </property>
+  </widget>
+  <widget class="RadioButton" name="radiobutton">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>220</y>
+     <width>181</width>
+     <height>81</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>A Radio B&amp;tn</string>
+   </property>
+  </widget>
+  <widget class="ScrollBar" name="scrollbar">
+   <property name="geometry">
+    <rect>
+     <x>690</x>
+     <y>120</y>
+     <width>81</width>
+     <height>201</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="Label" name="label_2">
+   <property name="geometry">
+    <rect>
+     <x>690</x>
+     <y>320</y>
+     <width>81</width>
+     <height>81</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">font-size: 12px;
+		</string>
+   </property>
+   <property name="text">
+    <string>some odd %</string>
+   </property>
+  </widget>
+  <widget class="White" name="white_2">
+   <property name="geometry">
+    <rect>
+     <x>180</x>
+     <y>300</y>
+     <width>621</width>
+     <height>181</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="White" name="white_3">
+   <property name="geometry">
+    <rect>
+     <x>180</x>
+     <y>0</y>
+     <width>181</width>
+     <height>221</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="White" name="white_4">
+   <property name="geometry">
+    <rect>
+     <x>360</x>
+     <y>0</y>
+     <width>441</width>
+     <height>301</height>
+    </rect>
+   </property>
+  </widget>
+  <zorder>white_2</zorder>
+  <zorder>white</zorder>
+  <zorder>white_3</zorder>
+  <zorder>white_4</zorder>
+  <zorder>headerlabel</zorder>
+  <zorder>button</zorder>
+  <zorder>checkbox</zorder>
+  <zorder>decimalspinbox</zorder>
+  <zorder>spinbox</zorder>
+  <zorder>label</zorder>
+  <zorder>radiobutton</zorder>
+  <zorder>scrollbar</zorder>
+  <zorder>label_2</zorder>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>Button</class>
+   <extends>QPushButton</extends>
+   <header>button</header>
+  </customwidget>
+  <customwidget>
+   <class>CheckBox</class>
+   <extends>QCheckBox</extends>
+   <header>check_box</header>
+  </customwidget>
+  <customwidget>
+   <class>DecimalSpinBox</class>
+   <extends>QDoubleSpinBox</extends>
+   <header>decimal_spin_box</header>
+  </customwidget>
+  <customwidget>
+   <class>HeaderLabel</class>
+   <extends>QLabel</extends>
+   <header>header_label</header>
+  </customwidget>
+  <customwidget>
+   <class>Label</class>
+   <extends>QLabel</extends>
+   <header>label</header>
+  </customwidget>
+  <customwidget>
+   <class>RadioButton</class>
+   <extends>QRadioButton</extends>
+   <header>radio_button</header>
+  </customwidget>
+  <customwidget>
+   <class>ScrollBar</class>
+   <extends>QScrollBar</extends>
+   <header>scroll_bar</header>
+  </customwidget>
+  <customwidget>
+   <class>SpinBox</class>
+   <extends>QSpinBox</extends>
+   <header>spin_box</header>
+  </customwidget>
+  <customwidget>
+   <class>White</class>
+   <extends>QLabel</extends>
+   <header>white</header>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>
