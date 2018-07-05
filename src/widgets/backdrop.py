@@ -5,7 +5,7 @@ from PyQt5.QtWidgets import *
 from debugger import *; dbg
 
 
-class White(QLabel):
+class Backdrop(QLabel):
 	def __init__(self, parent=None, inEditor=False):
 		super().__init__(parent)
 		

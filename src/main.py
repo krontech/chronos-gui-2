@@ -68,7 +68,7 @@ class Window():
 		from screens.trigger_delay import TriggerDelay
 		from screens.trigger_settings import TriggerSettings
 		from screens.settings import Settings
-		from screens.led_test import LedTest #Responsible for "QFont::setPointSize: Point size <= 0 (-1), must be greater than 0"
+		from screens.widget_test import WidgetTest #Responsible for "QFont::setPointSize: Point size <= 0 (-1), must be greater than 0"
 		
 		self._screens = {
 			'main': Main(self),
@@ -77,7 +77,7 @@ class Window():
 			'trigger delay': TriggerDelay(self),
 			'trigger settings': TriggerSettings(self),
 			'settings': Settings(self),
-			'led_test': LedTest(self),
+			'widget_test': WidgetTest(self),
 		}
 		
 		# Set the initial screen. If in dev mode, due to the frequent restarts,
@@ -85,7 +85,7 @@ class Window():
 		# open the main screen when rebooting to provide an escape route for a
 		# confusing or broken screen.
 		
-		# settings.setValue('current screen', 'led_test')
+		# settings.setValue('current screen', 'widget_test')
 		
 		if settings.value('development mode', True):
 			self.currentScreen = settings.value('current screen', 'main')

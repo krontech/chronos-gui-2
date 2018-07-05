@@ -39,7 +39,9 @@ class TouchMarginObject(MarginWidth):
 		self._clickMarginTop = MarginWidth.full
 		self._clickMarginBottom = MarginWidth.full
 		
-		self._clickMarginColor = f"rgba({randint(0, 32)}, {randint(0, 32)}, {randint(128, 255)}, {randint(32,96)})"
+		if not hasattr(self, '_clickMarginColor'):
+			# self._clickMarginColor = f"rgba({randint(0, 32)}, {randint(0, 32)}, {randint(128, 255)}, {randint(32,96)})"
+			self._clickMarginColor = f"rgba({randint(128, 255)}, {randint(128, 255)}, {randint(128, 255)}, {randint(32,96)})"
 		
 		self.refreshStyle()
 		

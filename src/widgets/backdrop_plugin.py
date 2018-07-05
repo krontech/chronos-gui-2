@@ -1,10 +1,10 @@
 from PyQt5.QtGui import QIcon, QPixmap
 from PyQt5.QtDesigner import QPyDesignerCustomWidgetPlugin
 
-from white import White
+from backdrop import Backdrop
 
 
-class WhitePlugin(QPyDesignerCustomWidgetPlugin):
+class BackdropPlugin(QPyDesignerCustomWidgetPlugin):
 
 	def __init__(self, parent=None):
 		super().__init__(parent)
@@ -19,10 +19,10 @@ class WhitePlugin(QPyDesignerCustomWidgetPlugin):
 		return self.initialized
 
 	def createWidget(self, parent):
-		return White(parent, inEditor=True)
+		return Backdrop(parent, inEditor=True)
 
 	def name(self):
-		return "White"
+		return "Backdrop"
 
 	def group(self):
 		return "Chronos"
@@ -46,4 +46,4 @@ which is why we don't just use a plain widget styled white here."""
 		return False #No subwidgets. This is just background paneling. 
 
 	def includeFile(self):
-		return "white"
+		return "backdrop"

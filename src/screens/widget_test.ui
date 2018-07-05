@@ -13,7 +13,7 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <widget class="White" name="white">
+  <widget class="Backdrop" name="white">
    <property name="geometry">
     <rect>
      <x>0</x>
@@ -135,7 +135,7 @@
     <string>some odd %</string>
    </property>
   </widget>
-  <widget class="White" name="white_2">
+  <widget class="Backdrop" name="white_2">
    <property name="geometry">
     <rect>
      <x>180</x>
@@ -145,7 +145,7 @@
     </rect>
    </property>
   </widget>
-  <widget class="White" name="white_3">
+  <widget class="Backdrop" name="white_3">
    <property name="geometry">
     <rect>
      <x>180</x>
@@ -155,7 +155,7 @@
     </rect>
    </property>
   </widget>
-  <widget class="White" name="white_4">
+  <widget class="Backdrop" name="white_4">
    <property name="geometry">
     <rect>
      <x>360</x>
@@ -221,9 +221,9 @@
    <header>spin_box</header>
   </customwidget>
   <customwidget>
-   <class>White</class>
+   <class>Backdrop</class>
    <extends>QLabel</extends>
-   <header>white</header>
+   <header>backdrop</header>
   </customwidget>
  </customwidgets>
  <resources/>

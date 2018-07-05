@@ -14,13 +14,13 @@ class Button(QPushButton, TouchMarginObject):
 		super().__init__(parent, inEditor=inEditor)
 		
 		if self.inEditor:
-			self.setStyleSheet(f"""
+			self.setStyleSheet("""
 				/* Editor style. Use border to show were click margin is, so we don't mess it up during layout. */
 				font-size: 16px;
 				background: white;
 			""" + self.styleSheet())
 		else:
-			self.setStyleSheet(f"""
+			self.setStyleSheet("""
 				/* App style. Use margin to provide further click area outside the visual button. */
 				font-size: 16px;
 				background: white;
