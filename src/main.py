@@ -85,7 +85,7 @@ class Window():
 		# open the main screen when rebooting to provide an escape route for a
 		# confusing or broken screen.
 		
-		# settings.setValue('current screen', 'widget_test')
+		#settings.setValue('current screen', 'widget_test')
 		
 		if settings.value('development mode', True):
 			self.currentScreen = settings.value('current screen', 'main')
