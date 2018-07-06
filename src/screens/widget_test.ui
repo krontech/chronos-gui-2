@@ -178,6 +178,31 @@
     <string>void</string>
    </property>
   </widget>
+  <widget class="ComboBox" name="combobox">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>300</y>
+     <width>181</width>
+     <height>81</height>
+    </rect>
+   </property>
+   <item>
+    <property name="text">
+     <string extracomment="comment 1">test 1</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>test 2</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>test 3</string>
+    </property>
+   </item>
+  </widget>
   <zorder>white_2</zorder>
   <zorder>white</zorder>
   <zorder>white_3</zorder>
@@ -192,6 +217,7 @@
   <zorder>scrollbar</zorder>
   <zorder>label_2</zorder>
   <zorder>label_3</zorder>
+  <zorder>combobox</zorder>
  </widget>
  <customwidgets>
   <customwidget>
@@ -208,6 +234,11 @@
    <class>CheckBox</class>
    <extends>QCheckBox</extends>
    <header>check_box</header>
+  </customwidget>
+  <customwidget>
+   <class>ComboBox</class>
+   <extends>QComboBox</extends>
+   <header>combo_box</header>
   </customwidget>
   <customwidget>
    <class>DecimalSpinBox</class>
