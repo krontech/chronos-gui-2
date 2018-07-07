@@ -28,7 +28,7 @@ class LabelPlugin(QPyDesignerCustomWidgetPlugin):
 		return "Chronos"
 
 	def icon(self):
-		return QIcon(QPixmap("../../assets/images/qt_creator_icons/button.svg"))
+		return QIcon(QPixmap("../../assets/qt_creator/label.svg"))
 
 	def toolTip(self):
 		return """A textual label in the Chronos style."""

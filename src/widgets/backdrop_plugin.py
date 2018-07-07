@@ -28,7 +28,7 @@ class BackdropPlugin(QPyDesignerCustomWidgetPlugin):
 		return "Chronos"
 
 	def icon(self):
-		return QIcon(QPixmap("../../assets/images/qt_creator_icons/button.svg"))
+		return QIcon(QPixmap("../../assets/qt_creator/backdrop.svg"))
 
 	def toolTip(self):
 		return """A white panel, to cover the video presentation layer when needed.

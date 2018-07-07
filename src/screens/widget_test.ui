@@ -18,7 +18,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>181</width>
+     <width>201</width>
      <height>481</height>
     </rect>
    </property>
@@ -138,44 +138,31 @@
   <widget class="Backdrop" name="white_2">
    <property name="geometry">
     <rect>
-     <x>180</x>
-     <y>300</y>
-     <width>621</width>
-     <height>181</height>
+     <x>200</x>
+     <y>280</y>
+     <width>601</width>
+     <height>201</height>
     </rect>
    </property>
   </widget>
   <widget class="Backdrop" name="white_3">
    <property name="geometry">
     <rect>
-     <x>180</x>
+     <x>200</x>
      <y>0</y>
-     <width>181</width>
-     <height>221</height>
+     <width>141</width>
+     <height>241</height>
     </rect>
    </property>
   </widget>
   <widget class="Backdrop" name="white_4">
    <property name="geometry">
     <rect>
-     <x>360</x>
+     <x>340</x>
      <y>0</y>
-     <width>441</width>
-     <height>301</height>
+     <width>461</width>
+     <height>281</height>
     </rect>
-   </property>
-  </widget>
-  <widget class="Label" name="label_3">
-   <property name="geometry">
-    <rect>
-     <x>190</x>
-     <y>220</y>
-     <width>141</width>
-     <height>31</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>void</string>
    </property>
   </widget>
   <widget class="ComboBox" name="combobox">
@@ -203,6 +190,19 @@
     </property>
    </item>
   </widget>
+  <widget class="Label" name="label_4">
+   <property name="geometry">
+    <rect>
+     <x>200</x>
+     <y>240</y>
+     <width>141</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>hole</string>
+   </property>
+  </widget>
   <zorder>white_2</zorder>
   <zorder>white</zorder>
   <zorder>white_3</zorder>
@@ -216,8 +216,8 @@
   <zorder>radiobutton</zorder>
   <zorder>scrollbar</zorder>
   <zorder>label_2</zorder>
-  <zorder>label_3</zorder>
   <zorder>combobox</zorder>
+  <zorder>label_4</zorder>
  </widget>
  <customwidgets>
   <customwidget>

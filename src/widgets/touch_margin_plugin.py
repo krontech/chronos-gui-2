@@ -21,7 +21,7 @@ class TouchMarginPlugin(MarginWidth):
 		margins are changed. (note: This could - and perhaps should - be
 		switched to a getter/setter so it's less intrusive, but since I don't
 		think we'll be doing a lot of work at the level where that would
-		matter it's better to keep it clearer and use another identifier.
+		matter it's better to keep it clearer and use another identifier.)
 		
 	"""
 	
@@ -39,10 +39,9 @@ class TouchMarginPlugin(MarginWidth):
 		self._clickMarginTop = MarginWidth.full
 		self._clickMarginBottom = MarginWidth.full
 		
-		if not hasattr(self, '_clickMarginColor'):
-			# self._clickMarginColor = f"rgba({randint(0, 32)}, {randint(0, 32)}, {randint(128, 255)}, {randint(32,96)})"
-			colour = randint(128, 255)
-			self._clickMarginColor = f"rgba({colour}, {colour}, {colour}, {randint(32,96)})"
+		# self._clickMarginColor = f"rgba({randint(0, 32)}, {randint(0, 32)}, {randint(128, 255)}, {randint(32,96)})"
+		colour = randint(100, 227)
+		self._clickMarginColor = f"rgba({colour}, {colour}, {colour}, {randint(32,96)})"
 		
 		
 	def refreshStyle(self):
@@ -94,3 +93,13 @@ class TouchMarginPlugin(MarginWidth):
 	def clickMarginBottomSetter(self, state):
 		self._clickMarginBottom = state
 		self.refreshStyle()
+	
+	
+	def clickMarginColorGetter(self):
+		return self._clickMarginColor
+	
+	def clickMarginColorSetter(self, state):
+		self._clickMarginColor = state
+		self.refreshStyle()
+		
+	clickMarginColor = property(clickMarginColorGetter, clickMarginColorSetter)

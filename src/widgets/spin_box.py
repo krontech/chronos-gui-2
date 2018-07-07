@@ -1,9 +1,10 @@
+from random import randint
+
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 
 from debugger import *; dbg
-
 from touch_margin_plugin import TouchMarginPlugin, MarginWidth
 
 
@@ -12,11 +13,11 @@ class SpinBox(QSpinBox, TouchMarginPlugin):
 	
 	def __init__(self, parent=None, inEditor=False):
 		super().__init__(parent, inEditor=inEditor)
-		self.refreshStyle()
+		self.clickMarginColor = f"rgba({randint(0, 32)}, {randint(128, 255)}, {randint(128, 255)}, {randint(32,96)})"
 
 
 	def sizeHint(self):
-		return QSize(181, 81)
+		return QSize(221, 81)
 	
 	
 	def refreshStyle(self):
@@ -27,23 +28,48 @@ class SpinBox(QSpinBox, TouchMarginPlugin):
 				background: white;
 				
 				/* use borders instead of margins so we can see what we're doing */
-				border-left:   {self.clickMarginLeft   * 10 + 1}px solid {self._clickMarginColor};
-				border-right:  {self.clickMarginRight  * 10 + 1}px solid {self._clickMarginColor};
-				border-top:    {self.clickMarginTop    * 10 + 1}px solid {self._clickMarginColor};
-				border-bottom: {self.clickMarginBottom * 10 + 1}px solid {self._clickMarginColor};
+				border-left:   {self.clickMarginLeft   * 10 + 1}px solid {self.clickMarginColor};
+				border-right:  {self.clickMarginRight  * 10 + 1}px solid {self.clickMarginColor};
+				border-top:    {self.clickMarginTop    * 10 + 1}px solid {self.clickMarginColor};
+				border-bottom: {self.clickMarginBottom * 10 + 1}px solid {self.clickMarginColor};
 			""" + self.originalStyleSheet())
 		else:
 			self.setStyleSheet(f"""
-				/* App style. Use margin to provide further click area outside the visual button. */
-				font-size: 16px;
-				background: white;
-				border: 1px solid black;
-				border-left-color: rgb(50,50,50);
-				border-top-color: rgb(50,50,50); /* Add a subtle 3d-ness until we figure out drop-shadows. */
-				
-				/* Add some touch space so this widget is easier to press. */
-				margin-left: {self.clickMarginLeft*10}px;
-				margin-right: {self.clickMarginRight*10}px;
-				margin-top: {self.clickMarginTop*10}px;
-				margin-bottom: {self.clickMarginBottom*10}px;
+				SpinBox {{ 
+					border: 1px solid black;
+					padding-right: 40px;
+					padding-left: 10px;
+					font-size: 16px;
+					
+					/* Add some touch space so this widget is easier to press. */
+					margin-left: {self.clickMarginLeft*10}px;
+					margin-right: {self.clickMarginRight*10}px;
+					margin-top: {self.clickMarginTop*10}px;
+					margin-bottom: {self.clickMarginBottom*10}px;
+				}}
+				SpinBox:disabled {{ 
+					color: #969696;
+				}}
+				SpinBox::up-button {{ 
+					subcontrol-position: right; 
+					right: 40px; 
+					image: url(assets/images/wedge-up-enabled.png);
+				}}
+				SpinBox::up-button:disabled {{ 
+					image: url(assets/images/wedge-up-disabled.png);
+				}}
+				SpinBox::down-button {{ 
+					subcontrol-position: right; 
+					image: url(assets/images/wedge-down-enabled.png);
+				}}
+				SpinBox::down-button:disabled {{ 
+					subcontrol-position: right; 
+					image: url(assets/images/wedge-down-disabled.png);
+				}}
+				SpinBox::up-button, SpinBox::down-button {{
+					border: 0px solid black;
+					border-left-width: 1px;
+					width: 40px; 
+					height: 40px;
+				}}
 			""" + self.originalStyleSheet())
