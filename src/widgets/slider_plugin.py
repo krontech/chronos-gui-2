@@ -1,10 +1,10 @@
 from PyQt5.QtGui import QIcon, QPixmap
 from PyQt5.QtDesigner import QPyDesignerCustomWidgetPlugin
 
-from scroll_bar import ScrollBar
+from slider import Slider
 
 
-class ScrollBarPlugin(QPyDesignerCustomWidgetPlugin):
+class SliderPlugin(QPyDesignerCustomWidgetPlugin):
 
 	def __init__(self, parent=None):
 		super().__init__(parent)
@@ -19,19 +19,21 @@ class ScrollBarPlugin(QPyDesignerCustomWidgetPlugin):
 		return self.initialized
 
 	def createWidget(self, parent):
-		return ScrollBar(parent, inEditor=True)
+		return Slider(parent, inEditor=True)
 
 	def name(self):
-		return "ScrollBar"
+		return "Slider"
 
 	def group(self):
 		return "Chronos"
 
 	def icon(self):
-		return QIcon(QPixmap("../../assets/qt_creator/scroll_bar.svg"))
+		return QIcon(QPixmap("../../assets/qt_creator/slider.svg"))
 
 	def toolTip(self):
-		return """A scroll bar with adjustable margins.
+		return """A slider with adjustable margins.
+
+Not to be confused with a scroll bar, which is for scrolling content.
 		
 Margins are displayed in Qt Designer so we can work with them. They
 are hidden in the app itself, but they are still clickable. This is
@@ -45,4 +47,4 @@ more clickable."""
 		return False
 
 	def includeFile(self):
-		return "scroll_bar"
+		return "slider"

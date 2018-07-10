@@ -48,6 +48,18 @@
    <property name="text">
     <string>A Button</string>
    </property>
+   <property name="clickMarginLeftSetter" stdset="0">
+    <enum>Button::full</enum>
+   </property>
+   <property name="clickMarginRightSetter" stdset="0">
+    <enum>Button::full</enum>
+   </property>
+   <property name="clickMarginTopSetter" stdset="0">
+    <enum>Button::full</enum>
+   </property>
+   <property name="clickMarginBottomSetter" stdset="0">
+    <enum>Button::full</enum>
+   </property>
   </widget>
   <widget class="CheckBox" name="checkbox">
    <property name="geometry">
@@ -61,6 +73,18 @@
    <property name="text">
     <string>A Checkbox</string>
    </property>
+   <property name="clickMarginLeftSetter" stdset="0">
+    <enum>CheckBox::full</enum>
+   </property>
+   <property name="clickMarginRightSetter" stdset="0">
+    <enum>CheckBox::full</enum>
+   </property>
+   <property name="clickMarginTopSetter" stdset="0">
+    <enum>CheckBox::full</enum>
+   </property>
+   <property name="clickMarginBottomSetter" stdset="0">
+    <enum>CheckBox::full</enum>
+   </property>
   </widget>
   <widget class="DecimalSpinBox" name="decimalspinbox">
    <property name="geometry">
@@ -70,6 +94,18 @@
      <width>181</width>
      <height>81</height>
     </rect>
+   </property>
+   <property name="clickMarginLeftSetter" stdset="0">
+    <enum>DecimalSpinBox::full</enum>
+   </property>
+   <property name="clickMarginRightSetter" stdset="0">
+    <enum>DecimalSpinBox::full</enum>
+   </property>
+   <property name="clickMarginTopSetter" stdset="0">
+    <enum>DecimalSpinBox::full</enum>
+   </property>
+   <property name="clickMarginBottomSetter" stdset="0">
+    <enum>DecimalSpinBox::full</enum>
    </property>
   </widget>
   <widget class="SpinBox" name="spinbox">
@@ -81,13 +117,25 @@
      <height>81</height>
     </rect>
    </property>
+   <property name="clickMarginLeftSetter" stdset="0">
+    <enum>SpinBox::full</enum>
+   </property>
+   <property name="clickMarginRightSetter" stdset="0">
+    <enum>SpinBox::full</enum>
+   </property>
+   <property name="clickMarginTopSetter" stdset="0">
+    <enum>SpinBox::full</enum>
+   </property>
+   <property name="clickMarginBottomSetter" stdset="0">
+    <enum>SpinBox::full</enum>
+   </property>
   </widget>
   <widget class="Label" name="label">
    <property name="geometry">
     <rect>
-     <x>200</x>
+     <x>210</x>
      <y>40</y>
-     <width>141</width>
+     <width>91</width>
      <height>21</height>
     </rect>
    </property>
@@ -107,8 +155,20 @@
    <property name="text">
     <string>A Radio B&amp;tn</string>
    </property>
+   <property name="clickMarginLeftSetter" stdset="0">
+    <enum>RadioButton::full</enum>
+   </property>
+   <property name="clickMarginRightSetter" stdset="0">
+    <enum>RadioButton::full</enum>
+   </property>
+   <property name="clickMarginTopSetter" stdset="0">
+    <enum>RadioButton::full</enum>
+   </property>
+   <property name="clickMarginBottomSetter" stdset="0">
+    <enum>RadioButton::full</enum>
+   </property>
   </widget>
-  <widget class="ScrollBar" name="scrollbar">
+  <widget class="Slider" name="slider">
    <property name="geometry">
     <rect>
      <x>690</x>
@@ -174,6 +234,18 @@
      <height>81</height>
     </rect>
    </property>
+   <property name="clickMarginLeftSetter" stdset="0">
+    <enum>ComboBox::full</enum>
+   </property>
+   <property name="clickMarginRightSetter" stdset="0">
+    <enum>ComboBox::full</enum>
+   </property>
+   <property name="clickMarginTopSetter" stdset="0">
+    <enum>ComboBox::full</enum>
+   </property>
+   <property name="clickMarginBottomSetter" stdset="0">
+    <enum>ComboBox::full</enum>
+   </property>
    <item>
     <property name="text">
      <string extracomment="comment 1">test 1</string>
@@ -193,14 +265,54 @@
   <widget class="Label" name="label_4">
    <property name="geometry">
     <rect>
-     <x>200</x>
+     <x>210</x>
      <y>240</y>
-     <width>141</width>
+     <width>51</width>
      <height>41</height>
     </rect>
    </property>
    <property name="text">
     <string>hole</string>
+   </property>
+  </widget>
+  <widget class="Button" name="button_2">
+   <property name="geometry">
+    <rect>
+     <x>370</x>
+     <y>70</y>
+     <width>161</width>
+     <height>61</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="Button" name="button_3">
+   <property name="geometry">
+    <rect>
+     <x>370</x>
+     <y>130</y>
+     <width>161</width>
+     <height>61</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="Button" name="button_4">
+   <property name="geometry">
+    <rect>
+     <x>530</x>
+     <y>70</y>
+     <width>111</width>
+     <height>61</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="Button" name="button_5">
+   <property name="geometry">
+    <rect>
+     <x>530</x>
+     <y>130</y>
+     <width>111</width>
+     <height>61</height>
+    </rect>
    </property>
   </widget>
   <zorder>white_2</zorder>
@@ -214,10 +326,14 @@
   <zorder>spinbox</zorder>
   <zorder>label</zorder>
   <zorder>radiobutton</zorder>
-  <zorder>scrollbar</zorder>
+  <zorder>slider</zorder>
   <zorder>label_2</zorder>
   <zorder>combobox</zorder>
   <zorder>label_4</zorder>
+  <zorder>button_2</zorder>
+  <zorder>button_3</zorder>
+  <zorder>button_4</zorder>
+  <zorder>button_5</zorder>
  </widget>
  <customwidgets>
   <customwidget>
@@ -261,9 +377,9 @@
    <header>radio_button</header>
   </customwidget>
   <customwidget>
-   <class>ScrollBar</class>
-   <extends>QScrollBar</extends>
-   <header>scroll_bar</header>
+   <class>Slider</class>
+   <extends>QSlider</extends>
+   <header>slider</header>
   </customwidget>
   <customwidget>
    <class>SpinBox</class>
