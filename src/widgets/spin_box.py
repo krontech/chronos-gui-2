@@ -23,15 +23,45 @@ class SpinBox(QSpinBox, TouchMarginPlugin):
 	def refreshStyle(self):
 		if self.inEditor:
 			self.setStyleSheet(f"""
-				/* Editor style. Use border to show were click margin is, so we don't mess it up during layout. */
-				font-size: 16px;
-				background: white;
-				
-				/* use borders instead of margins so we can see what we're doing */
-				border-left:   {self.clickMarginLeft   * 10 + 1}px solid {self.clickMarginColor};
-				border-right:  {self.clickMarginRight  * 10 + 1}px solid {self.clickMarginColor};
-				border-top:    {self.clickMarginTop    * 10 + 1}px solid {self.clickMarginColor};
-				border-bottom: {self.clickMarginBottom * 10 + 1}px solid {self.clickMarginColor};
+				SpinBox {{
+					/* Editor style. Use border to show were click margin is, so we don't mess it up during layout. */
+					font-size: 16px;
+					border: 1px solid black;
+					padding-right: 40px;
+					padding-left: 10px;
+					background: transparent;
+					
+					/* use borders instead of margins so we can see what we're doing */
+					border-left:   {self.clickMarginLeft   * 10 + 1}px solid {self.clickMarginColor};
+					border-right:  {self.clickMarginRight  * 10 + 1}px solid {self.clickMarginColor};
+					border-top:    {self.clickMarginTop    * 10 + 1}px solid {self.clickMarginColor};
+					border-bottom: {self.clickMarginBottom * 10 + 1}px solid {self.clickMarginColor};
+				}}
+				SpinBox:disabled {{ 
+					color: #969696;
+				}}
+				SpinBox::up-button {{ 
+					subcontrol-position: right; 
+					right: 40px; 
+					image: url(../../assets/images/wedge-up-enabled.png);
+				}}
+				SpinBox::up-button:disabled {{ 
+					image: url(../../assets/images/wedge-up-disabled.png);
+				}}
+				SpinBox::down-button {{ 
+					subcontrol-position: right; 
+					image: url(../../assets/images/wedge-down-enabled.png);
+				}}
+				SpinBox::down-button:disabled {{ 
+					subcontrol-position: right; 
+					image: url(../../assets/images/wedge-down-disabled.png);
+				}}
+				SpinBox::up-button, SpinBox::down-button {{
+					border: 0px solid black;
+					border-left-width: 1px;
+					width: 40px; 
+					height: 40px;
+				}}
 			""" + self.originalStyleSheet())
 		else:
 			self.setStyleSheet(f"""
@@ -40,6 +70,7 @@ class SpinBox(QSpinBox, TouchMarginPlugin):
 					padding-right: 40px;
 					padding-left: 10px;
 					font-size: 16px;
+					background: transparent;
 					
 					/* Add some touch space so this widget is easier to press. */
 					margin-left: {self.clickMarginLeft*10}px;

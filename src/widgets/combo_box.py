@@ -14,8 +14,8 @@ class ComboBox(QComboBox, TouchMarginPlugin):
 	def __init__(self, parent=None, inEditor=False):
 		super().__init__(parent, inEditor=inEditor)
 		self.clickMarginColor = f"rgba({randint(128, 255)}, {randint(0, 32)}, {randint(0, 32)}, {randint(32,96)})"
-
-
+	
+	
 	def sizeHint(self):
 		return QSize(181, 81)
 	
@@ -23,29 +23,18 @@ class ComboBox(QComboBox, TouchMarginPlugin):
 	def refreshStyle(self):
 		if self.inEditor:
 			self.setStyleSheet(f"""
-				/* Editor style. Use border to show were click margin is, so we don't mess it up during layout. */
-				font-size: 16px;
-				background: white;
-				
-				/* use borders instead of margins so we can see what we're doing */
-				border-left:   {self.clickMarginLeft   * 10 + 1}px solid {self.clickMarginColor};
-				border-right:  {self.clickMarginRight  * 10 + 1}px solid {self.clickMarginColor};
-				border-top:    {self.clickMarginTop    * 10 + 1}px solid {self.clickMarginColor};
-				border-bottom: {self.clickMarginBottom * 10 + 1}px solid {self.clickMarginColor};
-			""" + self.originalStyleSheet())
-		else:
-			self.setStyleSheet(f"""
 				ComboBox {{
-					/*subcontrol-origin: padding; does nothing but mess up the drop-down button*/
-					background: white;
-					border: 1px solid black;
+					/* Editor style. Use border to show were click margin is, so we don't mess it up during layout. */
 					font-size: 16px;
-					/*margin: 10px; breaks drop-down; hard to fix*/
-					margin-left: {self.clickMarginLeft*10}px;
-					margin-right: {self.clickMarginRight*10}px;
-					margin-top: {self.clickMarginTop*10}px;
-					margin-bottom: {self.clickMarginBottom*10}px;
-					/*padding-left: 10px; time to fix it*/
+					background: transparent;
+					
+					/* use borders instead of margins so we can see what we're doing */
+					border-left:   {self.clickMarginLeft   * 10 + 1}px solid {self.clickMarginColor};
+					border-right:  {self.clickMarginRight  * 10 + 1}px solid {self.clickMarginColor};
+					border-top:    {self.clickMarginTop    * 10 + 1}px solid {self.clickMarginColor};
+					border-bottom: {self.clickMarginBottom * 10 + 1}px solid {self.clickMarginColor};
+					
+					padding-left: 10px;
 				}}
 				ComboBox:on {{
 					/*when dropdown exists*/
@@ -65,7 +54,48 @@ class ComboBox(QComboBox, TouchMarginPlugin):
 					width: 40px;
 					border: 0px solid black;
 					border-left-width: 1px;
-					background: white;
+					color: black;
+					max-height: 100px;
+				}}
+				ComboBox::drop-down:on {{
+					/*Stupid hack because the dropdown scrollbar *can't* be increased in width. It's off the width of the drop-down button by -1px. We can't just decrease the width of the drop-down button, because every other button we own is 40px instead of 39px. So. What we do is adjust the button size down when the drop-down is open, because that's the only time the off-by-one with QScrollBar is noticable, and you're distracted by the scrollbar then.*/
+					padding-left: -1px;
+				}}
+				ComboBox::down-arrow {{
+					image: url(../../assets/images/wedge-down-enabled.png);
+				}}
+			""" + self.originalStyleSheet())
+		else:
+			self.setStyleSheet(f"""
+				ComboBox {{
+					/*subcontrol-origin: padding; does nothing but mess up the drop-down button*/
+					font-size: 16px;
+					background: transparent;
+					border: 1px solid black;
+					margin-left: {self.clickMarginLeft*10}px;
+					margin-right: {self.clickMarginRight*10}px;
+					margin-top: {self.clickMarginTop*10}px;
+					margin-bottom: {self.clickMarginBottom*10}px;
+					padding-left: 10px;
+				}}
+				ComboBox:on {{
+					/*when dropdown exists*/
+				}}
+
+				ComboBox QAbstractItemView {{ /*This is the drop-down menu.*/
+					border: 1px solid black;
+					color: black;
+					selection-background-color: grey;
+				}}
+				ComboBox QAbstractItemView::item {{
+					padding: 10px;
+					margin: 5px;
+				}}
+
+				ComboBox::drop-down {{
+					width: 40px;
+					border: 0px solid black;
+					border-left-width: 1px;
 					color: black;
 					max-height: 100px;
 				}}

@@ -22,11 +22,6 @@ class CheckBox(QCheckBox, TouchMarginPlugin):
 		self.refreshStyle()
 		
 		self.setMouseTracking(True)
-		#self.clicked.connect(
-		#	lambda: print(randint(0,10)) )
-		
-		self.clearMask()
-		self.setMouseTracking(True)
 	
 	
 	def mousePressEvent(self, ev):
