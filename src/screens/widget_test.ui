@@ -133,14 +133,14 @@
   <widget class="Label" name="label">
    <property name="geometry">
     <rect>
-     <x>210</x>
-     <y>40</y>
+     <x>390</x>
+     <y>250</y>
      <width>91</width>
      <height>21</height>
     </rect>
    </property>
    <property name="text">
-    <string>just a label</string>
+    <string>label</string>
    </property>
   </widget>
   <widget class="RadioButton" name="radiobutton">
@@ -575,7 +575,7 @@
     <rect>
      <x>530</x>
      <y>130</y>
-     <width>111</width>
+     <width>121</width>
      <height>61</height>
     </rect>
    </property>
@@ -1552,13 +1552,34 @@ so tall</string>
     </property>
    </item>
   </widget>
+  <widget class="Button" name="uiBack">
+   <property name="geometry">
+    <rect>
+     <x>630</x>
+     <y>410</y>
+     <width>171</width>
+     <height>71</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Back</string>
+   </property>
+   <property name="clickMarginLeftSetter" stdset="0">
+    <enum>Button::full</enum>
+   </property>
+   <property name="clickMarginRightSetter" stdset="0">
+    <enum>Button::half</enum>
+   </property>
+   <property name="clickMarginTopSetter" stdset="0">
+    <enum>Button::full</enum>
+   </property>
+  </widget>
   <zorder>white_4</zorder>
   <zorder>combobox_4</zorder>
   <zorder>white_2</zorder>
   <zorder>white</zorder>
   <zorder>white_3</zorder>
   <zorder>headerlabel</zorder>
-  <zorder>button</zorder>
   <zorder>checkbox</zorder>
   <zorder>decimalspinbox</zorder>
   <zorder>spinbox</zorder>
@@ -1575,6 +1596,8 @@ so tall</string>
   <zorder>combobox_2</zorder>
   <zorder>combobox_3</zorder>
   <zorder>slider</zorder>
+  <zorder>uiBack</zorder>
+  <zorder>button</zorder>
  </widget>
  <customwidgets>
   <customwidget>

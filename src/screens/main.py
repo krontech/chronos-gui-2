@@ -22,10 +22,15 @@ class Main(QtWidgets.QDialog):
 		
 		# Button binding.
 		self.cmdDebugWnd.clicked.connect(self.printAnalogGain)
+		self.cmdDebugWnd.clicked.connect(
+			lambda: window.show('widget_test') )
 		self.cmdClose.clicked.connect(QtWidgets.QApplication.closeAllWindows)
-		self.cmdRecSettings.clicked.connect(lambda: window.show('recording settings'))
-		self.cmdIOSettings.clicked.connect(lambda: window.show('trigger settings'))
-		self.cmdUtil.clicked.connect(lambda: window.show('settings'))
+		self.cmdRecSettings.clicked.connect(
+			lambda: window.show('recording settings') )
+		self.cmdIOSettings.clicked.connect(
+			lambda: window.show('trigger settings') )
+		self.cmdUtil.clicked.connect(
+			lambda: window.show('settings') )
 		
 		# Timer for text label update.
 		self._timer = QtCore.QTimer()

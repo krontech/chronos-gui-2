@@ -61,6 +61,7 @@ class TouchMarginPlugin(MarginWidth):
 		
 	@clickMarginLeft.setter
 	def clickMarginLeftSetter(self, state):
+		# We can't adjust the x position of our object to compensate for this, unfortunately, since there's no way to tell if the object is being set via menu or if it's being initialized.
 		self._clickMarginLeft = state
 		self.refreshStyle()
 	
