@@ -8,12 +8,8 @@ import api_mock as api
 class Main(QtWidgets.QDialog):
 	def __init__(self, window):
 		super().__init__()
-		uic.loadUi('src/screens/cammainwindow.ui', self) #Maybe load f"src/screens/{self.__module__}.ui" in the future? Right now, it is clearer to load the files as named by the original camApp because we will need to reference them in both places.
-		
-		self.battery = {
-			"charge": 0.,
-			"voltage": 0.,
-		}
+		uic.loadUi('src/screens/make-dbus-work.ui', self) #DDR 2018-07-12: QDBusConnection.systemBus().connect, in api.py, doesn't return if we don't load this here. I don't know what an empty dialog box has to do with anything. 🤷
+		uic.loadUi('src/screens/main.right-handed.ui', self)
 		
 		# Panel init.
 		self.move(0, 0)
@@ -21,18 +17,13 @@ class Main(QtWidgets.QDialog):
 		self.setAttribute(QtCore.Qt.WA_TranslucentBackground, True)
 		
 		# Button binding.
-		self.cmdDebugWnd.clicked.connect(self.printAnalogGain)
-		self.cmdDebugWnd.clicked.connect(
+		self.uiDebugA.clicked.connect(self.printAnalogGain)
+		self.uiDebugB.clicked.connect(
 			lambda: window.show('widget_test') )
-		self.cmdClose.clicked.connect(QtWidgets.QApplication.closeAllWindows)
-		self.cmdRecSettings.clicked.connect(
-			lambda: window.show('recording settings') )
-		self.cmdIOSettings.clicked.connect(
-			lambda: window.show('trigger settings') )
-		self.cmdUtil.clicked.connect(
-			lambda: window.show('settings') )
+		self.uiClose.clicked.connect(QtWidgets.QApplication.closeAllWindows)
 		
 		# Timer for text label update.
+		# self.updateBatteryStatus()
 		self._timer = QtCore.QTimer()
 		self._timer.timeout.connect(self.updateBatteryStatus)
 		self._timer.start(500) #ms
@@ -45,21 +36,13 @@ class Main(QtWidgets.QDialog):
 		print("Analog gain is %ins." % api.control('get_video_settings')["analogGain"])
 	
 	def updateBatteryStatus(self):
-		powerStatus = api.control('get_power_status')
-		self.battery["charge"] = powerStatus["batteryCharge"]
-		self.battery["voltage"] = powerStatus["batteryVoltage"]
-		self.updateStatusPane()
-	
-	def updateStatusPane(self):
-		self.lblCurrent.setText("\n".join([
-			f"Batt {round(self.battery['charge']*100)}% {'{:.2f}'.format(round(self.battery['voltage'], 2))}V",
-			f"1280×720 1502.88fps",
-			f"Exp 660.6µs (100%)",
-		]))
+		self.uiBatteryLevel.setText(
+			f"{round(api.control('get_power_status')['batteryCharge']*100)}%" )
 		
 	@pyqtSlot(int)
 	def updateExposureNs(self, newExposureNs):
-		self.expSlider.setValue(newExposureNs / (1e9/100) ) #hack in the limit from the API, replace with a proper queried constant when we have state
+		self.uiExposureSlider.setValue(newExposureNs / (1e9/100) ) #hack in the limit from the API, replace with a proper queried constant when we have state
+		#self.uiExposureOverlay.setText(f"{713.1}µs ({round(newExposureNs / (1e9/100))}%)")
 		
 	
 	# ~Emit to signal:

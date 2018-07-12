@@ -403,6 +403,8 @@ for key in _camState.keys():
 		def __init__(self):
 			super(Wrapper, self).__init__()
 			
+			print('ok, this needs to be solved sooner rather than later')
+			
 			return # DDR 2018-06-22: The following function never returns, so everything is broken.
 			QDBusConnection.systemBus().connect('com.krontech.chronos.control.mock', '/', '',
 				key, self.updateKey)
@@ -442,9 +444,6 @@ def observe(name: str, callback: Callable[[Any], None]) -> None:
 	callback(_camState[name])
 	QDBusConnection.systemBus().connect('com.krontech.chronos.control.mock', '/', '',
 		name, callback)
-
-
-
 
 # Only export the functions we will use. Keep it simple. (This can be complicated later as the need arises.)
 __all__ = ['control', 'video', 'observe'] #This doesn't work. Why?
