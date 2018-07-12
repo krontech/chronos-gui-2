@@ -63,20 +63,10 @@ class Window():
 	
 	def __init__(self):
 		from screens.main import Main
-		from screens.recording_settings import RecordingSettings
-		from screens.recording_mode import RecordingMode
-		from screens.trigger_delay import TriggerDelay
-		from screens.trigger_settings import TriggerSettings
-		from screens.settings import Settings
 		from screens.widget_test import WidgetTest #Responsible for "QFont::setPointSize: Point size <= 0 (-1), must be greater than 0"
 		
 		self._screens = {
 			'main': Main(self),
-			'recording settings': RecordingSettings(self),
-			'recording mode': RecordingMode(self),
-			'trigger delay': TriggerDelay(self),
-			'trigger settings': TriggerSettings(self),
-			'settings': Settings(self),
 			'widget_test': WidgetTest(self),
 		}
 		
