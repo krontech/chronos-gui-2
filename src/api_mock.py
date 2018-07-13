@@ -33,6 +33,7 @@ if not QDBusConnection.systemBus().isConnected():
 	sys.exit(-1)
 
 
+
 ##############################################
 #    Set up mock dbus interface provider.    #
 ##############################################
@@ -156,7 +157,7 @@ class ControlMock(QObject):
 	def get_timing_limits(self):
 		return {
 			"maxPeriod": sys.maxsize,
-			"minPeriod": (self._state['recordingGeometry']['hres'] * self._state['recordingGeometry']['vres'] * int(1e9)) / self.get_sensor_data()['pixelRate'],
+			"minPeriod": (self._state['recording']['hres'] * self._state['recording']['vres'] * int(1e9)) / self.get_sensor_data()['pixelRate'],
 			"minExposureNs": self.get_sensor_data()["minExposureNs"],
 			"maxExposureNs": self.get_sensor_data()["maxExposureNs"],
 			"exposureDelayNs": 1000, 
@@ -213,6 +214,12 @@ class ControlMock(QObject):
 			"outputCapable": False,
 		}]
 		
+	def emitControlSignal(self, name, value=None):
+		"""Emit an update signal, usually indicating a value has changed."""
+		signal = QDBusMessage.createSignal('/', 'com.krontech.chronos.control.mock', name)
+		signal << self._state[name] if value is None else value
+		QDBusConnection.systemBus().send(signal)
+		
 	@pyqtSlot(result='QVariantMap')
 	def get_power_status(self):
 		return {
@@ -236,7 +243,6 @@ class ControlMock(QObject):
 		
 		return retval
 	
-	
 	@pyqtSlot('QVariantMap')
 	def set(self, data):
 		# Check all errors first to avoid partially applying an update.
@@ -252,7 +258,14 @@ class ControlMock(QObject):
 		
 		for key, value in data.items():
 			self._state[key] = value
+			self.emitControlSignal(key)
+			print(f"updated {key} to {value}")
 	
+		for key, value in data.items():
+			if key == 'recording':
+				print("TODO DDR 2018-07-12: Emit update events for recording limits.")
+				self.emitControlSignal('maxExposureNs', 7e8) # Example.
+				self.emitControlSignal('minExposureNs', 3e2)
 	
 	def __init__(self):
 		super(ControlMock, self).__init__()
@@ -260,9 +273,7 @@ class ControlMock(QObject):
 		# Inject some fake update events.
 		def test1():
 			self._state["recordingExposureNs"] = int(8e8)
-			signal = QDBusMessage.createSignal('/', 'com.krontech.chronos.control.mock', 'recordingExposureNs')
-			signal << self._state["recordingExposureNs"]
-			QDBusConnection.systemBus().send(signal)
+			self.emitControlSignal('recordingExposureNs')
 			
 		self._timer1 = QTimer()
 		self._timer1.timeout.connect(test1)
@@ -271,9 +282,7 @@ class ControlMock(QObject):
 		
 		def test2():
 			self._state["recordingExposureNs"] = int(2e8)
-			signal = QDBusMessage.createSignal('/', 'com.krontech.chronos.control.mock', 'recordingExposureNs')
-			signal << self._state["recordingExposureNs"]
-			QDBusConnection.systemBus().send(signal)
+			self.emitControlSignal('recordingExposureNs')
 			
 		self._timer2 = QTimer()
 		self._timer2.timeout.connect(test2)
@@ -282,9 +291,7 @@ class ControlMock(QObject):
 		
 		def test3():
 			self._state["recordingExposureNs"] = int(8.5e8)
-			signal = QDBusMessage.createSignal('/', 'com.krontech.chronos.control.mock', 'recordingExposureNs')
-			signal << self._state["recordingExposureNs"]
-			QDBusConnection.systemBus().send(signal)
+			self.emitControlSignal('recordingExposureNs')
 			
 		self._timer3 = QTimer()
 		self._timer3.timeout.connect(test3)
@@ -403,8 +410,6 @@ for key in _camState.keys():
 		def __init__(self):
 			super(Wrapper, self).__init__()
 			
-			print('ok, this needs to be solved sooner rather than later')
-			
 			return # DDR 2018-06-22: The following function never returns, so everything is broken.
 			QDBusConnection.systemBus().connect('com.krontech.chronos.control.mock', '/', '',
 				key, self.updateKey)
@@ -414,6 +419,42 @@ for key in _camState.keys():
 			_camState[key] = msg.arguments()[0]
 			
 	__wrappers += [Wrapper()]
+
+
+class CallbackNotSilenced(Exception):
+	"""Raised when the API is passed an unsilenced callback for an event.
+	
+	It's important to silence events (with `@silenceCallbacks`) on Qt elements
+	because they'll update the API with their changes otherwise. If more than
+	one value is being processed by the API at the same time, it can cause an
+	infinite loop where each value changes the element and the element emits
+	another change event.
+	
+	This is explicitly checked because having an unsilenced element emit an
+	update will usually work. The update will (asychronously) wind its way
+	through the system, and when it gets back to updating the emitting element
+	the element will have the same value and will not emit another update.
+	However, if the element has a different value, then it will change back.
+	The update for the change will be in flight by this time, and the two will
+	enter an infinite loop of updating the element as they fight. Any further
+	changes made to the element will now emit more update events which will
+	themselves loop. Since this is very hard to detect reliably in testing,
+	we force at least the consideration of silencing elements on the callback,
+	since it makes it much easier to track down an issue by reading the
+	callback and making sure it silences the elements it changes. We can't
+	reasonably test if it silences the right elements unfortunately. This
+	could be solved by not emitting events to the client which initiated them,
+	but while fairly trivial with the socket.io websocket library, it seems
+	very difficult or impossible with d-bus.
+	
+	Note: It is helpful to have events propagate back to the python UI
+	however. It means we can ignore updating other elements when changing
+	one element, since - as either element could be updated at any time
+	from (say) a web ui, it doesn't really matter where the update originates
+	from. All that matters is that it does update.
+	"""
+	
+	pass
 
 
 def observe(name: str, callback: Callable[[Any], None]) -> None:
@@ -441,9 +482,50 @@ def observe(name: str, callback: Callable[[Any], None]) -> None:
 	key one syscall at a time as we instantiate each Qt control.
 	"""
 	
+	if not hasattr(callback, '_isSilencedCallback'):
+		raise CallbackNotSilenced(f"{callback} must consider silencing. Decorate with @silenceCallbacks(callback_name, …).")
+	
 	callback(_camState[name])
 	QDBusConnection.systemBus().connect('com.krontech.chronos.control.mock', '/', '',
 		name, callback)
+
+
+def observe_future_only(name: str, callback: Callable[[Any], None]) -> None:
+	"""Like `observe`, but without the initial callback when observing.
+	
+	Useful when `observe`ing a derived value, which observe can't deal with yet."""
+	
+	if not hasattr(callback, '_isSilencedCallback'):
+		raise CallbackNotSilenced(f"{callback} must consider silencing. Decorate with @silenceCallbacks(callback_name, …).")
+	
+	QDBusConnection.systemBus().connect('com.krontech.chronos.control.mock', '/', '',
+		name, callback)
+
+
+
+def silenceCallbacks(*elements):
+	"""Silence events for the duration of a callback.
+	
+	This allows an API element to be updated without triggering the API again.
+	If the API was triggered, it might update the element which would cause an
+	infinite loop.
+	"""
+	
+	def silenceCallbacksOf(callback):
+		def silencedCallback(self, *args, **kwargs):
+			for element in elements:
+				getattr(self, element).blockSignals(True)
+			
+			callback(self, *args, **kwargs)
+			
+			for element in elements:
+				getattr(self, element).blockSignals(False)
+		
+		silencedCallback._isSilencedCallback = True #Checked by the API, which only takes silenced callbacks to avoid loops.
+		return silencedCallback
+	return silenceCallbacksOf
+
+
 
 # Only export the functions we will use. Keep it simple. (This can be complicated later as the need arises.)
 __all__ = ['control', 'video', 'observe'] #This doesn't work. Why?

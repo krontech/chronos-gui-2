@@ -155,6 +155,11 @@ def observe(name: str, callback: Callable[[Any], None]) -> None:
 		name, callback)
 
 
+def silenceCallbacks(a):
+	# TODO: this, see api_mock.py.
+	system.exit(-3)
+	return a
+
 
 
 # Only export the functions we will use. Keep it simple. (This can be complicated later as the need arises.)
