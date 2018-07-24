@@ -50,24 +50,28 @@ class Main(QtWidgets.QDialog):
 	@silenceCallbacks('uiExposureSlider')
 	def updateExposureNs(self, newExposureNs):
 		self.uiExposureSlider.setValue(newExposureNs) #hack in the limit from the API, replace with a proper queried constant when we have state
-		self.updateExposureText()
+		self.updateExposureDependancies()
 		
 	@pyqtSlot(int)
 	@silenceCallbacks('uiExposureSlider')
 	def updateExposureMax(self, newExposureNs):
 		self.uiExposureSlider.setMaximum(newExposureNs) #hack in the limit from the API, replace with a proper queried constant when we have state
-		self.updateExposureText()
+		self.updateExposureDependancies()
 		
 	@pyqtSlot(int)
 	@silenceCallbacks('uiExposureSlider')
 	def updateExposureMin(self, newExposureNs):
 		self.uiExposureSlider.setValue(newExposureNs) #hack in the limit from the API, replace with a proper queried constant when we have state
-		self.updateExposureText()
+		self.updateExposureDependancies()
 	
-	def updateExposureText(self):
-		"""Update exposure text to match exposure slider."""
+	def updateExposureDependancies(self):
+		"""Update exposure text to match exposure slider, and sets the slider step so clicking the gutter always moves 1%."""
 		percent = round((self.uiExposureSlider.value()-self.uiExposureSlider.minimum()) / (self.uiExposureSlider.maximum()-self.uiExposureSlider.minimum()) * 99 + 1)
 		self.uiExposureOverlay.setText(f"{round(self.uiExposureSlider.value()/1000, 2)}µs ({percent}%)")
+		
+		step1percent = (self.uiExposureSlider.minimum() + self.uiExposureSlider.maximum()) // 100
+		self.uiExposureSlider.setPageStep(step1percent)
+		self.uiExposureSlider.setSingleStep(step1percent)
 		
 	
 	# ~Emit to signal:
