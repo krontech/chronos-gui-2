@@ -505,6 +505,7 @@ Save</string>
     </property>
    </widget>
   </widget>
+  <zorder>uiExposureOverlay</zorder>
   <zorder>backdrop_2</zorder>
   <zorder>uiExposureSlider</zorder>
   <zorder>backdrop</zorder>
@@ -525,7 +526,6 @@ Save</string>
   <zorder>label_3</zorder>
   <zorder>label_4</zorder>
   <zorder>uiResolutionOverlay</zorder>
-  <zorder>uiExposureOverlay</zorder>
   <zorder>uiDebugControls</zorder>
  </widget>
  <customwidgets>
