@@ -1,5 +1,6 @@
 from PyQt5.QtGui import QIcon, QPixmap
 from PyQt5.QtDesigner import QPyDesignerCustomWidgetPlugin
+from plugin_settings import showHitRects
 
 from spin_box import SpinBox
 
@@ -19,7 +20,7 @@ class SpinBoxPlugin(QPyDesignerCustomWidgetPlugin):
 		return self.initialized
 
 	def createWidget(self, parent):
-		return SpinBox(parent, inEditor=True)
+		return SpinBox(parent, showHitRects=showHitRects)
 
 	def name(self):
 		return "SpinBox"

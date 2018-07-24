@@ -1,5 +1,6 @@
 from PyQt5.QtGui import QIcon, QPixmap
 from PyQt5.QtDesigner import QPyDesignerCustomWidgetPlugin
+from plugin_settings import showHitRects
 
 from button import Button
 
@@ -19,7 +20,7 @@ class ButtonPlugin(QPyDesignerCustomWidgetPlugin):
 		return self.initialized
 
 	def createWidget(self, parent):
-		return Button(parent, inEditor=True)
+		return Button(parent, showHitRects=showHitRects)
 
 	def name(self):
 		return "Button"

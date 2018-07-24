@@ -27,8 +27,8 @@ class TouchMarginPlugin(MarginWidth):
 	
 	Q_ENUMS(MarginWidth)
 	
-	def __init__(self, inEditor=False):
-		self.inEditor = inEditor
+	def __init__(self, showHitRects=False):
+		self.showHitRects = showHitRects
 		self._originalStyleSheet = self.styleSheet()
 		
 		# Invisible margin to make clicking on buttons easier. When placing

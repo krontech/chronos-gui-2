@@ -1,5 +1,6 @@
 from PyQt5.QtGui import QIcon, QPixmap
 from PyQt5.QtDesigner import QPyDesignerCustomWidgetPlugin
+from plugin_settings import showHitRects
 
 from label import Label
 
@@ -19,7 +20,7 @@ class LabelPlugin(QPyDesignerCustomWidgetPlugin):
 		return self.initialized
 
 	def createWidget(self, parent):
-		return Label(parent, inEditor=True)
+		return Label(parent, showHitRects=showHitRects)
 
 	def name(self):
 		return "Label"

@@ -11,8 +11,8 @@ from touch_margin_plugin import TouchMarginPlugin, MarginWidth
 class Button(QPushButton, TouchMarginPlugin):
 	Q_ENUMS(MarginWidth) #This is needed here. I don't know why the definition in the TouchMarginPlugin doesn't work.
 	
-	def __init__(self, parent=None, inEditor=False):
-		super().__init__(parent, inEditor=inEditor)
+	def __init__(self, parent=None, showHitRects=False):
+		super().__init__(parent, showHitRects=showHitRects)
 		
 		# Set some default text, so we can see the widget.
 		if not self.text():
@@ -25,12 +25,12 @@ class Button(QPushButton, TouchMarginPlugin):
 		return QSize(161, 61)
 		
 	def refreshStyle(self):
-		if self.inEditor:
+		if self.showHitRects:
 			self.setStyleSheet(f"""
 				/* Editor style. Use border to show were click margin is, so we don't mess it up during layout. */
 				Button {{
 					font-size: 16px;
-					background: transparent;
+					background: white;
 					
 					/* use borders instead of margins so we can see what we're doing */
 					border-left:   {self.clickMarginLeft   * 10 + 1}px solid {self.clickMarginColor};
@@ -44,7 +44,7 @@ class Button(QPushButton, TouchMarginPlugin):
 				Button {{
 					/* App style. Use margin to provide further click area outside the visual button. */
 					font-size: 16px;
-					background: transparent;
+					background: white;
 					border: 1px solid black;
 					border-left-color: rgb(50,50,50);
 					border-top-color: rgb(50,50,50); /* Add a subtle 3d-ness until we figure out drop-shadows. */

@@ -1,5 +1,6 @@
 from PyQt5.QtGui import QIcon, QPixmap
 from PyQt5.QtDesigner import QPyDesignerCustomWidgetPlugin
+from plugin_settings import showHitRects
 
 from combo_box import ComboBox
 
@@ -19,7 +20,7 @@ class ComboBoxPlugin(QPyDesignerCustomWidgetPlugin):
 		return self.initialized
 
 	def createWidget(self, parent):
-		return ComboBox(parent, inEditor=True)
+		return ComboBox(parent, showHitRects=showHitRects)
 
 	def name(self):
 		return "ComboBox"

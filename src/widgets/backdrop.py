@@ -6,10 +6,10 @@ from debugger import *; dbg
 
 
 class Backdrop(QLabel):
-	def __init__(self, parent=None, inEditor=False):
+	def __init__(self, parent=None, showHitRects=False):
 		super().__init__(parent)
 		
-		if inEditor:
+		if showHitRects:
 			# Let us see the background grid for editing.
 			self.setStyleSheet(f"""
 				background: rgba(255,255,255,128);

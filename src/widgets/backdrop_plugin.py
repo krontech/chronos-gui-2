@@ -1,5 +1,6 @@
 from PyQt5.QtGui import QIcon, QPixmap
 from PyQt5.QtDesigner import QPyDesignerCustomWidgetPlugin
+from plugin_settings import showHitRects
 
 from backdrop import Backdrop
 
@@ -19,7 +20,7 @@ class BackdropPlugin(QPyDesignerCustomWidgetPlugin):
 		return self.initialized
 
 	def createWidget(self, parent):
-		return Backdrop(parent, inEditor=True)
+		return Backdrop(parent, showHitRects=showHitRects)
 
 	def name(self):
 		return "Backdrop"

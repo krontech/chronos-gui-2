@@ -6,7 +6,7 @@ from debugger import *; dbg
 
 
 class HeaderLabel(QLabel):
-	def __init__(self, parent=None, inEditor=False):
+	def __init__(self, parent=None, showHitRects=False):
 		super().__init__(parent)
 		
 		self.setStyleSheet(f"""

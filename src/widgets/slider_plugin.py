@@ -1,5 +1,6 @@
 from PyQt5.QtGui import QIcon, QPixmap
 from PyQt5.QtDesigner import QPyDesignerCustomWidgetPlugin
+from plugin_settings import showHitRects
 
 from slider import Slider
 
@@ -19,7 +20,7 @@ class SliderPlugin(QPyDesignerCustomWidgetPlugin):
 		return self.initialized
 
 	def createWidget(self, parent):
-		return Slider(parent, inEditor=True)
+		return Slider(parent, showHitRects=showHitRects)
 
 	def name(self):
 		return "Slider"

@@ -1,5 +1,6 @@
 from PyQt5.QtGui import QIcon, QPixmap
 from PyQt5.QtDesigner import QPyDesignerCustomWidgetPlugin
+from plugin_settings import showHitRects
 
 from radio_button import RadioButton
 
@@ -19,7 +20,7 @@ class RadioButtonPlugin(QPyDesignerCustomWidgetPlugin):
 		return self.initialized
 
 	def createWidget(self, parent):
-		return RadioButton(parent, inEditor=True)
+		return RadioButton(parent, showHitRects=showHitRects)
 
 	def name(self):
 		return "RadioButton"

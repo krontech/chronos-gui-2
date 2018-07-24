@@ -11,8 +11,8 @@ from touch_margin_plugin import TouchMarginPlugin, MarginWidth
 class ComboBox(QComboBox, TouchMarginPlugin):
 	Q_ENUMS(MarginWidth) #This is needed here. I don't know why the definition in the TouchMarginPlugin doesn't work.
 	
-	def __init__(self, parent=None, inEditor=False):
-		super().__init__(parent, inEditor=inEditor)
+	def __init__(self, parent=None, showHitRects=False):
+		super().__init__(parent, showHitRects=showHitRects)
 		self.clickMarginColor = f"rgba({randint(128, 255)}, {randint(0, 32)}, {randint(0, 32)}, {randint(32,96)})"
 	
 	
@@ -21,12 +21,12 @@ class ComboBox(QComboBox, TouchMarginPlugin):
 	
 	
 	def refreshStyle(self):
-		if self.inEditor:
+		if self.showHitRects:
 			self.setStyleSheet(f"""
 				ComboBox {{
 					/* Editor style. Use border to show were click margin is, so we don't mess it up during layout. */
 					font-size: 16px;
-					background: transparent;
+					background: white;
 					
 					/* use borders instead of margins so we can see what we're doing */
 					border-left:   {self.clickMarginLeft   * 10 + 1}px solid {self.clickMarginColor};
@@ -70,7 +70,7 @@ class ComboBox(QComboBox, TouchMarginPlugin):
 				ComboBox {{
 					/*subcontrol-origin: padding; does nothing but mess up the drop-down button*/
 					font-size: 16px;
-					background: transparent;
+					background: white;
 					border: 1px solid black;
 					margin-left: {self.clickMarginLeft*10}px;
 					margin-right: {self.clickMarginRight*10}px;

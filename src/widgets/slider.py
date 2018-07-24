@@ -8,10 +8,10 @@ from debugger import *; dbg
 
 
 class Slider(QSlider):
-	def __init__(self, parent=None, inEditor=False):
+	def __init__(self, parent=None, showHitRects=False):
 		super().__init__(parent)
 		
-		self.inEditor = inEditor
+		self.showHitRects = showHitRects
 		
 		self.clickMarginColorSlider = f"rgba({randint(0, 32)}, {randint(128, 255)}, {randint(0, 32)}, {randint(32,96)})"
 		self.clickMarginColorHandle = f"rgba({randint(0, 32)}, {randint(128, 255)}, {randint(0, 32)}, {randint(32,96)})"
@@ -25,12 +25,12 @@ class Slider(QSlider):
 		drawDebugArea = False
 		self.setStyleSheet(f"""
 			Slider {{
-				background-color: {self.clickMarginColorSlider if self.inEditor or drawDebugArea else "transparent"};
+				background-color: {self.clickMarginColorSlider if self.showHitRects or drawDebugArea else "transparent"};
 				/*padding: 0 0; Additional padding between top groove and top hitbox. Doesn't work due to scroll drag speed vs slider speed issue. */
 			}}
 			Slider::handle:vertical {{
-				image: url({"../../" if self.inEditor else ""}assets/images/handle-bars-41x81+20.png); /* File name fields: width x height + vertical padding. */
-				background: {self.clickMarginColorHandle if self.inEditor or drawDebugArea else "transparent"};
+				image: url({"../../" if self.showHitRects else ""}assets/images/handle-bars-41x81+20.png); /* File name fields: width x height + vertical padding. */
+				background: {self.clickMarginColorHandle if self.showHitRects or drawDebugArea else "transparent"};
 				/*Setting a border here messes up scrolling; scrolling goes faster than the drag does. Something in the math is off. */
 				margin: -20px -200px; /* y: -slider groove margin. x: touch padding outsidet the groove. Clipped by Slider width. Should be enough for most customizations if we move stuff around. */
 				padding: -1px;

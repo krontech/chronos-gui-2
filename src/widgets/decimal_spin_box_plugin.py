@@ -1,5 +1,6 @@
 from PyQt5.QtGui import QIcon, QPixmap
 from PyQt5.QtDesigner import QPyDesignerCustomWidgetPlugin
+from plugin_settings import showHitRects
 
 from decimal_spin_box import DecimalSpinBox
 
@@ -19,7 +20,7 @@ class DecimalSpinBoxPlugin(QPyDesignerCustomWidgetPlugin):
 		return self.initialized
 
 	def createWidget(self, parent):
-		return DecimalSpinBox(parent, inEditor=True)
+		return DecimalSpinBox(parent, showHitRects=showHitRects)
 
 	def name(self):
 		return "DecimalSpinBox"

@@ -15,8 +15,8 @@ class RadioButton(QRadioButton, TouchMarginPlugin):
 		return QSize(181, 81)
 	
 	
-	def __init__(self, parent=None, inEditor=False):
-		super().__init__(parent, inEditor=inEditor)
+	def __init__(self, parent=None, showHitRects=False):
+		super().__init__(parent, showHitRects=showHitRects)
 		self.clickMarginColor = f"rgba({randint(128, 255)}, {randint(128, 255)}, {randint(0, 32)}, {randint(32,96)})"
 	
 	
@@ -30,11 +30,12 @@ class RadioButton(QRadioButton, TouchMarginPlugin):
 	
 	
 	def refreshStyle(self):
-		if self.inEditor:
+		if self.showHitRects:
 			self.setStyleSheet(f"""
 				RadioButton {{
 					/* Editor style. Use border to show were click margin is, so we don't mess it up during layout. */
 					font-size: 16px;
+					background: white;
 					
 					/* use borders instead of margins so we can see what we're doing */
 					border-left:   {self.clickMarginLeft   * 10 + 1}px solid {self.clickMarginColor};
@@ -54,6 +55,7 @@ class RadioButton(QRadioButton, TouchMarginPlugin):
 					/* App style. Use margin to provide further click area outside the visual button. */
 					font-size: 16px;
 					padding-left: 10px;
+					background: white;
 					
 					/* Add some touch space so this widget is easier to press. */
 					margin-left: {self.clickMarginLeft*10}px;
