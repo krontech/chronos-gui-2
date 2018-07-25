@@ -16,4 +16,4 @@ class WidgetTest(QtWidgets.QDialog):
 		self.setAttribute(QtCore.Qt.WA_TranslucentBackground, True)
 		
 		# Button binding.
-		self.uiBack.clicked.connect(lambda: window.show('main'))
+		self.uiBack.clicked.connect(window.back)

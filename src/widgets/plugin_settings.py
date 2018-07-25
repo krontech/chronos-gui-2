@@ -1,1 +1,1 @@
-showHitRects = False
+showHitRects = True

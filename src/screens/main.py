@@ -21,6 +21,7 @@ class Main(QtWidgets.QDialog):
 		self.uiDebugA.clicked.connect(self.printAnalogGain)
 		self.uiDebugB.clicked.connect(lambda: window.show('widget_test'))
 		self.uiClose.clicked.connect(QtWidgets.QApplication.closeAllWindows)
+		self.uiTriggers.clicked.connect(lambda: window.show('triggers'))
 		
 		# Polling-based updates.
 		# self.updateBatteryStatus()

@@ -12,7 +12,7 @@ class CheckBox(QCheckBox, TouchMarginPlugin):
 	Q_ENUMS(MarginWidth) #This is needed here. I don't know why the definition in the TouchMarginPlugin doesn't work.
 	
 	def sizeHint(self):
-		return QSize(181, 81)
+		return QSize(161, 61)
 	
 	
 	def __init__(self, parent=None, showHitRects=False):

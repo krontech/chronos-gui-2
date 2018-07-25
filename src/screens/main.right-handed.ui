@@ -33,7 +33,7 @@
     </rect>
    </property>
   </widget>
-  <widget class="Button" name="uiTriggerIO">
+  <widget class="Button" name="uiTriggers">
    <property name="geometry">
     <rect>
      <x>0</x>
@@ -509,7 +509,7 @@ Save</string>
   <zorder>backdrop_2</zorder>
   <zorder>uiExposureSlider</zorder>
   <zorder>backdrop</zorder>
-  <zorder>uiTriggerIO</zorder>
+  <zorder>uiTriggers</zorder>
   <zorder>uiTriggerDelay</zorder>
   <zorder>uiPrefsAndUtils</zorder>
   <zorder>uiRecordingSettings</zorder>

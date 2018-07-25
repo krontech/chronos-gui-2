@@ -17,7 +17,7 @@ class SpinBox(QSpinBox, TouchMarginPlugin):
 
 
 	def sizeHint(self):
-		return QSize(221, 81)
+		return QSize(201, 61)
 	
 	
 	def refreshStyle(self):
