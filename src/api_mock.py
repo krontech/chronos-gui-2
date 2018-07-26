@@ -1,21 +1,19 @@
-"""
-Mock for api.py's wrapper around control and video dbus interfaces to allow for
-easier development of the QT interface.
+"""Mock for api.py. Allows easier development & testing of the QT interface.
 
-This mock is less "complete" than the C-based mock, as this mock only returns
-values sensible enough to develop the UI with. Currently the C-based mock is
-used for the camera API, and this mock is used for the control api. Note that
-this mock is still available for external programs to use via the dbus
-interface.
+	This mock is less "complete" than the C-based mock, as this mock only returns
+	values sensible enough to develop the UI with. Currently the C-based mock is
+	used for the camera API, and this mock is used for the control api. Note that
+	this mock is still available for external programs to use via the dbus
+	interface.
 
-Usage:
-import api_mock as api
-print(api.control('get_video_settings'))
+	Usage:
+	import api_mock as api
+	print(api.control('get_video_settings'))
 
-Remarks:
-The service provider component can be extracted if interaction with the HTTP
-api is desired. While there is a more complete C-based mock, in chronos-cli, it
-is exceptionally hard to add new calls to.
+	Remarks:
+	The service provider component can be extracted if interaction with the HTTP
+	api is desired. While there is a more complete C-based mock, in chronos-cli, it
+	is exceptionally hard to add new calls to.
 """
 
 import sys
@@ -33,87 +31,88 @@ if not QDBusConnection.systemBus().isConnected():
 	sys.exit(-1)
 
 
-
 ##############################################
 #    Set up mock dbus interface provider.    #
 ##############################################
 
-class ControlMock(QObject):
-	_state = {
-		"recording": { #Hack around video pipeline reconstruction being very slow.
-			"hres": 200,
-			"vres": 300,
-			"hoffset": 800,
-			"voffset": 480,
-			"analogGain": 2,
+class State(QObject):
+	recording = { #Hack around video pipeline reconstruction being very slow.
+		"hres": 200,
+		"vres": 300,
+		"hoffset": 800,
+		"voffset": 480,
+		"analogGain": 2,
+	}
+	recordingExposureNs = int(8.5e8) #These don't have to have the pipeline torn down, so they don't need the hack where we set video settings atomically.
+	recordingPeriodNs = int(4e4)
+	
+	currentVideoState = 'viwefinder' #eg, 'viewfinder', 'playback', etc.
+	currentCameraState = 'normal' #Can also be 'saving' or 'recording'. When saving, the API is unresponsive?
+	focusPeakingColor = 0x0000ff #currently presented as red, blue, green, alpha. - 0x000000 is off
+	focusPeakingIntensity = 0.5 #1=max, 0=off
+	zebraStripesEnabled = False
+	connectionTime = "2018-06-19T02:05:52.664Z" #To use this, add however many seconds ago the request was made. Time should pass roughly the same for the camera as for the client.
+	disableRingBuffer = False #In segmented mode, disable overwriting earlier recorded ring buffer segments. DDR 2018-06-19: Loial figures this was fixed, but neither of us know why it's hidden in the old UI.
+	recordedSegments = [{ #Each entry in this list a segment of recorded video. Although currently resolution/framerate is always the same having it in this data will make it easier to fix this in the future if we do.
+		"start": 0,
+		"end": 1000,
+		"hres": 200,
+		"vres": 300,
+		"timestamp": "2018-06-19T02:05:52.664Z",
+	}]
+	whiteBalance = [1., 1., 1.]
+	triggerDelayNs = int(1e9)
+	triggers = {
+		"trig1": {
+			"action": "none",
+			"threshold": 2.50,
+			"invertInput": False,
+			"invertOutput": False,
+			"debounce": True,
+			"pullup1ma": False,
+			"pullup20ma": True,
 		},
-		"recordingExposureNs": int(8.5e8), #These don't have to have the pipeline torn down, so they don't need the hack where we set video settings atomically.
-		"recordingPeriodNs": int(4e4),
-		
-		"currentVideoState": 'viwefinder', #eg, 'viewfinder', 'playback', etc.
-		"currentCameraState": 'normal', #Can also be 'saving' or 'recording'. When saving, the API is unresponsive?
-		"focusPeakingColor": 0x0000ff, #currently presented as red, blue, green, alpha. - 0x000000 is off
-		"focusPeakingIntensity": 0.5, #1=max, 0=off
-		"zebraStripesEnabled": False,
-		"connectionTime": "2018-06-19T02:05:52.664Z", #To use this, add however many seconds ago the request was made. Time should pass roughly the same for the camera as for the client.
-		"disableRingBuffer": False, #In segmented mode, disable overwriting earlier recorded ring buffer segments. DDR 2018-06-19: Loial figures this was fixed, but neither of us know why it's hidden in the old UI.
-		"recordedSegments": [{ #Each entry in this list a segment of recorded video. Although currently resolution/framerate is always the same, having it in this data will make it easier to fix this in the future if we do.
-			"start": 0,
-			"end": 1000,
-			"hres": 200,
-			"vres": 300,
-			"timestamp": "2018-06-19T02:05:52.664Z",
-		}],
-		"whiteBalance": [1., 1., 1.],
-		"triggerDelayNs": int(1e9),
-		"triggers": {
-			"trig1": {
-				"action": "none",
-				"threshold": 2.50,
-				"invertInput": False,
-				"invertOutput": False,
-				"debounce": True,
-				"pullup1ma": False,
-				"pullup20ma": True,
-			},
-			"trig2": {
-				"action": "none",
-				"threshold": 2.75,
-				"invertInput": True,
-				"invertOutput": False,
-				"debounce": True,
-				"pullup1ma": False,
-				"pullup20ma": False,
-			},
-			"trig3": {
-				"action": "none",
-				"threshold": 2.50,
-				"invertInput": False,
-				"invertOutput": False,
-				"debounce": False,
-				"pullup1ma": True,
-				"pullup20ma": True,
-			},
-			"~a1": {
-				"action": "record end",
-				"threshold": 2.50,
-				"invertInput": False,
-				"invertOutput": False,
-				"debounce": True,
-				"pullup1ma": False,
-				"pullup20ma": True,
-			},
-			"~a2": {
-				"action": "none",
-				"threshold": 2.50,
-				"invertInput": False,
-				"invertOutput": False,
-				"debounce": True,
-				"pullup1ma": False,
-				"pullup20ma": True,
-			},
+		"trig2": {
+			"action": "none",
+			"threshold": 2.75,
+			"invertInput": True,
+			"invertOutput": False,
+			"debounce": True,
+			"pullup1ma": False,
+			"pullup20ma": False,
+		},
+		"trig3": {
+			"action": "none",
+			"threshold": 2.50,
+			"invertInput": False,
+			"invertOutput": False,
+			"debounce": False,
+			"pullup1ma": True,
+			"pullup20ma": True,
+		},
+		"~a1": {
+			"action": "record end",
+			"threshold": 2.50,
+			"invertInput": False,
+			"invertOutput": False,
+			"debounce": True,
+			"pullup1ma": False,
+			"pullup20ma": True,
+		},
+		"~a2": {
+			"action": "none",
+			"threshold": 2.50,
+			"invertInput": False,
+			"invertOutput": False,
+			"debounce": True,
+			"pullup1ma": False,
+			"pullup20ma": True,
 		},
 	}
+
+
+class ControlMock(QObject):
+	_state = State()
 		
 	@pyqtSlot(result='QVariantMap')
 	def get_camera_data(self):
@@ -123,16 +122,16 @@ class ControlMock(QObject):
 			"fpgaVersion": "3.14",
 			"memoryGB": "16",
 			"serial": "Captain Crunch",
-		}	
+		}
 		
 	@pyqtSlot(result='QVariantMap')
 	def get_video_settings(self):
-		return self._state['recording']
+		return self._state.recording
 	
 	@pyqtSlot('QVariantMap')
 	def set_video_settings(self, data):
 		for k in ("recordingGeometry", "recordingExposureNs", "recordingPeriodNs", "analogGain"):
-			self._state['recording'][k] = data[k]
+			self._state.recording[k] = data[k]
 	
 	@pyqtSlot(result='QVariantMap')
 	def get_sensor_data(self):
@@ -157,7 +156,7 @@ class ControlMock(QObject):
 	def get_timing_limits(self):
 		return {
 			"maxPeriod": sys.maxsize,
-			"minPeriod": (self._state['recording']['hres'] * self._state['recording']['vres'] * int(1e9)) / self.get_sensor_data()['pixelRate'],
+			"minPeriod": (self._state.recording['hres'] * self._state.recording['vres'] * int(1e9)) / self.get_sensor_data()['pixelRate'],
 			"minExposureNs": self.get_sensor_data()["minExposureNs"],
 			"maxExposureNs": self.get_sensor_data()["maxExposureNs"],
 			"exposureDelayNs": 1000, 
@@ -217,7 +216,7 @@ class ControlMock(QObject):
 	def emitControlSignal(self, name, value=None):
 		"""Emit an update signal, usually indicating a value has changed."""
 		signal = QDBusMessage.createSignal('/', 'com.krontech.chronos.control.mock', name)
-		signal << self._state[name] if value is None else value
+		signal << getattr(self._state, name) if value is None else value
 		QDBusConnection.systemBus().send(signal)
 		
 	@pyqtSlot(result='QVariantMap')
@@ -235,11 +234,11 @@ class ControlMock(QObject):
 		retval = {}
 		
 		for key in keys:
-			if key not in self._state:
+			if not hasattr(self._state, key):
 				return cameraControlAPI.send( #Todo: This isn't how you return errors.
 					QDBusMessage.createErrorReply('unknownValue', f"The value '{key}' is not known. Valid keys are: {self._state.keys()}")
 				)
-			retval[key] = self._state[key]
+			retval[key] = getattr(self._state, key)
 		
 		return retval
 	
@@ -251,13 +250,13 @@ class ControlMock(QObject):
 				# return self.sendErrorReply('unknownValue', f"The value '{key}' is not known. Valid keys are: {self._state.keys()}")
 				cameraControlAPI.send(
 					QDBusMessage.createErrorReply('unknownValue', f"The value '{key}' is not known. Valid keys are: {self._state.keys()}") )
-			if not isinstance(value, type(self._state[key])):
+			if not isinstance(value, type(getattr(self._state, key))):
 				return cameraControlAPI.send(
-					QDBusMessage.createErrorReply('wrongType', f"Can not set '{key}' to {value}. (Previously {self._state[key]}.) Expected {type(self._state[key])}, got {type(value)}.")
+					QDBusMessage.createErrorReply('wrongType', f"Can not set '{key}' to {value}. (Previously {getattr(self._state, key)}.) Expected {type(getattr(self._state, key))}, got {type(value)}.")
 				)
 		
 		for key, value in data.items():
-			self._state[key] = value
+			setattr(self._state, key, value)
 			self.emitControlSignal(key)
 			print(f"updated {key} to {value}")
 	
@@ -272,7 +271,7 @@ class ControlMock(QObject):
 		
 		# Inject some fake update events.
 		def test1():
-			self._state["recordingExposureNs"] = int(8e8)
+			self._state.recordingExposureNs = int(8e8)
 			self.emitControlSignal('recordingExposureNs')
 			
 		self._timer1 = QTimer()
@@ -281,7 +280,7 @@ class ControlMock(QObject):
 		self._timer1.start(1000) #ms
 		
 		def test2():
-			self._state["recordingExposureNs"] = int(2e8)
+			self._state.recordingExposureNs = int(2e8)
 			self.emitControlSignal('recordingExposureNs')
 			
 		self._timer2 = QTimer()
@@ -290,7 +289,7 @@ class ControlMock(QObject):
 		self._timer2.start(2000) #ms
 		
 		def test3():
-			self._state["recordingExposureNs"] = int(8.5e8)
+			self._state.recordingExposureNs = int(8.5e8)
 			self.emitControlSignal('recordingExposureNs')
 			
 		self._timer3 = QTimer()
@@ -352,12 +351,11 @@ class DBusException(Exception):
 
 
 def video(*args, **kwargs):
-	"""
-	Call the camera video DBus API. First arg is the function name.
+	"""Call the camera video DBus API. First arg is the function name.
 	
-	See http://doc.qt.io/qt-5/qdbusabstractinterface.html#call for details about calling.
-	See https://github.com/krontech/chronos-cli/tree/master/src/api for implementation details about the API being called.
-	See README.md at https://github.com/krontech/chronos-cli/tree/master/src/daemon for API documentation.
+		See http://doc.qt.io/qt-5/qdbusabstractinterface.html#call for details about calling.
+		See https://github.com/krontech/chronos-cli/tree/master/src/api for implementation details about the API being called.
+		See README.md at https://github.com/krontech/chronos-cli/tree/master/src/daemon for API documentation.
 	"""
 	msg = QDBusReply(cameraVideoAPI.call(*args, **kwargs))
 	if not msg.isValid():
@@ -366,12 +364,11 @@ def video(*args, **kwargs):
 
 
 def control(*args, **kwargs):
-	"""
-	Call the camera control DBus API. First arg is the function name.
+	"""Call the camera control DBus API. First arg is the function name.
 	
-	See http://doc.qt.io/qt-5/qdbusabstractinterface.html#call for details about calling.
-	See https://github.com/krontech/chronos-cli/tree/master/src/api for implementation details about the API being called.
-	See README.md at https://github.com/krontech/chronos-cli/tree/master/src/daemon for API documentation.
+		See http://doc.qt.io/qt-5/qdbusabstractinterface.html#call for details about calling.
+		See https://github.com/krontech/chronos-cli/tree/master/src/api for implementation details about the API being called.
+		See README.md at https://github.com/krontech/chronos-cli/tree/master/src/daemon for API documentation.
 	"""
 	
 	msg = QDBusReply(cameraControlAPI.call(*args, **kwargs))
@@ -401,6 +398,9 @@ _camState = control('get', [
 	"triggers",
 ])
 
+if(not _camState):
+	raise Error("cache failed to populate")
+
 # Keep observe()'s state up-to-date.
 # TODO DDR 2018-06-22: This is broken currently, as connect() never returns here.
 # We're going to ignore the fact that this doesn't work for now, as it will only matter if we reinitialize something in the camApp from this cache. 😒
@@ -424,34 +424,34 @@ for key in _camState.keys():
 class CallbackNotSilenced(Exception):
 	"""Raised when the API is passed an unsilenced callback for an event.
 	
-	It's important to silence events (with `@silenceCallbacks`) on Qt elements
-	because they'll update the API with their changes otherwise. If more than
-	one value is being processed by the API at the same time, it can cause an
-	infinite loop where each value changes the element and the element emits
-	another change event.
-	
-	This is explicitly checked because having an unsilenced element emit an
-	update will usually work. The update will (asychronously) wind its way
-	through the system, and when it gets back to updating the emitting element
-	the element will have the same value and will not emit another update.
-	However, if the element has a different value, then it will change back.
-	The update for the change will be in flight by this time, and the two will
-	enter an infinite loop of updating the element as they fight. Any further
-	changes made to the element will now emit more update events which will
-	themselves loop. Since this is very hard to detect reliably in testing,
-	we force at least the consideration of silencing elements on the callback,
-	since it makes it much easier to track down an issue by reading the
-	callback and making sure it silences the elements it changes. We can't
-	reasonably test if it silences the right elements unfortunately. This
-	could be solved by not emitting events to the client which initiated them,
-	but while fairly trivial with the socket.io websocket library, it seems
-	very difficult or impossible with d-bus.
-	
-	Note: It is helpful to have events propagate back to the python UI
-	however. It means we can ignore updating other elements when changing
-	one element, since - as either element could be updated at any time
-	from (say) a web ui, it doesn't really matter where the update originates
-	from. All that matters is that it does update.
+		It's important to silence events (with `@silenceCallbacks`) on Qt elements
+		because they'll update the API with their changes otherwise. If more than
+		one value is being processed by the API at the same time, it can cause an
+		infinite loop where each value changes the element and the element emits
+		another change event.
+		
+		This is explicitly checked because having an unsilenced element emit an
+		update will usually work. The update will (asychronously) wind its way
+		through the system, and when it gets back to updating the emitting element
+		the element will have the same value and will not emit another update.
+		However, if the element has a different value, then it will change back.
+		The update for the change will be in flight by this time, and the two will
+		enter an infinite loop of updating the element as they fight. Any further
+		changes made to the element will now emit more update events which will
+		themselves loop. Since this is very hard to detect reliably in testing,
+		we force at least the consideration of silencing elements on the callback,
+		since it makes it much easier to track down an issue by reading the
+		callback and making sure it silences the elements it changes. We can't
+		reasonably test if it silences the right elements unfortunately. This
+		could be solved by not emitting events to the client which initiated them,
+		but while fairly trivial with the socket.io websocket library, it seems
+		very difficult or impossible with d-bus.
+		
+		Note: It is helpful to have events propagate back to the python UI
+		however. It means we can ignore updating other elements when changing
+		one element, since - as either element could be updated at any time
+		from (say) a web ui, it doesn't really matter where the update originates
+		from. All that matters is that it does update.
 	"""
 	
 	pass
@@ -460,26 +460,26 @@ class CallbackNotSilenced(Exception):
 def observe(name: str, callback: Callable[[Any], None]) -> None:
 	"""Observe changes in a state value.
 	
-	Args:
-		name: ID of the state variable. "exposure", "focusPeakingColor", etc.
-		callback: Function called when the state updates and upon subscription.
-			Called with one parameter, the new value. Called when registered
-			and when the value updates.
-	
-	Note: Some frequently updated values (> 10/sec) are only available via
-		polling due to flooding concerns. They can not be observed, as they're
-		assumed to *always* be changed. See the API docs for more details.
-	
-	
-	Rationale:
-	It is convenient and less error-prone if we only have one callback that
-	handles the initialization and update of values. The API provides separate
-	initialization and update methods, so we'll store the initialization and
-	use it to perform the initial call to the observe() callback.
-	
-	In addition, this means we only have to query the initial state once,
-	retrieving a blob of all the data available, rather than retrieving each
-	key one syscall at a time as we instantiate each Qt control.
+		Args:
+			name: ID of the state variable. "exposure", "focusPeakingColor", etc.
+			callback: Function called when the state updates and upon subscription.
+				Called with one parameter, the new value. Called when registered
+				and when the value updates.
+		
+		Note: Some frequently updated values (> 10/sec) are only available via
+			polling due to flooding concerns. They can not be observed, as they're
+			assumed to *always* be changed. See the API docs for more details.
+		
+		
+		Rationale:
+		It is convenient and less error-prone if we only have one callback that
+		handles the initialization and update of values. The API provides separate
+		initialization and update methods, so we'll store the initialization and
+		use it to perform the initial call to the observe() callback.
+		
+		In addition, this means we only have to query the initial state once,
+		retrieving a blob of all the data available, rather than retrieving each
+		key one syscall at a time as we instantiate each Qt control.
 	"""
 	
 	if not hasattr(callback, '_isSilencedCallback'):
@@ -493,7 +493,8 @@ def observe(name: str, callback: Callable[[Any], None]) -> None:
 def observe_future_only(name: str, callback: Callable[[Any], None]) -> None:
 	"""Like `observe`, but without the initial callback when observing.
 	
-	Useful when `observe`ing a derived value, which observe can't deal with yet."""
+		Useful when `observe`ing a derived value, which observe can't deal with yet.
+	"""
 	
 	if not hasattr(callback, '_isSilencedCallback'):
 		raise CallbackNotSilenced(f"{callback} must consider silencing. Decorate with @silenceCallbacks(callback_name, …).")
@@ -506,9 +507,9 @@ def observe_future_only(name: str, callback: Callable[[Any], None]) -> None:
 def silenceCallbacks(*elements):
 	"""Silence events for the duration of a callback.
 	
-	This allows an API element to be updated without triggering the API again.
-	If the API was triggered, it might update the element which would cause an
-	infinite loop.
+		This allows an API element to be updated without triggering the API again.
+		If the API was triggered, it might update the element which would cause an
+		infinite loop.
 	"""
 	
 	def silenceCallbacksOf(callback):

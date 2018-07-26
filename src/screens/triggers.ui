@@ -605,7 +605,7 @@
      <property name="geometry">
       <rect>
        <x>20</x>
-       <y>110</y>
+       <y>160</y>
        <width>141</width>
        <height>25</height>
       </rect>
@@ -618,7 +618,7 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>250</y>
+       <y>300</y>
        <width>201</width>
        <height>61</height>
       </rect>
@@ -640,7 +640,7 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>130</y>
+       <y>180</y>
        <width>201</width>
        <height>61</height>
       </rect>
@@ -662,7 +662,7 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>190</y>
+       <y>240</y>
        <width>201</width>
        <height>61</height>
       </rect>
@@ -683,7 +683,7 @@
     <widget class="QWidget" name="widget_3" native="true">
      <property name="geometry">
       <rect>
-       <x>450</x>
+       <x>440</x>
        <y>140</y>
        <width>341</width>
        <height>251</height>
@@ -696,7 +696,7 @@
     <widget class="HeaderLabel" name="headerlabel_11">
      <property name="geometry">
       <rect>
-       <x>460</x>
+       <x>450</x>
        <y>110</y>
        <width>141</width>
        <height>31</height>
@@ -714,6 +714,79 @@
        <width>41</width>
        <height>41</height>
       </rect>
+     </property>
+    </widget>
+    <widget class="HeaderLabel" name="headerlabel_15">
+     <property name="geometry">
+      <rect>
+       <x>460</x>
+       <y>10</y>
+       <width>301</width>
+       <height>41</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Trigger Action</string>
+     </property>
+    </widget>
+    <widget class="ComboBox" name="combobox_4">
+     <property name="geometry">
+      <rect>
+       <x>440</x>
+       <y>30</y>
+       <width>341</width>
+       <height>81</height>
+      </rect>
+     </property>
+     <property name="clickMarginLeftSetter" stdset="0">
+      <enum>ComboBox::full</enum>
+     </property>
+     <property name="clickMarginRightSetter" stdset="0">
+      <enum>ComboBox::full</enum>
+     </property>
+     <property name="clickMarginTopSetter" stdset="0">
+      <enum>ComboBox::full</enum>
+     </property>
+     <property name="clickMarginBottomSetter" stdset="0">
+      <enum>ComboBox::full</enum>
+     </property>
+     <item>
+      <property name="text">
+       <string>Record End Trigger</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Exposure Trigger</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Shutter Gating</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Frame Sync Output</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>None</string>
+      </property>
+     </item>
+    </widget>
+    <widget class="Label" name="label_2">
+     <property name="geometry">
+      <rect>
+       <x>30</x>
+       <y>100</y>
+       <width>211</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Threshold: 2 volts</string>
      </property>
     </widget>
    </widget>
@@ -758,7 +831,7 @@
       </rect>
      </property>
     </widget>
-    <widget class="Button" name="button_5">
+    <widget class="Button" name="uiConfigure">
      <property name="geometry">
       <rect>
        <x>0</x>
@@ -788,7 +861,7 @@
       <rect>
        <x>440</x>
        <y>320</y>
-       <width>171</width>
+       <width>161</width>
        <height>81</height>
       </rect>
      </property>
@@ -811,9 +884,9 @@
     <widget class="CheckBox" name="checkbox_15">
      <property name="geometry">
       <rect>
-       <x>610</x>
+       <x>600</x>
        <y>320</y>
-       <width>191</width>
+       <width>201</width>
        <height>81</height>
       </rect>
      </property>
@@ -836,9 +909,9 @@
     <widget class="QWidget" name="widget_4" native="true">
      <property name="geometry">
       <rect>
-       <x>450</x>
+       <x>440</x>
        <y>140</y>
-       <width>341</width>
+       <width>361</width>
        <height>181</height>
       </rect>
      </property>
@@ -912,6 +985,19 @@
        <width>41</width>
        <height>41</height>
       </rect>
+     </property>
+    </widget>
+    <widget class="HeaderLabel" name="headerlabel_14">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>110</y>
+       <width>141</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Trigger Area</string>
      </property>
     </widget>
    </widget>

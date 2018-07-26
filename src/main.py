@@ -65,11 +65,13 @@ class Window():
 		from screens.main import Main
 		from screens.widget_test import WidgetTest
 		from screens.triggers import Triggers
+		from screens.stamp import Stamp
 		
 		self._screens = {
 			'main': Main(self),
 			'widget_test': WidgetTest(self),
-			'triggers': Triggers(self)
+			'triggers': Triggers(self),
+			'stamp': Stamp(self),
 		}
 		
 		# Set the initial screen. If in dev mode, due to the frequent restarts,

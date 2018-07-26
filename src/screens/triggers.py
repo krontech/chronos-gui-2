@@ -46,6 +46,7 @@ class Triggers(QtWidgets.QDialog):
 		# Widget behavour.
 		self.uiDone.clicked.connect(window.back)
 		self.uiActiveTrigger.currentIndexChanged.connect(self.changeShownTrigger)
+		self.uiConfigure.clicked.connect(lambda: window.show('stamp'))
 		
 	def changeShownTrigger(self, index):
 		self.uiTriggerScreens.setCurrentIndex(index)
