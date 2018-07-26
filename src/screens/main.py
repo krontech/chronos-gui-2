@@ -41,7 +41,7 @@ class Main(QtWidgets.QDialog):
 	
 	# @pyqtSlot() is not strictly needed - see http://pyqt.sourceforge.net/Docs/PyQt5/signals_slots.html#the-pyqtslot-decorator for details. (import with `from PyQt5.QtCore import pyqtSlot`)
 	def printAnalogGain(self):
-		print("Analog gain is %ins." % api.control('get_video_settings')["analogGain"])
+		print("Analog gain is %ins." % api.control('get', ["analogGain"])["analogGain"])
 	
 	def updateBatteryStatus(self):
 		self.uiBatteryLevel.setText(

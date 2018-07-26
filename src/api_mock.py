@@ -35,14 +35,21 @@ if not QDBusConnection.systemBus().isConnected():
 #    Set up mock dbus interface provider.    #
 ##############################################
 
-class State(QObject):
+class State():
+	cameraModel = "Mock Camera 1.4"
+	cameraApiVersion = 1.0
+	cameraFpgaVersion = 3.14
+	cameraMemoryGB = 160
+	cameraSerial = "Captain Crunch"
+	
 	recording = { #Hack around video pipeline reconstruction being very slow.
 		"hres": 200,
 		"vres": 300,
 		"hoffset": 800,
 		"voffset": 480,
-		"analogGain": 2,
 	}
+	analogGain = 2
+	
 	recordingExposureNs = int(8.5e8) #These don't have to have the pipeline torn down, so they don't need the hack where we set video settings atomically.
 	recordingPeriodNs = int(4e4)
 	
@@ -117,11 +124,11 @@ class ControlMock(QObject):
 	@pyqtSlot(result='QVariantMap')
 	def get_camera_data(self):
 		return {
-			"model": "Mock Camera 1.4",
-			"apiVersion": "1.0",
-			"fpgaVersion": "3.14",
-			"memoryGB": "16",
-			"serial": "Captain Crunch",
+			"cameraModel": "Mock Camera 1.4",
+			"cameraApiVersion": "1.0",
+			"cameraFpgaVersion": "3.14",
+			"cameraMemoryGB": "16",
+			"cameraSerial": "Captain Crunch",
 		}
 		
 	@pyqtSlot(result='QVariantMap')
@@ -234,7 +241,7 @@ class ControlMock(QObject):
 		retval = {}
 		
 		for key in keys:
-			if not hasattr(self._state, key):
+			if key[0] is '_' or not hasattr(self._state, key): # Don't allow querying of private variables.
 				return cameraControlAPI.send( #Todo: This isn't how you return errors.
 					QDBusMessage.createErrorReply('unknownValue', f"The value '{key}' is not known. Valid keys are: {self._state.keys()}")
 				)
@@ -246,7 +253,7 @@ class ControlMock(QObject):
 	def set(self, data):
 		# Check all errors first to avoid partially applying an update.
 		for key, value in data.items():
-			if key not in self._state:
+			if key[0] is '_' or not hasattr(self._state, key):  # Don't allow setting of private variables.
 				# return self.sendErrorReply('unknownValue', f"The value '{key}' is not known. Valid keys are: {self._state.keys()}")
 				cameraControlAPI.send(
 					QDBusMessage.createErrorReply('unknownValue', f"The value '{key}' is not known. Valid keys are: {self._state.keys()}") )
@@ -397,7 +404,6 @@ _camState = control('get', [
 	"triggerDelayNs",
 	"triggers",
 ])
-
 if(not _camState):
 	raise Error("cache failed to populate")
 
