@@ -45,7 +45,7 @@ class Main(QtWidgets.QDialog):
 	
 	def updateBatteryStatus(self):
 		self.uiBatteryLevel.setText(
-			f"{round(api.control('get_power_status')['batteryCharge']*100)}%" )
+			f"{round(api.control('get', ['batteryCharge'])['batteryCharge']*100)}%" )
 		
 	@pyqtSlot(int)
 	@silenceCallbacks('uiExposureSlider')

@@ -21,7 +21,7 @@ import random
 from debugger import *; dbg
 
 from PyQt5.QtCore import pyqtSlot, QObject, QTimer
-from PyQt5.QtDBus import QDBusConnection, QDBusInterface, QDBusReply, QDBusMessage
+from PyQt5.QtDBus import QDBusConnection, QDBusInterface, QDBusReply, QDBusMessage, QDBusError
 from typing import Callable, Any
 
 
@@ -31,24 +31,122 @@ if not QDBusConnection.systemBus().isConnected():
 	sys.exit(-1)
 
 
+#Pending callbacks is used by state callbacks to queue long-running or multi
+#arg tasks such as changeRecordingResolution. This is so a call to set which
+#contains x/y/w/h of a new camera resolution only actually resets the camera
+#video pipeline once. Each function which appears in the list is called only
+#once, after all values have been set.
+pendingCallbacks = []
+
+
+def changeRecordingResolution(state):
+	print(f'Mock: changing recording resolution to xywh {recordingHoffset} {recordingVoffset} {recordingHRes} {recordingVRes}.')
+
+
+def notifyExposureChange(state):
+	print('TODO: Notify exposure change.')
+	#self.emitControlSignal('maxExposureNs', 7e8) # Example.
+	#self.emitControlSignal('minExposureNs', 3e2)
+
+
 ##############################################
 #    Set up mock dbus interface provider.    #
 ##############################################
 
 class State():
+	#Invariant data about the camera.
 	cameraModel = "Mock Camera 1.4"
 	cameraApiVersion = 1.0
 	cameraFpgaVersion = 3.14
 	cameraMemoryGB = 160
 	cameraSerial = "Captain Crunch"
+	sensorName = "acme9001"
+	sensorHMax = 1920
+	sensorVMax = 1080
+	sensorHMin = 256
+	sensorVMin = 64
+	sensorHIncrement = 2
+	sensorVIncrement = 32
+	sensorPixelRate = 1920 * 1080 * 1000
+	sensorPixelFormat = "BYR2"
+	sensorFramerateMax = 1000
+	sensorQuantizeTimingNs = 250
+	sensorMinExposureNs = int(1e3)
+	sensorMaxExposureNs = int(1e9)
+	sensorMaxShutterAngle = 330
+	timingMaxPeriod = sys.maxsize
 	
-	recording = { #Hack around video pipeline reconstruction being very slow.
-		"hres": 200,
-		"vres": 300,
-		"hoffset": 800,
-		"voffset": 480,
-	}
-	analogGain = 2
+	@property
+	def timingMinPeriod(self):
+		return (state.recordingHRes * state.recordingVRes * int(1e9)) / state.sensorPixelRate
+	
+	timingMinExposureNs = sensorMinExposureNs
+	timingMaxExposureNs = sensorMaxExposureNs
+	timingExposureDelayNs = 1000
+	timingMaxShutterAngle = 330
+	timingQuantization = 1e9 / sensorQuantizeTimingNs
+	
+	#Camera state.
+	externallyPowered = True
+	batteryCharge = 1. #0. to 1. inclusive
+	
+	@property
+	def batteryVoltage(self):
+		return random.choice((12.38, 12.38, 12.39, 12.39, 12.40))
+	
+	_recordingHRes = 200 #rebuilds video pipeline
+	
+	
+	@property
+	def recordingHRes(self): #rebuilds video pipeline
+		return self._recordingHRes
+	
+	@recordingHRes.setter
+	def recordingHRes(self, value):
+		global pendingCallbacks
+		self._recordingHRes = value
+		pendingCallbacks += [changeRecordingResolution, notifyExposureChange]
+	
+	_recordingVRes = 300 
+	
+	
+	@property
+	def recordingVRes(self): 
+		return self._recordingVRes
+	
+	@recordingVRes.setter
+	def recordingVRes(self, value):
+		global pendingCallbacks
+		self._recordingVRes = value
+		pendingCallbacks += [changeRecordingResolution, notifyExposureChange]
+	
+	_recordingHoffset = 800 #rebuilds video pipeline
+	
+	
+	@property
+	def recordingHoffset(self): #rebuilds video pipeline
+		return self._recordingHoffset
+	
+	@recordingHoffset.setter
+	def recordingHoffset(self, value):
+		global pendingCallbacks
+		self._recordingHoffset = value
+		pendingCallbacks += [changeRecordingResolution]
+	
+	_recordingVoffset = 480
+	
+	
+	@property
+	def recordingVoffset(self):
+		return self._recordingVoffset
+	
+	@recordingVoffset.setter
+	def recordingVoffset(self, value):
+		global pendingCallbacks
+		self._recordingVoffset = value
+		pendingCallbacks += [changeRecordingResolution]
+	
+	recordingAnalogGain = 2 #doesn't rebuild video pipeline
 	
 	recordingExposureNs = int(8.5e8) #These don't have to have the pipeline torn down, so they don't need the hack where we set video settings atomically.
 	recordingPeriodNs = int(4e4)
@@ -117,58 +215,25 @@ class State():
 		},
 	}
 
+state = State()
+
 
 class ControlMock(QObject):
-	_state = State()
-		
-	@pyqtSlot(result='QVariantMap')
-	def get_camera_data(self):
-		return {
-			"cameraModel": "Mock Camera 1.4",
-			"cameraApiVersion": "1.0",
-			"cameraFpgaVersion": "3.14",
-			"cameraMemoryGB": "16",
-			"cameraSerial": "Captain Crunch",
-		}
-		
-	@pyqtSlot(result='QVariantMap')
-	def get_video_settings(self):
-		return self._state.recording
-	
-	@pyqtSlot('QVariantMap')
-	def set_video_settings(self, data):
-		for k in ("recordingGeometry", "recordingExposureNs", "recordingPeriodNs", "analogGain"):
-			self._state.recording[k] = data[k]
-	
-	@pyqtSlot(result='QVariantMap')
-	def get_sensor_data(self):
-		return {
-			"name": "acme9001",
-			"hMax": 1920,
-			"vMax": 1080,
-			"hMin": 256,
-			"vMin": 64,
-			"hIncrement": 2,
-			"vIncrement": 32,
-			"pixelRate": 1920 * 1080 * 1000,
-			"pixelFormat": "BYR2",
-			"framerateMax": 1000,
-			"quantizeTimingNs": 250,
-			"minExposureNs": int(1e3),
-			"maxExposureNs": int(1e9),
-			"maxShutterAngle": 330,
-		}
+	@pyqtSlot()
+	def power_down(self):
+		print('powering down camera…')
+		print('aborted, mock will not shut down machine')
 	
 	@pyqtSlot(result='QVariantMap')
 	def get_timing_limits(self):
 		return {
-			"maxPeriod": sys.maxsize,
-			"minPeriod": (self._state.recording['hres'] * self._state.recording['vres'] * int(1e9)) / self.get_sensor_data()['pixelRate'],
-			"minExposureNs": self.get_sensor_data()["minExposureNs"],
-			"maxExposureNs": self.get_sensor_data()["maxExposureNs"],
+			"maxPeriod": state.timingMaxPeriod,
+			"minPeriod": state.timingMinPeriod,
+			"minExposureNs": state.sensorMinExposureNs,
+			"maxExposureNs": state.sensorMaxExposureNs,
 			"exposureDelayNs": 1000, 
 			"maxShutterAngle": 330,
-			"quantization": 1e9 / self.get_sensor_data()['quantizeTimingNs'], #DDR 2018-06-18: What is this? It's pulled from the C API's constraints.f_quantization value.
+			"quantization": 1e9 / state.sensorQuantizeTimingNs, #DDR 2018-06-18: What is this? It's pulled from the C API's constraints.f_quantization value.
 		}
 	
 	@pyqtSlot(result='QVariantMap')
@@ -221,9 +286,9 @@ class ControlMock(QObject):
 		}]
 		
 	def emitControlSignal(self, name, value=None):
-		"""Emit an update signal, usually indicating a value has changed."""
+		"""Emit an update signal, usually for indicating a value has changed."""
 		signal = QDBusMessage.createSignal('/', 'com.krontech.chronos.control.mock', name)
-		signal << getattr(self._state, name) if value is None else value
+		signal << getattr(state, name) if value is None else value
 		QDBusConnection.systemBus().send(signal)
 		
 	@pyqtSlot(result='QVariantMap')
@@ -241,11 +306,12 @@ class ControlMock(QObject):
 		retval = {}
 		
 		for key in keys:
-			if key[0] is '_' or not hasattr(self._state, key): # Don't allow querying of private variables.
-				return cameraControlAPI.send( #Todo: This isn't how you return errors.
-					QDBusMessage.createErrorReply('unknownValue', f"The value '{key}' is not known. Valid keys are: {self._state.keys()}")
-				)
-			retval[key] = getattr(self._state, key)
+			if key[0] is '_' or not hasattr(state, key): # Don't allow querying of private variables.
+				#QDBusMessage.createErrorReply does not exist in PyQt5, and QDBusMessage.errorReply can't be sent.
+				dbg()
+				return print("D-BUS ERROR", QDBusError.UnknownProperty, f"The value '{key}' is not known.\nValid keys are: {[i for i in dir(state) if i[0] != '_']}")
+			
+			retval[key] = getattr(state, key)
 		
 		return retval
 	
@@ -253,32 +319,31 @@ class ControlMock(QObject):
 	def set(self, data):
 		# Check all errors first to avoid partially applying an update.
 		for key, value in data.items():
-			if key[0] is '_' or not hasattr(self._state, key):  # Don't allow setting of private variables.
-				# return self.sendErrorReply('unknownValue', f"The value '{key}' is not known. Valid keys are: {self._state.keys()}")
-				cameraControlAPI.send(
-					QDBusMessage.createErrorReply('unknownValue', f"The value '{key}' is not known. Valid keys are: {self._state.keys()}") )
-			if not isinstance(value, type(getattr(self._state, key))):
-				return cameraControlAPI.send(
-					QDBusMessage.createErrorReply('wrongType', f"Can not set '{key}' to {value}. (Previously {getattr(self._state, key)}.) Expected {type(getattr(self._state, key))}, got {type(value)}.")
-				)
+			if key[0] is '_' or not hasattr(state, key):  # Don't allow setting of private variables.
+				# return self.sendError('unknownValue', f"The value '{key}' is not known.\nValid keys are: {[i for i in dir(state) if i[0] != '_']}")
+				return print("D-BUS ERROR", QDBusError.UnknownProperty, f"The value '{key}' is not known.\nValid keys are: {[i for i in dir(state) if i[0] != '_']}")
+			if not isinstance(value, type(getattr(state, key))):
+				return print("D-BUS ERROR", QDBusError.InvalidSignature, f"Can not set '{key}' to {value}.\n(Previously {getattr(state, key)}.) Expected {type(getattr(state, key))}, got {type(value)}.")
 		
+		# Set only changed variables. Changing can be quite involved, such as with recordingHRes.
 		for key, value in data.items():
-			setattr(self._state, key, value)
-			self.emitControlSignal(key)
-			print(f"updated {key} to {value}")
-	
-		for key, value in data.items():
-			if key == 'recording':
-				print("TODO DDR 2018-07-12: Emit update events for recording limits.")
-				self.emitControlSignal('maxExposureNs', 7e8) # Example.
-				self.emitControlSignal('minExposureNs', 3e2)
+			if getattr(state, key) != value:
+				setattr(state, key, value)
+				self.emitControlSignal(key)
+				print(f"updated {key} to {value}")
+				
+		
+		#Call each callback only once. For long-running callbacks ior multi-arg tasks.
+		global pendingCallbacks
+		[cb(_state) for cb in {cb for cb in pendingCallbacks}]
+		pendingCallbacks = []
 	
 	def __init__(self):
 		super(ControlMock, self).__init__()
 		
 		# Inject some fake update events.
 		def test1():
-			self._state.recordingExposureNs = int(8e8)
+			state.recordingExposureNs = int(8e8)
 			self.emitControlSignal('recordingExposureNs')
 			
 		self._timer1 = QTimer()
@@ -287,7 +352,7 @@ class ControlMock(QObject):
 		self._timer1.start(1000) #ms
 		
 		def test2():
-			self._state.recordingExposureNs = int(2e8)
+			state.recordingExposureNs = int(2e8)
 			self.emitControlSignal('recordingExposureNs')
 			
 		self._timer2 = QTimer()
@@ -296,7 +361,7 @@ class ControlMock(QObject):
 		self._timer2.start(2000) #ms
 		
 		def test3():
-			self._state.recordingExposureNs = int(8.5e8)
+			state.recordingExposureNs = int(8.5e8)
 			self.emitControlSignal('recordingExposureNs')
 			
 		self._timer3 = QTimer()
@@ -388,24 +453,9 @@ def control(*args, **kwargs):
 
 
 # State for observe().
-_camState = control('get', [
-	"recording",
-	"recordingExposureNs",
-	"recordingPeriodNs",
-	"currentVideoState",
-	"currentCameraState",
-	"focusPeakingColor",
-	"focusPeakingIntensity",
-	"zebraStripesEnabled",
-	"connectionTime",
-	"disableRingBuffer",
-	"recordedSegments",
-	"whiteBalance",
-	"triggerDelayNs",
-	"triggers",
-])
+_camState = control('get', [i for i in dir(state) if i[0] != '_'])
 if(not _camState):
-	raise Error("cache failed to populate")
+	raise Exception("Cache failed to populate. This indicates the get call is not working.")
 
 # Keep observe()'s state up-to-date.
 # TODO DDR 2018-06-22: This is broken currently, as connect() never returns here.
