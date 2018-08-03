@@ -163,11 +163,12 @@ class State():
 		"end": 1000,
 		"hres": 200,
 		"vres": 300,
-		"timestamp": "2018-06-19T02:05:52.664Z",
+		"id": "ldPxTT5R",
 	}]
 	whiteBalance = [1., 1., 1.]
 	triggerDelayNs = int(1e9)
-	triggers = {
+	
+	triggerConfiguration = { #read/write, what the triggers do
 		"trig1": {
 			"action": "none",
 			"threshold": 2.50,
@@ -214,90 +215,129 @@ class State():
 			"pullup20ma": True,
 		},
 	}
+	
+	@property
+	def triggerCapabilities(self): #read, what the triggers are capable of
+		return {
+			"trig1": {                     # id
+				"name": "Trigger 1 (BNC)", # full name (human-readable label)
+				"label": "TRIG1",          # short name (as printed on the case)
+				"thresholdMinV": 0.,
+				"thresholdMaxV": 7.2,
+				"pullup1ma": True,
+				"pullup20ma": True,
+				"outputCapable": True,
+			},
+			"trig2": {
+				"name": "Trigger 2",
+				"label": "TRIG2",
+				"thresholdMinV": 0.,
+				"thresholdMaxV": 7.2,
+				"pullup1ma": False,
+				"pullup20ma": True,
+				"outputCapable": True,
+			},
+			"trig3": {
+				"name": "Trigger 3 (isolated)",
+				"label": "TRIG3",
+				"thresholdMinV": 0.,
+				"thresholdMaxV": 7.2,
+				"pullup1ma": False,
+				"pullup20ma": False,
+				"outputCapable": False,
+			},
+			"~a1": { #DDR 2018-06-18: I don't know what the analog input settings will be like.
+				"name": "Analog 1",
+				"label": "~A1",
+				"thresholdMinV": 0.,
+				"thresholdMaxV": 7.2,
+				"pullup1ma": False,
+				"pullup20ma": False,
+				"outputCapable": False,
+			},
+			"~a2": {
+				"name": "Analog 2",
+				"label": "~A2",
+				"thresholdMinV": 0.,
+				"thresholdMaxV": 7.2,
+				"pullup1ma": False,
+				"pullup20ma": False,
+				"outputCapable": False,
+			},
+		}
+	
+	@property
+	def triggers(self):
+		return list(self.triggerCapabilities.keys())
+	
+	@property
+	def triggerState(self):
+		return {
+			"trig1": {
+				"active": random.choice((True, False)), #such modelling, so sophisticated 🖏 
+				"voltage": random.choice((2.45, 2.50, 2.50, 2.50, 2.50, 4.11, 4.12))
+			},
+			"trig2": {
+				"active": random.choice((True, False)),
+				"voltage": random.choice((2.45, 2.50, 2.50, 2.50, 2.50, 4.11, 4.12))
+			},
+			"trig3": {
+				"active": random.choice((True, False)),
+				"voltage": random.choice((2.45, 2.50, 2.50, 2.50, 2.50, 4.11, 4.12))
+			},
+			"~a1": {
+				"active": random.choice((True, False)),
+				"voltage": random.choice((2.45, 2.50, 2.50, 2.50, 2.50, 4.11, 4.12))
+			},
+			"~a2": {
+				"active": random.choice((True, False)),
+				"voltage": random.choice((2.45, 2.50, 2.50, 2.50, 2.50, 4.11, 4.12))
+			},
+		}
+		
+	
 
 state = State()
 
 
 class ControlMock(QObject):
-	@pyqtSlot()
-	def power_down(self):
-		print('powering down camera…')
-		print('aborted, mock will not shut down machine')
-	
-	@pyqtSlot(result='QVariantMap')
-	def get_timing_limits(self):
-		return {
-			"maxPeriod": state.timingMaxPeriod,
-			"minPeriod": state.timingMinPeriod,
-			"minExposureNs": state.sensorMinExposureNs,
-			"maxExposureNs": state.sensorMaxExposureNs,
-			"exposureDelayNs": 1000, 
-			"maxShutterAngle": 330,
-			"quantization": 1e9 / state.sensorQuantizeTimingNs, #DDR 2018-06-18: What is this? It's pulled from the C API's constraints.f_quantization value.
-		}
-	
-	@pyqtSlot(result='QVariantMap')
-	def get_trigger_data(self):
-		return [{                     # internal id
-			"name": "Trigger 1 (BNC)", # full name (human-readable label)
-			"label": "TRIG1",          # short name (as printed on the case)
-			"thresholdMinV": 0.,
-			"thresholdMaxV": 7.2,
-			"pullup1ma": True,
-			"pullup20ma": True,
-			"enabled": True,
-			"outputCapable": True,
-		}, {
-			"name": "Trigger 2",
-			"label": "TRIG2",
-			"thresholdMinV": 0.,
-			"thresholdMaxV": 7.2,
-			"pullup1ma": False,
-			"pullup20ma": True,
-			"enabled": True,
-			"outputCapable": True,
-		}, {
-			"name": "Trigger 3 (isolated)",
-			"label": "TRIG3",
-			"thresholdMinV": 0.,
-			"thresholdMaxV": 7.2,
-			"pullup1ma": False,
-			"pullup20ma": False,
-			"enabled": True,
-			"outputCapable": False,
-		}, { #DDR 2018-06-18: I don't know what the analog input settings will be like.
-			"name": "Analog 1",
-			"label": "~A1",
-			"thresholdMinV": 0.,
-			"thresholdMaxV": 7.2,
-			"pullup1ma": False,
-			"pullup20ma": False,
-			"enabled": False,
-			"outputCapable": False,
-		}, {
-			"name": "Analog 2",
-			"label": "~A2",
-			"thresholdMinV": 0.,
-			"thresholdMaxV": 7.2,
-			"pullup1ma": False,
-			"pullup20ma": False,
-			"enabled": False,
-			"outputCapable": False,
-		}]
+	def __init__(self):
+		super(ControlMock, self).__init__()
 		
+		# Inject some fake update events.
+		def test1():
+			state.recordingExposureNs = int(8e8)
+			self.emitControlSignal('recordingExposureNs')
+			
+		self._timer1 = QTimer()
+		self._timer1.timeout.connect(test1)
+		self._timer1.setSingleShot(True)
+		self._timer1.start(1000) #ms
+		
+		def test2():
+			state.recordingExposureNs = int(2e8)
+			self.emitControlSignal('recordingExposureNs')
+			
+		self._timer2 = QTimer()
+		self._timer2.timeout.connect(test2)
+		self._timer2.setSingleShot(True)
+		self._timer2.start(2000) #ms
+		
+		def test3():
+			state.recordingExposureNs = int(8.5e8)
+			self.emitControlSignal('recordingExposureNs')
+			
+		self._timer3 = QTimer()
+		self._timer3.timeout.connect(test3)
+		self._timer3.setSingleShot(True)
+		self._timer3.start(3000) #ms
+	
+	
 	def emitControlSignal(self, name, value=None):
 		"""Emit an update signal, usually for indicating a value has changed."""
 		signal = QDBusMessage.createSignal('/', 'com.krontech.chronos.control.mock', name)
 		signal << getattr(state, name) if value is None else value
 		QDBusConnection.systemBus().send(signal)
-		
-	@pyqtSlot(result='QVariantMap')
-	def get_power_status(self):
-		return {
-			"externallyPowered": True,
-			"batteryCharge": 1., #0. to 1. inclusive
-			"batteryVoltage": random.choice((12.38, 12.38, 12.39, 12.39, 12.40)),
-		}
 	
 	
 	@pyqtSlot(QDBusMessage, result='QVariantMap')
@@ -337,36 +377,14 @@ class ControlMock(QObject):
 		[cb(_state) for cb in {cb for cb in pendingCallbacks}]
 		pendingCallbacks = []
 	
-	def __init__(self):
-		super(ControlMock, self).__init__()
+	@pyqtSlot()
+	def power_down(self):
+		print('powering down camera…')
+		print('aborted, mock will not shut down machine')
 		
-		# Inject some fake update events.
-		def test1():
-			state.recordingExposureNs = int(8e8)
-			self.emitControlSignal('recordingExposureNs')
-			
-		self._timer1 = QTimer()
-		self._timer1.timeout.connect(test1)
-		self._timer1.setSingleShot(True)
-		self._timer1.start(1000) #ms
-		
-		def test2():
-			state.recordingExposureNs = int(2e8)
-			self.emitControlSignal('recordingExposureNs')
-			
-		self._timer2 = QTimer()
-		self._timer2.timeout.connect(test2)
-		self._timer2.setSingleShot(True)
-		self._timer2.start(2000) #ms
-		
-		def test3():
-			state.recordingExposureNs = int(8.5e8)
-			self.emitControlSignal('recordingExposureNs')
-			
-		self._timer3 = QTimer()
-		self._timer3.timeout.connect(test3)
-		self._timer3.setSingleShot(True)
-		self._timer3.start(3000) #ms
+	@pyqtSlot(result='QVariantMap')
+	def available_keys(self):
+		return [i for i in dir(state) if i[0] != '_']
 			
 
 

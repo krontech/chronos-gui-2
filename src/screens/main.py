@@ -31,12 +31,11 @@ class Main(QtWidgets.QDialog):
 		self._timer.start(500) #ms
 		
 		#Set up exposure slider.
-		self._timingLimits = api.control('get_timing_limits')
-		self.uiExposureSlider.setMaximum(self._timingLimits['maxExposureNs'])
-		self.uiExposureSlider.setMinimum(self._timingLimits['minExposureNs'])
 		api.observe('recordingExposureNs', self.updateExposureNs)
-		api.observe_future_only('minExposureNs', self.updateExposureMin)
-		api.observe_future_only('maxExposureNs', self.updateExposureMax)
+		self.uiExposureSlider.setMaximum(api.get('sensorMaxExposureNs'))
+		self.uiExposureSlider.setMinimum(api.get('sensorMinExposureNs'))
+		api.observe_future_only('sensorMaxExposureNs', self.updateExposureMax)
+		api.observe_future_only('sensorMinExposureNs', self.updateExposureMin)
 		self.uiExposureSlider.valueChanged.connect(
 			lambda val: api.control('set', {'recordingExposureNs': val}) )
 	
