@@ -308,7 +308,6 @@ class ControlMock(QObject):
 		for key in keys:
 			if key[0] is '_' or not hasattr(state, key): # Don't allow querying of private variables.
 				#QDBusMessage.createErrorReply does not exist in PyQt5, and QDBusMessage.errorReply can't be sent.
-				dbg()
 				return print("D-BUS ERROR", QDBusError.UnknownProperty, f"The value '{key}' is not known.\nValid keys are: {[i for i in dir(state) if i[0] != '_']}")
 			
 			retval[key] = getattr(state, key)
@@ -444,6 +443,31 @@ def control(*args, **kwargs):
 	"""
 	
 	msg = QDBusReply(cameraControlAPI.call(*args, **kwargs))
+	if not msg.isValid():
+		raise DBusException("%s: %s" % (msg.error().name(), msg.error().message()))
+	return msg.value()
+
+
+def get(keyOrKeys):
+	"""Call the camera control DBus get method.
+		
+		Accepts str or [str].
+		
+		Returns value or [value], relatively.
+	"""
+	
+	keyList = [keyOrKeys] if isinstance(keyOrKeys, str) else keyOrKeys
+	
+	msg = QDBusReply(cameraControlAPI.call('get', keyList))
+	if not msg.isValid():
+		raise DBusException("%s: %s" % (msg.error().name(), msg.error().message()))
+	return msg.value()[keyOrKeys] if isinstance(keyOrKeys, str) else msg.value()
+
+
+def set(values):
+	"""Call the camera control DBus set method. Accepts {str: value}."""
+	
+	msg = QDBusReply(cameraControlAPI.call('set', values))
 	if not msg.isValid():
 		raise DBusException("%s: %s" % (msg.error().name(), msg.error().message()))
 	return msg.value()
