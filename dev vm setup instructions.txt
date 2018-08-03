@@ -36,11 +36,11 @@ I hope it works.
 			> sudo make install
 			> export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
 				- I also added this to .bashrc. This might cause problems later though if something doesn't like it.
-		> ./configure #--enable-optimizations not needed in VM, but absolutely will be needed on the camera. Takes forever to compile.
+		> ./configure #--enable-optimizations not needed (or wanted?) in VM, but absolutely will be needed on the camera. Takes forever to compile though.
 		> make -j4
 		> sudo make install #altinstall is recommended, but we don't have a python3 version we care to preserve
 		- python3[.6] is now available
-	- pip
+	x pip #no, this is taken care of by python... check for pip3.
 		> wget https://bootstrap.pypa.io/3.2/get-pip.py
 		> sudo python3 get-pip.py #gets us pip 7
 		> sudo pip install --upgrade pip #gets us pip 10
@@ -56,7 +56,7 @@ I hope it works.
 		> sudo apt-get install bison build-essential flex gperf libgstreamer-plugins-base0.10-dev libasound2-dev libatkmm-1.6-dev libbz2-dev libcap-dev libcups2-dev libdrm-dev libegl1-mesa-dev libfontconfig1-dev libfreetype6-dev libgcrypt11-dev libglu1-mesa-dev libgstreamer0.10-dev libicu-dev libnss3-dev libpci-dev libpulse-dev libssl-dev libudev-dev libx11-dev libx11-xcb-dev libxcb-composite0 libxcb-composite0-dev libxcb-damage0 libxcb-damage0-dev libxcb-dpms0 libxcb-dpms0-dev libxcb-dri2-0 libxcb-dri2-0-dev libxcb-glx0 libxcb-glx0-dev libxcb-icccm4 libxcb-image0 libxcb-keysyms1 libxcb-randr0 libxcb-randr0-dev libxcb-record0 libxcb-record0-dev libxcb-render-util0 libxcb-render-util0-dev libxcb-render0 libxcb-render0-dev libxcb-res0 libxcb-res0-dev libxcb-screensaver0 libxcb-screensaver0-dev libxcb-shape0 libxcb-shape0-dev libxcb-shm0 libxcb-shm0-dev libxcb-sync0-dev libxcb-xevie0 libxcb-xevie0-dev libxcb-xf86dri0 libxcb-xf86dri0-dev libxcb-xfixes0 libxcb-xfixes0-dev libxcb-xinerama0 libxcb-xinerama0-dev libxcb-xprint0 libxcb-xprint0-dev libxcb-xtest0 libxcb-xtest0-dev libxcb-xv0 libxcb-xv0-dev libxcb-xvmc0 libxcb-xvmc0-dev libxcb1 libxcb1-dev libxcomposite-dev libxcursor-dev libxdamage-dev libxext-dev libxfixes-dev libxi-dev libxrandr-dev libxrender-dev libxslt-dev libxss-dev libxtst-dev perl ruby libdbus-1-dev libdbus-glib-1-dev
 			- QT Quick doesn't compile for me by default, it seems. Try to fix from https://www.ics.com/blog/how-compile-qt-source-code-linux.
 				- Not all packages -- especiall the -dev ones -- could be found. I have removed those and hope for the best.
-				- Only gperf and bison are actually *required* to be installed. All of Qt is optional, it would seem.
+				- Only gperf and bison are actually *required* to be installed. Almost all of Qt is optional, it would seem.
 		> ./configure -prefix $PWD/qtbase -opensource --confirm-license -nomake tests 2>&1 | tee configure.log
 		> time make -j4 2>&1 | tee make.log
 		> cd ~/
