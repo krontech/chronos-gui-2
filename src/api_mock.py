@@ -373,11 +373,18 @@ class ControlMock(QObject):
 
 
 if not QDBusConnection.systemBus().registerService('com.krontech.chronos.control.mock'):
-	sys.stderr.write(f"Could not register service: {QDBusConnection.systemBus().lastError().message() or '(no message)'}\n")
+	sys.stderr.write(f"Could not register control service: {QDBusConnection.systemBus().lastError().message() or '(no message)'}\n")
 	sys.exit(2)
 
 controlMock = ControlMock() #This absolutely, positively can't be inlined or it throws error "No such object path '/'".
 QDBusConnection.systemBus().registerObject('/', controlMock, QDBusConnection.ExportAllSlots)
+
+if not QDBusConnection.systemBus().registerService('com.krontech.chronos.video.mock'):
+	sys.stderr.write(f"Could not register video service: {QDBusConnection.systemBus().lastError().message() or '(no message)'}\n")
+	sys.exit(2)
+
+videoMock = ControlMock() #This absolutely, positively can't be inlined or it throws error "No such object path '/'".
+QDBusConnection.systemBus().registerObject('/', videoMock, QDBusConnection.ExportAllSlots)
 
 
 
@@ -392,9 +399,9 @@ cameraControlAPI = QDBusInterface(
 	'', #Interface
 	QDBusConnection.systemBus() )
 cameraVideoAPI = QDBusInterface(
-	'com.krontech.chronos.video', #Service
-	'/com/krontech/chronos/video', #Path
-	'com.krontech.chronos.video', #Interface
+	'com.krontech.chronos.video.mock', #Service
+	'/', #Path
+	'', #Interface
 	QDBusConnection.systemBus() )
 
 cameraControlAPI.setTimeout(16) #Default is -1, which means 25000ms. 25 seconds is too long to go without some sort of feedback, and the only real long-running operation we have - saving - can take upwards of 5 minutes. Instead of setting the timeout to half an hour, we should probably use events which are emitted as the event progresses. One frame (at 60fps) should be plenty of time for the API to respond, and also quick enough that we'll notice any slowness. The mock replies to messages in under 1ms, so I'm not too worried here.
