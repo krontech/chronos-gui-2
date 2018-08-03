@@ -22,7 +22,7 @@ class Button(QPushButton, TouchMarginPlugin):
 
 
 	def sizeHint(self):
-		return QSize(161, 61)
+		return QSize(181, 81)
 		
 	def refreshStyle(self):
 		if self.showHitRects:

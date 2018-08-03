@@ -20,4 +20,4 @@ class HeaderLabel(QLabel):
 
 
 	def sizeHint(self):
-		return QSize(141, 31)
+		return QSize(241, 31)

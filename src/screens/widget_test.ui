@@ -559,6 +559,18 @@
      <height>61</height>
     </rect>
    </property>
+   <property name="clickMarginLeftSetter" stdset="0">
+    <enum>Button::half</enum>
+   </property>
+   <property name="clickMarginRightSetter" stdset="0">
+    <enum>Button::half</enum>
+   </property>
+   <property name="clickMarginTopSetter" stdset="0">
+    <enum>Button::half</enum>
+   </property>
+   <property name="clickMarginBottomSetter" stdset="0">
+    <enum>Button::half</enum>
+   </property>
   </widget>
   <widget class="Button" name="button_3">
    <property name="geometry">
@@ -569,6 +581,18 @@
      <height>61</height>
     </rect>
    </property>
+   <property name="clickMarginLeftSetter" stdset="0">
+    <enum>Button::half</enum>
+   </property>
+   <property name="clickMarginRightSetter" stdset="0">
+    <enum>Button::half</enum>
+   </property>
+   <property name="clickMarginTopSetter" stdset="0">
+    <enum>Button::half</enum>
+   </property>
+   <property name="clickMarginBottomSetter" stdset="0">
+    <enum>Button::half</enum>
+   </property>
   </widget>
   <widget class="Button" name="button_5">
    <property name="geometry">
@@ -578,6 +602,18 @@
      <width>121</width>
      <height>61</height>
     </rect>
+   </property>
+   <property name="clickMarginLeftSetter" stdset="0">
+    <enum>Button::half</enum>
+   </property>
+   <property name="clickMarginRightSetter" stdset="0">
+    <enum>Button::half</enum>
+   </property>
+   <property name="clickMarginTopSetter" stdset="0">
+    <enum>Button::half</enum>
+   </property>
+   <property name="clickMarginBottomSetter" stdset="0">
+    <enum>Button::half</enum>
    </property>
   </widget>
   <widget class="CheckBox" name="checkbox_2">
@@ -592,6 +628,15 @@
    <property name="text">
     <string>checkbox #2</string>
    </property>
+   <property name="clickMarginLeftSetter" stdset="0">
+    <enum>CheckBox::half</enum>
+   </property>
+   <property name="clickMarginTopSetter" stdset="0">
+    <enum>CheckBox::half</enum>
+   </property>
+   <property name="clickMarginBottomSetter" stdset="0">
+    <enum>CheckBox::half</enum>
+   </property>
   </widget>
   <widget class="RadioButton" name="radiobutton_2">
    <property name="geometry">
@@ -604,6 +649,15 @@
    </property>
    <property name="text">
     <string>Another Radio</string>
+   </property>
+   <property name="clickMarginLeftSetter" stdset="0">
+    <enum>RadioButton::half</enum>
+   </property>
+   <property name="clickMarginTopSetter" stdset="0">
+    <enum>RadioButton::half</enum>
+   </property>
+   <property name="clickMarginBottomSetter" stdset="0">
+    <enum>RadioButton::half</enum>
    </property>
   </widget>
   <widget class="ComboBox" name="combobox_2">
@@ -1563,15 +1617,6 @@ so tall</string>
    </property>
    <property name="text">
     <string>Back</string>
-   </property>
-   <property name="clickMarginLeftSetter" stdset="0">
-    <enum>Button::full</enum>
-   </property>
-   <property name="clickMarginRightSetter" stdset="0">
-    <enum>Button::half</enum>
-   </property>
-   <property name="clickMarginTopSetter" stdset="0">
-    <enum>Button::full</enum>
    </property>
   </widget>
   <zorder>white_4</zorder>

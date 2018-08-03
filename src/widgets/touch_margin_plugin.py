@@ -34,10 +34,10 @@ class TouchMarginPlugin(MarginWidth):
 		# Invisible margin to make clicking on buttons easier. When placing
 		# buttons, it's important to make sure the margin isn't on top of other
 		# elements.
-		self._clickMarginLeft = MarginWidth.half
-		self._clickMarginRight = MarginWidth.half
-		self._clickMarginTop = MarginWidth.half
-		self._clickMarginBottom = MarginWidth.half
+		self._clickMarginLeft = MarginWidth.full
+		self._clickMarginRight = MarginWidth.full
+		self._clickMarginTop = MarginWidth.full
+		self._clickMarginBottom = MarginWidth.full
 		
 		# self._clickMarginColor = f"rgba({randint(0, 32)}, {randint(0, 32)}, {randint(128, 255)}, {randint(32,96)})"
 		colour = randint(100, 227)

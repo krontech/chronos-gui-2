@@ -54,9 +54,6 @@
    <property name="clickMarginTopSetter" stdset="0">
     <enum>Button::none</enum>
    </property>
-   <property name="clickMarginBottomSetter" stdset="0">
-    <enum>Button::full</enum>
-   </property>
   </widget>
   <widget class="Button" name="uiTriggerDelay">
    <property name="geometry">
@@ -78,9 +75,6 @@
    </property>
    <property name="clickMarginTopSetter" stdset="0">
     <enum>Button::none</enum>
-   </property>
-   <property name="clickMarginBottomSetter" stdset="0">
-    <enum>Button::full</enum>
    </property>
   </widget>
   <widget class="Button" name="uiPrefsAndUtils">
@@ -104,9 +98,6 @@
    <property name="clickMarginTopSetter" stdset="0">
     <enum>Button::none</enum>
    </property>
-   <property name="clickMarginBottomSetter" stdset="0">
-    <enum>Button::full</enum>
-   </property>
   </widget>
   <widget class="Button" name="uiRecordingSettings">
    <property name="geometry">
@@ -128,9 +119,6 @@
    </property>
    <property name="clickMarginTopSetter" stdset="0">
     <enum>Button::none</enum>
-   </property>
-   <property name="clickMarginBottomSetter" stdset="0">
-    <enum>Button::full</enum>
    </property>
   </widget>
   <widget class="Button" name="uiBatteryLevel">
@@ -464,6 +452,18 @@ Save</string>
     <property name="text">
      <string>Debug A</string>
     </property>
+    <property name="clickMarginLeftSetter" stdset="0">
+     <enum>Button::half</enum>
+    </property>
+    <property name="clickMarginRightSetter" stdset="0">
+     <enum>Button::half</enum>
+    </property>
+    <property name="clickMarginTopSetter" stdset="0">
+     <enum>Button::half</enum>
+    </property>
+    <property name="clickMarginBottomSetter" stdset="0">
+     <enum>Button::half</enum>
+    </property>
    </widget>
    <widget class="Button" name="uiClose">
     <property name="geometry">
@@ -476,6 +476,18 @@ Save</string>
     </property>
     <property name="text">
      <string>Close</string>
+    </property>
+    <property name="clickMarginLeftSetter" stdset="0">
+     <enum>Button::half</enum>
+    </property>
+    <property name="clickMarginRightSetter" stdset="0">
+     <enum>Button::half</enum>
+    </property>
+    <property name="clickMarginTopSetter" stdset="0">
+     <enum>Button::half</enum>
+    </property>
+    <property name="clickMarginBottomSetter" stdset="0">
+     <enum>Button::half</enum>
     </property>
    </widget>
    <widget class="Button" name="uiDebugB">
@@ -490,6 +502,18 @@ Save</string>
     <property name="text">
      <string>Debug B</string>
     </property>
+    <property name="clickMarginLeftSetter" stdset="0">
+     <enum>Button::half</enum>
+    </property>
+    <property name="clickMarginRightSetter" stdset="0">
+     <enum>Button::half</enum>
+    </property>
+    <property name="clickMarginTopSetter" stdset="0">
+     <enum>Button::half</enum>
+    </property>
+    <property name="clickMarginBottomSetter" stdset="0">
+     <enum>Button::half</enum>
+    </property>
    </widget>
    <widget class="Button" name="uiDebugC">
     <property name="geometry">
@@ -502,6 +526,18 @@ Save</string>
     </property>
     <property name="text">
      <string>Debug C</string>
+    </property>
+    <property name="clickMarginLeftSetter" stdset="0">
+     <enum>Button::half</enum>
+    </property>
+    <property name="clickMarginRightSetter" stdset="0">
+     <enum>Button::half</enum>
+    </property>
+    <property name="clickMarginTopSetter" stdset="0">
+     <enum>Button::half</enum>
+    </property>
+    <property name="clickMarginBottomSetter" stdset="0">
+     <enum>Button::half</enum>
     </property>
    </widget>
   </widget>

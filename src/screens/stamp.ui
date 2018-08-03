@@ -117,14 +117,8 @@
      <height>71</height>
     </rect>
    </property>
-   <property name="clickMarginLeftSetter" stdset="0">
-    <enum>ComboBox::full</enum>
-   </property>
-   <property name="clickMarginRightSetter" stdset="0">
-    <enum>ComboBox::full</enum>
-   </property>
-   <property name="clickMarginTopSetter" stdset="0">
-    <enum>ComboBox::full</enum>
+   <property name="clickMarginBottomSetter" stdset="0">
+    <enum>ComboBox::half</enum>
    </property>
   </widget>
   <widget class="QWidget" name="widget" native="true">
@@ -175,18 +169,6 @@
      <height>81</height>
     </rect>
    </property>
-   <property name="clickMarginLeftSetter" stdset="0">
-    <enum>SpinBox::full</enum>
-   </property>
-   <property name="clickMarginRightSetter" stdset="0">
-    <enum>SpinBox::full</enum>
-   </property>
-   <property name="clickMarginTopSetter" stdset="0">
-    <enum>SpinBox::full</enum>
-   </property>
-   <property name="clickMarginBottomSetter" stdset="0">
-    <enum>SpinBox::full</enum>
-   </property>
   </widget>
   <widget class="SpinBox" name="uiOffsetY">
    <property name="geometry">
@@ -200,15 +182,6 @@
    <property name="clickMarginLeftSetter" stdset="0">
     <enum>SpinBox::half</enum>
    </property>
-   <property name="clickMarginRightSetter" stdset="0">
-    <enum>SpinBox::full</enum>
-   </property>
-   <property name="clickMarginTopSetter" stdset="0">
-    <enum>SpinBox::full</enum>
-   </property>
-   <property name="clickMarginBottomSetter" stdset="0">
-    <enum>SpinBox::full</enum>
-   </property>
   </widget>
   <widget class="SpinBox" name="uiOpacity">
    <property name="geometry">
@@ -218,15 +191,6 @@
      <width>191</width>
      <height>81</height>
     </rect>
-   </property>
-   <property name="clickMarginLeftSetter" stdset="0">
-    <enum>SpinBox::full</enum>
-   </property>
-   <property name="clickMarginRightSetter" stdset="0">
-    <enum>SpinBox::full</enum>
-   </property>
-   <property name="clickMarginTopSetter" stdset="0">
-    <enum>SpinBox::full</enum>
    </property>
    <property name="clickMarginBottomSetter" stdset="0">
     <enum>SpinBox::full</enum>
@@ -270,18 +234,6 @@
    <property name="text">
     <string>Time</string>
    </property>
-   <property name="clickMarginLeftSetter" stdset="0">
-    <enum>CheckBox::full</enum>
-   </property>
-   <property name="clickMarginRightSetter" stdset="0">
-    <enum>CheckBox::none</enum>
-   </property>
-   <property name="clickMarginTopSetter" stdset="0">
-    <enum>CheckBox::full</enum>
-   </property>
-   <property name="clickMarginBottomSetter" stdset="0">
-    <enum>CheckBox::full</enum>
-   </property>
   </widget>
   <widget class="CheckBox" name="checkbox_2">
    <property name="geometry">
@@ -294,18 +246,6 @@
    </property>
    <property name="text">
     <string>Frame</string>
-   </property>
-   <property name="clickMarginLeftSetter" stdset="0">
-    <enum>CheckBox::full</enum>
-   </property>
-   <property name="clickMarginRightSetter" stdset="0">
-    <enum>CheckBox::none</enum>
-   </property>
-   <property name="clickMarginTopSetter" stdset="0">
-    <enum>CheckBox::full</enum>
-   </property>
-   <property name="clickMarginBottomSetter" stdset="0">
-    <enum>CheckBox::full</enum>
    </property>
   </widget>
   <widget class="CheckBox" name="checkbox_3">
@@ -320,18 +260,6 @@
    <property name="text">
     <string>Watermark</string>
    </property>
-   <property name="clickMarginLeftSetter" stdset="0">
-    <enum>CheckBox::full</enum>
-   </property>
-   <property name="clickMarginRightSetter" stdset="0">
-    <enum>CheckBox::none</enum>
-   </property>
-   <property name="clickMarginTopSetter" stdset="0">
-    <enum>CheckBox::full</enum>
-   </property>
-   <property name="clickMarginBottomSetter" stdset="0">
-    <enum>CheckBox::full</enum>
-   </property>
   </widget>
   <widget class="Button" name="uiDetailedMode">
    <property name="geometry">
@@ -345,17 +273,8 @@
    <property name="text">
     <string>Detailed Mode</string>
    </property>
-   <property name="clickMarginLeftSetter" stdset="0">
-    <enum>Button::full</enum>
-   </property>
    <property name="clickMarginRightSetter" stdset="0">
     <enum>Button::half</enum>
-   </property>
-   <property name="clickMarginTopSetter" stdset="0">
-    <enum>Button::full</enum>
-   </property>
-   <property name="clickMarginBottomSetter" stdset="0">
-    <enum>Button::full</enum>
    </property>
   </widget>
   <widget class="Button" name="uiDone">
@@ -372,15 +291,6 @@
    </property>
    <property name="clickMarginLeftSetter" stdset="0">
     <enum>Button::half</enum>
-   </property>
-   <property name="clickMarginRightSetter" stdset="0">
-    <enum>Button::full</enum>
-   </property>
-   <property name="clickMarginTopSetter" stdset="0">
-    <enum>Button::full</enum>
-   </property>
-   <property name="clickMarginBottomSetter" stdset="0">
-    <enum>Button::full</enum>
    </property>
   </widget>
   <zorder>backdrop</zorder>

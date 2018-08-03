@@ -20,6 +20,7 @@ class Main(QtWidgets.QDialog):
 		# Widget behavour.
 		self.uiDebugA.clicked.connect(self.printAnalogGain)
 		self.uiDebugB.clicked.connect(lambda: window.show('widget_test'))
+		self.uiDebugC.clicked.connect(lambda: window.show('stamp'))
 		self.uiClose.clicked.connect(QtWidgets.QApplication.closeAllWindows)
 		self.uiTriggers.clicked.connect(lambda: window.show('triggers'))
 		
@@ -41,7 +42,7 @@ class Main(QtWidgets.QDialog):
 	
 	# @pyqtSlot() is not strictly needed - see http://pyqt.sourceforge.net/Docs/PyQt5/signals_slots.html#the-pyqtslot-decorator for details. (import with `from PyQt5.QtCore import pyqtSlot`)
 	def printAnalogGain(self):
-		print("Analog gain is %ins." % api.control('get', ["analogGain"])["analogGain"])
+		print("Analog gain is %ins." % api.get("recordingAnalogGain"))
 	
 	def updateBatteryStatus(self):
 		self.uiBatteryLevel.setText(
