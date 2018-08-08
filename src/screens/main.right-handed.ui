@@ -36,10 +36,10 @@
   <widget class="Button" name="uiTriggers">
    <property name="geometry">
     <rect>
-     <x>0</x>
-     <y>0</y>
-     <width>181</width>
-     <height>61</height>
+     <x>-1</x>
+     <y>-1</y>
+     <width>182</width>
+     <height>62</height>
     </rect>
    </property>
    <property name="text">
@@ -59,9 +59,9 @@
    <property name="geometry">
     <rect>
      <x>180</x>
-     <y>0</y>
+     <y>-1</y>
      <width>181</width>
-     <height>61</height>
+     <height>62</height>
     </rect>
    </property>
    <property name="text">
@@ -81,9 +81,9 @@
    <property name="geometry">
     <rect>
      <x>360</x>
-     <y>0</y>
+     <y>-1</y>
      <width>181</width>
-     <height>61</height>
+     <height>62</height>
     </rect>
    </property>
    <property name="text">
@@ -103,9 +103,9 @@
    <property name="geometry">
     <rect>
      <x>540</x>
-     <y>0</y>
+     <y>-1</y>
      <width>181</width>
-     <height>61</height>
+     <height>62</height>
     </rect>
    </property>
    <property name="text">
@@ -125,9 +125,9 @@
    <property name="geometry">
     <rect>
      <x>720</x>
-     <y>0</y>
-     <width>81</width>
-     <height>41</height>
+     <y>-1</y>
+     <width>82</width>
+     <height>42</height>
     </rect>
    </property>
    <property name="text">
@@ -305,7 +305,7 @@ Save</string>
      <x>570</x>
      <y>65</y>
      <width>121</width>
-     <height>425</height>
+     <height>415</height>
     </rect>
    </property>
    <property name="minimum">
@@ -321,7 +321,7 @@ Save</string>
     <number>10000000</number>
    </property>
    <property name="value">
-    <number>1000000000</number>
+    <number>750000000</number>
    </property>
   </widget>
   <widget class="Label" name="label">
@@ -360,11 +360,17 @@ Save</string>
   <widget class="Label" name="label_2">
    <property name="geometry">
     <rect>
-     <x>20</x>
+     <x>0</x>
      <y>40</y>
-     <width>551</width>
-     <height>31</height>
+     <width>361</width>
+     <height>20</height>
     </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">
+			font-size: 16px;
+			background: rgba(255,255,255, 128);
+		</string>
    </property>
    <property name="text">
     <string>No video available; waiting for gated burst.</string>
@@ -373,11 +379,17 @@ Save</string>
   <widget class="Label" name="label_3">
    <property name="geometry">
     <rect>
-     <x>20</x>
+     <x>0</x>
      <y>60</y>
-     <width>551</width>
-     <height>31</height>
+     <width>361</width>
+     <height>20</height>
     </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">
+			font-size: 16px;
+			background: rgba(255,255,255, 128);
+		</string>
    </property>
    <property name="text">
     <string>No video available; exposure trigger low.</string>
@@ -386,11 +398,17 @@ Save</string>
   <widget class="Label" name="label_4">
    <property name="geometry">
     <rect>
-     <x>20</x>
+     <x>0</x>
      <y>80</y>
-     <width>551</width>
-     <height>31</height>
+     <width>361</width>
+     <height>20</height>
     </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">
+			font-size: 16px;
+			background: rgba(255,255,255, 128);
+		</string>
    </property>
    <property name="text">
     <string>You are zoomed in.</string>
@@ -405,6 +423,15 @@ Save</string>
      <height>21</height>
     </rect>
    </property>
+   <property name="autoFillBackground">
+    <bool>false</bool>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">
+			font-size: 16px;
+			background: rgba(255,255,255, 128);
+		</string>
+   </property>
    <property name="text">
     <string>1280×1024 @ 1057fps</string>
    </property>
@@ -417,6 +444,12 @@ Save</string>
      <width>261</width>
      <height>21</height>
     </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">
+			font-size: 16px;
+			background: rgba(255,255,255, 128);
+		</string>
    </property>
    <property name="text">
     <string>Exposure: 713.1µs (75%)</string>
@@ -545,12 +578,7 @@ Save</string>
   <zorder>backdrop_2</zorder>
   <zorder>uiExposureSlider</zorder>
   <zorder>backdrop</zorder>
-  <zorder>uiTriggers</zorder>
-  <zorder>uiTriggerDelay</zorder>
-  <zorder>uiPrefsAndUtils</zorder>
-  <zorder>uiRecordingSettings</zorder>
   <zorder>uiBatteryLevel</zorder>
-  <zorder>uiBlackCal</zorder>
   <zorder>uiFocusAid</zorder>
   <zorder>uiSetZebraStripes</zorder>
   <zorder>uiSetWhiteBalance</zorder>
@@ -563,6 +591,11 @@ Save</string>
   <zorder>label_4</zorder>
   <zorder>uiResolutionOverlay</zorder>
   <zorder>uiDebugControls</zorder>
+  <zorder>uiTriggers</zorder>
+  <zorder>uiRecordingSettings</zorder>
+  <zorder>uiTriggerDelay</zorder>
+  <zorder>uiPrefsAndUtils</zorder>
+  <zorder>uiBlackCal</zorder>
  </widget>
  <customwidgets>
   <customwidget>
