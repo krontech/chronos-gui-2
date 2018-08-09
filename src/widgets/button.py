@@ -12,6 +12,8 @@ class Button(QPushButton, TouchMarginPlugin):
 	Q_ENUMS(MarginWidth) #This is needed here. I don't know why the definition in the TouchMarginPlugin doesn't work.
 	
 	def __init__(self, parent=None, showHitRects=False):
+		self.keepActiveLook = False
+		
 		super().__init__(parent, showHitRects=showHitRects)
 		
 		# Set some default text, so we can see the widget.
@@ -19,7 +21,6 @@ class Button(QPushButton, TouchMarginPlugin):
 			self.setText('Button')
 			
 		self.clickMarginColor = f"rgba({randint(0, 32)}, {randint(0, 32)}, {randint(128, 255)}, {randint(32,96)})"
-
 
 	def sizeHint(self):
 		return QSize(181, 81)
@@ -56,7 +57,7 @@ class Button(QPushButton, TouchMarginPlugin):
 					margin-bottom: {self.clickMarginBottom*10}px;
 				}}
 				
-				Button:pressed {{
+				Button{'' if self.keepActiveLook else ':pressed'} {{
 					border: 1px solid rgb(50,50,50);
 					border-top-color: black;
 					border-left-color: black;

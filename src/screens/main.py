@@ -79,7 +79,7 @@ class Main(QtWidgets.QDialog):
 	def linkButtonToMenu(self, button, menu):
 		"""Have one of the side bar buttons bring up its menu.
 		
-		The menu closes when it looses focus.
+		The menu closes when it loses focus.
 		"""
 		
 		paddingLeft = 20 #Can't extract this from the CSS without string parsing.
@@ -97,6 +97,8 @@ class Main(QtWidgets.QDialog):
 			if anim.currentTime() == 0 or anim.direction() == QPropertyAnimation.Backward:
 				anim.setDirection(QPropertyAnimation.Forward)
 				menu.setFocus()
+				button.keepActiveLook = True
+				button.refreshStyle()
 			else:
 				anim.setDirection(QPropertyAnimation.Backward)
 				
@@ -134,6 +136,8 @@ class Main(QtWidgets.QDialog):
 			"""Hide menu when not needed."""
 			if anim.direction() == QPropertyAnimation.Backward:
 				menu.hide()
+				button.keepActiveLook = False
+				button.refreshStyle()
 			
 		anim.finished.connect(animationFinished)
 		
