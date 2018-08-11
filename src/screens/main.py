@@ -114,6 +114,12 @@ class Main(QtWidgets.QDialog):
 				# toggle it open again.
 				return
 			
+			if any(child.hasFocus() for child in menu.children()):
+				# Don't close when a sub-element is selected. This has to be
+				# taken care of manually by the sub-element, because in the
+				# focus assist menu not all buttons go to other screens.
+				return
+			
 			anim.setDirection(QPropertyAnimation.Backward)
 			
 			if anim.state() == QPropertyAnimation.Stopped:
