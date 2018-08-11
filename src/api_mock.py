@@ -294,6 +294,40 @@ class State():
 				"voltage": random.choice((2.45, 2.50, 2.50, 2.50, 2.50, 4.11, 4.12))
 			},
 		}
+	
+	overlayIdentifier = 0x55
+	overlayVersion = "1.1"
+	
+	overlayTextbox0Content = 'textbox 0 sample text'
+	overlayTextbox0Font = list(b'<binary font data here>')
+	overlayTextbox0Colour = 0xFFFFFF20 #RGBA
+	overlayTextbox0X = 0x0008
+	overlayTextbox0Y = 0x0010
+	overlayTextbox0W = 0x02D0
+	overlayTextbox0H = 0x0028
+	overlayTextbox0OffsetX = 0x08
+	overlayTextbox0OffsetY = 0x08
+	
+	overlayTextbox1Content = 'textbox 1 sample text'
+	overlayTextbox1Font = list(b'<binary data here>')
+	overlayTextbox1Colour = 0xFFFFFF20 #RGBA
+	overlayTextbox1X = 0x0110
+	overlayTextbox1Y = 0x03D8
+	overlayTextbox1W = 0x0320
+	overlayTextbox1H = 0x0028
+	overlayTextbox1OffsetX = 0x08
+	overlayTextbox1OffsetY = 0x08
+	
+	overlayWatermarkColour = 0x20202020 #RGBA
+	overlayWatermarkX = 0x0008
+	overlayWatermarkY = 0x02F8
+	
+	overlayRGBImage = list(b'<binary data here>')
+	overlayRGBLogoPalette = list(b'<binary LUT here>')
+	overlayRGBImageX = 0x0190
+	overlayRGBImageY = 0x0258
+	overlayRGBImageWidth = 0x0080
+	overlayRGBImageHeight = 0x0080
 		
 	
 
