@@ -50,5 +50,8 @@ It is strongly encouraged to set your favourite editor up with some sort of Pyth
 - Run `util/designer.sh` on your development computer to open Qt Designer with the Chronos widgets loaded.
 
 
-### Contributing
+## Contributing
 Contributions are welcome! Thank you! Before diving in and changing things, it's a good idea to tell us what you'd like to do on [the forums](http://forum.krontech.ca/). Since we are familiar with the codebase, we can help get you started in the right direction. 🙂
+
+## Known Issues
+See https://github.com/krontech/chronos-gui-2/issues
