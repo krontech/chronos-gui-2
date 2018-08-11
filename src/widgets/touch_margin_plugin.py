@@ -29,7 +29,7 @@ class TouchMarginPlugin(MarginWidth):
 	
 	def __init__(self, showHitRects=False):
 		self.showHitRects = showHitRects
-		self._originalStyleSheet = self.styleSheet()
+		#self._customStyleSheet = self.styleSheet() #This is always blank during init, don't know why. Set up another custom property to cover for it, since those do seem to have a story for retrieval.
 		
 		# Invisible margin to make clicking on buttons easier. When placing
 		# buttons, it's important to make sure the margin isn't on top of other
@@ -38,6 +38,7 @@ class TouchMarginPlugin(MarginWidth):
 		self._clickMarginRight = MarginWidth.full
 		self._clickMarginTop = MarginWidth.full
 		self._clickMarginBottom = MarginWidth.full
+		self._customStyleSheet = ''
 		
 		# self._clickMarginColor = f"rgba({randint(0, 32)}, {randint(0, 32)}, {randint(128, 255)}, {randint(32,96)})"
 		colour = randint(100, 227)
@@ -50,10 +51,10 @@ class TouchMarginPlugin(MarginWidth):
 	
 	
 	def setOriginalStyleSheet(self, sheet):
-		self._originalStyleSheet = sheet
+		self._customStyleSheet = sheet
 	
 	def originalStyleSheet(self):
-		return self._originalStyleSheet
+		return self._customStyleSheet
 
 	@pyqtProperty(MarginWidth)
 	def clickMarginLeft(self):
@@ -103,4 +104,13 @@ class TouchMarginPlugin(MarginWidth):
 	@clickMarginColor.setter
 	def clickMarginColor(self, state):
 		self._clickMarginColor = state
+		self.refreshStyle()
+		
+	@pyqtProperty(str)
+	def customStyleSheet(self):
+		return self._customStyleSheet
+	
+	@customStyleSheet.setter
+	def customStyleSheet(self, styleSheet):
+		self._customStyleSheet = styleSheet
 		self.refreshStyle()
