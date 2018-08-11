@@ -21,7 +21,7 @@ class Button(QPushButton, TouchMarginPlugin):
 			self.setText('Button')
 			
 		self.clickMarginColor = f"rgba({randint(0, 32)}, {randint(0, 32)}, {randint(128, 255)}, {randint(32,96)})"
-
+	
 	def sizeHint(self):
 		return QSize(181, 81)
 		

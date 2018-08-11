@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1382</width>
+    <width>1551</width>
     <height>480</height>
    </rect>
   </property>
@@ -125,7 +125,7 @@
     <enum>Button::none</enum>
    </property>
   </widget>
-  <widget class="Button" name="uiCalibration">
+  <widget class="Button" name="uiCalibrationOrBlackCal">
    <property name="geometry">
     <rect>
      <x>660</x>
@@ -572,6 +572,414 @@ Delay</string>
     </property>
    </widget>
   </widget>
+  <widget class="QWidget" name="uiCalibrationMenu" native="true">
+   <property name="geometry">
+    <rect>
+     <x>1050</x>
+     <y>170</y>
+     <width>161</width>
+     <height>161</height>
+    </rect>
+   </property>
+   <widget class="Button" name="uiWhiteBalance">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>0</y>
+      <width>161</width>
+      <height>81</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Set White
+Balance</string>
+    </property>
+    <property name="clickMarginRightSetter" stdset="0">
+     <enum>Button::none</enum>
+    </property>
+    <property name="clickMarginBottomSetter" stdset="0">
+     <enum>Button::none</enum>
+    </property>
+   </widget>
+   <widget class="Button" name="uiBlackCal">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>80</y>
+      <width>161</width>
+      <height>81</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Do Black
+Calibration</string>
+    </property>
+    <property name="clickMarginRightSetter" stdset="0">
+     <enum>Button::none</enum>
+    </property>
+    <property name="clickMarginTopSetter" stdset="0">
+     <enum>Button::none</enum>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QLabel" name="label_5">
+   <property name="geometry">
+    <rect>
+     <x>820</x>
+     <y>410</y>
+     <width>191</width>
+     <height>61</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Comment: These menus get moved left and right as needed. They don't get moved up and down, though.</string>
+   </property>
+   <property name="wordWrap">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QWidget" name="uiShotAssistMenu" native="true">
+   <property name="geometry">
+    <rect>
+     <x>1280</x>
+     <y>0</y>
+     <width>171</width>
+     <height>480</height>
+    </rect>
+   </property>
+   <widget class="CheckBox" name="ShowWhiteClipping">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>20</y>
+      <width>171</width>
+      <height>71</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Show White
+Clipping</string>
+    </property>
+    <property name="clickMarginRightSetter" stdset="0">
+     <enum>CheckBox::half</enum>
+    </property>
+    <property name="clickMarginBottomSetter" stdset="0">
+     <enum>CheckBox::none</enum>
+    </property>
+   </widget>
+   <widget class="CheckBox" name="ShowBlackClipping">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>90</y>
+      <width>171</width>
+      <height>71</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Show Black
+Clipping</string>
+    </property>
+    <property name="clickMarginRightSetter" stdset="0">
+     <enum>CheckBox::half</enum>
+    </property>
+    <property name="clickMarginTopSetter" stdset="0">
+     <enum>CheckBox::none</enum>
+    </property>
+    <property name="clickMarginBottomSetter" stdset="0">
+     <enum>CheckBox::full</enum>
+    </property>
+   </widget>
+   <widget class="HeaderLabel" name="headerlabel">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>10</y>
+      <width>141</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Zebra Stripes</string>
+    </property>
+   </widget>
+   <widget class="HeaderLabel" name="headerlabel_2">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>160</y>
+      <width>141</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Peaking</string>
+    </property>
+   </widget>
+   <widget class="ComboBox" name="combobox">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>180</y>
+      <width>181</width>
+      <height>61</height>
+     </rect>
+    </property>
+    <property name="clickMarginBottomSetter" stdset="0">
+     <enum>ComboBox::none</enum>
+    </property>
+    <item>
+     <property name="text">
+      <string>Off</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Low</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Medium</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>High</string>
+     </property>
+    </item>
+   </widget>
+   <widget class="Button" name="uiBlueFocusPeaking">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>240</y>
+      <width>91</width>
+      <height>81</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">
+				/* Editor style. Use border to show were click margin is, so we don't mess it up during layout. */
+				Button {
+					font-size: 16px;
+					background: white;
+					
+					/* use borders instead of margins so we can see what we're doing */
+					border-left:   21px solid rgba(8, 7, 226, 96);
+					border-right:  1px solid rgba(8, 7, 226, 96);
+					border-top:    11px solid rgba(8, 7, 226, 96);
+					border-bottom: 1px solid rgba(8, 7, 226, 96);
+				}
+			Button { background: #7a70f7 }</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="clickMarginRightSetter" stdset="0">
+     <enum>Button::none</enum>
+    </property>
+    <property name="clickMarginTopSetter" stdset="0">
+     <enum>Button::half</enum>
+    </property>
+    <property name="clickMarginBottomSetter" stdset="0">
+     <enum>Button::none</enum>
+    </property>
+    <property name="customStyleSheet" stdset="0">
+     <string>Button { background: #7a70f7 }</string>
+    </property>
+   </widget>
+   <widget class="Button" name="uiPinkFocusPeaking">
+    <property name="geometry">
+     <rect>
+      <x>90</x>
+      <y>240</y>
+      <width>81</width>
+      <height>81</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="clickMarginLeftSetter" stdset="0">
+     <enum>Button::none</enum>
+    </property>
+    <property name="clickMarginRightSetter" stdset="0">
+     <enum>Button::half</enum>
+    </property>
+    <property name="clickMarginTopSetter" stdset="0">
+     <enum>Button::half</enum>
+    </property>
+    <property name="clickMarginBottomSetter" stdset="0">
+     <enum>Button::none</enum>
+    </property>
+    <property name="customStyleSheet" stdset="0">
+     <string>Button { background: #f770f2 }</string>
+    </property>
+   </widget>
+   <widget class="Button" name="uiYellowFocusPeaking">
+    <property name="geometry">
+     <rect>
+      <x>90</x>
+      <y>320</y>
+      <width>81</width>
+      <height>71</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="clickMarginLeftSetter" stdset="0">
+     <enum>Button::none</enum>
+    </property>
+    <property name="clickMarginRightSetter" stdset="0">
+     <enum>Button::half</enum>
+    </property>
+    <property name="clickMarginTopSetter" stdset="0">
+     <enum>Button::none</enum>
+    </property>
+    <property name="clickMarginBottomSetter" stdset="0">
+     <enum>Button::none</enum>
+    </property>
+    <property name="customStyleSheet" stdset="0">
+     <string>Button { background: #f7d270 }</string>
+    </property>
+   </widget>
+   <widget class="Button" name="uiRedFocusPeaking">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>320</y>
+      <width>91</width>
+      <height>71</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="clickMarginLeftSetter" stdset="0">
+     <enum>Button::full</enum>
+    </property>
+    <property name="clickMarginRightSetter" stdset="0">
+     <enum>Button::none</enum>
+    </property>
+    <property name="clickMarginTopSetter" stdset="0">
+     <enum>Button::none</enum>
+    </property>
+    <property name="clickMarginBottomSetter" stdset="0">
+     <enum>Button::none</enum>
+    </property>
+    <property name="customStyleSheet" stdset="0">
+     <string>Button { background: #f77070 }</string>
+    </property>
+   </widget>
+   <widget class="Button" name="uiGreenFocusPeaking">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>390</y>
+      <width>91</width>
+      <height>91</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="clickMarginLeftSetter" stdset="0">
+     <enum>Button::full</enum>
+    </property>
+    <property name="clickMarginRightSetter" stdset="0">
+     <enum>Button::none</enum>
+    </property>
+    <property name="clickMarginTopSetter" stdset="0">
+     <enum>Button::none</enum>
+    </property>
+    <property name="customStyleSheet" stdset="0">
+     <string>Button { background: #7ef770 }</string>
+    </property>
+   </widget>
+   <widget class="Button" name="uiCyanFocusPeaking">
+    <property name="geometry">
+     <rect>
+      <x>90</x>
+      <y>390</y>
+      <width>81</width>
+      <height>91</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="clickMarginLeftSetter" stdset="0">
+     <enum>Button::none</enum>
+    </property>
+    <property name="clickMarginRightSetter" stdset="0">
+     <enum>Button::half</enum>
+    </property>
+    <property name="clickMarginTopSetter" stdset="0">
+     <enum>Button::none</enum>
+    </property>
+    <property name="customStyleSheet" stdset="0">
+     <string>Button { background: #70f7c8 }</string>
+    </property>
+   </widget>
+   <widget class="Backdrop" name="backdrop">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>0</y>
+      <width>161</width>
+      <height>481</height>
+     </rect>
+    </property>
+    <property name="customStyleSheet" stdset="0">
+     <string>border-left: 1px solid black;</string>
+    </property>
+   </widget>
+   <widget class="QWidget" name="uiFocusPeakingColourSelectionIndicator" native="true">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>250</y>
+      <width>71</width>
+      <height>71</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">border: 4px solid black</string>
+    </property>
+   </widget>
+   <zorder>backdrop</zorder>
+   <zorder>ShowBlackClipping</zorder>
+   <zorder>headerlabel</zorder>
+   <zorder>ShowWhiteClipping</zorder>
+   <zorder>headerlabel_2</zorder>
+   <zorder>combobox</zorder>
+   <zorder>uiBlueFocusPeaking</zorder>
+   <zorder>uiPinkFocusPeaking</zorder>
+   <zorder>uiYellowFocusPeaking</zorder>
+   <zorder>uiRedFocusPeaking</zorder>
+   <zorder>uiGreenFocusPeaking</zorder>
+   <zorder>uiCyanFocusPeaking</zorder>
+   <zorder>uiFocusPeakingColourSelectionIndicator</zorder>
+  </widget>
+  <widget class="Backdrop" name="uiPinchToZoomGestureInterceptionPanel">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>801</width>
+     <height>481</height>
+    </rect>
+   </property>
+   <property name="focusPolicy">
+    <enum>Qt::ClickFocus</enum>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background: transparent</string>
+   </property>
+  </widget>
+  <zorder>uiPinchToZoomGestureInterceptionPanel</zorder>
   <zorder>uiExposureOverlay</zorder>
   <zorder>backdrop_2</zorder>
   <zorder>uiExposureSlider</zorder>
@@ -583,13 +991,16 @@ Delay</string>
   <zorder>uiResolutionOverlay</zorder>
   <zorder>uiDebugControls</zorder>
   <zorder>uiRecordingAndTriggersMenu</zorder>
-  <zorder>uiRecordingAndTriggers</zorder>
-  <zorder>uiPrefsAndUtils</zorder>
-  <zorder>uiPlayAndSave</zorder>
-  <zorder>uiBattery</zorder>
-  <zorder>uiCalibration</zorder>
-  <zorder>uiShotAssist</zorder>
+  <zorder>uiCalibrationMenu</zorder>
+  <zorder>label_5</zorder>
+  <zorder>uiShotAssistMenu</zorder>
+  <zorder>uiCalibrationOrBlackCal</zorder>
   <zorder>uiRecord</zorder>
+  <zorder>uiPrefsAndUtils</zorder>
+  <zorder>uiShotAssist</zorder>
+  <zorder>uiPlayAndSave</zorder>
+  <zorder>uiRecordingAndTriggers</zorder>
+  <zorder>uiBattery</zorder>
  </widget>
  <customwidgets>
   <customwidget>
@@ -601,6 +1012,21 @@ Delay</string>
    <class>Button</class>
    <extends>QPushButton</extends>
    <header>button</header>
+  </customwidget>
+  <customwidget>
+   <class>CheckBox</class>
+   <extends>QCheckBox</extends>
+   <header>check_box</header>
+  </customwidget>
+  <customwidget>
+   <class>ComboBox</class>
+   <extends>QComboBox</extends>
+   <header>combo_box</header>
+  </customwidget>
+  <customwidget>
+   <class>HeaderLabel</class>
+   <extends>QLabel</extends>
+   <header>header_label</header>
   </customwidget>
   <customwidget>
    <class>Label</class>

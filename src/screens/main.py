@@ -24,7 +24,19 @@ class Main(QtWidgets.QDialog):
 		self.uiDebugC.clicked.connect(lambda: window.show('stamp'))
 		self.uiClose.clicked.connect(QtWidgets.QApplication.closeAllWindows)
 		#self.uiTriggers.clicked.connect(lambda: window.show('triggers'))
-		self.linkButtonToMenu(self.uiRecordingAndTriggers, self.uiRecordingAndTriggersMenu)
+		self.linkButtonToMenu(
+			self.uiRecordingAndTriggers, 
+			self.uiRecordingAndTriggersMenu )
+		self.linkButtonToMenu(
+			self.uiShotAssist, 
+			self.uiShotAssistMenu )
+		
+		if api.get('sensorPixelFormat') == 'BYR2': #colour model
+			self.linkButtonToMenu(
+				self.uiCalibrationOrBlackCal, 
+				self.uiCalibrationMenu )
+		else:
+			self.uiCalibrationOrBlackCal.setText(self.uiBlackCal.text())
 		
 		# Polling-based updates.
 		# self.updateBatteryStatus()
@@ -105,7 +117,7 @@ class Main(QtWidgets.QDialog):
 			if anim.state() == QPropertyAnimation.Stopped:
 				anim.start()
 		
-		self.uiRecordingAndTriggers.clicked.connect(toggleMenu)
+		button.clicked.connect(toggleMenu)
 		
 		def hideMenu(evt):
 			if button.hasFocus():
