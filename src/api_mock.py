@@ -318,9 +318,9 @@ class State():
 	overlayTextbox1OffsetX = 0x08
 	overlayTextbox1OffsetY = 0x08
 	
-	overlayWatermarkColour = 0x20202020 #RGBA
-	overlayWatermarkX = 0x0008
-	overlayWatermarkY = 0x02F8
+	overlayChronosWatermarkColour = 0x20202020 #RGBA
+	overlayChronosWatermarkX = 0x0008
+	overlayChronosWatermarkY = 0x02F8
 	
 	overlayRGBImage = list(b'<binary data here>')
 	overlayRGBLogoPalette = list(b'<binary LUT here>')
