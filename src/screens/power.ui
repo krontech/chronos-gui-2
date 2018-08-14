@@ -46,7 +46,7 @@
     <string>Battery &amp; Power</string>
    </property>
   </widget>
-  <widget class="Label" name="label">
+  <widget class="Label" name="uiChargeLabel">
    <property name="geometry">
     <rect>
      <x>40</x>
@@ -59,7 +59,7 @@
     <string>Battery Charge: %i%%</string>
    </property>
   </widget>
-  <widget class="Label" name="label_2">
+  <widget class="Label" name="uiVoltageLabel">
    <property name="geometry">
     <rect>
      <x>40</x>
@@ -98,12 +98,12 @@
     <string>Options</string>
    </property>
   </widget>
-  <widget class="CheckBox" name="checkbox">
+  <widget class="CheckBox" name="uiDimScreen">
    <property name="geometry">
     <rect>
      <x>20</x>
      <y>280</y>
-     <width>261</width>
+     <width>281</width>
      <height>71</height>
     </rect>
    </property>
@@ -114,12 +114,12 @@
     <enum>CheckBox::half</enum>
    </property>
   </widget>
-  <widget class="CheckBox" name="checkbox_2">
+  <widget class="CheckBox" name="uiSafelyPowerDown">
    <property name="geometry">
     <rect>
      <x>20</x>
      <y>350</y>
-     <width>261</width>
+     <width>281</width>
      <height>61</height>
     </rect>
    </property>
@@ -133,10 +133,10 @@
     <enum>CheckBox::half</enum>
    </property>
   </widget>
-  <widget class="ComboBox" name="combobox">
+  <widget class="ComboBox" name="uiPowerDownThreshold">
    <property name="geometry">
     <rect>
-     <x>260</x>
+     <x>284</x>
      <y>340</y>
      <width>151</width>
      <height>81</height>
@@ -181,7 +181,7 @@
   <widget class="Label" name="label_4">
    <property name="geometry">
     <rect>
-     <x>400</x>
+     <x>424</x>
      <y>360</y>
      <width>161</width>
      <height>41</height>
@@ -191,12 +191,12 @@
     <string>battery remaining</string>
    </property>
   </widget>
-  <widget class="CheckBox" name="checkbox_3">
+  <widget class="CheckBox" name="uiStartWhenPowered">
    <property name="geometry">
     <rect>
      <x>20</x>
      <y>410</y>
-     <width>351</width>
+     <width>371</width>
      <height>71</height>
     </rect>
    </property>
@@ -207,7 +207,7 @@
     <enum>CheckBox::half</enum>
    </property>
   </widget>
-  <widget class="Button" name="button">
+  <widget class="Button" name="uiDone">
    <property name="geometry">
     <rect>
      <x>620</x>
@@ -216,34 +216,37 @@
      <height>81</height>
     </rect>
    </property>
+   <property name="text">
+    <string>Done</string>
+   </property>
   </widget>
-  <widget class="QWidget" name="widget" native="true">
+  <widget class="QWidget" name="uiChart" native="true">
    <property name="geometry">
     <rect>
-     <x>350</x>
-     <y>50</y>
-     <width>441</width>
-     <height>201</height>
+     <x>330</x>
+     <y>30</y>
+     <width>471</width>
+     <height>241</height>
     </rect>
    </property>
    <property name="styleSheet">
-    <string notr="true">background: rgb(255, 235, 226)</string>
+    <string notr="true">background: rgba(128, 128, 113, 64)</string>
    </property>
   </widget>
   <zorder>backdrop</zorder>
   <zorder>backdrop_2</zorder>
   <zorder>headerlabel</zorder>
-  <zorder>label</zorder>
-  <zorder>label_2</zorder>
+  <zorder>uiChargeLabel</zorder>
+  <zorder>uiVoltageLabel</zorder>
   <zorder>label_3</zorder>
   <zorder>headerlabel_2</zorder>
-  <zorder>checkbox</zorder>
-  <zorder>checkbox_2</zorder>
+  <zorder>uiDimScreen</zorder>
+  <zorder>uiSafelyPowerDown</zorder>
   <zorder>label_4</zorder>
-  <zorder>checkbox_3</zorder>
-  <zorder>combobox</zorder>
-  <zorder>button</zorder>
-  <zorder>widget</zorder>
+  <zorder>uiStartWhenPowered</zorder>
+  <zorder>uiPowerDownThreshold</zorder>
+  <zorder>uiDone</zorder>
+  <zorder>uiChart</zorder>
  </widget>
  <customwidgets>
   <customwidget>

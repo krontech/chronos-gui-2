@@ -21,22 +21,34 @@ class Main(QtWidgets.QDialog):
 		# Widget behavour.
 		self.uiDebugA.clicked.connect(self.printAnalogGain)
 		self.uiDebugB.clicked.connect(lambda: window.show('widget_test'))
-		self.uiDebugC.clicked.connect(lambda: window.show('stamp'))
+		#self.uiDebugC.clicked.connect(lambda: window.show('stamp'))
+		self.uiDebugC.clicked.connect(lambda: dbg())
 		self.uiClose.clicked.connect(QtWidgets.QApplication.closeAllWindows)
-		#self.uiTriggers.clicked.connect(lambda: window.show('triggers'))
-		self.linkButtonToMenu(
+		
+		self.uiBattery.clicked.connect(lambda: window.show('power'))
+		
+		closeRecordingAndTriggersMenu = self.linkButtonToMenu(
 			self.uiRecordingAndTriggers, 
 			self.uiRecordingAndTriggersMenu )
+		self.uiCaptureModes.clicked.connect(closeRecordingAndTriggersMenu)
+		self.uiRecordingSettings.clicked.connect(closeRecordingAndTriggersMenu)
+		self.uiTriggerDelay.clicked.connect(closeRecordingAndTriggersMenu)
+		self.uiTriggerIOSettings.clicked.connect(closeRecordingAndTriggersMenu)
+		
 		self.linkButtonToMenu(
 			self.uiShotAssist, 
 			self.uiShotAssistMenu )
 		
 		if api.get('sensorPixelFormat') == 'BYR2': #colour model
-			self.linkButtonToMenu(
+			closeCalibrationMenu = self.linkButtonToMenu(
 				self.uiCalibrationOrBlackCal, 
 				self.uiCalibrationMenu )
+			self.uiWhiteBalance.clicked.connect(closeCalibrationMenu)
+			self.uiBlackCal.clicked.connect(closeCalibrationMenu)
 		else:
 			self.uiCalibrationOrBlackCal.setText(self.uiBlackCal.text())
+		
+		self.uiTriggerIOSettings.clicked.connect(lambda: window.show('triggers'))
 		
 		# Polling-based updates.
 		# self.updateBatteryStatus()
@@ -58,8 +70,8 @@ class Main(QtWidgets.QDialog):
 		print("Analog gain is %ins." % api.get("recordingAnalogGain"))
 	
 	def updateBatteryStatus(self):
-		self.uiBattery.setText(
-			f"{round(api.control('get', ['batteryCharge'])['batteryCharge']*100)}%" )
+		charged = f"{round(api.control('get', ['batteryCharge'])['batteryCharge']*100)}%"
+		self.uiBattery.setText(charged)
 		
 	@pyqtSlot(int)
 	@silenceCallbacks('uiExposureSlider')
@@ -92,6 +104,8 @@ class Main(QtWidgets.QDialog):
 		"""Have one of the side bar buttons bring up its menu.
 		
 		The menu closes when it loses focus.
+		
+		Returns a function which can be called to hide the menu, by an external widget.
 		"""
 		
 		paddingLeft = 20 #Can't extract this from the CSS without string parsing.
@@ -104,6 +118,7 @@ class Main(QtWidgets.QDialog):
 		menu.hide()
 		
 		def toggleMenu():
+			"""Start to show the menu, or start to hide the menu if it's already opened."""
 			menu.show()
 				
 			if anim.currentTime() == 0 or anim.direction() == QPropertyAnimation.Backward:
@@ -120,6 +135,7 @@ class Main(QtWidgets.QDialog):
 		button.clicked.connect(toggleMenu)
 		
 		def hideMenu(evt):
+			"""Start to hide the menu, if not in use."""
 			if button.hasFocus():
 				# The button to toggle this menu is now focused, and will
 				# probably toggle it shut. Don't close the menu, or it would
@@ -150,14 +166,22 @@ class Main(QtWidgets.QDialog):
 		
 		menu.focusOutEvent = hideMenu
 		
+		def forceHideMenu(evt):
+			"""Start to hide the menu, even if something's focussed on it."""
+			anim.setDirection(QPropertyAnimation.Backward)
+			if anim.state() == QPropertyAnimation.Stopped:
+				anim.start()
+		
 		def animationFinished():
-			"""Hide menu when not needed."""
+			"""Actually hide the menu when the menu hiding animation finishes."""
 			if anim.direction() == QPropertyAnimation.Backward:
 				menu.hide()
 				button.keepActiveLook = False
 				button.refreshStyle()
 			
 		anim.finished.connect(animationFinished)
+		
+		return forceHideMenu
 		
 	
 	# ~Emit to signal:
