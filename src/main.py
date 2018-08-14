@@ -67,6 +67,7 @@ class Window():
 		from screens.triggers import Triggers
 		from screens.stamp import Stamp
 		from screens.power import Power
+		from screens.play_and_save import PlayAndSave
 		
 		self._screens = {
 			'main': Main(self),
@@ -74,6 +75,7 @@ class Window():
 			'triggers': Triggers(self),
 			'stamp': Stamp(self),
 			'power': Power(self),
+			'play_and_save': PlayAndSave(self),
 		}
 		
 		# Set the initial screen. If in dev mode, due to the frequent restarts,

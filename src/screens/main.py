@@ -22,7 +22,7 @@ class Main(QtWidgets.QDialog):
 		self.uiDebugA.clicked.connect(self.printAnalogGain)
 		self.uiDebugB.clicked.connect(lambda: window.show('widget_test'))
 		#self.uiDebugC.clicked.connect(lambda: window.show('stamp'))
-		self.uiDebugC.clicked.connect(lambda: dbg())
+		self.uiDebugC.clicked.connect(lambda: self and dbg())
 		self.uiClose.clicked.connect(QtWidgets.QApplication.closeAllWindows)
 		
 		self.uiBattery.clicked.connect(lambda: window.show('power'))
@@ -49,6 +49,8 @@ class Main(QtWidgets.QDialog):
 			self.uiCalibrationOrBlackCal.setText(self.uiBlackCal.text())
 		
 		self.uiTriggerIOSettings.clicked.connect(lambda: window.show('triggers'))
+		
+		self.uiPlayAndSave.clicked.connect(lambda: window.show('play_and_save'))
 		
 		# Polling-based updates.
 		# self.updateBatteryStatus()
