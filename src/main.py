@@ -68,6 +68,7 @@ class Window():
 		from screens.stamp import Stamp
 		from screens.power import Power
 		from screens.play_and_save import PlayAndSave
+		from screens.file_settings import FileSettings
 		
 		self._screens = {
 			'main': Main(self),
@@ -76,6 +77,7 @@ class Window():
 			'stamp': Stamp(self),
 			'power': Power(self),
 			'play_and_save': PlayAndSave(self),
+			'file_settings': FileSettings(self),
 		}
 		
 		# Set the initial screen. If in dev mode, due to the frequent restarts,
@@ -99,7 +101,9 @@ class Window():
 		settings.setValue('current screen', self.currentScreen)
 	
 	def show(self, screen):
-		"""Switch between the screens of the back-of-camera interface."""
+		"""Switch between the screens of the back-of-camera interface.
+		
+		Example: self.uiPlayAndSave.clicked.connect(lambda: window.show('play_and_save'))"""
 		
 		# Prevent screen from disappearing entirely. Because we open the screen next screen then hide the current, if both are the same it shows then hides the screen so it goes away.
 		if(screen == self.currentScreen):

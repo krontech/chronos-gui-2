@@ -5,10 +5,10 @@ from debugger import *; dbg
 # import api_mock as api
 
 
-class PlayAndSave(QtWidgets.QDialog):
+class FileSettings(QtWidgets.QDialog):
 	def __init__(self, window):
 		super().__init__()
-		uic.loadUi("src/screens/play_and_save.ui", self)
+		uic.loadUi("src/screens/file_settings.ui", self)
 		
 		# Panel init.
 		self.move(0, 0)
@@ -16,5 +16,5 @@ class PlayAndSave(QtWidgets.QDialog):
 		self.setAttribute(QtCore.Qt.WA_TranslucentBackground, True)
 		
 		# Button binding.
-		self.uiSavedFileSettings.clicked.connect(lambda: window.show('file_settings'))
+		self.uiStampData.clicked.connect(lambda: window.show('stamp'))
 		self.uiDone.clicked.connect(window.back)
