@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Chronos Screen</string>
+   <string>Triggers</string>
   </property>
   <widget class="QStackedWidget" name="uiTriggerScreens">
    <property name="geometry">

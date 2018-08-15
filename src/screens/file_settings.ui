@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Chronos Screen</string>
+   <string>File Settings</string>
   </property>
   <widget class="HeaderLabel" name="headerlabel">
    <property name="geometry">

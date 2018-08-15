@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Form</string>
+   <string>Stamp Output</string>
   </property>
   <widget class="Backdrop" name="backdrop">
    <property name="geometry">
