@@ -48,6 +48,7 @@ class Main(QtWidgets.QDialog):
 		else:
 			self.uiCalibrationOrBlackCal.setText(self.uiBlackCal.text())
 		
+		self.uiRecordingSettings.clicked.connect(lambda: window.show('recording_settings'))
 		self.uiTriggerIOSettings.clicked.connect(lambda: window.show('triggers'))
 		
 		self.uiPlayAndSave.clicked.connect(lambda: window.show('play_and_save'))

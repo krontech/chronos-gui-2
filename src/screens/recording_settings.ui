@@ -1,0 +1,547 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Form</class>
+ <widget class="QWidget" name="Form">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>800</width>
+    <height>480</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string notr="true">Recording Settings</string>
+  </property>
+  <widget class="Backdrop" name="backdrop">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>551</width>
+     <height>481</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="HeaderLabel" name="headerlabel">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>20</y>
+     <width>131</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Picture</string>
+   </property>
+  </widget>
+  <widget class="ComboBox" name="uiPreset">
+   <property name="geometry">
+    <rect>
+     <x>140</x>
+     <y>0</y>
+     <width>381</width>
+     <height>81</height>
+    </rect>
+   </property>
+   <item>
+    <property name="text">
+     <string>1000×1000 @ 1000fps</string>
+    </property>
+   </item>
+  </widget>
+  <widget class="SpinBox" name="uiHRes">
+   <property name="geometry">
+    <rect>
+     <x>140</x>
+     <y>70</y>
+     <width>191</width>
+     <height>51</height>
+    </rect>
+   </property>
+   <property name="clickMarginTopSetter" stdset="0">
+    <enum>SpinBox::none</enum>
+   </property>
+   <property name="clickMarginBottomSetter" stdset="0">
+    <enum>SpinBox::half</enum>
+   </property>
+  </widget>
+  <widget class="SpinBox" name="uiVRes">
+   <property name="geometry">
+    <rect>
+     <x>330</x>
+     <y>70</y>
+     <width>191</width>
+     <height>51</height>
+    </rect>
+   </property>
+   <property name="clickMarginTopSetter" stdset="0">
+    <enum>SpinBox::none</enum>
+   </property>
+   <property name="clickMarginBottomSetter" stdset="0">
+    <enum>SpinBox::half</enum>
+   </property>
+  </widget>
+  <widget class="SpinBox" name="uiHOffset">
+   <property name="geometry">
+    <rect>
+     <x>140</x>
+     <y>120</y>
+     <width>191</width>
+     <height>61</height>
+    </rect>
+   </property>
+   <property name="clickMarginTopSetter" stdset="0">
+    <enum>SpinBox::half</enum>
+   </property>
+   <property name="clickMarginBottomSetter" stdset="0">
+    <enum>SpinBox::half</enum>
+   </property>
+  </widget>
+  <widget class="SpinBox" name="uiVOffset">
+   <property name="geometry">
+    <rect>
+     <x>330</x>
+     <y>120</y>
+     <width>191</width>
+     <height>61</height>
+    </rect>
+   </property>
+   <property name="clickMarginTopSetter" stdset="0">
+    <enum>SpinBox::half</enum>
+   </property>
+   <property name="clickMarginBottomSetter" stdset="0">
+    <enum>SpinBox::half</enum>
+   </property>
+  </widget>
+  <widget class="SpinBox" name="uiFps">
+   <property name="geometry">
+    <rect>
+     <x>140</x>
+     <y>180</y>
+     <width>231</width>
+     <height>61</height>
+    </rect>
+   </property>
+   <property name="clickMarginTopSetter" stdset="0">
+    <enum>SpinBox::half</enum>
+   </property>
+   <property name="clickMarginBottomSetter" stdset="0">
+    <enum>SpinBox::half</enum>
+   </property>
+  </widget>
+  <widget class="SpinBox" name="uiFrameDuration">
+   <property name="geometry">
+    <rect>
+     <x>140</x>
+     <y>240</y>
+     <width>231</width>
+     <height>51</height>
+    </rect>
+   </property>
+   <property name="clickMarginTopSetter" stdset="0">
+    <enum>SpinBox::none</enum>
+   </property>
+   <property name="clickMarginBottomSetter" stdset="0">
+    <enum>SpinBox::half</enum>
+   </property>
+  </widget>
+  <widget class="Button" name="uiMaximizeFramerate">
+   <property name="geometry">
+    <rect>
+     <x>400</x>
+     <y>180</y>
+     <width>121</width>
+     <height>71</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Max</string>
+   </property>
+   <property name="clickMarginTopSetter" stdset="0">
+    <enum>Button::half</enum>
+   </property>
+  </widget>
+  <widget class="Label" name="label">
+   <property name="geometry">
+    <rect>
+     <x>360</x>
+     <y>200</y>
+     <width>31</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>fps</string>
+   </property>
+  </widget>
+  <widget class="Label" name="label_2">
+   <property name="geometry">
+    <rect>
+     <x>360</x>
+     <y>250</y>
+     <width>31</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>µs</string>
+   </property>
+  </widget>
+  <widget class="QWidget" name="widget" native="true">
+   <property name="geometry">
+    <rect>
+     <x>390</x>
+     <y>210</y>
+     <width>10</width>
+     <height>51</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">border: 1px solid black; border-left-width: 0px;</string>
+   </property>
+  </widget>
+  <widget class="SpinBox" name="uiExposure">
+   <property name="geometry">
+    <rect>
+     <x>140</x>
+     <y>290</y>
+     <width>231</width>
+     <height>61</height>
+    </rect>
+   </property>
+   <property name="clickMarginTopSetter" stdset="0">
+    <enum>SpinBox::half</enum>
+   </property>
+   <property name="clickMarginBottomSetter" stdset="0">
+    <enum>SpinBox::half</enum>
+   </property>
+  </widget>
+  <widget class="Button" name="uiMaximizeExposure">
+   <property name="geometry">
+    <rect>
+     <x>370</x>
+     <y>280</y>
+     <width>111</width>
+     <height>81</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Max</string>
+   </property>
+   <property name="clickMarginLeftSetter" stdset="0">
+    <enum>Button::half</enum>
+   </property>
+  </widget>
+  <widget class="SpinBox" name="uiAnalogGain">
+   <property name="geometry">
+    <rect>
+     <x>140</x>
+     <y>350</y>
+     <width>231</width>
+     <height>71</height>
+    </rect>
+   </property>
+   <property name="clickMarginTopSetter" stdset="0">
+    <enum>SpinBox::half</enum>
+   </property>
+   <property name="clickMarginBottomSetter" stdset="0">
+    <enum>SpinBox::full</enum>
+   </property>
+  </widget>
+  <widget class="HeaderLabel" name="headerlabel_2">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>130</y>
+     <width>131</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Offset</string>
+   </property>
+  </widget>
+  <widget class="HeaderLabel" name="headerlabel_3">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>190</y>
+     <width>131</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Frame Rate</string>
+   </property>
+  </widget>
+  <widget class="HeaderLabel" name="headerlabel_4">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>300</y>
+     <width>131</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Exposure</string>
+   </property>
+  </widget>
+  <widget class="HeaderLabel" name="headerlabel_5">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>360</y>
+     <width>131</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Analog Gain</string>
+   </property>
+  </widget>
+  <widget class="Button" name="uiRecordModes">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>400</y>
+     <width>181</width>
+     <height>81</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Record Modes</string>
+   </property>
+  </widget>
+  <widget class="Button" name="uiSavePreset">
+   <property name="geometry">
+    <rect>
+     <x>460</x>
+     <y>400</y>
+     <width>171</width>
+     <height>81</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Save Preset</string>
+   </property>
+   <property name="clickMarginRightSetter" stdset="0">
+    <enum>Button::half</enum>
+   </property>
+  </widget>
+  <widget class="Button" name="uiDone">
+   <property name="geometry">
+    <rect>
+     <x>630</x>
+     <y>400</y>
+     <width>171</width>
+     <height>81</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Done</string>
+   </property>
+   <property name="clickMarginLeftSetter" stdset="0">
+    <enum>Button::half</enum>
+   </property>
+  </widget>
+  <widget class="Button" name="button">
+   <property name="geometry">
+    <rect>
+     <x>620</x>
+     <y>200</y>
+     <width>181</width>
+     <height>81</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Recenter</string>
+   </property>
+  </widget>
+  <widget class="Backdrop" name="backdrop_2">
+   <property name="geometry">
+    <rect>
+     <x>550</x>
+     <y>200</y>
+     <width>251</width>
+     <height>281</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="Backdrop" name="backdrop_3">
+   <property name="geometry">
+    <rect>
+     <x>550</x>
+     <y>0</y>
+     <width>251</width>
+     <height>21</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="Backdrop" name="backdrop_4">
+   <property name="geometry">
+    <rect>
+     <x>781</x>
+     <y>20</y>
+     <width>20</width>
+     <height>181</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QWidget" name="uiPreviewPanel" native="true">
+   <property name="geometry">
+    <rect>
+     <x>550</x>
+     <y>20</y>
+     <width>231</width>
+     <height>181</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">border: 1px solid rgba(0,0,0,255)</string>
+   </property>
+   <widget class="QWidget" name="uiPassepartoutTop" native="true">
+    <property name="geometry">
+     <rect>
+      <x>1</x>
+      <y>1</y>
+      <width>229</width>
+      <height>39</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">border: none; background: rgba(255,255,255,128)</string>
+    </property>
+   </widget>
+   <widget class="QWidget" name="uiPassepartoutBottom" native="true">
+    <property name="geometry">
+     <rect>
+      <x>1</x>
+      <y>141</y>
+      <width>229</width>
+      <height>39</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">border: none; background: rgba(255,255,255,128)</string>
+    </property>
+   </widget>
+   <widget class="QWidget" name="uiPassepartoutLeft" native="true">
+    <property name="geometry">
+     <rect>
+      <x>1</x>
+      <y>40</y>
+      <width>39</width>
+      <height>101</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">border: none; background: rgba(255,255,255,128)</string>
+    </property>
+   </widget>
+   <widget class="QWidget" name="uiPassepartoutRight" native="true">
+    <property name="geometry">
+     <rect>
+      <x>190</x>
+      <y>40</y>
+      <width>40</width>
+      <height>101</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">border: none; background: rgba(255,255,255,128)</string>
+    </property>
+   </widget>
+   <widget class="QWidget" name="uiPassepartoutInnerBorder" native="true">
+    <property name="geometry">
+     <rect>
+      <x>39</x>
+      <y>39</y>
+      <width>151</width>
+      <height>102</height>
+     </rect>
+    </property>
+   </widget>
+   <zorder>uiPassepartoutBottom</zorder>
+   <zorder>uiPassepartoutTop</zorder>
+   <zorder>uiPassepartoutLeft</zorder>
+   <zorder>uiPassepartoutRight</zorder>
+   <zorder>uiPassepartoutInnerBorder</zorder>
+  </widget>
+  <widget class="Backdrop" name="uiAmbiguityHiderBecauseThereWasNoGoodWayToOverlapTheseCorners">
+   <property name="geometry">
+    <rect>
+     <x>140</x>
+     <y>401</y>
+     <width>41</width>
+     <height>19</height>
+    </rect>
+   </property>
+  </widget>
+  <zorder>backdrop_4</zorder>
+  <zorder>backdrop_3</zorder>
+  <zorder>backdrop_2</zorder>
+  <zorder>backdrop</zorder>
+  <zorder>headerlabel_2</zorder>
+  <zorder>headerlabel</zorder>
+  <zorder>headerlabel_4</zorder>
+  <zorder>headerlabel_3</zorder>
+  <zorder>headerlabel_5</zorder>
+  <zorder>uiPreset</zorder>
+  <zorder>uiHRes</zorder>
+  <zorder>uiVRes</zorder>
+  <zorder>uiHOffset</zorder>
+  <zorder>label</zorder>
+  <zorder>uiFps</zorder>
+  <zorder>label_2</zorder>
+  <zorder>widget</zorder>
+  <zorder>uiMaximizeExposure</zorder>
+  <zorder>uiFrameDuration</zorder>
+  <zorder>uiExposure</zorder>
+  <zorder>uiRecordModes</zorder>
+  <zorder>uiAnalogGain</zorder>
+  <zorder>uiSavePreset</zorder>
+  <zorder>uiDone</zorder>
+  <zorder>button</zorder>
+  <zorder>uiPreviewPanel</zorder>
+  <zorder>uiMaximizeFramerate</zorder>
+  <zorder>uiVOffset</zorder>
+  <zorder>uiAmbiguityHiderBecauseThereWasNoGoodWayToOverlapTheseCorners</zorder>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>Backdrop</class>
+   <extends>QLabel</extends>
+   <header>backdrop</header>
+  </customwidget>
+  <customwidget>
+   <class>Button</class>
+   <extends>QPushButton</extends>
+   <header>button</header>
+  </customwidget>
+  <customwidget>
+   <class>ComboBox</class>
+   <extends>QComboBox</extends>
+   <header>combo_box</header>
+  </customwidget>
+  <customwidget>
+   <class>HeaderLabel</class>
+   <extends>QLabel</extends>
+   <header>header_label</header>
+  </customwidget>
+  <customwidget>
+   <class>Label</class>
+   <extends>QLabel</extends>
+   <header>label</header>
+  </customwidget>
+  <customwidget>
+   <class>SpinBox</class>
+   <extends>QSpinBox</extends>
+   <header>spin_box</header>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>

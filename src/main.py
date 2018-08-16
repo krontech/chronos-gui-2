@@ -62,22 +62,24 @@ class Window():
 	"""
 	
 	def __init__(self):
-		from screens.main import Main
-		from screens.widget_test import WidgetTest
-		from screens.triggers import Triggers
-		from screens.stamp import Stamp
-		from screens.power import Power
-		from screens.play_and_save import PlayAndSave
 		from screens.file_settings import FileSettings
+		from screens.main import Main
+		from screens.play_and_save import PlayAndSave
+		from screens.power import Power
+		from screens.recording_settings import RecordingSettings
+		from screens.stamp import Stamp
+		from screens.triggers import Triggers
+		from screens.widget_test import WidgetTest
 		
 		self._screens = {
-			'main': Main(self),
-			'widget_test': WidgetTest(self),
-			'triggers': Triggers(self),
-			'stamp': Stamp(self),
-			'power': Power(self),
-			'play_and_save': PlayAndSave(self),
 			'file_settings': FileSettings(self),
+			'main': Main(self),
+			'play_and_save': PlayAndSave(self),
+			'power': Power(self),
+			'recording_settings': RecordingSettings(self),
+			'stamp': Stamp(self),
+			'triggers': Triggers(self),
+			'widget_test': WidgetTest(self),
 		}
 		
 		# Set the initial screen. If in dev mode, due to the frequent restarts,
