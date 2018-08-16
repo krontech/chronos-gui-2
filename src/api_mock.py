@@ -31,6 +31,46 @@ if not QDBusConnection.systemBus().isConnected():
 	sys.exit(-1)
 
 
+
+
+
+########################
+#    Pure Functions    #
+########################
+
+
+def resolution_is_valid(hOffset, vOffset, hRes, vRes): #xywh px
+	LUX1310_MIN_HRES = 192 #The LUX1310 is our image sensor.
+	LUX1310_MAX_HRES = 1280
+	LUX1310_MIN_VRES = 96
+	LUX1310_MAX_VRES = 1024
+	LUX1310_HRES_INCREMENT = 16
+	LUX1310_VRES_INCREMENT = 2
+	
+	return (
+		hOffset > 0 and vOffset > 0 and hRes > 0 and vRes > 0
+		and hRes > LUX1310_MIN_HRES and hRes + hOffset < LUX1310_MAX_HRES
+		and vRes > LUX1310_MIN_VRES and vRes + vOffset < LUX1310_MAX_VRES
+		and not hRes % LUX1310_HRES_INCREMENT and not hOffset % LUX1310_HRES_INCREMENT
+		and not vRes % LUX1310_VRES_INCREMENT and not vOffset % LUX1310_VRES_INCREMENT
+	)
+
+
+def framerate_for_resolution(hRes: int, vRes: int):
+	if type(hRes) is not int or type(vRes) is not int:
+		return print("D-BUS ERROR", QDBusError.InvalidArgs, f"framerate must be of type <class 'int'>, <class 'int'>. Got type {type(hRes)}, {type(vRes)}.")
+			
+	return 60*4e7/(hRes*vRes+1e6) #Mock. Total BS but feels about right at the higher resolutions.
+
+
+
+
+
+##################################
+#    Callbacks for Set Values    #
+##################################
+
+
 #Pending callbacks is used by state callbacks to queue long-running or multi
 #arg tasks such as changeRecordingResolution. This is so a call to set which
 #contains x/y/w/h of a new camera resolution only actually resets the camera
@@ -49,9 +89,10 @@ def notifyExposureChange(state):
 	#self.emitControlSignal('minExposureNs', 3e2)
 
 
-##############################################
-#    Set up mock dbus interface provider.    #
-##############################################
+
+#######################################
+#    Mock D-Bus Interface Provider    #
+#######################################
 
 class State():
 	#Invariant data about the camera.
@@ -85,6 +126,34 @@ class State():
 	timingExposureDelayNs = 1000
 	timingMaxShutterAngle = 330
 	timingQuantization = 1e9 / sensorQuantizeTimingNs
+	
+	@property
+	def commonlySupportedResolutions(self): 
+		return [{
+			'hRes': x, 
+			'vRes': y, 
+			'maxFramerate': framerate_for_resolution(x, y),
+		} for x, y in [
+			[1280, 1024],
+			[1280, 720],
+			[1280, 512],
+			[1280, 360],
+			[1280, 240],
+			[1280, 120],
+			[1280, 96],
+			[1024, 768],
+			[1024, 576],
+			[800, 600],
+			[800, 480],
+			[640, 480],
+			[640, 360],
+			[640, 240],
+			[640, 120],
+			[640, 96],
+			[336, 240],
+			[336, 120],
+			[336, 96],
+		]]
 	
 	#Camera state.
 	externallyPowered = True
@@ -419,6 +488,16 @@ class ControlMock(QObject):
 	@pyqtSlot(result='QVariantMap')
 	def available_keys(self):
 		return [i for i in dir(state) if i[0] != '_']
+		
+	@pyqtSlot(result='QVariantMap')
+	def framerate_for_resolution(self, hRes: int, vRes: int):
+		return framerate_for_resolution(hRes, vRes)
+	
+	
+	@pyqtSlot(result=bool)
+	def resolution_is_valid(self, hOffset: int, vOffset: int, hRes: int, vRes: int): #xywh px
+		return resolution_is_valid(hOffset, vOffset, hRes, vRes)
+	
 			
 
 
@@ -441,9 +520,12 @@ QDBusConnection.systemBus().registerObject('/', videoMock, QDBusConnection.Expor
 
 
 
-#######################
-#    Use the mock.    #
-#######################
+
+#####################################
+#    Mock D-Bus Interface Client    #
+#####################################
+
+
 
 cameraControlAPI = QDBusInterface(
 	'com.krontech.chronos.control.mock', #Service
