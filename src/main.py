@@ -66,6 +66,7 @@ class Window():
 		from screens.main import Main
 		from screens.play_and_save import PlayAndSave
 		from screens.power import Power
+		from screens.record_mode import RecordMode
 		from screens.recording_settings import RecordingSettings
 		from screens.stamp import Stamp
 		from screens.triggers import Triggers
@@ -76,6 +77,7 @@ class Window():
 			'main': Main(self),
 			'play_and_save': PlayAndSave(self),
 			'power': Power(self),
+			'record_mode': RecordMode(self),
 			'recording_settings': RecordingSettings(self),
 			'stamp': Stamp(self),
 			'triggers': Triggers(self),

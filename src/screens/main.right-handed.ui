@@ -485,7 +485,7 @@ Save</string>
      <height>281</height>
     </rect>
    </property>
-   <widget class="Button" name="uiCaptureModes">
+   <widget class="Button" name="uiRecordModes">
     <property name="geometry">
      <rect>
       <x>0</x>
@@ -495,7 +495,7 @@ Save</string>
      </rect>
     </property>
     <property name="text">
-     <string>Capture
+     <string>Record
 Modes</string>
     </property>
     <property name="clickMarginRightSetter" stdset="0">
@@ -766,10 +766,10 @@ Clipping</string>
 					background: white;
 					
 					/* use borders instead of margins so we can see what we're doing */
-					border-left:   21px solid rgba(8, 7, 226, 96);
-					border-right:  1px solid rgba(8, 7, 226, 96);
-					border-top:    11px solid rgba(8, 7, 226, 96);
-					border-bottom: 1px solid rgba(8, 7, 226, 96);
+					border-left:   21px solid rgba(24, 14, 180, 48);
+					border-right:  1px solid rgba(24, 14, 180, 48);
+					border-top:    11px solid rgba(24, 14, 180, 48);
+					border-bottom: 1px solid rgba(24, 14, 180, 48);
 				}
 			Button { background: #7a70f7 }</string>
     </property>

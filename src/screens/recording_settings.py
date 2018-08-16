@@ -19,3 +19,4 @@ class RecordingSettings(QtWidgets.QDialog):
 		
 		# Button binding.
 		self.uiDone.clicked.connect(window.back)
+		self.uiRecordModes.clicked.connect(lambda: window.show('record_mode'))

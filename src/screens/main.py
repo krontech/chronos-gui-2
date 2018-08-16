@@ -30,7 +30,7 @@ class Main(QtWidgets.QDialog):
 		closeRecordingAndTriggersMenu = self.linkButtonToMenu(
 			self.uiRecordingAndTriggers, 
 			self.uiRecordingAndTriggersMenu )
-		self.uiCaptureModes.clicked.connect(closeRecordingAndTriggersMenu)
+		self.uiRecordModes.clicked.connect(closeRecordingAndTriggersMenu)
 		self.uiRecordingSettings.clicked.connect(closeRecordingAndTriggersMenu)
 		self.uiTriggerDelay.clicked.connect(closeRecordingAndTriggersMenu)
 		self.uiTriggerIOSettings.clicked.connect(closeRecordingAndTriggersMenu)
@@ -48,6 +48,7 @@ class Main(QtWidgets.QDialog):
 		else:
 			self.uiCalibrationOrBlackCal.setText(self.uiBlackCal.text())
 		
+		self.uiRecordModes.clicked.connect(lambda: window.show('record_mode'))
 		self.uiRecordingSettings.clicked.connect(lambda: window.show('recording_settings'))
 		self.uiTriggerIOSettings.clicked.connect(lambda: window.show('triggers'))
 		

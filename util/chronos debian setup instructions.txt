@@ -66,7 +66,7 @@ installing on a new VM
     tar xvf qt-everywhere-src-5.11.1.tar.xz
     rm qt-everywhere-src-5.11.1.tar.xz
     cd qt-everywhere-src-5.11.1
-    #??? remove the line containing "drmSetClientCap" in /root/qt-everywhere-src-5.11.1/qtbase/src/platformsupport/kmsconvenience/qkmsdevice.cpp, line 225-ish or 523-ish
+    #??? comment out the line containing "drmSetClientCap" in /root/qt-everywhere-src-5.11.1/qtbase/src/platformsupport/kmsconvenience/qkmsdevice.cpp:523
     #Compile this, and everything else, with -release when we release it?
     ./configure -prefix $PWD/qtbase -qt-zlib -qt-libpng -qt-libjpeg -no-cups -no-opengl -skip qt3d -skip qtx11extras -skip qtwayland -skip qtserialbus -skip qtconnectivity -skip qtdeclarative -skip qtlocation -skip qtmultimedia -skip qtquick1 -skip qtquickcontrols -skip qttools -skip qtwebsockets -skip qtwinextras -skip qtwebchannel -skip qtwebengine -nomake examples -nomake tests -opensource -confirm-license
     nohup bash -c "time make -j$(nproc)"
