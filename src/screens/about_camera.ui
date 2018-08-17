@@ -58,6 +58,12 @@
      <height>431</height>
     </rect>
    </property>
+   <property name="singleStep">
+    <number>100</number>
+   </property>
+   <property name="pageStep">
+    <number>100</number>
+   </property>
    <property name="invertedAppearance">
     <bool>true</bool>
    </property>
