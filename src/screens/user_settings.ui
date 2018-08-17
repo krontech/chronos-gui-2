@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Form</class>
+ <widget class="QWidget" name="Form">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>800</width>
+    <height>480</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string notr="true">User Settings</string>
+  </property>
+  <widget class="Backdrop" name="backdrop">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>801</width>
+     <height>481</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="HeaderLabel" name="headerlabel">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>10</y>
+     <width>241</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>User Settings</string>
+   </property>
+  </widget>
+  <widget class="Label" name="label">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>50</y>
+     <width>671</width>
+     <height>81</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>This screen allows you to save and restore how you've set up your camera so far. Some examples of user settings are: saved video framerate, focus peaking colour, trigger settings, and so on. If you're selling the camera, it is recommend to reset it to the default factory settings.</string>
+   </property>
+   <property name="wordWrap">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="Button" name="uiSaveSettings">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>130</y>
+     <width>201</width>
+     <height>81</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Save User Settings</string>
+   </property>
+   <property name="clickMarginRightSetter" stdset="0">
+    <enum>Button::half</enum>
+   </property>
+  </widget>
+  <widget class="Button" name="uiLoadSettings">
+   <property name="geometry">
+    <rect>
+     <x>200</x>
+     <y>130</y>
+     <width>201</width>
+     <height>81</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Load User Settings</string>
+   </property>
+   <property name="clickMarginLeftSetter" stdset="0">
+    <enum>Button::half</enum>
+   </property>
+  </widget>
+  <widget class="Button" name="uiFactoryReset">
+   <property name="geometry">
+    <rect>
+     <x>480</x>
+     <y>130</y>
+     <width>211</width>
+     <height>81</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Factory Reset</string>
+   </property>
+  </widget>
+  <widget class="Label" name="label_2">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>210</y>
+     <width>141</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Save Location</string>
+   </property>
+  </widget>
+  <widget class="ComboBox" name="uiSaveLocation">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>220</y>
+     <width>371</width>
+     <height>81</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="Button" name="button_4">
+   <property name="geometry">
+    <rect>
+     <x>370</x>
+     <y>220</y>
+     <width>161</width>
+     <height>81</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Safely Remove</string>
+   </property>
+   <property name="clickMarginLeftSetter" stdset="0">
+    <enum>Button::none</enum>
+   </property>
+  </widget>
+  <widget class="Button" name="uiDone">
+   <property name="geometry">
+    <rect>
+     <x>620</x>
+     <y>400</y>
+     <width>181</width>
+     <height>81</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Done</string>
+   </property>
+  </widget>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>Backdrop</class>
+   <extends>QLabel</extends>
+   <header>backdrop</header>
+  </customwidget>
+  <customwidget>
+   <class>Button</class>
+   <extends>QPushButton</extends>
+   <header>button</header>
+  </customwidget>
+  <customwidget>
+   <class>ComboBox</class>
+   <extends>QComboBox</extends>
+   <header>combo_box</header>
+  </customwidget>
+  <customwidget>
+   <class>HeaderLabel</class>
+   <extends>QLabel</extends>
+   <header>header_label</header>
+  </customwidget>
+  <customwidget>
+   <class>Label</class>
+   <extends>QLabel</extends>
+   <header>label</header>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>

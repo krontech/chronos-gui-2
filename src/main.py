@@ -62,25 +62,31 @@ class Window():
 	"""
 	
 	def __init__(self):
+		from screens.about_camera import AboutCamera
 		from screens.file_settings import FileSettings
 		from screens.main import Main
 		from screens.play_and_save import PlayAndSave
 		from screens.power import Power
+		from screens.primary_settings import PrimarySettings
 		from screens.record_mode import RecordMode
 		from screens.recording_settings import RecordingSettings
 		from screens.stamp import Stamp
 		from screens.triggers import Triggers
+		from screens.user_settings import UserSettings
 		from screens.widget_test import WidgetTest
 		
 		self._screens = {
+			'about_camera': AboutCamera(self),
 			'file_settings': FileSettings(self),
 			'main': Main(self),
 			'play_and_save': PlayAndSave(self),
 			'power': Power(self),
+			'primary_settings': PrimarySettings(self),
 			'record_mode': RecordMode(self),
 			'recording_settings': RecordingSettings(self),
 			'stamp': Stamp(self),
 			'triggers': Triggers(self),
+			'user_settings': UserSettings(self),
 			'widget_test': WidgetTest(self),
 		}
 		

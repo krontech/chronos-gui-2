@@ -27,6 +27,8 @@ class Main(QtWidgets.QDialog):
 		
 		self.uiBattery.clicked.connect(lambda: window.show('power'))
 		
+		self.uiPrefsAndUtils.clicked.connect(lambda: window.show('primary_settings'))
+		
 		closeRecordingAndTriggersMenu = self.linkButtonToMenu(
 			self.uiRecordingAndTriggers, 
 			self.uiRecordingAndTriggersMenu )
