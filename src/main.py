@@ -75,6 +75,7 @@ class Window():
 		from screens.update_firmware import UpdateFirmware
 		from screens.user_settings import UserSettings
 		from screens.widget_test import WidgetTest
+		from screens.service_screen import ServiceScreenLocked, ServiceScreenUnlocked
 		
 		self._screens = {
 			'about_camera': AboutCamera(self),
@@ -90,6 +91,8 @@ class Window():
 			'update_firmware': UpdateFirmware(self),
 			'user_settings': UserSettings(self),
 			'widget_test': WidgetTest(self),
+			'service_screen.locked': ServiceScreenLocked(self),
+			'service_screen.unlocked': ServiceScreenUnlocked(self),
 		}
 		
 		# Set the initial screen. If in dev mode, due to the frequent restarts,
