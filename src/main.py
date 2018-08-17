@@ -72,6 +72,7 @@ class Window():
 		from screens.recording_settings import RecordingSettings
 		from screens.stamp import Stamp
 		from screens.triggers import Triggers
+		from screens.update_firmware import UpdateFirmware
 		from screens.user_settings import UserSettings
 		from screens.widget_test import WidgetTest
 		
@@ -86,6 +87,7 @@ class Window():
 			'recording_settings': RecordingSettings(self),
 			'stamp': Stamp(self),
 			'triggers': Triggers(self),
+			'update_firmware': UpdateFirmware(self),
 			'user_settings': UserSettings(self),
 			'widget_test': WidgetTest(self),
 		}

@@ -191,7 +191,7 @@ Unsaved Video in RAM</string>
     <enum>Button::half</enum>
    </property>
   </widget>
-  <widget class="Button" name="uiUpdateCamear">
+  <widget class="Button" name="uiUpdateCamera">
    <property name="geometry">
     <rect>
      <x>570</x>

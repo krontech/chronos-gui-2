@@ -20,3 +20,4 @@ class PrimarySettings(QtWidgets.QDialog):
 		self.uiFileSaving.clicked.connect(lambda: window.show('file_settings'))
 		self.uiUserSettings.clicked.connect(lambda: window.show('user_settings'))
 		self.uiAboutCamera.clicked.connect(lambda: window.show('about_camera'))
+		self.uiUpdateCamera.clicked.connect(lambda: window.show('update_firmware'))
