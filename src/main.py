@@ -71,6 +71,7 @@ class Window():
 		from screens.record_mode import RecordMode
 		from screens.recording_settings import RecordingSettings
 		from screens.stamp import Stamp
+		from screens.trigger_delay import TriggerDelay
 		from screens.triggers import Triggers
 		from screens.update_firmware import UpdateFirmware
 		from screens.user_settings import UserSettings
@@ -87,6 +88,7 @@ class Window():
 			'record_mode': RecordMode(self),
 			'recording_settings': RecordingSettings(self),
 			'stamp': Stamp(self),
+			'trigger_delay': TriggerDelay(self),
 			'triggers': Triggers(self),
 			'update_firmware': UpdateFirmware(self),
 			'user_settings': UserSettings(self),

@@ -496,7 +496,7 @@ Save</string>
     </property>
     <property name="text">
      <string>Record
-Modes</string>
+Mode</string>
     </property>
     <property name="clickMarginRightSetter" stdset="0">
      <enum>Button::none</enum>
@@ -766,10 +766,10 @@ Clipping</string>
 					background: white;
 					
 					/* use borders instead of margins so we can see what we're doing */
-					border-left:   21px solid rgba(24, 14, 180, 48);
-					border-right:  1px solid rgba(24, 14, 180, 48);
-					border-top:    11px solid rgba(24, 14, 180, 48);
-					border-bottom: 1px solid rgba(24, 14, 180, 48);
+					border-left:   21px solid rgba(19, 29, 234, 66);
+					border-right:  1px solid rgba(19, 29, 234, 66);
+					border-top:    11px solid rgba(19, 29, 234, 66);
+					border-bottom: 1px solid rgba(19, 29, 234, 66);
 				}
 			Button { background: #7a70f7 }</string>
     </property>

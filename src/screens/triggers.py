@@ -14,6 +14,7 @@ class Triggers(QtWidgets.QDialog):
 	#Save current screen by ID, not by index or display text because those are UI changes.
 	availableTriggerIds = ['trig1', 'trig2', 'trig3', 'motion']
 	
+	
 	def __init__(self, window):
 		super().__init__()
 		uic.loadUi('src/screens/make-dbus-work.ui', self) #DDR 2018-07-12: QDBusConnection.systemBus().connect, in api.py, doesn't return if we don't load this here. I don't know what an empty dialog box has to do with anything. 🤷
@@ -44,9 +45,13 @@ class Triggers(QtWidgets.QDialog):
 		self.changeShownTrigger(currentScreenIndex)
 		
 		# Widget behavour.
-		self.uiDone.clicked.connect(window.back)
 		self.uiActiveTrigger.currentIndexChanged.connect(self.changeShownTrigger)
 		
+		self.uiRecordMode.clicked.connect(lambda: window.show('record_mode'))
+		self.uiTriggerDelay.clicked.connect(lambda: window.show('trigger_delay'))
+		self.uiDone.clicked.connect(window.back)
+	
+	
 	def changeShownTrigger(self, index):
 		self.uiTriggerScreens.setCurrentIndex(index)
 		settings.setValue('active trigger', self.availableTriggerIds[index])
