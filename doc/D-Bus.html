@@ -1,0 +1,268 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>Chronos D-Bus API Documentation</title>
+		
+		<style>
+			/* from http://bettermotherfuckingwebsite.com */
+			body {
+				margin:40px auto;
+				max-width: 650px;
+				line-height: 1.6;
+				font-size: 18px;
+				color: #444;
+				padding: 0 10px;
+				tab-size: 4;
+			}
+			
+			h1,h2,h3 {
+				line-height: 1.2;
+			}
+			
+			
+			
+			body > code {
+				white-space: pre;
+				overflow-x: auto;
+				display: block;
+			}
+			
+			svg path {
+				stroke: black;
+			}
+			
+			svg text {
+				font-size: 16px;
+				line-height: 1.25;
+				text-align: center;
+				text-anchor: middle;
+				pointer-events: none; /* Keep links, on rects, working when mouse is over text. */
+			}
+			
+			svg rect {
+				fill-opacity:.25;
+				fill:#10bfbf;
+				stroke:#107f7f
+			}
+		</style>
+		
+		<script>
+			//Remove HTML-formatting whitespace from code snippets. (Leading newlines, indentation.)
+			document.addEventListener('DOMContentLoaded', ()=>{
+				document.querySelectorAll('code').forEach(elem => {
+					lines = elem.innerHTML
+						.split('\n')
+						.filter(line=>line) //Filter to remove non-code lines, mainly the leading newline between <code> and the actual code.
+					
+					minLeadingTabs = lines
+						.filter(line => line.trim())
+						.reduce((minimum, line) => Math.min(line.split(/[^\t]/)[0].length, minimum), Infinity)
+					
+					elem.innerHTML = lines
+						.map(line => line.replace(new RegExp(`^\t{0,${minLeadingTabs}}`), '')) //Remove leading snippet-level indentation, it provides nothing.
+						.join('\n')
+				})
+			})
+		</script>
+	</head>
+	<body>
+		<h1>Chronos D-Bus API</h1>
+		
+		
+		
+		<p>This documentation covers the Chronos 1.4 <a href="https://www.freedesktop.org/wiki/Software/dbus/">D-Bus</a> API. The API has two major components: The Control API and the Video API. There is also a reference client written in Python which is used for the user interface.</p>
+		
+		<p>You can use the D-Bus API to write your own application on the camera. This application will be able to display a UI on the back of the camera as well as respond to remote HTTP requests over MiniUSB and the network.</p>
+		
+		<p>If you only need to control the camera remotely, you should consider using the [planned, as of writing] HTTP interface instead. The HTTP interface lets you send commands to the camera over the network, and is used by the [planned, as of writing] remote-control app. It is easier to develop for the HTTP interface than the D-Bus interface.</p>
+		
+		
+		<h2>Architecture</h2>
+		
+		<p>The D-Bus APIs sit between the hardware and the applications running on the camera.</p>
+		
+		<svg id="SVGRoot" version="1.1" viewBox="0 0 701 241" xmlns="http://www.w3.org/2000/svg">
+			<g id="layer1" transform="translate(-29.5,-119.5)" inkscape:groupmode="layer" inkscape:label="Layer 1" style="font-family:sans-serif;">
+				<a href="#hardware"><rect id="rect2667" x="40" y="160" width="160" height="140"/></a>
+				<a href="#control-api"><rect id="rect2669" x="300" y="160" width="160" height="60"/></a>
+				<a href="#video-api"><rect id="rect2671" x="300" y="240" width="160" height="60"/></a>
+				<a href="#user-interface"><rect id="rect2673" x="580" y="130" width="140" height="60"/></a>
+				<a href="#http-interface"><rect id="rect2675" x="580" y="210" width="140" height="60"/></a>
+				<a href="#ych"><rect id="rect2677" x="580" y="290" width="140" height="60" style="fill-opacity:1;fill:#6ecff0;stroke:#2c4d8e"/></a>
+				<text id="text3352" x="120.00391" y="225.96484">
+					<tspan id="tspan3350" x="120.00391" y="225.96484">Chronos 1.4</tspan><tspan id="tspan3354" x="120.00391" y="245.96484">Hardware</tspan>
+				</text>
+				<text id="text3358" x="380.33594" y="195.96484">
+					<tspan id="tspan3356" x="380.33594" y="195.96484">Control API</tspan>
+				</text>
+				<text id="text3362" x="380.72266" y="275.96484">
+					<tspan id="tspan3360" x="380.72266" y="275.96484">Video API</tspan>
+				</text>
+				<text id="text3366" x="650.00391" y="154.41406">
+					<tspan id="tspan3364" x="650.00391" y="154.41406">User Interface</tspan><tspan id="tspan3368" x="650.00391" y="174.41406">(chronos-gui-2)</tspan>
+				</text>
+				<text id="text3367" x="649.64062" y="234.41406">
+					<tspan id="tspan3364-3" x="649.64062" y="234.41406">HTTP Interface</tspan>
+					<tspan id="tspan3368-9" x="649.64062" y="254.41406">(planned)</tspan>
+				</text>
+				<text id="text3348" x="650.44141" y="325.96484" style="fill:#2c4d8e">
+					<tspan id="tspan3346" x="650.44141" y="325.96484">Your Client Here</tspan>
+				</text>
+				<path id="path3393" d="m300 257.69-100-15.385" inkscape:connection-end="#rect2667" inkscape:connection-start="#rect2671" inkscape:connector-type="polyline"/>
+				<path id="path3397" d="m460 180.31 120 37.698" inkscape:connection-end="#rect2675" inkscape:connection-start="#rect2669" inkscape:connector-type="polyline"/>
+				<path id="path3401" d="m452.32 240 127.68-52.963" inkscape:connection-end="#rect2673" inkscape:connection-start="#rect2671" inkscape:connector-type="polyline"/>
+				<path id="path3403" d="m460 260.52 120-14.222" inkscape:connection-end="#rect2675" inkscape:connection-start="#rect2671" inkscape:connector-type="polyline"/>
+				<path id="path3405" d="m460 284.22 120 21.333" inkscape:connection-end="#rect2677" inkscape:connection-start="#rect2671" inkscape:connector-type="polyline"/>
+				<path id="path3409" d="m580 167.78-120 13.333" inkscape:connection-end="#rect2669" inkscape:connection-start="#rect2673" inkscape:connector-type="polyline"/>
+				<path id="path3411" d="m587.69 290-145.38-70" inkscape:connection-end="#rect2669" inkscape:connection-start="#rect2677" inkscape:connector-type="polyline"/>
+				<path id="path3417" d="m200 217.69 100-15.385" inkscape:connection-end="#rect2669" inkscape:connection-start="#rect2667" inkscape:connector-type="polyline"/>
+			</g>
+		</svg>
+		
+		<p>The APIs provide a way to configure the camera hardware. The APIs also emit updates so that clients can keep themselves up-to-date when the camera is reconfigured. For example, if the HTTP interface receives a request to change the exposure time of the camera, then the user interface on the camera will need to update itself to reflect the new exposure time.</p>
+		
+		
+		<a name="hardware"><h2>Hardware</h2></a>
+		
+		<p>The APIs primarily drive the FPGA of the Chronos, as well as set up the video pipeline to display and save content. While the FPGA image itself is proprietary, the register definitions are available as part of the implementation of the APIs.</p>
+		
+		
+		<a name="control-api"><h2>Control API</h2></a>
+		
+		<p>The control D-Bus API deals with configuring the camera, as opposed to the video API which is responsible for playing back and saving footage.</p>
+		
+		<h3>Connecting</h3>
+		
+		<p>To connect to the control API, connect to the D-Bus service/path/interface as in the following example:</p>
+		
+		<code>
+			from PyQt5.QtDBus import QDBusInterface, QDBusConnection
+			
+			cameraControlAPI = QDBusInterface(
+				'com.krontech.chronos.control', #Service
+				'/', #Path
+				'', #Interface
+				QDBusConnection.systemBus() )
+		</code>
+		
+		<p>To use the mock interface, to avoid misconfiguring the camera during development, connect to the <code>com.krontech.chronos.control<strong>.mock</strong></code> service instead of <code>com.krontech.chronos.control</code>.</p>
+		
+		<h3>Methods</h3>
+		
+		<ul>
+			<li><code><strong>get</strong>([string, string, …])→{string:value, string:value, …}</code> — Return camera setting values. See <a href="#control-settings">Settings</a> for a list of valid keys.</li>
+			<li><code><strong>set</strong>({string:value, string:value, …})</code> — Update a camera setting value. See <a href="#control-settings">Settings</a> for a list of valid keys.</li>
+			<li><code><strong>available_keys</strong> → [string, string, …]</code> — Get a list of available codecamera settings keys, for use with <code>get</code> or <code>set</code>.</li>
+			<li><code><strong>framerate_for_resolution</strong>(hRes: int, vRes: int) → float</code> — Returns the frames per seconds a resolution will record at. Non-valid resolutions will return undefined results.</li>
+			<li><code><strong>resolution_is_valid</strong>(hOffset: int, vOffset: int, hRes: int, vRes: int) → bool</code> — Returns true if the supplied video resolution and offset is valid for recording. A resolution is not valid if it is offset too far. All parameters are positive integers.</li>
+			<li><code><strong>power_down</strong></code> — Turn off the camera. Useful in conjunction with the "Turn camera on when power connected" checkbox in the Battery & Power screen.</li>
+		</ul>
+		
+		<p>In addition, when a camera setting is changed, a signal named the key is emitted on the D-Bus interface. It can be intercepted with <code>QDBusConnection.systemBus().connect('com.krontech.chronos.control.mock', '/', '', NAME_OF_KEY, CALLBACK)</code>.
+		
+		
+		<a name="control-settings"><h3>Settings Keys</h3></a>
+		
+		<p>Control settings keys hold the state of the camera. These keys are used with the <code>get</code> and <code>set</code> method calls. They can be retrieved with the <code>available_keys</code> method.</p>
+		
+		<p>Keys have different levels of mutability. <strong>Constant</strong> keys do not change over the course of a connection, although they may be changed if the camera is upgraded. These are things like firmware version and the amount of RAM installed. Keys which are a <strong>property</strong>, on the other hand, only change in response to external stimulus. Properties can't be set through the API. These are things like battery level and trigger status. <strong>Variable</strong> keys are settable through the API, but may be changed externally as well.</p>
+		
+		<ul>
+			<li><code><strong>batteryCharge</strong></code> — Decimal property between 0.0 and 1.0 indicating how charged the battery is. 0 is dead, 1 is fully powered.</li>
+			<li><code><strong>batteryVoltage</strong></code> — Decimal property indicating voltage of the battery in volts. A happy battery outputs between 12v and 12.5v.</li>
+			<li><code><strong>cameraApiVersion</strong></code> — Constant string indicating the iteration of this interface. Adheres to <a href="https://semver.org/">SemVer</a>.</li>
+			<li><code><strong>cameraFpgaVersion</strong></code> — Constant string indicating what firmware the <a href="https://en.wikipedia.org/wiki/Field-programmable_gate_array">field-programmable gate array</a> inside the Chronos is running. The FPGA is primarily responsible for recording the high-speed video coming off the sensor to a buffer in RAM.</li>
+			<li><code><strong>cameraMemoryGB</strong></code> — Constant decimal. Amount of RAM installed in the Chronos in <a href="https://en.wikipedia.org/wiki/Gigabyte">GB</a> (vs <a href="https://en.wikipedia.org/wiki/Gibibyte">GiB</a>).</li>
+			<li><code><strong>cameraModel</strong></code> — </li>
+			<li><code><strong>cameraSerial</strong></code> — </li>
+			<li><code><strong>commonlySupportedResolutions</strong></code> — </li>
+			<li><code><strong>connectionTime</strong></code> — </li>
+			<li><code><strong>currentCameraState</strong></code> — </li>
+			<li><code><strong>currentVideoState</strong></code> — </li>
+			<li><code><strong>disableRingBuffer</strong></code> — </li>
+			<li><code><strong>externallyPowered</strong></code> — </li>
+			<li><code><strong>focusPeakingColor</strong></code> — </li>
+			<li><code><strong>focusPeakingIntensity</strong></code> — </li>
+			<li><code><strong>overlayChronosWatermarkColour</strong></code> — </code></li>
+			<li><code><strong>overlayChronosWatermarkX</strong></code> — </li>
+			<li><code><strong>overlayChronosWatermarkY</strong></code>— </li>
+			<li><code><strong>overlayIdentifier</strong></code> — </li>
+			<li><code><strong>overlayRGBImage</strong></code> — </li>
+			<li><code><strong>overlayRGBImageHeight</strong></code> — </li>
+			<li><code><strong>overlayRGBImageWidth</strong></code> — </li>
+			<li><code><strong>overlayRGBImageX</strong></code> — </li>
+			<li><code><strong>overlayRGBImageY</strong></code> — </li>
+			<li><code><strong>overlayRGBLogoPalette</strong></code> — </li>
+			<li><code><strong>overlayTextbox0Colour</strong></code> — </li>
+			<li><code><strong>overlayTextbox0Content</strong></code> — </li>
+			<li><code><strong>overlayTextbox0Font</strong></code> — </li>
+			<li><code><strong>overlayTextbox0H</strong></code> — </li>
+			<li><code><strong>overlayTextbox0OffsetX</strong></code> — </li>
+			<li><code><strong>overlayTextbox0OffsetY</strong></code> — </li>
+			<li><code><strong>overlayTextbox0W</strong></code> — </li>
+			<li><code><strong>overlayTextbox0X</strong></code> — </li>
+			<li><code><strong>overlayTextbox0Y</strong></code> — </li>
+			<li><code><strong>overlayTextbox1Colour</strong></code> — </li>
+			<li><code><strong>overlayTextbox1Content</strong></code> — </li>
+			<li><code><strong>overlayTextbox1Font</strong></code> — </li>
+			<li><code><strong>overlayTextbox1H</strong></code> — </li>
+			<li><code><strong>overlayTextbox1OffsetX</strong></code> — </li>
+			<li><code><strong>overlayTextbox1OffsetY</strong></code> — </li>
+			<li><code><strong>overlayTextbox1W</strong></code> — </li>
+			<li><code><strong>overlayTextbox1X</strong></code> — </li>
+			<li><code><strong>overlayTextbox1Y</strong></code> — </li>
+			<li><code><strong>overlayVersion</strong></code> — </li>
+			<li><code><strong>recordedSegments</strong></code> — </li>
+			<li><code><strong>recordingAnalogGain</strong></code> — </li>
+			<li><code><strong>recordingExposureNs</strong></code> — </li>
+			<li><code><strong>recordingHRes</strong></code> — </li>
+			<li><code><strong>recordingHoffset</strong></code> — </li>
+			<li><code><strong>recordingPeriodNs</strong></code> — </li>
+			<li><code><strong>recordingVRes</strong></code> — </li>
+			<li><code><strong>recordingVoffset</strong></code> — </li>
+			<li><code><strong>sensorFramerateMax</strong></code> — </li>
+			<li><code><strong>sensorHIncrement</strong></code> — </li>
+			<li><code><strong>sensorHMax</strong></code> — </li>
+			<li><code><strong>sensorHMin</strong></code> — </li>
+			<li><code><strong>sensorMaxExposureNs</strong></code> — </li>
+			<li><code><strong>sensorMaxShutterAngle</strong></code> — </li>
+			<li><code><strong>sensorMinExposureNs</strong></code> — </li>
+			<li><code><strong>sensorName</strong></code> — </li>
+			<li><code><strong>sensorPixelFormat</strong></code> — </li>
+			<li><code><strong>sensorPixelRate</strong></code> — </li>
+			<li><code><strong>sensorQuantizeTimingNs</strong></code> — </li>
+			<li><code><strong>sensorVIncrement</strong></code> — </li>
+			<li><code><strong>sensorVMax</strong></code> — </li>
+			<li><code><strong>sensorVMin</strong></code> — </li>
+			<li><code><strong>timingExposureDelayNs</strong></code> — </li>
+			<li><code><strong>timingMaxExposureNs</strong></code> — </li>
+			<li><code><strong>timingMaxPeriod</strong></code> — </li>
+			<li><code><strong>timingMaxShutterAngle</strong></code> — </li>
+			<li><code><strong>timingMinExposureNs</strong></code> — </li>
+			<li><code><strong>timingMinPeriod</strong></code> — </li>
+			<li><code><strong>timingQuantization</strong></code> — </li>
+			<li><code><strong>triggerCapabilities</strong></code> — </li>
+			<li><code><strong>triggerConfiguration</strong></code> — </li>
+			<li><code><strong>triggerDelayNs</strong></code> — </li>
+			<li><code><strong>triggerState</strong></code> — </li>
+			<li><code><strong>triggers</strong></code> — </li>
+			<li><code><strong>whiteBalance</strong></code> — </li>
+			<li><code><strong>zebraStripesEnabled</strong></code> — </li>
+		</ul>
+		
+		<p>Some settings related to the video pipeline take a little while to update, so it's recommended to set them all at once with one call to to <code>set</code>.</p>
+		
+		<a name="video-api"><h2>Video API</h2></a>
+		<p>…</p>
+		
+		<a name="user-interface"><h2>User Interface</h2></a>
+		<p>…</p>
+		
+		<a name="http-interface"><h2>HTTP Interface</h2></a>
+		<p>…</p>
+		
+		<a name="ych"><h2>Your Client Here</h2></a>
+		<p>…</p>
+	</body>
+</html>
