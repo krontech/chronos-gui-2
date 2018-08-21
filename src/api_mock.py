@@ -39,7 +39,7 @@ if not QDBusConnection.systemBus().isConnected():
 ########################
 
 
-def resolution_is_valid(hOffset, vOffset, hRes, vRes): #xywh px
+def resolution_is_valid(hOffset: int, vOffset: int, hRes: int, vRes: int):
 	LUX1310_MIN_HRES = 192 #The LUX1310 is our image sensor.
 	LUX1310_MAX_HRES = 1280
 	LUX1310_MIN_VRES = 96
@@ -97,9 +97,9 @@ def notifyExposureChange(state):
 class State():
 	#Invariant data about the camera.
 	cameraModel = "Mock Camera 1.4"
-	cameraApiVersion = 1.0
-	cameraFpgaVersion = 3.14
-	cameraMemoryGB = 160
+	cameraApiVersion = '0.1.0'
+	cameraFpgaVersion = '3.14'
+	cameraMemoryGiB = 16.
 	cameraSerial = "Captain Crunch"
 	sensorName = "acme9001"
 	sensorHMax = 1920
@@ -631,7 +631,6 @@ for key in _camState.keys():
 		def __init__(self):
 			super(Wrapper, self).__init__()
 			
-			return # DDR 2018-06-22: The following function never returns, so everything is broken.
 			QDBusConnection.systemBus().connect('com.krontech.chronos.control.mock', '/', '',
 				key, self.updateKey)
 		
