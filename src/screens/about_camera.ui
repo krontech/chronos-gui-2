@@ -67,6 +67,9 @@
    <property name="invertedAppearance">
     <bool>true</bool>
    </property>
+   <property name="invertedControls">
+    <bool>true</bool>
+   </property>
   </widget>
   <widget class="QScrollArea" name="uiScrollArea">
    <property name="geometry">
@@ -89,15 +92,6 @@
    <property name="widgetResizable">
     <bool>true</bool>
    </property>
-   <widget class="QWidget" name="uiScrollAreaContents">
-    <property name="geometry">
-     <rect>
-      <x>0</x>
-      <y>0</y>
-      <width>563</width>
-      <height>411</height>
-     </rect>
-    </property>
     <widget class="Label" name="uiText">
      <property name="geometry">
       <rect>
@@ -284,7 +278,6 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Plus 19 backers who wished to remain anonymous.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
     </widget>
-   </widget>
   </widget>
   <zorder>backdrop</zorder>
   <zorder>headerlabel</zorder>

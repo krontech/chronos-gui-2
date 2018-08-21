@@ -18,8 +18,10 @@ class AboutCamera(QtWidgets.QDialog):
 		
 		# Set scroll bar to scroll all text content. 
 		self.uiScroll.setMaximum( 
-			#text height * wtf - window height + margin
-			self.uiText.height()*2 - self.uiScrollArea.height() + 20 )
+			self.uiText.height() - self.uiScrollArea.height() )
+		
+		self.uiScrollArea.setAttribute(QtCore.Qt.WA_TransparentForMouseEvents)
+		self.uiScrollArea.setFocusPolicy(QtCore.Qt.NoFocus)
 		
 		# Button binding.
 		self.uiScroll.valueChanged.connect(self.scrollPane)
@@ -27,12 +29,6 @@ class AboutCamera(QtWidgets.QDialog):
 		self.uiDone.clicked.connect(window.back)
 		
 	def scrollPane(self, pos):
-		"""Update the text position when scrollbar changes.
+		"""Update the text position when scrollbar changes."""
 		
-			I can't figure out how to scroll the scroll-pane itself. 😝 This just
-			scrolls the text widget itside it, which seems to be horrendously
-			inefficient.
-		"""
-		geometry = self.uiText.geometry()
-		geometry.setTop(-pos)
-		self.uiText.setGeometry(geometry)
+		self.uiScrollArea.verticalScrollBar().setValue(pos)
