@@ -99,7 +99,7 @@ class State():
 	cameraModel = "Mock Camera 1.4"
 	cameraApiVersion = '0.1.0'
 	cameraFpgaVersion = '3.14'
-	cameraMemoryGiB = 16.
+	cameraMemoryGB = 16.
 	cameraSerial = "Captain Crunch"
 	sensorName = "acme9001"
 	sensorHMax = 1920

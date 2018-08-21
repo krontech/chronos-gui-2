@@ -16,7 +16,6 @@ class RecordMode(QtWidgets.QDialog):
 	
 	def __init__(self, window):
 		super().__init__()
-		uic.loadUi('src/screens/make-dbus-work.ui', self) #DDR 2018-07-12: QDBusConnection.systemBus().connect, in api.py, doesn't return if we don't load this here. I don't know what an empty dialog box has to do with anything. 🤷
 		uic.loadUi('src/screens/record_mode.ui', self)
 		
 		# Panel init.
