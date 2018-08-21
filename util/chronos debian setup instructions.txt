@@ -90,6 +90,8 @@ installing on a new VM
     python3 configure.py --confirm-license --qmake ~/qt-everywhere-src-5.11.1/qtbase/bin/qmake --verbose
     nohup bash -c "time make -j$(nproc)"
     nohup bash -c "time make install -j$(nproc)"
+    # NOTE: If you get an error saying libstdc++ is the wrong version or not found, it cannot be fixed by tweaking LD_EXPORT_PATH. You need to run `cd /usr/lib && ln -s gcc-4.9-backport/lib/libstdc++* .` to fix it. I don't know why, but it seems QT *really* wants to look for the files there.
+    # NOTE: If you get an error saying No module named 'PyQt5.sip', rebuild SIP as detailed above and rebuild PyQt5.
     pip install --upgrade pip
     
     
