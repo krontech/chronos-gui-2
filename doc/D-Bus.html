@@ -22,7 +22,7 @@
 			
 			
 			
-			body > code {
+			body > code, .codeblock {
 				white-space: pre;
 				overflow-x: auto;
 				display: block;
@@ -86,7 +86,7 @@
 			<g id="layer1" transform="translate(-29.5,-119.5)" inkscape:groupmode="layer" inkscape:label="Layer 1" style="font-family:sans-serif;">
 				<a href="#hardware"><rect id="rect2667" x="40" y="160" width="160" height="140"/></a>
 				<a href="#control-api"><rect id="rect2669" x="300" y="160" width="160" height="60"/></a>
-				<a href="#video-api"><rect id="rect2671" x="300" y="240" width="160" height="60"/></a>
+				<a href="https://github.com/krontech/chronos-cli/blob/master/src/pipeline/README.md"><rect id="rect2671" x="300" y="240" width="160" height="60"/></a>
 				<a href="#user-interface"><rect id="rect2673" x="580" y="130" width="140" height="60"/></a>
 				<a href="#http-interface"><rect id="rect2675" x="580" y="210" width="140" height="60"/></a>
 				<a href="#ych"><rect id="rect2677" x="580" y="290" width="140" height="60" style="fill-opacity:1;fill:#6ecff0;stroke:#2c4d8e"/></a>
@@ -153,7 +153,7 @@
 		<ul>
 			<li><code><strong>get</strong>([string, string, …])→{string:value, string:value, …}</code> — Return camera setting values. See <a href="#control-settings">Settings</a> for a list of valid keys.</li>
 			<li><code><strong>set</strong>({string:value, string:value, …})</code> — Update a camera setting value. See <a href="#control-settings">Settings</a> for a list of valid keys.</li>
-			<li><code><strong>available_keys</strong> → [string, string, …]</code> — Get a list of available codecamera settings keys, for use with <code>get</code> or <code>set</code>.</li>
+			<li><code><strong>available_keys</strong> → [string, string, …]</code> — Get a list of available camera settings keys, for use with <code>get</code> or <code>set</code>.</li>
 			<li><code><strong>framerate_for_resolution</strong>(hRes: int, vRes: int) → float</code> — Returns the frames per seconds a resolution will record at. Non-valid resolutions will return undefined results.</li>
 			<li><code><strong>resolution_is_valid</strong>(hOffset: int, vOffset: int, hRes: int, vRes: int) → bool</code> — Returns true if the supplied video resolution and offset is valid for recording. A resolution is not valid if it is offset too far. All parameters are positive integers.</li>
 			<li><code><strong>power_down</strong></code> — Turn off the camera. Useful in conjunction with the "Turn camera on when power connected" checkbox in the Battery & Power screen.</li>
@@ -253,16 +253,74 @@
 		
 		<p>Some settings related to the video pipeline take a little while to update, so it's recommended to set them all at once with one call to to <code>set</code>.</p>
 		
+		
+		<h3>Reference Client</h3>
+		
+		<p>A Python reference client for the control API is available. If you're using Python to script, it may be useful as a library. Otherwise, it may serve as a useful example how to connect to and use the D-Bus API.</p>
+		
+		<p>It is <strong>not</strong> required to use the reference client. The client simply sands down some of the rough edges of the D-Bus API. For example, when <code>get</code>ting or <code>set</code>ting a single value, the reference client automatically converts the single value into the list the D-Bus API requires. It also emits an update signal immediately on subscription, which eliminates the need for separate initialiser code in many cases.</p>
+		
+		<p>The reference API has the following available methods:</p>
+		
+		<ul>
+			<li><code><strong>video</strong>(methodName: string, optional args: any)</code> — Convenience method to invoke one of the D-Bus API Video methods. See the <a href="https://github.com/krontech/chronos-cli/blob/master/src/pipeline/README.md">video api documentation</a> for details.</li>
+			<li><code><strong>control</strong>(methodName: string, optional args: any)</code> — </li>
+			<li><code><strong>get</strong>(string or [strings])</code> — Convenience method to invoke one of the D-Bus API Video methods. See the <a href="#control-settings">control settings keys</a> for a list of values. If a string is passed, this method will automatically wrap it in a list before calling the underlying D-Bus method and unwrap the returned list.</li>
+			<li><code><strong>set</strong>({key: value})</code> — Wrapper for <code>control('set', {…})</code>. See the <a href="#control-settings">control settings keys</a> for a list of values.</li>
+			<li><code><strong>observe</strong>(valueName: string, callback: Callable[[Any], None])</code> — Invoke the callback with the new value when the value changes. The value is initially presumed to be unknown, and so is considered to change to the current value is when the subscription is started. valueName is one of the <a href="#control-settings">control settings keys</a>.</li>
+			<li><code><strong>observe_future_only</strong></code> — Like <code>observe</code>, but the callback is not called on subscription. This is useful for some of the more complex compound values which can arise around sliders and such.</li>
+			<li><code><strong>@silenceCallbacks(Qt Widget)</strong></code> — Function decorator for a callback. Before a decorated callback is called, this turns off events for the supplied Qt Widget. For example, on the main screen of the UI, the callback
+				<code class="codeblock">
+					@pyqtSlot(int)
+					@silenceCallbacks('uiExposureSlider')
+					def updateExposureNs(self, newExposureNs):
+						self.uiExposureSlider.setValue(newExposureNs)
+				</code>
+			is used by 
+				<code class="codeblock">
+					api.observe('recordingExposureNs', self.updateExposureNs)
+				</code>
+			to update the exposure slider when the exposure is changed externally.
+			</li>
+		</ul>
+		
+		
+		
 		<a name="video-api"><h2>Video API</h2></a>
-		<p>…</p>
+		<p>The video interface deals with getting the video data from A to B.</p>
+		
+		<p>The <a href="https://github.com/krontech/chronos-cli/blob/master/src/pipeline/README.md">full documentation</a> for the video API is available in the <a href="https://github.com/krontech/chronos-cli">chronos-cli repository</a>.</p>
+		
+		
 		
 		<a name="user-interface"><h2>User Interface</h2></a>
-		<p>…</p>
+		<p>The user interface, on the screen on the back of the Chronos, uses the D-Bus API to drive the camera and keep itself in sync with the state the camera is in.</p>
 		
 		<a name="http-interface"><h2>HTTP Interface</h2></a>
-		<p>…</p>
+		<p><em>I have not written this program yet, but what is documented as follows will follow.</em></p>
+		<p>The HTTP interface exposes a web API. It also provides web app which uses the web API. The web app can be used from any phone, tablet, or laptop running a modern web browser.</p>
+		
+		<p>The HTTP interface is very similar to the D-Bus interface. It mostly exposes the same method calls, and provides the same events. However, it also contains an authentication mechanism so other people can't control your camera without your permission. The D-Bus API does not need an authentication mechanism, since anything capable of talking to it is already running on the camera and can do anything the API can do.</p>
+		
+		
 		
 		<a name="ych"><h2>Your Client Here</h2></a>
-		<p>…</p>
+		
+		<p>So, you have a specialized application you want the camera to perform? Perhaps you just want to lock down the back-of-camera UI? Luckily for you, it is easy to develop your own application to run on the Chronos.</p>
+		
+		<p>There are two approaches to developing an app. You can write the code on the camera, or you can write the code on a virtual machine and copy it to the camera later. If you want to set up a VM, refer to <a href="../util/chronos debian setup instructions.txt">~util/chronos debian setup instructions.txt</a>. The following instructions assume you have a working development environment, either on the camera or in a virtual machine.</p>
+		
+		
+		<h3>Connecting to the Camera</h3>
+		
+		<p>Developing directly on your Chronos, via SSH or file upload, is simpler than developing on a virtual machine. If you develop via SSH, you'll usually run commands and edit files in-place on the camera with Vim or Emacs. If you prefer file upload, you'll set up a little watcher-script that will restart your application when you change a file. The advantage of uploading the files is being able to edit them locally, with your preferred text editor, although this method is a little more complex. Either way the files on the camera are changed, the result is the same.</p>
+		
+		<p>Before making any changes to your camera, it is strongly recommended to make a backup of your system SD card. Pop the SD card out of the bottom of the camera, insert it into your computer, and then make a backup of the card filesystems. (Not the files themselves.) On Linux, this can be done with <code>gzip /dev/sdb --to-stdout --verbose > chronos-fs-$(date +%F).gz</code>, where <code>/dev/sdb</code> is the device you just plugged in. You can list plugged-in devices with <code>lsblk</code>. (You should see <code>BOOT</code> and <code>ROOTFS</code> on your microSD card.) After you've taken your backup, which will take a while to complete, test it by restoring it to a <em>different</em> microSD card. If you don't have a spare card to test with, it is advised to say a brief prayer instead.</p>
+		
+		<p>You can connect via the local network by plugging an Ethernet cable into your camera, or connect directly to your computer with a MicroUSB cable. Either way, the camera will get an IP address which you can SSH to. For example, I have my camera connected to my PC via USB, so I run <code>ssh root@192.168.12.1</code> to connect to my camera. I can also visit <code>fish://root@192.168.12.1/root/</code> in Dolphin to browse the files on my camera graphically. When prompted, the password is "chronos", or whatever you set it to.</p>
+		
+		<p>The camera runs Debian 7 (Wheezy). As such, most common linuxisims will still work, but modern programs must be compiled from scratch. The back-of-camera UI, chronos-gui-2, lives in <code>~/gui</code>. For your own app, you may wish to build new screens for chronos-gui-2, or use it as a reference for developing your own Qt app. The D-Bus API resides in <code>~/chronos-cli</code>. All software running on the CPU is open source, and can be <a href="https://github.com/krontech">freely downloaded from GitHub</a>. If you'd like to contribute a bug fix or a new feature to the existing app, please drop us a line on the forum so we can coordinate!</p>
+		
+		<p>So, basically, make a new <code>my_client_app.py</code> file on the camera and run it with <code>python3 my_client_app.py</code>. Refer to above for how to make it do stuff.</p>
 	</body>
 </html>
