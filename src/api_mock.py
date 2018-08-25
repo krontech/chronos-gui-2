@@ -109,7 +109,7 @@ class State():
 	sensorHIncrement = 2
 	sensorVIncrement = 32
 	sensorPixelRate = 1920 * 1080 * 1000
-	sensorPixelFormat = "BYR2"
+	sensorPixelFormat = "BYR2" #Or "y12" for mono models.
 	sensorFramerateMax = 1000
 	sensorQuantizeTimingNs = 250
 	sensorMinExposureNs = int(1e3)
@@ -132,7 +132,7 @@ class State():
 		return [{
 			'hRes': x, 
 			'vRes': y, 
-			'maxFramerate': framerate_for_resolution(x, y),
+			'framerate': framerate_for_resolution(x, y),
 		} for x, y in [
 			[1280, 1024],
 			[1280, 720],
@@ -220,13 +220,11 @@ class State():
 	recordingExposureNs = int(8.5e8) #These don't have to have the pipeline torn down, so they don't need the hack where we set video settings atomically.
 	recordingPeriodNs = int(4e4)
 	
-	currentVideoState = 'viwefinder' #eg, 'viewfinder', 'playback', etc.
 	currentCameraState = 'normal' #Can also be 'saving' or 'recording'. When saving, the API is unresponsive?
-	focusPeakingColor = 0x0000ff #currently presented as red, blue, green, alpha. - 0x000000 is off
-	focusPeakingIntensity = 0.5 #1=max, 0=off
+	currentVideoState = 'viwefinder' #eg, 'viewfinder', 'playback', etc.
+	focusPeakingColor = 0x0000ff #currently presented as red, green, blue, alpha (RGBA). 0x000000 is off
 	zebraStripesEnabled = False
-	connectionTime = "2018-06-19T02:05:52.664Z" #To use this, add however many seconds ago the request was made. Time should pass roughly the same for the camera as for the client.
-	disableRingBuffer = False #In segmented mode, disable overwriting earlier recorded ring buffer segments. DDR 2018-06-19: Loial figures this was fixed, but neither of us know why it's hidden in the old UI.
+	disableOverwritingRingBuffer = False #In segmented mode, disable overwriting earlier recorded ring buffer segments. DDR 2018-06-19: Loial figures this was fixed, but neither of us know why it's hidden in the old UI.
 	recordedSegments = [{ #Each entry in this list a segment of recorded video. Although currently resolution/framerate is always the same having it in this data will make it easier to fix this in the future if we do.
 		"start": 0,
 		"end": 1000,
@@ -364,7 +362,6 @@ class State():
 			},
 		}
 	
-	overlayIdentifier = 0x55
 	overlayVersion = "1.1"
 	
 	overlayTextbox0Content = 'textbox 0 sample text'

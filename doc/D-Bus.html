@@ -5,10 +5,12 @@
 		<title>Chronos D-Bus API Documentation</title>
 		
 		<style>
-			/* from http://bettermotherfuckingwebsite.com */
+			/* Originally from http://bettermotherfuckingwebsite.com */
 			body {
-				margin:40px auto;
-				max-width: 650px;
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				margin: 40px 2%;
 				line-height: 1.6;
 				font-size: 18px;
 				color: #444;
@@ -16,11 +18,13 @@
 				tab-size: 4;
 			}
 			
-			h1,h2,h3 {
-				line-height: 1.2;
+			body > * {
+				max-width: 650px;
 			}
 			
-			
+			body > table {
+				max-width: 975px;
+			}
 			
 			body > code, .codeblock {
 				white-space: pre;
@@ -28,22 +32,45 @@
 				display: block;
 			}
 			
+			h1,h2,h3 {
+				line-height: 1.2;
+				width: 100%;
+			}
+			
+			thead, th {
+				position: sticky;
+				top: 0px;
+				background: white;
+				text-align: left;
+			}
+			
+			th, td {
+				padding: 1ex;
+			}
+			
+			
 			svg path {
 				stroke: black;
 			}
 			
 			svg text {
+				font-family:sans-serif;
 				font-size: 16px;
 				line-height: 1.25;
 				text-align: center;
 				text-anchor: middle;
 				pointer-events: none; /* Keep links, on rects, working when mouse is over text. */
+				user-select: none;
 			}
 			
 			svg rect {
 				fill-opacity:.25;
 				fill:#10bfbf;
 				stroke:#107f7f
+			}
+			
+			svg a:hover {
+				opacity: 0.7;
 			}
 		</style>
 		
@@ -80,10 +107,10 @@
 		
 		<h2>Architecture</h2>
 		
-		<p>The D-Bus APIs sit between the hardware and the applications running on the camera.</p>
+		<p>The D-Bus Control and Video APIs sit between the hardware and the applications running on the camera.</p>
 		
 		<svg id="SVGRoot" version="1.1" viewBox="0 0 701 241" xmlns="http://www.w3.org/2000/svg">
-			<g id="layer1" transform="translate(-29.5,-119.5)" inkscape:groupmode="layer" inkscape:label="Layer 1" style="font-family:sans-serif;">
+			<g id="layer1" transform="translate(-29.5,-119.5)" inkscape:groupmode="layer" inkscape:label="Layer 1">
 				<a href="#hardware"><rect id="rect2667" x="40" y="160" width="160" height="140"/></a>
 				<a href="#control-api"><rect id="rect2669" x="300" y="160" width="160" height="60"/></a>
 				<a href="https://github.com/krontech/chronos-cli/blob/master/src/pipeline/README.md"><rect id="rect2671" x="300" y="240" width="160" height="60"/></a>
@@ -123,12 +150,12 @@
 		<p>The APIs provide a way to configure the camera hardware. The APIs also emit updates so that clients can keep themselves up-to-date when the camera is reconfigured. For example, if the HTTP interface receives a request to change the exposure time of the camera, then the user interface on the camera will need to update itself to reflect the new exposure time.</p>
 		
 		
-		<a name="hardware"><h2>Hardware</h2></a>
+		<h2><a name="hardware">Hardware</a></h2>
 		
 		<p>The APIs primarily drive the FPGA of the Chronos, as well as set up the video pipeline to display and save content. While the FPGA image itself is proprietary, the register definitions are available as part of the implementation of the APIs.</p>
 		
 		
-		<a name="control-api"><h2>Control API</h2></a>
+		<h2><a name="control-api">Control API</a></h2>
 		
 		<p>The control D-Bus API deals with configuring the camera, as opposed to the video API which is responsible for playing back and saving footage.</p>
 		
@@ -162,94 +189,498 @@
 		<p>In addition, when a camera setting is changed, a signal named the key is emitted on the D-Bus interface. It can be intercepted with <code>QDBusConnection.systemBus().connect('com.krontech.chronos.control.mock', '/', '', NAME_OF_KEY, CALLBACK)</code>.
 		
 		
-		<a name="control-settings"><h3>Settings Keys</h3></a>
+		<h3><a name="control-settings">Settings Keys</a></h3>
 		
 		<p>Control settings keys hold the state of the camera. These keys are used with the <code>get</code> and <code>set</code> method calls. They can be retrieved with the <code>available_keys</code> method.</p>
 		
 		<p>Keys have different levels of mutability. <strong>Constant</strong> keys do not change over the course of a connection, although they may be changed if the camera is upgraded. These are things like firmware version and the amount of RAM installed. Keys which are a <strong>property</strong>, on the other hand, only change in response to external stimulus. Properties can't be set through the API. These are things like battery level and trigger status. <strong>Variable</strong> keys are settable through the API, but may be changed externally as well.</p>
 		
-		<ul>
-			<li><code><strong>batteryCharge</strong></code> — Decimal property between 0.0 and 1.0 indicating how charged the battery is. 0 is dead, 1 is fully powered.</li>
-			<li><code><strong>batteryVoltage</strong></code> — Decimal property indicating voltage of the battery in volts. A happy battery outputs between 12v and 12.5v.</li>
-			<li><code><strong>cameraApiVersion</strong></code> — Constant string indicating the iteration of this interface. Adheres to <a href="https://semver.org/">SemVer</a>.</li>
-			<li><code><strong>cameraFpgaVersion</strong></code> — Constant string indicating what firmware the <a href="https://en.wikipedia.org/wiki/Field-programmable_gate_array">field-programmable gate array</a> inside the Chronos is running. The FPGA is primarily responsible for recording the high-speed video coming off the sensor to a buffer in RAM.</li>
-			<li><code><strong>cameraMemoryGB</strong></code> — Constant decimal. Amount of RAM installed in the Chronos in <a href="https://en.wikipedia.org/wiki/Gigabyte">GB</a> (vs <a href="https://en.wikipedia.org/wiki/Gibibyte">GiB</a>).</li>
-			<li><code><strong>cameraModel</strong></code> — </li>
-			<li><code><strong>cameraSerial</strong></code> — </li>
-			<li><code><strong>commonlySupportedResolutions</strong></code> — </li>
-			<li><code><strong>connectionTime</strong></code> — </li>
-			<li><code><strong>currentCameraState</strong></code> — </li>
-			<li><code><strong>currentVideoState</strong></code> — </li>
-			<li><code><strong>disableRingBuffer</strong></code> — </li>
-			<li><code><strong>externallyPowered</strong></code> — </li>
-			<li><code><strong>focusPeakingColor</strong></code> — </li>
-			<li><code><strong>focusPeakingIntensity</strong></code> — </li>
-			<li><code><strong>overlayChronosWatermarkColour</strong></code> — </code></li>
-			<li><code><strong>overlayChronosWatermarkX</strong></code> — </li>
-			<li><code><strong>overlayChronosWatermarkY</strong></code>— </li>
-			<li><code><strong>overlayIdentifier</strong></code> — </li>
-			<li><code><strong>overlayRGBImage</strong></code> — </li>
-			<li><code><strong>overlayRGBImageHeight</strong></code> — </li>
-			<li><code><strong>overlayRGBImageWidth</strong></code> — </li>
-			<li><code><strong>overlayRGBImageX</strong></code> — </li>
-			<li><code><strong>overlayRGBImageY</strong></code> — </li>
-			<li><code><strong>overlayRGBLogoPalette</strong></code> — </li>
-			<li><code><strong>overlayTextbox0Colour</strong></code> — </li>
-			<li><code><strong>overlayTextbox0Content</strong></code> — </li>
-			<li><code><strong>overlayTextbox0Font</strong></code> — </li>
-			<li><code><strong>overlayTextbox0H</strong></code> — </li>
-			<li><code><strong>overlayTextbox0OffsetX</strong></code> — </li>
-			<li><code><strong>overlayTextbox0OffsetY</strong></code> — </li>
-			<li><code><strong>overlayTextbox0W</strong></code> — </li>
-			<li><code><strong>overlayTextbox0X</strong></code> — </li>
-			<li><code><strong>overlayTextbox0Y</strong></code> — </li>
-			<li><code><strong>overlayTextbox1Colour</strong></code> — </li>
-			<li><code><strong>overlayTextbox1Content</strong></code> — </li>
-			<li><code><strong>overlayTextbox1Font</strong></code> — </li>
-			<li><code><strong>overlayTextbox1H</strong></code> — </li>
-			<li><code><strong>overlayTextbox1OffsetX</strong></code> — </li>
-			<li><code><strong>overlayTextbox1OffsetY</strong></code> — </li>
-			<li><code><strong>overlayTextbox1W</strong></code> — </li>
-			<li><code><strong>overlayTextbox1X</strong></code> — </li>
-			<li><code><strong>overlayTextbox1Y</strong></code> — </li>
-			<li><code><strong>overlayVersion</strong></code> — </li>
-			<li><code><strong>recordedSegments</strong></code> — </li>
-			<li><code><strong>recordingAnalogGain</strong></code> — </li>
-			<li><code><strong>recordingExposureNs</strong></code> — </li>
-			<li><code><strong>recordingHRes</strong></code> — </li>
-			<li><code><strong>recordingHoffset</strong></code> — </li>
-			<li><code><strong>recordingPeriodNs</strong></code> — </li>
-			<li><code><strong>recordingVRes</strong></code> — </li>
-			<li><code><strong>recordingVoffset</strong></code> — </li>
-			<li><code><strong>sensorFramerateMax</strong></code> — </li>
-			<li><code><strong>sensorHIncrement</strong></code> — </li>
-			<li><code><strong>sensorHMax</strong></code> — </li>
-			<li><code><strong>sensorHMin</strong></code> — </li>
-			<li><code><strong>sensorMaxExposureNs</strong></code> — </li>
-			<li><code><strong>sensorMaxShutterAngle</strong></code> — </li>
-			<li><code><strong>sensorMinExposureNs</strong></code> — </li>
-			<li><code><strong>sensorName</strong></code> — </li>
-			<li><code><strong>sensorPixelFormat</strong></code> — </li>
-			<li><code><strong>sensorPixelRate</strong></code> — </li>
-			<li><code><strong>sensorQuantizeTimingNs</strong></code> — </li>
-			<li><code><strong>sensorVIncrement</strong></code> — </li>
-			<li><code><strong>sensorVMax</strong></code> — </li>
-			<li><code><strong>sensorVMin</strong></code> — </li>
-			<li><code><strong>timingExposureDelayNs</strong></code> — </li>
-			<li><code><strong>timingMaxExposureNs</strong></code> — </li>
-			<li><code><strong>timingMaxPeriod</strong></code> — </li>
-			<li><code><strong>timingMaxShutterAngle</strong></code> — </li>
-			<li><code><strong>timingMinExposureNs</strong></code> — </li>
-			<li><code><strong>timingMinPeriod</strong></code> — </li>
-			<li><code><strong>timingQuantization</strong></code> — </li>
-			<li><code><strong>triggerCapabilities</strong></code> — </li>
-			<li><code><strong>triggerConfiguration</strong></code> — </li>
-			<li><code><strong>triggerDelayNs</strong></code> — </li>
-			<li><code><strong>triggerState</strong></code> — </li>
-			<li><code><strong>triggers</strong></code> — </li>
-			<li><code><strong>whiteBalance</strong></code> — </li>
-			<li><code><strong>zebraStripesEnabled</strong></code> — </li>
-		</ul>
+		<table>
+			<thead>
+				<tr>
+					<th>Setting Key</th>
+					<th>Type</th>
+					<th>Mutability</th>
+					<th>Description</th>
+				</tr>
+			</thead>
+			
+			<tbody>
+				<tr>
+					<td><code>batteryCharge</code></td>
+					<td>decimal</td>
+					<td>property</td>
+					<td>On a scale of 0.0 to 1.0, how full is the camera battery? 0 is dead, and 1 is fully charged.</td>
+				</tr>
+				<tr>
+					<td><code>batteryVoltage</code></td>
+					<td>decimal</td>
+					<td>property</td>
+					<td>DThe voltage of the battery, in volts. A happy battery outputs between 12v and 12.5v.</td>
+				</tr>
+				<tr>
+					<td><code>cameraApiVersion</code></td>
+					<td>string</td>
+					<td>constant</td>
+					<td>The iteration of this API. Adheres to <a href="https://semver.org/">SemVer</a>.</td>
+				</tr>
+				<tr>
+					<td><code>cameraFpgaVersion</code></td>
+					<td>string</td>
+					<td>constant</td>
+					<td>The firmware iteration the <a href="https://en.wikipedia.org/wiki/Field-programmable_gate_array">field-programmable gate array</a> inside the Chronos is running. (The FPGA is primarily responsible for recording the high-speed video coming off the sensor to a buffer in RAM.)</td>
+				</tr>
+				<tr>
+					<td><code>cameraMemoryGB</code></td>
+					<td>decimal</td>
+					<td>constant</td>
+					<td>Amount of RAM installed in the Chronos in <a href="https://en.wikipedia.org/wiki/Gigabyte">GB</a> (vs <a href="https://en.wikipedia.org/wiki/Gibibyte">GiB</a>). This will correspond to the memory amount printed on the bottom of your camera, if you haven't made any modification.</td>
+				</tr>
+				<tr>
+					<td><code>cameraModel</code></td>
+					<td>string</td>
+					<td>constant</td>
+					<td>The product the API is running on. This corresponds to the model printed on the bottom of your camera. Example: <code>CR14-1.0</code></td>
+				</tr>
+				<tr>
+					<td><code>cameraSerial</code></td>
+					<td>string</td>
+					<td>constant</td>
+					<td>The serial number of the product the API is running on. This corresponds to the SN printed on the bottom of your camera. Example: <code>00555</code></td>
+				</tr>
+				<tr>
+					<td><code>commonlySupportedResolutions</code></td>
+					<td>list</td>
+					<td>constant</td>
+					<td>
+						A list of maps. Each map indicates a preset by specifying <code>hRes</code> (int, px), <code>vRes</code> (int, px), and <code>framerate</code> (decimal, frames per second). Partial example:
+						<code class="codeblock">
+							[{
+								'hRes': 1280, 
+								'vRes': 1024, 
+								'framerate': 1057.362,
+							}, …]
+						</code>
+					</td>
+				</tr>
+				<tr>
+					<td><code>currentCameraState</code></td>
+					<td>enum</td>
+					<td>property</td>
+					<td>Indicates what the camera is doing. One of <code>normal</code>, <code>saving</code> or <code>recording</code>. When saving (to file), parts of the API may be unresponsive. The main difference between <code>normal</code> and <code>recording</code> is whether the red indicator lights on the chronos are red or not. Some actions, like 'stop recording' or 'stop saving', only make sense in certain states.</td>
+				</tr>
+				<tr>
+					<td><code>currentVideoState</code></td>
+					<td>enum</td>
+					<td>variable</td>
+					<td>Indicates what the video display is showing. One of <code>viewfinder</code> or <code>playback</code>.</colgroup>. In <code>viewfinder</code> mode, the video on the back of the camera is showing what the sensor is seeing. In <code>playback</code> mode, the video is showing footage previously recorded in RAM.</td>
+				</tr>
+				<tr>
+					<td><code>disableOverwritingRingBuffer</code></td>
+					<td>boolean</td>
+					<td>variable</td>
+					<td>In segmented mode, disable overwriting earlier recorded ring buffer segments.</td>
+				</tr>
+				<tr>
+					<td><code>externallyPowered</code></td>
+					<td>boolean</td>
+					<td>property</td>
+					<td>Returns True if the camera is running on mains power. In this mode, the battery will recharge until full.</td>
+				</tr>
+				<tr>
+					<td><a name=focusPeakingColor><code>focusPeakingColor</code></a></td>
+					<td>integer</td>
+					<td>variable</td>
+					<td>
+						An integer specifying the colour of focus peaking, one of the available focus aids. Like HTML/CSS, this value is composed of four packed 8-bit channels, representing Red, Green, Blue, and Alpha (strength). In <a href="https://en.wikipedia.org/wiki/Hexadecimal">hexadecimal</a>, this is formatted as 0x<span style="color: #D00F;">RR</span><span style="color: #0B0F;">GG</span><span style="color: #00DF;">BB</span><span style="color: #000F;">AA</span>. For example, <code style="color: #AA00AAFF;">0xAA00AAFF</code> is maximum-strength purple, because red and blue are both set to AA, and alpha is set to FF. <code style="color: #C1681988;">0xC1681988</code> is half-strength brown.
+						<br>
+						To turn off/disable focus peaking, set this value to 0.
+					</td>
+				</tr>
+				<tr>
+					<td><code>overlayChronosWatermarkColour</code></td>
+					<td>integer</td>
+					<td>variable</td>
+					<td>8 bit per channel RGBA value indicating the colour for the Chronos logo overlay. The watermark is burned into saved video. See <a href="#focusPeakingColor">focusPeakingColor</a> for more information about colour.</td>
+				</tr>
+				<tr>
+					<td><code>overlayChronosWatermarkX</code></td>
+					<td>integer</td>
+					<td>variable</td>
+					<td rowspan=2>The x/y position (horizontal/vertical offset from the top-left corner) of the Chronos watermark.</td>
+				</tr>
+				<tr>
+					<td><code>overlayChronosWatermarkY</code></td>
+					<td>integer</td>
+					<td>variable</td>
+				</tr>
+				<tr>
+					<td><a name="overlayRGBImage"><code>overlayRGBImage</code></a></td>
+					<td>binary</td>
+					<td>variable</td>
+					<td>An image to burn on to the video. <a href="https://en.wikipedia.org/wiki/Indexed_color">Indexed colour</a> (like a gif), 20480 pixels maximum. Dimensions are given by the <a href="#overlayRGBImageHeight">overlayRGBImageHeight</a> and <a href="#overlayRGBImageWidth">overlayRGBImageWidth</a> variables. Colour index is given by <a href="#overlayRGBLogoPalette">overlayRGBLogoPalette</a>.</td>
+				</td>
+				<tr>
+					<td><a name="#overlayRGBImageHeight"><code>overlayRGBImageHeight</code></a></td>
+					<td>integer</td>
+					<td>variable</td>
+					<td rowspan=2>Set the width and the height of the <a href="#overlayRGBImage">overlay image/watermark</a> to burn into the video. Area (overlayRGBImageWidth × overlayRGBImageHeight) should be less than 20480.</td>
+				</td>
+				<tr>
+					<td><a name="#overlayRGBImageWidth"><code>overlayRGBImageWidth</code></a></td>
+					<td>integer</td>
+					<td>variable</td>
+				</td>
+				<tr>
+					<td><code>overlayRGBImageX</code></td>
+					<td>integer</td>
+					<td>variable</td>
+					<td rowspan=2>Set the offset left and top of the <a href="#overlayRGBImage">overlay/watermark image</a>.</td>
+				</td>
+				<tr>
+					<td><code>overlayRGBImageY</code></td>
+					<td>integer</td>
+					<td>variable</td>
+				</td>
+				<tr>
+					<td><code>overlayRGBLogoPalette</code></td>
+					<td>binary</td>
+					<td>variable</td>
+					<td>
+						The colour index for the <a href="#overlayRGBImage">indexed overlay image</a>. Planar format, 256 8-bit bytes each for Red, Green, and Blue. (If you had two colours in your overlay image, pink and black, your colour index might look like:
+						<code class=codeblock>
+							[
+								0xFF, 0x00, «254 more entries»,
+								0x00, 0x00, «254 more entries»,
+								0xFF, 0x00, «254 more entries»
+							]
+						</code>
+						The first column represents the first colour, pink, with it's red and blue components. The second column represents black.
+						<br>
+						True black is rendered transparent. If you want to actually draw black, the colour <code style="color: #00000100;">0x000001</code> may be used instead.
+					</td>
+				</td>
+				<tr>
+					<td><code>overlayTextbox0Colour</code></td>
+					<td>integer</td>
+					<td>variable</td>
+					<td rowspan=2>Set the first textbox's text colour. Format RGBA. See <a href="#focusPeakingColor">focusPeakingColor</a> for more information about colour.</td>
+				</td>
+				<tr>
+					<td><code>overlayTextbox1Colour</code></td>
+					<td>integer</td>
+					<td>variable</td>
+				</td>
+				<tr>
+					<td><a name="overlayTextbox0Content"><code>overlayTextbox0Content</code></a></td>
+					<td>string</td>
+					<td>variable</td>
+					<td rowspan=2>A string of length no more than 128, including a required null terminator (0). Characters in this string are simple numeric indexes into the <a href="#overlayTextbox0Font">overlayTextboxFonts</a>, instead of into the standard <a href="https://en.wikipedia.org/wiki/List_of_Unicode_characters">Unicode</a> (utf-8) tables used elsewhere in this API.</td>
+				</td>
+				<tr>
+					<td><code>overlayTextbox1Content</code></td>
+					<td>string</td>
+					<td>variable</td>
+				</td>
+				<tr>
+					<td><a name="overlayTextbox0Font"><code>overlayTextbox0Font</code></a></td>
+					<td>binary</td>
+					<td>variable</td>
+					<td rowspan=2>A block of 128 16x32px characters indexed in to by <a href="#overlayTextbox0Content">overlayTextBoxContents</a>. 1<a href="https://en.wikipedia.org/wiki/Color_depth">bpp</a>.</td>
+				</td>
+				<tr>
+					<td><code>overlayTextbox1Font</code></td>
+					<td>binary</td>
+					<td>variable</td>
+				</td>
+				<tr>
+					<td><code>overlayTextbox0W</code></td>
+					<td>integer</td>
+					<td>variable</td>
+					<td rowspan=4>Textbox dimensions, <strong>w</strong>idth and <strong>h</strong>eight in pixels. Text is centered inside the box.</td>
+				</td>
+				<tr>
+					<td><code>overlayTextbox0H</code></td>
+					<td>integer</td>
+					<td>variable</td>
+				</td>
+				<tr>
+					<td><code>overlayTextbox1W</code></td>
+					<td>integer</td>
+					<td>variable</td>
+				</td>
+				<tr>
+					<td><code>overlayTextbox1H</code></td>
+					<td>integer</td>
+					<td>variable</td>
+				</td>
+				<tr>
+					<td><code>overlayTextbox0OffsetX</code></td>
+					<td>integer</td>
+					<td>variable</td>
+					<td rowspan=4>Distance from the top (y) left (x) corner of the recorded picture to the top left corner of the textbox in pixels.</td>
+				</td>
+				<tr>
+					<td><code>overlayTextbox0OffsetY</code></td>
+					<td>integer</td>
+					<td>variable</td>
+				</td>
+				<tr>
+					<td><code>overlayTextbox1OffsetX</code></td>
+					<td>integer</td>
+					<td>variable</td>
+				</td>
+				<tr>
+					<td><code>overlayTextbox1OffsetY</code></td>
+					<td>integer</td>
+					<td>variable</td>
+				</td>
+				<tr>
+					<td><code>overlayTextbox0X</code></td>
+					<td></td>
+					<td></td>
+					<td rowspan=2></td>
+				</td>
+				<tr>
+					<td><code>overlayTextbox1X</code></td>
+					<td></td>
+					<td></td>
+				</td>
+				<tr>
+					<td><code>overlayTextbox0Y</code></td>
+					<td></td>
+					<td></td>
+					<td rowspan=2></td>
+				</td>
+				<tr>
+					<td><code>overlayTextbox1Y</code></td>
+					<td></td>
+					<td></td>
+				</td>
+				<tr>
+					<td><code>overlayVersion</code></td>
+					<td></td>
+					<td></td>
+					<td></td>
+				</td>
+				<tr>
+					<td><code>recordedSegments</code></td>
+					<td></td>
+					<td></td>
+					<td></td>
+				</td>
+				<tr>
+					<td><code>recordingAnalogGain</code></td>
+					<td></td>
+					<td></td>
+					<td></td>
+				</td>
+				<tr>
+					<td><code>recordingExposureNs</code></td>
+					<td></td>
+					<td></td>
+					<td></td>
+				</td>
+				<tr>
+					<td><code>recordingHRes</code></td>
+					<td></td>
+					<td></td>
+					<td></td>
+				</td>
+				<tr>
+					<td><code>recordingHoffset</code></td>
+					<td></td>
+					<td></td>
+					<td></td>
+				</td>
+				<tr>
+					<td><code>recordingPeriodNs</code></td>
+					<td></td>
+					<td></td>
+					<td></td>
+				</td>
+				<tr>
+					<td><code>recordingVRes</code></td>
+					<td></td>
+					<td></td>
+					<td></td>
+				</td>
+				<tr>
+					<td><code>recordingVoffset</code></td>
+					<td></td>
+					<td></td>
+					<td></td>
+				</td>
+				<tr>
+					<td><code>sensorFramerateMax</code></td>
+					<td></td>
+					<td></td>
+					<td></td>
+				</td>
+				<tr>
+					<td><code>sensorHIncrement</code></td>
+					<td></td>
+					<td></td>
+					<td></td>
+				</td>
+				<tr>
+					<td><code>sensorHMax</code></td>
+					<td></td>
+					<td></td>
+					<td></td>
+				</td>
+				<tr>
+					<td><code>sensorHMin</code></td>
+					<td></td>
+					<td></td>
+					<td></td>
+				</td>
+				<tr>
+					<td><code>sensorMaxExposureNs</code></td>
+					<td></td>
+					<td></td>
+					<td></td>
+				</td>
+				<tr>
+					<td><code>sensorMaxShutterAngle</code></td>
+					<td></td>
+					<td></td>
+					<td></td>
+				</td>
+				<tr>
+					<td><code>sensorMinExposureNs</code></td>
+					<td></td>
+					<td></td>
+					<td></td>
+				</td>
+				<tr>
+					<td><code>sensorName</code></td>
+					<td></td>
+					<td></td>
+					<td></td>
+				</td>
+				<tr>
+					<td><code>sensorPixelFormat</code></td>
+					<td>string</td>
+					<td>constant</td>
+					<td>Either <code>BYR2</code> for colour cameras or <code>y12</code> for monochromatic cameras. This corresponds to the Color or Mono information printed on the bottom of the Chronos.</td>
+				</td>
+				<tr>
+					<td><code>sensorPixelRate</code></td>
+					<td></td>
+					<td></td>
+					<td></td>
+				</td>
+				<tr>
+					<td><code>sensorQuantizeTimingNs</code></td>
+					<td></td>
+					<td></td>
+					<td></td>
+				</td>
+				<tr>
+					<td><code>sensorVIncrement</code></td>
+					<td></td>
+					<td></td>
+					<td></td>
+				</td>
+				<tr>
+					<td><code>sensorVMax</code></td>
+					<td></td>
+					<td></td>
+					<td></td>
+				</td>
+				<tr>
+					<td><code>sensorVMin</code></td>
+					<td></td>
+					<td></td>
+					<td></td>
+				</td>
+				<tr>
+					<td><code>timingExposureDelayNs</code></td>
+					<td></td>
+					<td></td>
+					<td></td>
+				</td>
+				<tr>
+					<td><code>timingMaxExposureNs</code></td>
+					<td></td>
+					<td></td>
+					<td></td>
+				</td>
+				<tr>
+					<td><code>timingMaxPeriod</code></td>
+					<td></td>
+					<td></td>
+					<td></td>
+				</td>
+				<tr>
+					<td><code>timingMaxShutterAngle</code></td>
+					<td></td>
+					<td></td>
+					<td></td>
+				</td>
+				<tr>
+					<td><code>timingMinExposureNs</code></td>
+					<td></td>
+					<td></td>
+					<td></td>
+				</td>
+				<tr>
+					<td><code>timingMinPeriod</code></td>
+					<td></td>
+					<td></td>
+					<td></td>
+				</td>
+				<tr>
+					<td><code>timingQuantization</code></td>
+					<td></td>
+					<td></td>
+					<td></td>
+				</td>
+				<tr>
+					<td><code>triggerCapabilities</code></td>
+					<td></td>
+					<td></td>
+					<td></td>
+				</td>
+				<tr>
+					<td><code>triggerConfiguration</code></td>
+					<td></td>
+					<td></td>
+					<td></td>
+				</td>
+				<tr>
+					<td><code>triggerDelayNs</code></td>
+					<td></td>
+					<td></td>
+					<td></td>
+				</td>
+				<tr>
+					<td><code>triggerState</code></td>
+					<td></td>
+					<td></td>
+					<td></td>
+				</td>
+				<tr>
+					<td><code>triggers</code></td>
+					<td></td>
+					<td></td>
+					<td></td>
+				</td>
+				<tr>
+					<td><code>whiteBalance</code></td>
+					<td></td>
+					<td></td>
+					<td></td>
+				</td>
+				<tr>
+					<td><code>zebraStripesEnabled</code></td>
+					<td></td>
+					<td></td>
+					<td></td>
+				</td>
+			</tbody>
+		</table>
 		
 		<p>Some settings related to the video pipeline take a little while to update, so it's recommended to set them all at once with one call to to <code>set</code>.</p>
 		
@@ -286,17 +717,17 @@
 		
 		
 		
-		<a name="video-api"><h2>Video API</h2></a>
+		<h2><a name="video-api">Video API</a></h2>
 		<p>The video interface deals with getting the video data from A to B.</p>
 		
 		<p>The <a href="https://github.com/krontech/chronos-cli/blob/master/src/pipeline/README.md">full documentation</a> for the video API is available in the <a href="https://github.com/krontech/chronos-cli">chronos-cli repository</a>.</p>
 		
 		
 		
-		<a name="user-interface"><h2>User Interface</h2></a>
+		<h2><a name="user-interface">User Interface</a></h2>
 		<p>The user interface, on the screen on the back of the Chronos, uses the D-Bus API to drive the camera and keep itself in sync with the state the camera is in.</p>
 		
-		<a name="http-interface"><h2>HTTP Interface</h2></a>
+		<h2><a name="http-interface">HTTP Interface</a></h2>
 		<p><em>I have not written this program yet, but what is documented as follows will follow.</em></p>
 		<p>The HTTP interface exposes a web API. It also provides web app which uses the web API. The web app can be used from any phone, tablet, or laptop running a modern web browser.</p>
 		
@@ -304,7 +735,7 @@
 		
 		
 		
-		<a name="ych"><h2>Your Client Here</h2></a>
+		<h2><a name="ych">Your Client Here</a></h2>
 		
 		<p>So, you have a specialized application you want the camera to perform? Perhaps you just want to lock down the back-of-camera UI? Luckily for you, it is easy to develop your own application to run on the Chronos.</p>
 		
