@@ -28,7 +28,7 @@ from control_api_mock import ControlMock
 # Set up d-bus interface. Connect to mock system buses. Check everything's working.
 if not QDBusConnection.systemBus().isConnected():
 	print("Error: Can not connect to D-Bus. Is D-Bus itself running?", file=sys.stderr)
-	sys.exit(-1)
+	raise Exception("D-Bus Setup Error")
 
 
 
@@ -36,14 +36,14 @@ if not QDBusConnection.systemBus().isConnected():
 
 if not QDBusConnection.systemBus().registerService('com.krontech.chronos.control.mock'):
 	sys.stderr.write(f"Could not register control service: {QDBusConnection.systemBus().lastError().message() or '(no message)'}\n")
-	sys.exit(2)
+	raise Exception("D-Bus Setup Error")
 
 controlMock = ControlMock() #This absolutely, positively can't be inlined or it throws error "No such object path '/'".
 QDBusConnection.systemBus().registerObject('/', controlMock, QDBusConnection.ExportAllSlots)
 
 if not QDBusConnection.systemBus().registerService('com.krontech.chronos.video.mock'):
 	sys.stderr.write(f"Could not register video service: {QDBusConnection.systemBus().lastError().message() or '(no message)'}\n")
-	sys.exit(2)
+	raise Exception("D-Bus Setup Error")
 
 videoMock = ControlMock() #This absolutely, positively can't be inlined or it throws error "No such object path '/'".
 QDBusConnection.systemBus().registerObject('/', videoMock, QDBusConnection.ExportAllSlots)
@@ -78,14 +78,14 @@ if not cameraControlAPI.isValid():
 		cameraControlAPI.lastError().name(), 
 		cameraControlAPI.lastError().message(),
 	), file=sys.stderr)
-	sys.exit(-2)
+	raise Exception("D-Bus Setup Error")
 if not cameraVideoAPI.isValid():
 	print("Error: Can not connect to Camera D-Bus API at %s. (%s: %s)" % (
 		cameraVideoAPI.service(), 
 		cameraVideoAPI.lastError().name(), 
 		cameraVideoAPI.lastError().message(),
 	), file=sys.stderr)
-	sys.exit(-2)
+	raise Exception("D-Bus Setup Error")
 
 
 class DBusException(Exception):

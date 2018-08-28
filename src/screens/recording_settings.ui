@@ -249,6 +249,9 @@
    <property name="clickMarginBottomSetter" stdset="0">
     <enum>SpinBox::full</enum>
    </property>
+   <property name="linkedValueName" stdset="0">
+    <string>recordingAnalogGain</string>
+   </property>
   </widget>
   <widget class="HeaderLabel" name="headerlabel_2">
    <property name="geometry">
