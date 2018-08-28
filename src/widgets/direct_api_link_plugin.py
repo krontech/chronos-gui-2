@@ -10,7 +10,15 @@ from debugger import dbg, brk; dbg, brk
 
 
 class DirectAPILinkPlugin():
-	"""Bind an input to a Control API value from QT Designer. 🔗"""
+	"""Bind an input to a Control API value from QT Designer. 🔗
+	
+		To use in Qt Designer, put the name of an API control variable
+		in linkedValueName. To enable for a widget in Python, add to
+		the inheritance chain.
+		
+		If more logic than a straight-through link is desired, set up
+		the observer and updater on the screen the widget appears on.
+	"""
 	
 	@pyqtProperty(str)
 	def linkedValueName(self):
