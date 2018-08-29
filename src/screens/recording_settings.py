@@ -1,34 +1,68 @@
-from PyQt5 import uic, QtWidgets, QtCore
+from PyQt5 import QtWidgets
 from PyQt5.QtCore import pyqtSlot
 
-from debugger import *; dbg
-import api_mock as api
-from api_mock import silenceCallbacks
-import format_data
+
+#Expected output when spinning the spinbox:
+#	got A 1
+#   got C 1
+#Because the spinbox is hooked up to
+#	callbackA
+#	self.callbackC
+#However, the actual output is:
+#	got A 1
+#   got D 1
+#I do not know why D is being called, since I don't actually reference
+#it anywhere. However, if we remove the 
+
+
+def silenceCallbacks(*elements):
+	"""Silence events for the duration of a callback. Mostly skipped for this reproduction."""
+	def silenceCallbacksOf(callback):
+		def silencedCallback(self, *args, **kwargs):
+			callback(self, *args, **kwargs)
+		return silencedCallback
+	return silenceCallbacksOf
+
+
+@pyqtSlot(int)
+@silenceCallbacks()
+def callbackA(px: int):
+	print('got A', px)
+	
+@pyqtSlot(int) #this overwrites the last three functions
+@silenceCallbacks()
+def callbackB(px: int):
+	print('got B', px)
 
 
 class RecordingSettings(QtWidgets.QDialog):
-	"""The recording settings is one of the few windows that doesn't update 
-		the camera settings directly. Instead, it has a preview which utilizes
-		these settings under the hood, and the settings are actually only
-		applied when the "done" button is pressed. The camera is strictly modal
-		in its configuration, so there will be some weirdness around this.
-	"""
-	
-	def __init__(self, window):
-		super().__init__()
-		uic.loadUi("src/screens/recording_settings.ui", self)
-		
-		self.uiHRes.valueChanged.connect(self.updateForSensorHRes)
-	
 	@pyqtSlot(int)
 	@silenceCallbacks()
-	def updateForSensorHRes(self, px: int):
-		print('set hr', px)
-		self.uiHOffset.setMaximum(self.uiHRes.maximum() - px) #Can't capture off-sensor.
-	
-	@pyqtSlot(int) #this overwrites the last three functions
+	def callbackC(self, px: int):
+		print('got C', px)
+		
+	@pyqtSlot(int) #this overwrites the previous pyqtSlot-decorated function
 	@silenceCallbacks()
-	def updateForSensorVRes(self, px: int):
-		print('set vr', px)
-		self.uiVOffset.setMaximum(self.uiVRes.maximum() - px) #Can't capture off-sensor.
+	def callbackD(self, px: int):
+		print('got D', px)
+		
+		
+	def __init__(self, window):
+		super().__init__()
+		
+		spin = QtWidgets.QSpinBox()
+		
+		spin.valueChanged.connect(callbackA)
+		spin.valueChanged.connect(self.callbackC)
+		
+		layout = QtWidgets.QVBoxLayout()
+		layout.addWidget(spin)
+		self.setLayout(layout)
+		self.show()
+
+
+
+app = QtWidgets.QApplication([])
+recSettingsWindow = RecordingSettings(app)
+recSettingsWindow.show()
+app.exec_()
