@@ -80,7 +80,7 @@ pendingCallbacks = []
 
 
 def changeRecordingResolution(state):
-	print(f'Mock: changing recording resolution to xywh {recordingHoffset} {recordingVoffset} {recordingHRes} {recordingVRes}.')
+	print(f'Mock: changing recording resolution to xywh {recordingHOffset} {recordingVOffset} {recordingHRes} {recordingVRes}.')
 
 
 def notifyExposureChange(state):
@@ -103,14 +103,14 @@ class State():
 	cameraSerial = "Captain Crunch"
 	sensorName = "acme9001"
 	sensorHMax = 1920
-	sensorVMax = 1080
 	sensorHMin = 256
+	sensorVMax = 1080
 	sensorVMin = 64
 	sensorHIncrement = 2
 	sensorVIncrement = 32
 	sensorPixelRate = 1920 * 1080 * 1000
 	sensorPixelFormat = "BYR2" #Or "y12" for mono models.
-	sensorFramerateMax = 1000
+	sensorFramerate = 1000
 	sensorQuantizeTimingNs = 250
 	sensorMinExposureNs = int(1e3)
 	sensorMaxExposureNs = int(1e9)
@@ -189,30 +189,30 @@ class State():
 		self._recordingVRes = value
 		pendingCallbacks += [changeRecordingResolution, notifyExposureChange]
 	
-	_recordingHoffset = 800 #rebuilds video pipeline
+	_recordingHOffset = 800 #rebuilds video pipeline
 	
 	
 	@property
-	def recordingHoffset(self): #rebuilds video pipeline
-		return self._recordingHoffset
+	def recordingHOffset(self): #rebuilds video pipeline
+		return self._recordingHOffset
 	
-	@recordingHoffset.setter
-	def recordingHoffset(self, value):
+	@recordingHOffset.setter
+	def recordingHOffset(self, value):
 		global pendingCallbacks
-		self._recordingHoffset = value
+		self._recordingHOffset = value
 		pendingCallbacks += [changeRecordingResolution]
 	
-	_recordingVoffset = 480
+	_recordingVOffset = 480
 	
 	
 	@property
-	def recordingVoffset(self):
-		return self._recordingVoffset
+	def recordingVOffset(self):
+		return self._recordingVOffset
 	
-	@recordingVoffset.setter
-	def recordingVoffset(self, value):
+	@recordingVOffset.setter
+	def recordingVOffset(self, value):
 		global pendingCallbacks
-		self._recordingVoffset = value
+		self._recordingVOffset = value
 		pendingCallbacks += [changeRecordingResolution]
 	
 	recordingAnalogGain = 2 #doesn't rebuild video pipeline

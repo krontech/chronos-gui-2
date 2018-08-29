@@ -64,7 +64,7 @@ class Main(QtWidgets.QDialog):
 		
 		#Set up exposure slider.
 		api.observe('recordingExposureNs', self.updateExposureNs)
-		self.uiExposureSlider.setMaximum(api.get('sensorMaxExposureNs'))
+		self.uiExposureSlider.setMaximum(api.get('sensorMaxExposureNs')) #TODO: This is incorrect, should use update not update_future_only since we're drawing from the wrong value -_-
 		self.uiExposureSlider.setMinimum(api.get('sensorMinExposureNs'))
 		api.observe_future_only('sensorMaxExposureNs', self.updateExposureMax)
 		api.observe_future_only('sensorMinExposureNs', self.updateExposureMin)

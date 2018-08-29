@@ -33,7 +33,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>Picture</string>
+    <string>Preset</string>
    </property>
   </widget>
   <widget class="ComboBox" name="uiPreset">
@@ -221,7 +221,7 @@
   <widget class="Button" name="uiMaximizeExposure">
    <property name="geometry">
     <rect>
-     <x>370</x>
+     <x>360</x>
      <y>280</y>
      <width>111</width>
      <height>81</height>
@@ -483,10 +483,57 @@
     </rect>
    </property>
   </widget>
+  <widget class="Label" name="label_3">
+   <property name="geometry">
+    <rect>
+     <x>310</x>
+     <y>80</y>
+     <width>41</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>×</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignCenter</set>
+   </property>
+  </widget>
+  <widget class="Label" name="label_4">
+   <property name="geometry">
+    <rect>
+     <x>310</x>
+     <y>140</y>
+     <width>41</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>×</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignCenter</set>
+   </property>
+  </widget>
+  <widget class="HeaderLabel" name="headerlabel_6">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>70</y>
+     <width>131</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Resolution</string>
+   </property>
+  </widget>
+  <zorder>backdrop</zorder>
+  <zorder>label_3</zorder>
+  <zorder>label_4</zorder>
   <zorder>backdrop_4</zorder>
   <zorder>backdrop_3</zorder>
   <zorder>backdrop_2</zorder>
-  <zorder>backdrop</zorder>
   <zorder>headerlabel_2</zorder>
   <zorder>headerlabel</zorder>
   <zorder>headerlabel_4</zorder>
@@ -512,6 +559,7 @@
   <zorder>uiMaximizeFramerate</zorder>
   <zorder>uiVOffset</zorder>
   <zorder>uiAmbiguityHiderBecauseThereWasNoGoodWayToOverlapTheseCorners</zorder>
+  <zorder>headerlabel_6</zorder>
  </widget>
  <customwidgets>
   <customwidget>

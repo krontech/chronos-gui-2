@@ -208,7 +208,7 @@ class CallbackNotSilenced(Exception):
 	pass
 
 
-def observe(name: str, callback: Callable[[Any], None]) -> None:
+def observe(name: str, callback: Callable[[Any], None], isUpdatingCallback=True) -> None:
 	"""Observe changes in a state value.
 	
 		Args:
@@ -216,6 +216,11 @@ def observe(name: str, callback: Callable[[Any], None]) -> None:
 			callback: Function called when the state updates and upon subscription.
 				Called with one parameter, the new value. Called when registered
 				and when the value updates.
+			isNonUpdatingCallback=False: Indicates no API requests will be made from
+				this function. This is usually false, because most callbacks *do*
+				cause updates to the API, and it's really hard to detect this. A
+				silenced callback does not update anything, since it should silence
+				all the affected fields via the @silenceCallbacks(…) decorator.
 		
 		Note: Some frequently updated values (> 10/sec) are only available via
 			polling due to flooding concerns. They can not be observed, as they're
@@ -233,7 +238,7 @@ def observe(name: str, callback: Callable[[Any], None]) -> None:
 		key one syscall at a time as we instantiate each Qt control.
 	"""
 	
-	if not hasattr(callback, '_isSilencedCallback'):
+	if not hasattr(callback, '_isSilencedCallback') and isUpdatingCallback:
 		raise CallbackNotSilenced(f"{callback} must consider silencing. Decorate with @silenceCallbacks(callback_name, …).")
 	
 	callback(_camState[name])
@@ -241,13 +246,13 @@ def observe(name: str, callback: Callable[[Any], None]) -> None:
 		name, callback)
 
 
-def observe_future_only(name: str, callback: Callable[[Any], None]) -> None:
+def observe_future_only(name: str, callback: Callable[[Any], None], isUpdatingCallback=True) -> None:
 	"""Like `observe`, but without the initial callback when observing.
 	
 		Useful when `observe`ing a derived value, which observe can't deal with yet.
 	"""
 	
-	if not hasattr(callback, '_isSilencedCallback'):
+	if not hasattr(callback, '_isSilencedCallback') and isUpdatingCallback:
 		raise CallbackNotSilenced(f"{callback} must consider silencing. Decorate with @silenceCallbacks(callback_name, …).")
 	
 	QDBusConnection.systemBus().connect('com.krontech.chronos.control.mock', '/', '',
