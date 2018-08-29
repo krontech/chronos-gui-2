@@ -4,15 +4,17 @@ from PyQt5.QtCore import pyqtSlot
 
 #Expected output when spinning the spinbox:
 #	got A 1
-#   got C 1
-#Because the spinbox is hooked up to
-#	callbackA
-#	self.callbackC
+#	got C 1
 #However, the actual output is:
 #	got A 1
-#   got D 1
+#	got D 1
+#This is wrong because the spinbox is hooked up to
+#	callbackA
+#	self.callbackC
 #I do not know why D is being called, since I don't actually reference
-#it anywhere. However, if we remove the 
+#it anywhere. However, if we remove any of the decorators from C or D
+#they work again. If we move them to the top level, out of
+#RecordingSettings, they work again. What am I doing wrong?
 
 
 def silenceCallbacks(*elements):
