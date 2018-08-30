@@ -2,61 +2,50 @@ from PyQt5 import QtWidgets
 from PyQt5.QtCore import pyqtSlot
 
 
-#Expected output when spinning the spinbox:
-#	got A 1
-#	got C 1
-#However, the actual output is:
-#	got A 1
-#	got D 1
-#This is wrong because the spinbox is hooked up to
-#	callbackA
-#	self.callbackC
-#I do not know why D is being called, since I don't actually reference
-#it anywhere. However, if we remove any of the decorators from C or D
-#they work again. If we move them to the top level, out of
-#RecordingSettings, they work again. What am I doing wrong?
-
-
-def silenceCallbacks(*elements):
+def silenceCallbacks(qtType, *elements):
 	"""Silence events for the duration of a callback. Mostly skipped for this reproduction."""
-	def silenceCallbacksOf(callback):
-		def silencedCallback(self, *args, **kwargs):
-			callback(self, *args, **kwargs)
-		return silencedCallback
-	return silenceCallbacksOf
-
-
-@pyqtSlot(int)
-@silenceCallbacks()
-def callbackA(px: int):
-	print('got A', px)
 	
-@pyqtSlot(int) #this overwrites the last three functions
-@silenceCallbacks()
+	return pyqtSlot(qtType)(lambda callback: lambda self, *args, **kwargs: callback(self, *args, **kwargs))
+
+@silenceCallbacks(int)
+def callbackA(px: int):
+	#correctly called
+	print('got A', px)
+
+@silenceCallbacks(int)
 def callbackB(px: int):
+	#correctly not called
 	print('got B', px)
 
 
 class RecordingSettings(QtWidgets.QDialog):
-	@pyqtSlot(int)
-	@silenceCallbacks()
+	@silenceCallbacks(int)
 	def callbackC(self, px: int):
+		#incorrectly not called
 		print('got C', px)
-		
-	@pyqtSlot(int) #this overwrites the previous pyqtSlot-decorated function
-	@silenceCallbacks()
+
+	@silenceCallbacks(int)
 	def callbackD(self, px: int):
+		#incorrectly called
 		print('got D', px)
-		
-		
+
+
 	def __init__(self, window):
 		super().__init__()
-		
+
 		spin = QtWidgets.QSpinBox()
-		
+
 		spin.valueChanged.connect(callbackA)
 		spin.valueChanged.connect(self.callbackC)
 		
+		print(dir(self))
+		print(self.callbackC.__repr__())
+		print(self.callbackD.__repr__())
+		self.callbackC(5)
+		self.callbackD(6)
+		print(dir(spin.valueChanged))
+		print(pyqtSlot)
+
 		layout = QtWidgets.QVBoxLayout()
 		layout.addWidget(spin)
 		self.setLayout(layout)
