@@ -36,7 +36,9 @@ if hasattr(pdb, 'hideframe'):
 dbg = brk #I keep using one or the other. Either should probably work, let's make debugging easy on ourselves.
 
 
-def dump(val):
+def dump(val, label=None):
 	"""Print and return the value. Useful for inline print-debugging."""
-	print(val)
+	
+	print(label, val) if label else print(val)
+	
 	return val

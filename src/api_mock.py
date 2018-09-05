@@ -208,7 +208,7 @@ class CallbackNotSilenced(Exception):
 	pass
 
 
-def observe(name: str, callback: Callable[[Any], None], isUpdatingCallback=True) -> None:
+def observe(name: str, callback: Callable[[Any], None], saftyCheckForSilencedWidgets=True) -> None:
 	"""Observe changes in a state value.
 	
 		Args:
@@ -238,7 +238,7 @@ def observe(name: str, callback: Callable[[Any], None], isUpdatingCallback=True)
 		key one syscall at a time as we instantiate each Qt control.
 	"""
 	
-	if not hasattr(callback, '_isSilencedCallback') and isUpdatingCallback:
+	if not hasattr(callback, '_isSilencedCallback') and saftyCheckForSilencedWidgets:
 		raise CallbackNotSilenced(f"{callback} must consider silencing. Decorate with @silenceCallbacks(callback_name, …).")
 	
 	callback(_camState[name])
@@ -246,13 +246,13 @@ def observe(name: str, callback: Callable[[Any], None], isUpdatingCallback=True)
 		name, callback)
 
 
-def observe_future_only(name: str, callback: Callable[[Any], None], isUpdatingCallback=True) -> None:
+def observe_future_only(name: str, callback: Callable[[Any], None], saftyCheckForSilencedWidgets=True) -> None:
 	"""Like `observe`, but without the initial callback when observing.
 	
 		Useful when `observe`ing a derived value, which observe can't deal with yet.
 	"""
 	
-	if not hasattr(callback, '_isSilencedCallback') and isUpdatingCallback:
+	if not hasattr(callback, '_isSilencedCallback') and saftyCheckForSilencedWidgets:
 		raise CallbackNotSilenced(f"{callback} must consider silencing. Decorate with @silenceCallbacks(callback_name, …).")
 	
 	QDBusConnection.systemBus().connect('com.krontech.chronos.control.mock', '/', '',

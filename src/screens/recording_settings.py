@@ -34,35 +34,35 @@ class RecordingSettings(QtWidgets.QDialog):
 		self.uiVRes.setMaximum(api.get('sensorVMax'))
 		self.uiHRes.setSingleStep(api.get('sensorHIncrement'))
 		self.uiVRes.setSingleStep(api.get('sensorVIncrement'))
-		self.uiHRes.valueChanged.connect(self.updateForSensorHRes)
-		self.uiVRes.valueChanged.connect(self.updateForSensorVRes)
+		
+		self.uiHRes.valueChanged.connect(lambda x: self.updateForSensorHRes(x))
+		self.uiVRes.valueChanged.connect(lambda x: self.updateForSensorVRes(x))
 		api.observe('recordingHRes', self.updateUiHRes) #DDR 2018-08-28: This screen mostly only updates on "done", since it's using the values it sets to do the preview. Gain being the exception at the moment.
 		api.observe('recordingHRes', self.updateForSensorHRes)
 		api.observe('recordingVRes', self.updateUiVRes)
 		api.observe('recordingVRes', self.updateForSensorVRes)
 		
-		#Offset min implicit, max set by resolution. Offset set after res because 0 is a good default to set up res at.
-		self.uiHOffset.valueChanged.connect(self.updateForSensorHOffset)
-		self.uiVOffset.valueChanged.connect(self.updateForSensorVOffset)
+		self.uiHOffset.valueChanged.connect(lambda x: self.updateForSensorHOffset(x)) #Offset min implicit, max set by resolution. Offset set after res because 0 is a good default to set up res at.
+		self.uiVOffset.valueChanged.connect(lambda x: self.updateForSensorVOffset(x))
 		api.observe('recordingHOffset', self.updateUiHOffset) #Originally, this triggered valueChanged which triggered updateForSensorHOffset. However, if h and v were 0, then the change event would never happen since the fields initialize to 0. To fix this, we silence the change events, and bind the passepartout updater functions directly. It's more straightforward, so this isn't necessarily a bad thing.
 		api.observe('recordingHOffset', self.updateForSensorHOffset)
 		api.observe('recordingVOffset', self.updateUiVOffset)
 		api.observe('recordingVOffset', self.updateForSensorVOffset)
+		
+		#Frame rate fps/µs binding
+		self.uiFps.valueChanged.connect(self.updateFpsProxy)
+		self.uiFrameDuration.valueChanged.connect(lambda x: self.updateFrameDurationMicroseconds(x))
+		api.observe('recordingExposureNs', self.updateFrameDurationNanoseconds)
 		
 		# Button binding.
 		self.uiDone.clicked.connect(window.back)
 		self.uiRecordModes.clicked.connect(lambda: window.show('record_mode'))
 		
 		self.uiMaximizeFramerate.clicked.connect(lambda: 
-			self.uiFps.setValue(
-				api.control(
-					'framerate_for_resolution', 
-					self.uiHRes.value(),
-					self.uiVRes.value()
-				)
-			)
-		)
+			self.uiFps.setValue(self.uiFps.maximum()) )
 		
+	
+	#xywh accessor callbacks, just update the spin box values
 	
 	@pyqtSlot(int)
 	@silenceCallbacks('uiHRes')
@@ -85,6 +85,8 @@ class RecordingSettings(QtWidgets.QDialog):
 		self.uiVOffset.setValue(px)
 	
 	
+	#side-effect callbacks, update everything *but* the spin box values
+	
 	@pyqtSlot(int)
 	@silenceCallbacks()
 	def updateForSensorHOffset(self, px: int):
@@ -98,14 +100,49 @@ class RecordingSettings(QtWidgets.QDialog):
 	@pyqtSlot(int)
 	@silenceCallbacks()
 	def updateForSensorHRes(self, px: int):
-		print('set hr', px)
+		print('set hres', px)
 		self.uiHOffset.setMaximum(self.uiHRes.maximum() - px) #Can't capture off-sensor.
+		self.updateMaximumFramerate()
 	
 	@pyqtSlot(int) #this overwrites the last three functions
 	@silenceCallbacks()
 	def updateForSensorVRes(self, px: int):
-		print('set vr', px)
+		print('set vres', px)
 		self.uiVOffset.setMaximum(self.uiVRes.maximum() - px) #Can't capture off-sensor.
+		self.updateMaximumFramerate()
+		
+	
+	def updateMaximumFramerate(self):
+		framerateIsMaxed = self.uiFps.value() == self.uiFps.maximum()
+		self.uiFps.setMaximum(
+			api.control(
+				'framerate_for_resolution', 
+				self.uiHRes.value(),
+				self.uiVRes.value() ) )
+		if framerateIsMaxed:
+			self.uiFps.setValue(self.uiFps.maximum())
+	
+	
+	@pyqtSlot(float)
+	@silenceCallbacks('uiFps', 'uiFrameDuration')
+	def updateFps(self, fps: float):
+		self.uiFps.setValue(fps)
+		self.uiFrameDuration.setValue(1/fps*1000)
+	
+	@pyqtSlot(float)
+	def updateFpsProxy(self, *args):
+		self.updateFps(*args)
+		
+	@pyqtSlot(float)
+	@silenceCallbacks('uiFps', 'uiFrameDuration')
+	def updateFrameDurationMicroseconds(self, µs: float):
+		self.uiFrameDuration.setValue(µs)
+		self.uiFps.setValue(1000/µs)
+		
+	@pyqtSlot(float)
+	@silenceCallbacks() #Taken care of by Microsecond version.
+	def updateFrameDurationNanoseconds(self, ns: int):
+		self.updateFrameDurationMicroseconds(ns/1000)
 	
 	# sensorHMax
 	# sensorHMin

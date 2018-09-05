@@ -218,7 +218,7 @@ class State():
 	recordingAnalogGain = 2 #doesn't rebuild video pipeline
 	
 	recordingExposureNs = int(8.5e8) #These don't have to have the pipeline torn down, so they don't need the hack where we set video settings atomically.
-	recordingPeriodNs = int(4e4)
+	recordingPeriodNs = int(4e4) #I'm assuming this is how long each frame is exposed for? And that there's no delay between exposures?
 	
 	currentCameraState = 'normal' #Can also be 'saving' or 'recording'. When saving, the API is unresponsive?
 	currentVideoState = 'viwefinder' #eg, 'viewfinder', 'playback', etc.
@@ -488,7 +488,7 @@ class ControlMock(QObject):
 	def available_keys(self):
 		return [i for i in dir(state) if i[0] != '_']
 		
-	@pyqtSlot(result='QVariantMap')
+	@pyqtSlot(int, int, result=int)
 	def framerate_for_resolution(self, hRes: int, vRes: int):
 		return framerate_for_resolution(hRes, vRes)
 	

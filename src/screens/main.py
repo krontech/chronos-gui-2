@@ -108,17 +108,17 @@ class Main(QtWidgets.QDialog):
 	
 	def linkButtonToMenu(self, button, menu):
 		"""Have one of the side bar buttons bring up its menu.
-		
-		The menu closes when it loses focus.
-		
-		Returns a function which can be called to hide the menu, by an external widget.
+			
+			The menu closes when it loses focus.
+			
+			Returns a function which can be called to hide the menu, by an external widget.
 		"""
 		
 		paddingLeft = 20 #Can't extract this from the CSS without string parsing.
 		shownAt = QPoint(self.uiPlayAndSave.x() - menu.width() + 1, menu.y())
 		hiddenAt = QPoint(self.uiPlayAndSave.x() - paddingLeft, menu.y())
 		anim = QPropertyAnimation(menu, b"pos")
-		anim.setDuration(16*2) #framerate ms (?) * frames to animate, excluding start and end frame?
+		anim.setDuration(17) #framerate ms (?) * frames to animate, excluding start and end frame?
 		anim.setStartValue(hiddenAt)
 		anim.setEndValue(shownAt)
 		menu.hide()

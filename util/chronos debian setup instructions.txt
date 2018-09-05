@@ -145,14 +145,17 @@ import os
 os.system("stty sane")
 EOL
     
-    #Bonus Content
+    #Bonus Content - this is NOT required
     pip3 install numpy
-    apt-get install strace    #ponysay, a cowsay replacement
+    apt-get install strace
+    apt-get install curl
+    
+    #ponysay, a cowsay replacement
     wget http://www.vcheng.org/ponysay/ponysay_3.0.2-1_all.deb
     dpkg -i --ignore-depends=python3 ponysay_3.0.2-1_all.deb #We installed python3 from source.
     #in /usr/share/ponysay/ponies, remove the non-free horse: 
     #   run `grep -rn . -e 'FREE: no'`
-    #   delete any pony printed
+    #   delete printed ponies
     #   delete any leftover symlinks with `find . -xtype l -delete`
     #delete the ponysay section from /var/lib/dpkg/status SO IT DOESN'T BREAK APT-GET INSTALL
     #Create and add to /etc/profile.d/horse.sh:
