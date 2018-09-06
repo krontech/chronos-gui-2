@@ -50,6 +50,11 @@ class RecordingSettings(QtWidgets.QDialog):
 		api.observe('recordingVOffset', self.updateForSensorVOffset)
 		
 		#Frame rate fps/µs binding
+		self.uiFps.setMinimum(1e6/api.get('timingMaxExposureNs')) #note: max is min / scale
+		self.uiFps.setMaximum(1e6/api.get('timingMinExposureNs'))
+		self.uiFrameDuration.setMinimum(api.get('timingMinExposureNs')/1000)
+		self.uiFrameDuration.setMaximum(api.get('timingMaxExposureNs')/1000)
+		
 		self.uiFps.valueChanged.connect(self.updateFpsProxy)
 		self.uiFrameDuration.valueChanged.connect(lambda x: self.updateFrameDurationMicroseconds(x))
 		api.observe('recordingExposureNs', self.updateFrameDurationNanoseconds)
@@ -90,24 +95,22 @@ class RecordingSettings(QtWidgets.QDialog):
 	@pyqtSlot(int)
 	@silenceCallbacks()
 	def updateForSensorHOffset(self, px: int):
-		print('set ho', px)
+		pass
 	
 	@pyqtSlot(int)
 	@silenceCallbacks()
 	def updateForSensorVOffset(self, px: int):
-		print('set vo', px)
+		pass
 	
 	@pyqtSlot(int)
 	@silenceCallbacks()
 	def updateForSensorHRes(self, px: int):
-		print('set hres', px)
 		self.uiHOffset.setMaximum(self.uiHRes.maximum() - px) #Can't capture off-sensor.
 		self.updateMaximumFramerate()
 	
 	@pyqtSlot(int) #this overwrites the last three functions
 	@silenceCallbacks()
 	def updateForSensorVRes(self, px: int):
-		print('set vres', px)
 		self.uiVOffset.setMaximum(self.uiVRes.maximum() - px) #Can't capture off-sensor.
 		self.updateMaximumFramerate()
 		

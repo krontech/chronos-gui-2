@@ -511,6 +511,9 @@
    <property name="maximum">
     <double>1000000000000000043845843045076197354634047651840.000000000000000</double>
    </property>
+   <property name="singleStep">
+    <double>0.100000000000000</double>
+   </property>
    <property name="clickMarginTopSetter" stdset="0">
     <enum>DecimalSpinBox::none</enum>
    </property>

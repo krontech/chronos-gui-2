@@ -112,8 +112,18 @@ class State():
 	sensorPixelFormat = "BYR2" #Or "y12" for mono models.
 	sensorRecordsColour = True
 	sensorFramerate = 1000
+	
+		
+	@property
+	def sensorFramerate(self):
+		return 1e6/self.recordingExposureNs
+	
+	@sensorFramerate.setter
+	def sensorFramerate(self, value):
+		self.recordingExposureNs = 1e6*value
+	
 	sensorQuantizeTimingNs = 250
-	sensorMinExposureNs = int(1e3)
+	sensorMinExposureNs = int(1e1)
 	sensorMaxExposureNs = int(1e9)
 	sensorMaxShutterAngle = 330
 	timingMaxPeriod = sys.maxsize
@@ -218,9 +228,19 @@ class State():
 	
 	recordingAnalogGain = 2 #doesn't rebuild video pipeline
 	
-	recordingExposureNs = int(8.5e8) #These don't have to have the pipeline torn down, so they don't need the hack where we set video settings atomically.
-	recordingPeriodNs = int(4e4) #I'm assuming this is how long each frame is exposed for? And that there's no delay between exposures?
+	recordingExposureNs = int(850) #These don't have to have the pipeline torn down, so they don't need the hack where we set video settings atomically.
+		
+	@property
+	def recordingPeriod(self):
+		return self.recordingExposureNs + 5000
 	
+	@recordingPeriod.setter
+	def recordingPeriod(self, value):
+		global pendingCallbacks
+		if value > 5000: 
+			raise ValueError("Recording period is 5000ns greater than recording exposure - since exposure can't be negative, the total recording period can't be less than 5000.")
+		self.recordingExposureNs = value - 5000
+		
 	currentCameraState = 'normal' #Can also be 'saving' or 'recording'. When saving, the API is unresponsive?
 	currentVideoState = 'viwefinder' #eg, 'viewfinder', 'playback', etc.
 	focusPeakingColor = 0x0000ff #currently presented as red, green, blue, alpha (RGBA). 0x000000 is off
