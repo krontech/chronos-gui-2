@@ -160,8 +160,12 @@ EOL
     #delete the ponysay section from /var/lib/dpkg/status SO IT DOESN'T BREAK APT-GET INSTALL
     #Create and add to /etc/profile.d/horse.sh:
     #   ponysay ++pony aquarius ++pony archlinux ++pony aries ++pony artemis ++pony aurora ++pony barbara ++pony bubbleberry ++pony butterscotch ++pony buttonmom ++pony calamity ++pony cancer ++pony capricorn ++pony childrenofthenight ++pony chrome ++pony coffeetalk ++pony coffeewalk ++pony danger ++pony doctornohat ++pony donutpony ++pony drhooves1 ++pony drhooves10 ++pony drhooves11 ++pony drhooves8 ++pony drhooves9 ++pony drhoovesdiscorded ++pony drizzle ++pony duskshine ++pony elusive ++pony faust ++pony firefox ++pony fluffle ++pony freckles ++pony fyrefly ++pony fyreflyready ++pony gemini ++pony gleamingshield ++pony gnupony ++pony hestelle ++pony internetexplorer ++pony johndelancie ++pony jristz ++pony kingsley ++pony kingsleybanner ++pony leo ++pony libra ++pony littlepip ++pony maandree ++pony milky ++pony milkylay ++pony molestia ++pony nyx ++pony nyxdisguised ++pony opera ++pony orion ++pony oscura ++pony paradise ++pony pinkaminacupcake ++pony pisces ++pony pizzapony ++pony posey ++pony princeartemis ++pony rainbowblitz ++pony reddit ++pony robodash ++pony sagittarius ++pony scorpio ++pony seabreeze ++pony sealyra ++pony slanderpony ++pony snowdrop ++pony snowdrop-crew ++pony solaris ++pony sparkler ++pony starstruck ++pony surprise ++pony sweetiebot ++pony taurus ++pony tempo ++pony ticket ++pony twibrain ++pony virgo ++pony wiggles ++pony woona ++pony woonanohat << EOQ
-    #   Hello! Welcome!
-    #   This camera is a $(cat /opt/camera/model) model.
-    #   It is number $(cat /opt/camera/serial_number).
-    #   For help and documentation, see http://forum.krontech.ca/ and https://github.com/krontech."
+    #   Hello! Welcome to camera #$(cat /opt/camera/serial_number)! ($(cat /opt/camera/model))
+    #   For help and documentation, see http://forum.krontech.ca/ and https://github.com/krontech.
     #   EOQ
+    
+    #Faster SSH:
+    #If present, remove /etc/profile.d/horse.sh. It takes a moment to run. 😭
+    #Go to the SSH *client*, edit /etc/nsswitch.conf, and change a line
+    #FROM: hosts:          files mdns4_minimal [NOTFOUND=return] dns
+    #TO:   hosts:          files dns

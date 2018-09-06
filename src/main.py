@@ -10,11 +10,14 @@ See readme.md for more details.
 """
 
 # General imports
-import sys
+import sys, time
 from debugger import *; dbg
 
 # QT-specific imports
 from PyQt5 import QtWidgets, QtCore, QtGui
+from stats import report
+
+perf_start_time = time.perf_counter()
 
 sys.path.append('src/widgets') #Add the components' path to import, because — since pyQt5 calculates the import path outside of our control — we can't import them from a subfolder like with the screens.
 
@@ -146,11 +149,12 @@ class Window():
 		self.show(self._screenStack[-2])
 
 
-
 if __name__ == '__main__':
 	app = QtWidgets.QApplication(sys.argv)
 	app.setFont(QtGui.QFont("DejaVu Sans", 12)) #Fix fonts being just a little smaller by default than in Creator. This probably only applies to the old camApp .ui files.
-
+	
 	window = Window()
-
+	
+	report("start_up_time", {"seconds": time.perf_counter() - perf_start_time})
+	
 	sys.exit(app.exec_())

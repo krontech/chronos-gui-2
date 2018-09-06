@@ -110,6 +110,7 @@ class State():
 	sensorVIncrement = 32
 	sensorPixelRate = 1920 * 1080 * 1000
 	sensorPixelFormat = "BYR2" #Or "y12" for mono models.
+	sensorRecordsColour = True
 	sensorFramerate = 1000
 	sensorQuantizeTimingNs = 250
 	sensorMinExposureNs = int(1e3)

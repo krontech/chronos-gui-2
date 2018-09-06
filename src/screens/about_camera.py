@@ -2,7 +2,8 @@ from PyQt5 import uic, QtWidgets, QtCore
 # from PyQt5.QtCore import pyqtSlot
 
 from debugger import *; dbg
-# import api_mock as api
+import api_mock as api
+from stats import app_version
 
 
 class AboutCamera(QtWidgets.QDialog):
@@ -14,6 +15,16 @@ class AboutCamera(QtWidgets.QDialog):
 		self.move(0, 0)
 		self.setWindowFlags(QtCore.Qt.FramelessWindowHint)
 		self.setAttribute(QtCore.Qt.WA_TranslucentBackground, True)
+		
+		#Substitute constants into header bit.
+		self.uiText.setText(
+			self.uiText.text()
+			.replace('{MODEL}', f"{api.get('cameraModel')}, {api.get('cameraMemoryGB')}, {'colour' if api.get('sensorRecordsColour') else 'mono'}")
+			.replace('{SERIAL_NUMBER}', api.get('cameraSerial'))
+			.replace('{UI_VERSION}', app_version)
+			.replace('{API_VERSION}', api.get('cameraApiVersion'))
+			.replace('{FPGA_VERSION}', api.get('cameraFpgaVersion'))
+		)
 		
 		# Set scroll bar to scroll all text content. 
 		self.uiScroll.setMaximum( 
