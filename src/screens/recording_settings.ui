@@ -318,7 +318,7 @@
     <enum>Button::half</enum>
    </property>
   </widget>
-  <widget class="Button" name="button">
+  <widget class="Button" name="uiCenterRecording">
    <property name="geometry">
     <rect>
      <x>620</x>
@@ -435,10 +435,10 @@
      </rect>
     </property>
    </widget>
-   <zorder>uiPassepartoutBottom</zorder>
-   <zorder>uiPassepartoutTop</zorder>
    <zorder>uiPassepartoutLeft</zorder>
    <zorder>uiPassepartoutRight</zorder>
+   <zorder>uiPassepartoutTop</zorder>
+   <zorder>uiPassepartoutBottom</zorder>
    <zorder>uiPassepartoutInnerBorder</zorder>
   </widget>
   <widget class="Backdrop" name="uiAmbiguityHiderBecauseThereWasNoGoodWayToOverlapTheseCorners">
@@ -559,7 +559,7 @@
   <zorder>uiRecordModes</zorder>
   <zorder>uiSavePreset</zorder>
   <zorder>uiDone</zorder>
-  <zorder>button</zorder>
+  <zorder>uiCenterRecording</zorder>
   <zorder>uiPreviewPanel</zorder>
   <zorder>uiMaximizeFramerate</zorder>
   <zorder>uiVOffset</zorder>

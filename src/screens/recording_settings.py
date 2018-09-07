@@ -50,6 +50,7 @@ class RecordingSettings(QtWidgets.QDialog):
 		api.observe('recordingVOffset', self.updateForSensorVOffset)
 		
 		#Frame rate fps/µs binding
+		
 		self.uiFps.setMinimum(1e6/api.get('timingMaxExposureNs')) #note: max is min / scale
 		self.uiFps.setMaximum(1e6/api.get('timingMinExposureNs'))
 		self.uiFrameDuration.setMinimum(api.get('timingMinExposureNs')/1000)
@@ -62,6 +63,7 @@ class RecordingSettings(QtWidgets.QDialog):
 		# Button binding.
 		self.uiDone.clicked.connect(window.back)
 		self.uiRecordModes.clicked.connect(lambda: window.show('record_mode'))
+		self.uiCenterRecording.clicked.connect(self.centerRecording)
 		
 		self.uiMaximizeFramerate.clicked.connect(lambda: 
 			self.uiFps.setValue(self.uiFps.maximum()) )
@@ -73,11 +75,13 @@ class RecordingSettings(QtWidgets.QDialog):
 	@silenceCallbacks('uiHRes')
 	def updateUiHRes(self, px: int):
 		self.uiHRes.setValue(px)
+		
 	
 	@pyqtSlot(int)
 	@silenceCallbacks('uiVRes')
 	def updateUiVRes(self, px: int):
 		self.uiVRes.setValue(px)
+		
 	
 	@pyqtSlot(int)
 	@silenceCallbacks('uiHOffset')
@@ -95,24 +99,30 @@ class RecordingSettings(QtWidgets.QDialog):
 	@pyqtSlot(int)
 	@silenceCallbacks()
 	def updateForSensorHOffset(self, px: int):
-		pass
+		self.updatePassepartout()
 	
 	@pyqtSlot(int)
 	@silenceCallbacks()
 	def updateForSensorVOffset(self, px: int):
-		pass
+		self.updatePassepartout()
 	
 	@pyqtSlot(int)
 	@silenceCallbacks()
 	def updateForSensorHRes(self, px: int):
+		wasCentered = self.uiHOffset.value() == self.uiHOffset.maximum()//2
 		self.uiHOffset.setMaximum(self.uiHRes.maximum() - px) #Can't capture off-sensor.
+		wasCentered and self.uiHOffset.setValue(self.uiHOffset.maximum()//2)
 		self.updateMaximumFramerate()
+		self.updatePassepartout()
 	
 	@pyqtSlot(int) #this overwrites the last three functions
 	@silenceCallbacks()
 	def updateForSensorVRes(self, px: int):
+		wasCentered = self.uiVOffset.value() == self.uiVOffset.maximum()//2
 		self.uiVOffset.setMaximum(self.uiVRes.maximum() - px) #Can't capture off-sensor.
+		wasCentered and self.uiVOffset.setValue(self.uiVOffset.maximum()//2)
 		self.updateMaximumFramerate()
+		self.updatePassepartout()
 		
 	
 	def updateMaximumFramerate(self):
@@ -124,6 +134,53 @@ class RecordingSettings(QtWidgets.QDialog):
 				self.uiVRes.value() ) )
 		if framerateIsMaxed:
 			self.uiFps.setValue(self.uiFps.maximum())
+	
+	
+	
+	_sensorWidth = api.get('sensorHMax')
+	_sensorHeight = api.get('sensorVMax')
+	
+	def updatePassepartout(self):
+		previewTop = 0
+		previewLeft = 0
+		previewWidth = self.uiPreviewPanel.geometry().right() - self.uiPreviewPanel.geometry().left()
+		previewHeight = self.uiPreviewPanel.geometry().bottom() - self.uiPreviewPanel.geometry().top()
+		
+		recordingTop = self.uiVOffset.value()
+		recordingLeft = self.uiHOffset.value()
+		recordingRight = self.uiHOffset.value() + self.uiHRes.value()
+		recordingBottom = self.uiVOffset.value() + self.uiVRes.value()
+		
+		passepartoutTop = round(recordingTop / self._sensorHeight * previewHeight)
+		passepartoutLeft = round(recordingLeft / self._sensorWidth * previewWidth)
+		passepartoutWidth = round((recordingRight - recordingLeft) / self._sensorWidth * previewWidth)
+		passepartoutHeight = round((recordingBottom - recordingTop) / self._sensorHeight * previewHeight)
+		
+		self.uiPassepartoutTop.setGeometry(
+			previewLeft+1,
+			previewTop+1,
+			previewWidth-1,
+			passepartoutTop-2 )
+		self.uiPassepartoutLeft.setGeometry(
+			previewLeft+1,
+			passepartoutTop-1,
+			passepartoutLeft-2,
+			passepartoutHeight+2 )
+		self.uiPassepartoutRight.setGeometry(
+			passepartoutLeft + passepartoutWidth + 1,
+			passepartoutTop-1,
+			previewWidth - passepartoutLeft - passepartoutWidth - 1,
+			passepartoutHeight+2 )
+		self.uiPassepartoutBottom.setGeometry(
+			previewLeft+1,
+			passepartoutTop + passepartoutHeight + 1,
+			previewWidth-1,
+			previewHeight - passepartoutTop - passepartoutHeight - 1 )
+		self.uiPassepartoutInnerBorder.setGeometry(
+			passepartoutLeft-1,
+			passepartoutTop-1,
+			passepartoutWidth+2,
+			passepartoutHeight+2 )
 	
 	
 	@pyqtSlot(float)
@@ -146,6 +203,10 @@ class RecordingSettings(QtWidgets.QDialog):
 	@silenceCallbacks() #Taken care of by Microsecond version.
 	def updateFrameDurationNanoseconds(self, ns: int):
 		self.updateFrameDurationMicroseconds(ns/1000)
+		
+	def centerRecording(self):
+		self.uiHOffset.setValue(self.uiHOffset.maximum() // 2)
+		self.uiVOffset.setValue(self.uiVOffset.maximum() // 2)
 	
 	# sensorHMax
 	# sensorHMin
