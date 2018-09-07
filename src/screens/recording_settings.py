@@ -26,8 +26,10 @@ class RecordingSettings(QtWidgets.QDialog):
 		
 		self.uiSavePreset.hide()
 		
-		#Resolution & resolution preview
+		self.populatePresets()
+		self.uiPresets.currentIndexChanged.connect(self.applyPreset)
 		
+		#Resolution & resolution preview
 		self.uiHRes.setMinimum(api.get('sensorHMin'))
 		self.uiVRes.setMinimum(api.get('sensorVMin'))
 		self.uiHRes.setMaximum(api.get('sensorHMax'))
@@ -50,7 +52,6 @@ class RecordingSettings(QtWidgets.QDialog):
 		api.observe('recordingVOffset', self.updateForSensorVOffset)
 		
 		#Frame rate fps/µs binding
-		
 		self.uiFps.setMinimum(1e6/api.get('timingMaxExposureNs')) #note: max is min / scale
 		self.uiFps.setMaximum(1e6/api.get('timingMinExposureNs'))
 		self.uiFrameDuration.setMinimum(api.get('timingMinExposureNs')/1000)
@@ -60,16 +61,51 @@ class RecordingSettings(QtWidgets.QDialog):
 		self.uiFrameDuration.valueChanged.connect(lambda x: self.updateFrameDurationMicroseconds(x))
 		api.observe('recordingExposureNs', self.updateFrameDurationNanoseconds)
 		
+		#Analog gain
+		self.populateUiAnalogGain()
+		api.observe('recordingAnalogGainMultiplier', self.setAnalogGain)
+		self.uiAnalogGain.currentIndexChanged.connect(self.analogGainChanged)
+		
+		#Presets
+		
 		# Button binding.
 		self.uiDone.clicked.connect(window.back)
 		self.uiRecordModes.clicked.connect(lambda: window.show('record_mode'))
 		self.uiCenterRecording.clicked.connect(self.centerRecording)
 		
+		api.observe('sensorMinExposureNs', self.setMinExposure)
+		api.observe('sensorMaxExposureNs', self.setMaxExposure)
+		api.observe('recordingExposureNs', self.updateExposure)
+		self.uiExposure.valueChanged.connect(
+			lambda val: api.set({'recordingExposureNs': val}) )
+		self.uiMaximizeExposure.clicked.connect(lambda: 
+			self.uiExposure.setValue(self.uiExposure.maximum()) )
+		
 		self.uiMaximizeFramerate.clicked.connect(lambda: 
 			self.uiFps.setValue(self.uiFps.maximum()) )
 		
 	
-	#xywh accessor callbacks, just update the spin box values
+	presets = api.get('commonlySupportedResolutions')
+	
+	def populatePresets(self):
+		formatString = self.uiPresets.currentText()
+		self.uiPresets.clear()
+		self.uiPresets.insertItems(0, [
+			formatString % (preset["hRes"], preset["vRes"], preset["framerate"])
+			for preset in self.presets
+		])
+	
+	@silenceCallbacks('uiPresets')
+	def applyPreset(self, presetNumber: int):
+		self.uiPresets.setCurrentIndex(presetNumber)
+		preset = self.presets[presetNumber]
+		self.uiHRes.setValue(preset["hRes"])
+		self.uiVRes.setValue(preset["vRes"])
+		self.centerRecording()
+		self.uiFps.setValue(self.uiFps.maximum())
+		
+	
+	#xywh accessor callbacks, just update the spin box values since these values require a lengthy pipeline rebuild - and because we're using them for the preview window ;)
 	
 	@pyqtSlot(int)
 	@silenceCallbacks('uiHRes')
@@ -204,18 +240,49 @@ class RecordingSettings(QtWidgets.QDialog):
 	def updateFrameDurationNanoseconds(self, ns: int):
 		self.updateFrameDurationMicroseconds(ns/1000)
 		
+	
 	def centerRecording(self):
 		self.uiHOffset.setValue(self.uiHOffset.maximum() // 2)
 		self.uiVOffset.setValue(self.uiVOffset.maximum() // 2)
+		
 	
-	# sensorHMax
-	# sensorHMin
-	# sensorVMax
-	# sensorVMin
-	# sensorHIncrement
-	# sensorVIncrement
+	availableRecordingAnalogGains = api.get('availableRecordingAnalogGains')
 	
-	# recordingHRes
-	# recordingVRes
-	# recordingHoffset
-	# recordingVoffset
+	def populateUiAnalogGain(self):
+		formatString = self.uiAnalogGain.currentText()
+		self.uiAnalogGain.clear()
+		self.uiAnalogGain.insertItems(0, [
+			formatString.format(multiplier=gain["multiplier"], dB=gain["dB"])
+			for gain in self.availableRecordingAnalogGains
+		])
+	
+	
+	@silenceCallbacks('uiAnalogGain')
+	def analogGainChanged(self, index):
+		self.uiAnalogGain.setCurrentIndex(index)
+		api.set({'recordingAnalogGainMultiplier': 
+			self.availableRecordingAnalogGains[index]["multiplier"]})
+	
+	@pyqtSlot(int)
+	@silenceCallbacks('uiAnalogGain')
+	def setAnalogGain(self, gainMultiplier):
+		self.uiAnalogGain.setCurrentIndex(
+			list(map(lambda availableGain: availableGain["multiplier"],
+				self.availableRecordingAnalogGains))
+			.index(gainMultiplier)
+		)
+	
+	@pyqtSlot(int)
+	@silenceCallbacks('uiExposure')
+	def setMaxExposure(self, ns):
+		self.uiExposure.setMaximum(ns)
+	
+	@pyqtSlot(int)
+	@silenceCallbacks('uiExposure')
+	def setMinExposure(self, ns):
+		self.uiExposure.setMaximum(ns)
+	
+	@pyqtSlot(int)
+	@silenceCallbacks('uiExposure')
+	def updateExposure(self, ns):
+		self.uiExposure.setValue(ns)

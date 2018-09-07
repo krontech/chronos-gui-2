@@ -226,7 +226,11 @@ class State():
 		self._recordingVOffset = value
 		pendingCallbacks += [changeRecordingResolution]
 	
-	recordingAnalogGain = 2 #doesn't rebuild video pipeline
+	recordingAnalogGainMultiplier = 2 #doesn't rebuild video pipeline, only takes gain multiplier
+	
+	@property
+	def availableRecordingAnalogGains(self): 
+		return [{"multiplier":2**i, "dB":6*i} for i in range(0,5)]
 	
 	recordingExposureNs = int(850) #These don't have to have the pipeline torn down, so they don't need the hack where we set video settings atomically.
 		

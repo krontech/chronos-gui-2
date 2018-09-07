@@ -36,7 +36,7 @@
     <string>Preset</string>
    </property>
   </widget>
-  <widget class="ComboBox" name="uiPreset">
+  <widget class="ComboBox" name="uiPresets">
    <property name="geometry">
     <rect>
      <x>140</x>
@@ -47,7 +47,7 @@
    </property>
    <item>
     <property name="text">
-     <string>1000×1000 @ 1000fps</string>
+     <string>%i×%i @ %ifps</string>
     </property>
    </item>
   </widget>
@@ -200,25 +200,6 @@
    </property>
    <property name="clickMarginLeftSetter" stdset="0">
     <enum>Button::half</enum>
-   </property>
-  </widget>
-  <widget class="SpinBox" name="uiAnalogGain">
-   <property name="geometry">
-    <rect>
-     <x>140</x>
-     <y>350</y>
-     <width>231</width>
-     <height>71</height>
-    </rect>
-   </property>
-   <property name="clickMarginTopSetter" stdset="0">
-    <enum>SpinBox::half</enum>
-   </property>
-   <property name="clickMarginBottomSetter" stdset="0">
-    <enum>SpinBox::full</enum>
-   </property>
-   <property name="linkedValueName" stdset="0">
-    <string>recordingAnalogGain</string>
    </property>
   </widget>
   <widget class="HeaderLabel" name="headerlabel_2">
@@ -537,6 +518,24 @@
     <enum>DecimalSpinBox::half</enum>
    </property>
   </widget>
+  <widget class="ComboBox" name="uiAnalogGain">
+   <property name="geometry">
+    <rect>
+     <x>140</x>
+     <y>350</y>
+     <width>221</width>
+     <height>71</height>
+    </rect>
+   </property>
+   <property name="clickMarginTopSetter" stdset="0">
+    <enum>ComboBox::half</enum>
+   </property>
+   <item>
+    <property name="text">
+     <string>{dB}dB (×{multiplier})</string>
+    </property>
+   </item>
+  </widget>
   <zorder>backdrop</zorder>
   <zorder>label_3</zorder>
   <zorder>label_4</zorder>
@@ -548,7 +547,7 @@
   <zorder>headerlabel_4</zorder>
   <zorder>headerlabel_3</zorder>
   <zorder>headerlabel_5</zorder>
-  <zorder>uiPreset</zorder>
+  <zorder>uiPresets</zorder>
   <zorder>uiHRes</zorder>
   <zorder>uiVRes</zorder>
   <zorder>uiHOffset</zorder>
