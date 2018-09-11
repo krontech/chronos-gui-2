@@ -146,7 +146,10 @@ class Window():
 		
 	def back(self):
 		"""Return to a previous screen."""
-		self.show(self._screenStack[-2])
+		if(len(self._screenStack) >= 2):
+			self.show(self._screenStack[-2])
+		else:
+			print('Error: No more back to navigate to.')
 
 
 if __name__ == '__main__':
