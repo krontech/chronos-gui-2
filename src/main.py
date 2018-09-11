@@ -17,13 +17,13 @@ from debugger import *; dbg
 from PyQt5 import QtWidgets, QtCore, QtGui
 from stats import report
 
+import settings
+
 perf_start_time = time.perf_counter()
 
 sys.path.append('src/widgets') #Add the components' path to import, because — since pyQt5 calculates the import path outside of our control — we can't import them from a subfolder like with the screens.
 
 QtWidgets.QApplication.setAttribute(QtCore.Qt.AA_EnableHighDpiScaling, True)
-
-settings = QtCore.QSettings('Krontech', 'back-of-camera interface')
 
 
 

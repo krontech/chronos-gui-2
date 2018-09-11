@@ -4,7 +4,7 @@ from PyQt5.QtCore import pyqtSlot, QPropertyAnimation, QPoint
 from debugger import *; dbg
 import api_mock as api
 from api_mock import silenceCallbacks
-
+import settings
 
 class Main(QtWidgets.QDialog):
 	def __init__(self, window):
@@ -70,6 +70,10 @@ class Main(QtWidgets.QDialog):
 		api.observe_future_only('sensorMinExposureNs', self.updateExposureMin)
 		self.uiExposureSlider.valueChanged.connect(
 			lambda val: api.control('set', {'recordingExposureNs': val}) )
+		
+		#Only show the debug controls if enabled in factory settings.
+		settings.observe('debug controls enabled', lambda show='False':
+			self.uiDebugControls.hide() if show == 'False' else self.uiDebugControls.show() )
 	
 	# @pyqtSlot() is not strictly needed - see http://pyqt.sourceforge.net/Docs/PyQt5/signals_slots.html#the-pyqtslot-decorator for details. (import with `from PyQt5.QtCore import pyqtSlot`)
 	def printAnalogGain(self):

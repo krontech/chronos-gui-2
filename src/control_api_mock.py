@@ -481,6 +481,7 @@ class ControlMock(QObject):
 		
 		return retval
 	
+	
 	@pyqtSlot('QVariantMap')
 	def set(self, data):
 		# Check all errors first to avoid partially applying an update.
@@ -504,15 +505,18 @@ class ControlMock(QObject):
 		[cb(_state) for cb in {cb for cb in pendingCallbacks}]
 		pendingCallbacks = []
 	
+	
 	@pyqtSlot()
 	def power_down(self):
 		print('powering down camera…')
 		print('aborted, mock will not shut down machine')
 		
+	
 	@pyqtSlot(result=list)
 	def available_keys(self):
 		return [i for i in dir(state) if i[0] != '_']
 		
+	
 	@pyqtSlot(int, int, result=int)
 	def framerate_for_resolution(self, hRes: int, vRes: int):
 		return framerate_for_resolution(hRes, vRes)
@@ -521,3 +525,48 @@ class ControlMock(QObject):
 	@pyqtSlot(result=bool)
 	def resolution_is_valid(self, hOffset: int, vOffset: int, hRes: int, vRes: int): #xywh px
 		return resolution_is_valid(hOffset, vOffset, hRes, vRes)
+	
+	
+	@pyqtSlot(str)
+	def autoFactoryCal(self, safeword: str):
+		if(safeword != 'tempest shadow'): #The safeword (which is not a password, and confers no security) is a safty precaution to prevent the API call from being placed inadvertently during normal scripting. It can be quite hard to undo the effects these factory functions.
+			print('incorrect safeword specified')
+			return
+		
+		print('MOCK: perform auto factory calibration')
+	
+	
+	@pyqtSlot(str)
+	def adcOffsetCal(self, safeword: str):
+		if(safeword != 'tempest shadow'): 
+			print('incorrect safeword specified')
+			return
+		
+		print('MOCK: perform adc offset calibration')
+	
+	
+	@pyqtSlot(str)
+	def columnGainCal(self, safeword: str):
+		if(safeword != 'tempest shadow'): 
+			print('incorrect safeword specified')
+			return
+		
+		print('MOCK: perform column gain calibration')
+	
+	
+	@pyqtSlot(str)
+	def blackCalAllStandard(self, safeword: str):
+		if(safeword != 'tempest shadow'): 
+			print('incorrect safeword specified')
+			return
+		
+		print('MOCK: perform black calibration, all standard resolutions')
+	
+	
+	@pyqtSlot(str)
+	def whiteRefCal(self, safeword: str):
+		if(safeword != 'tempest shadow'): 
+			print('incorrect safeword specified')
+			return
+		
+		print('MOCK: perform white reference calibration')

@@ -4,6 +4,7 @@ from PyQt5.QtCore import pyqtSlot
 from debugger import *; dbg
 import api_mock as api
 from api_mock import silenceCallbacks
+import settings
 
 
 class ServiceScreenLocked(QtWidgets.QDialog):
@@ -47,11 +48,23 @@ class ServiceScreenUnlocked(QtWidgets.QDialog):
 		self.setWindowFlags(QtCore.Qt.FramelessWindowHint)
 		self.setAttribute(QtCore.Qt.WA_TranslucentBackground, True)
 		
+		# Button binding.
+		self.uiAutoCal.clicked.connect(lambda: api.control('autoFactoryCal', 'tempest shadow'))
+		self.uiAdcOffset.clicked.connect(lambda: api.control('adcOffsetCal', 'tempest shadow'))
+		self.uiColumnGain.clicked.connect(lambda: api.control('columnGainCal', 'tempest shadow'))
+		self.uiBlackCalAll.clicked.connect(lambda: api.control('blackCalAllStandard', 'tempest shadow'))
+		self.uiWhiteRef.clicked.connect(lambda: api.control('whiteRefCal', 'tempest shadow'))
+		self.uiCloseApp.clicked.connect(QtWidgets.QApplication.closeAllWindows)
+		
+		settings.observe('debug controls enabled', lambda x='False':
+			self.uiShowDebugControls.setChecked(x == 'True') )
+		self.uiShowDebugControls.stateChanged.connect(lambda x:
+			settings.setValue('debug controls enabled', str(bool(x))) )
+		
 		api.observe('cameraSerial', self.updateSerial)
 		self.uiSerialNumber.textChanged.connect(lambda x: 
 			api.set({'cameraSerial': x}))
 		
-		# Button binding.
 		self.uiDone.clicked.connect(lambda: window.show('primary_settings'))
 	
 	
@@ -59,3 +72,7 @@ class ServiceScreenUnlocked(QtWidgets.QDialog):
 	@silenceCallbacks('uiSerialNumber')
 	def updateSerial(self, value):
 		self.uiSerialNumber.setText(value)
+	
+	@silenceCallbacks('uiSerialNumber')
+	def updateDebugControlVisibility(self, value):
+		pass
