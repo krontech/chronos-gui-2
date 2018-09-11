@@ -1,8 +1,9 @@
 from PyQt5 import uic, QtWidgets, QtCore
-# from PyQt5.QtCore import pyqtSlot
+from PyQt5.QtCore import pyqtSlot
 
 from debugger import *; dbg
-# import api_mock as api
+import api_mock as api
+from api_mock import silenceCallbacks
 
 
 class ServiceScreenLocked(QtWidgets.QDialog):
@@ -34,6 +35,8 @@ class ServiceScreenLocked(QtWidgets.QDialog):
 		"""Hack around self.show during self.showEvent not behaving."""
 		self._delayedUnlockTimer.start(0) #ms
 
+
+
 class ServiceScreenUnlocked(QtWidgets.QDialog):
 	def __init__(self, window):
 		super().__init__()
@@ -44,5 +47,15 @@ class ServiceScreenUnlocked(QtWidgets.QDialog):
 		self.setWindowFlags(QtCore.Qt.FramelessWindowHint)
 		self.setAttribute(QtCore.Qt.WA_TranslucentBackground, True)
 		
+		api.observe('cameraSerial', self.updateSerial)
+		self.uiSerialNumber.textChanged.connect(lambda x: 
+			api.set({'cameraSerial': x}))
+		
 		# Button binding.
 		self.uiDone.clicked.connect(lambda: window.show('primary_settings'))
+	
+	
+	@pyqtSlot(int)
+	@silenceCallbacks('uiSerialNumber')
+	def updateSerial(self, value):
+		self.uiSerialNumber.setText(value)
