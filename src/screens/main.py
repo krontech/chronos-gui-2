@@ -5,6 +5,7 @@ from debugger import *; dbg
 import api_mock as api
 from api_mock import silenceCallbacks
 import settings
+from widgets.button import Button
 
 class Main(QtWidgets.QDialog):
 	def __init__(self, window):
@@ -20,7 +21,6 @@ class Main(QtWidgets.QDialog):
 		# Widget behavour.
 		self.uiDebugA.clicked.connect(self.printAnalogGain)
 		self.uiDebugB.clicked.connect(lambda: window.show('widget_test'))
-		#self.uiDebugC.clicked.connect(lambda: window.show('stamp'))
 		self.uiDebugC.clicked.connect(lambda: self and dbg())
 		self.uiClose.clicked.connect(QtWidgets.QApplication.closeAllWindows)
 		
@@ -40,14 +40,51 @@ class Main(QtWidgets.QDialog):
 			self.uiShotAssist, 
 			self.uiShotAssistMenu )
 		
-		if api.get('sensorPixelFormat') == 'BYR2': #colour model
-			closeCalibrationMenu = self.linkButtonToMenu(
-				self.uiCalibrationOrBlackCal, 
+		
+		#Twiddle the calibration menu so it shows the right thing. It's pretty context-sensitive - you can't white-balance a black-and-white camera, and you can't do motion trigger calibration when there's no motion trigger set up.
+		#I think the sanest approach is to duplicate the button, one for each menu, since opening the menu is pretty complex and I don't want to try dynamically rebind menus.
+		if not api.get('sensorRecordsColour'):
+			self.uiCalibration = self.uiCalibrationOrBlackCal
+			self.uiBlackCal0 = Button(parent=self.uiCalibrationOrBlackCal.parent())
+			self.copyButton(src=self.uiCalibrationOrBlackCal, dest=self.uiBlackCal0)
+			self.uiBlackCal0.setText(self.uiBlackCal1.text())
+			
+			self.closeCalibrationMenu = self.linkButtonToMenu(
+				self.uiCalibration, 
 				self.uiCalibrationMenu )
-			self.uiWhiteBalance.clicked.connect(closeCalibrationMenu)
-			self.uiBlackCal.clicked.connect(closeCalibrationMenu)
+			
+			#WB is either removed or becomes recalibrate motion trigger in this mode.
+			self.uiWhiteBalance1.setText(self.uiRecalibrateMotionTrigger.text())
+			self.uiWhiteBalance1.clicked.connect(self.closeCalibrationMenu)
+			self.uiBlackCal1.clicked.connect(self.closeCalibrationMenu)
+			
+			api.observe('triggerConfiguration', self.updateBaWTriggers)
 		else:
-			self.uiCalibrationOrBlackCal.setText(self.uiBlackCal.text())
+			self.uiCalibration1 = self.uiCalibrationOrBlackCal
+			self.uiCalibration2 = Button(parent=self.uiCalibrationOrBlackCal.parent())
+			self.copyButton(src=self.uiCalibration1, dest=self.uiCalibration2)
+			
+			self.closeCalibrationMenu1 = self.linkButtonToMenu(
+				self.uiCalibration1, 
+				self.uiCalibrationMenu )
+			self.closeCalibrationMenu2 = self.linkButtonToMenu(
+				self.uiCalibration2, 
+				self.uiCalibrationMenuWithMotion )
+			
+			#Calibration either opens the uiCalibrationMenu or the uiCalibrationMenuWithMotion [trigger button].
+			self.uiWhiteBalance1.clicked.connect(self.closeCalibrationMenu1)
+			self.uiWhiteBalance1.clicked.connect(self.closeCalibrationMenu2)
+			self.uiBlackCal1.clicked.connect(self.closeCalibrationMenu1)
+			self.uiBlackCal1.clicked.connect(self.closeCalibrationMenu2)
+			self.uiWhiteBalance2.clicked.connect(self.closeCalibrationMenu1)
+			self.uiWhiteBalance2.clicked.connect(self.closeCalibrationMenu2)
+			self.uiBlackCal2.clicked.connect(self.closeCalibrationMenu1)
+			self.uiBlackCal2.clicked.connect(self.closeCalibrationMenu2)
+			self.uiRecalibrateMotionTrigger.clicked.connect(self.closeCalibrationMenu1)
+			self.uiRecalibrateMotionTrigger.clicked.connect(self.closeCalibrationMenu2)
+			
+			api.observe('triggerConfiguration', self.updateColourTriggers)
+		
 		
 		self.uiRecordModes.clicked.connect(lambda: window.show('record_mode'))
 		self.uiRecordingSettings.clicked.connect(lambda: window.show('recording_settings'))
@@ -110,6 +147,44 @@ class Main(QtWidgets.QDialog):
 		self.uiExposureSlider.setPageStep(step1percent)
 		self.uiExposureSlider.setSingleStep(step1percent)
 	
+	
+	@pyqtSlot('QVariantMap')
+	@silenceCallbacks()
+	def updateBaWTriggers(self, triggers):
+		#	VAR IF no mocal
+		#		show black cal button
+		#	ELSE
+		#		show cal menu button → recal motion menu
+		#dbg()
+		if triggers['motion']['action'] == 'none':
+			self.uiCalibration.hide()
+			self.uiBlackCal0.show()
+		else:
+			self.uiCalibration.show()
+			self.uiBlackCal0.hide()
+		
+		#Ensure this menu is closed, since we're about to hide the thing to close it.
+		self.closeCalibrationMenu()
+	
+	@pyqtSlot('QVariantMap')
+	@silenceCallbacks()
+	def updateColourTriggers(self, triggers):
+		#	VAR IF no mocal
+		#		show cal menu button → wb/bc menu
+		#	ELSE
+		#		show cal menu button → wb/bc/recal menu
+		if triggers['motion']['action'] == 'none':
+			self.uiCalibration1.show()
+			self.uiCalibration2.hide()
+		else:
+			self.uiCalibration1.hide()
+			self.uiCalibration2.show()
+	
+		#Ensure this menu is closed, since we're about to hide the thing to close it.
+		self.closeCalibrationMenu1()
+		self.closeCalibrationMenu2()
+	
+	
 	def linkButtonToMenu(self, button, menu):
 		"""Have one of the side bar buttons bring up its menu.
 			
@@ -144,7 +219,7 @@ class Main(QtWidgets.QDialog):
 		
 		button.clicked.connect(toggleMenu)
 		
-		def hideMenu(evt):
+		def hideMenu(*_):
 			"""Start to hide the menu, if not in use."""
 			if button.hasFocus():
 				# The button to toggle this menu is now focused, and will
@@ -176,7 +251,7 @@ class Main(QtWidgets.QDialog):
 		
 		menu.focusOutEvent = hideMenu
 		
-		def forceHideMenu(evt):
+		def forceHideMenu(*_):
 			"""Start to hide the menu, even if something's focussed on it."""
 			anim.setDirection(QPropertyAnimation.Backward)
 			if anim.state() == QPropertyAnimation.Stopped:
@@ -192,10 +267,13 @@ class Main(QtWidgets.QDialog):
 		anim.finished.connect(animationFinished)
 		
 		return forceHideMenu
-		
 	
-	# ~Emit to signal:
-	# https://doc.qt.io/qt-5/qdbusmessage.html#createSignal
-	#
-	# ~Subscribe to dbus signal.
-	# QDBusConnection::sessionBus().connect("org.gnome.SessionManager", "/org/gnome/SessionManager/Presence", "org.gnome.SessionManager.Presence" ,"StatusChanged", this, SLOT(MySlot(uint))); 
+	
+	def copyButton(_, *, src, dest):
+		dest.setText(src.text())
+		dest.clickMarginTopSetter = src.clickMarginTopSetter
+		dest.clickMarginLeftSetter = src.clickMarginLeftSetter
+		dest.clickMarginBottomSetter = src.clickMarginBottomSetter
+		dest.clickMarginRightSetter = src.clickMarginRightSetter
+		dest.setGeometry(src.geometry())
+		dest.customStyleSheet = src.customStyleSheet

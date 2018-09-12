@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1551</width>
+    <width>1759</width>
     <height>480</height>
    </rect>
   </property>
@@ -581,7 +581,7 @@ Delay</string>
      <height>161</height>
     </rect>
    </property>
-   <widget class="Button" name="uiWhiteBalance">
+   <widget class="Button" name="uiWhiteBalance1">
     <property name="geometry">
      <rect>
       <x>0</x>
@@ -601,7 +601,7 @@ Balance</string>
      <enum>Button::none</enum>
     </property>
    </widget>
-   <widget class="Button" name="uiBlackCal">
+   <widget class="Button" name="uiBlackCal1">
     <property name="geometry">
      <rect>
       <x>0</x>
@@ -641,7 +641,7 @@ Calibration</string>
   <widget class="QWidget" name="uiShotAssistMenu" native="true">
    <property name="geometry">
     <rect>
-     <x>1280</x>
+     <x>1490</x>
      <y>0</y>
      <width>171</width>
      <height>480</height>
@@ -766,10 +766,10 @@ Clipping</string>
 					background: white;
 					
 					/* use borders instead of margins so we can see what we're doing */
-					border-left:   21px solid rgba(19, 29, 234, 66);
-					border-right:  1px solid rgba(19, 29, 234, 66);
-					border-top:    11px solid rgba(19, 29, 234, 66);
-					border-bottom: 1px solid rgba(19, 29, 234, 66);
+					border-left:   21px solid rgba(10, 3, 236, 39);
+					border-right:  1px solid rgba(10, 3, 236, 39);
+					border-top:    11px solid rgba(10, 3, 236, 39);
+					border-bottom: 1px solid rgba(10, 3, 236, 39);
 				}
 			Button { background: #7a70f7 }</string>
     </property>
@@ -979,6 +979,79 @@ Clipping</string>
     <string notr="true">background: transparent</string>
    </property>
   </widget>
+  <widget class="QWidget" name="uiCalibrationMenuWithMotion" native="true">
+   <property name="geometry">
+    <rect>
+     <x>1230</x>
+     <y>140</y>
+     <width>161</width>
+     <height>221</height>
+    </rect>
+   </property>
+   <widget class="Button" name="uiWhiteBalance2">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>0</y>
+      <width>161</width>
+      <height>81</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Set White
+Balance</string>
+    </property>
+    <property name="clickMarginRightSetter" stdset="0">
+     <enum>Button::none</enum>
+    </property>
+    <property name="clickMarginBottomSetter" stdset="0">
+     <enum>Button::none</enum>
+    </property>
+   </widget>
+   <widget class="Button" name="uiRecalibrateMotionTrigger">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>140</y>
+      <width>161</width>
+      <height>81</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Recalibrate
+Motion Trigger</string>
+    </property>
+    <property name="clickMarginRightSetter" stdset="0">
+     <enum>Button::none</enum>
+    </property>
+    <property name="clickMarginTopSetter" stdset="0">
+     <enum>Button::none</enum>
+    </property>
+   </widget>
+   <widget class="Button" name="uiBlackCal2">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>80</y>
+      <width>161</width>
+      <height>61</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Do Black
+Calibration</string>
+    </property>
+    <property name="clickMarginRightSetter" stdset="0">
+     <enum>Button::none</enum>
+    </property>
+    <property name="clickMarginTopSetter" stdset="0">
+     <enum>Button::none</enum>
+    </property>
+    <property name="clickMarginBottomSetter" stdset="0">
+     <enum>Button::none</enum>
+    </property>
+   </widget>
+  </widget>
   <zorder>uiPinchToZoomGestureInterceptionPanel</zorder>
   <zorder>uiExposureOverlay</zorder>
   <zorder>backdrop_2</zorder>
@@ -994,13 +1067,14 @@ Clipping</string>
   <zorder>uiCalibrationMenu</zorder>
   <zorder>label_5</zorder>
   <zorder>uiShotAssistMenu</zorder>
-  <zorder>uiCalibrationOrBlackCal</zorder>
-  <zorder>uiRecord</zorder>
+  <zorder>uiCalibrationMenuWithMotion</zorder>
   <zorder>uiPrefsAndUtils</zorder>
   <zorder>uiShotAssist</zorder>
-  <zorder>uiPlayAndSave</zorder>
   <zorder>uiRecordingAndTriggers</zorder>
+  <zorder>uiPlayAndSave</zorder>
   <zorder>uiBattery</zorder>
+  <zorder>uiCalibrationOrBlackCal</zorder>
+  <zorder>uiRecord</zorder>
  </widget>
  <customwidgets>
   <customwidget>

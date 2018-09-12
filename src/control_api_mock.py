@@ -306,6 +306,15 @@ class State():
 			"pullup1ma": False,
 			"pullup20ma": True,
 		},
+		"motion": {
+			"action": "none",
+			"threshold": 2.50,
+			"invertInput": False,
+			"invertOutput": False,
+			"debounce": True,
+			"pullup1ma": False,
+			"pullup20ma": True,
+		},
 	}
 	
 	@property
@@ -314,47 +323,62 @@ class State():
 			"trig1": {                     # id
 				"name": "Trigger 1 (BNC)", # full name (human-readable label)
 				"label": "TRIG1",          # short name (as printed on the case)
-				"thresholdMinV": 0.,
-				"thresholdMaxV": 7.2,
+				"thresholdMin": 0.,
+				"thresholdMax": 7.2,
 				"pullup1ma": True,
 				"pullup20ma": True,
 				"outputCapable": True,
+				"motion": False,
 			},
 			"trig2": {
 				"name": "Trigger 2",
 				"label": "TRIG2",
-				"thresholdMinV": 0.,
-				"thresholdMaxV": 7.2,
+				"thresholdMin": 0.,
+				"thresholdMax": 7.2,
 				"pullup1ma": False,
 				"pullup20ma": True,
 				"outputCapable": True,
+				"motion": False,
 			},
 			"trig3": {
 				"name": "Trigger 3 (isolated)",
 				"label": "TRIG3",
-				"thresholdMinV": 0.,
-				"thresholdMaxV": 7.2,
+				"thresholdMin": 0.,
+				"thresholdMax": 7.2,
 				"pullup1ma": False,
 				"pullup20ma": False,
 				"outputCapable": False,
+				"motion": False,
 			},
 			"~a1": { #DDR 2018-06-18: I don't know what the analog input settings will be like.
 				"name": "Analog 1",
 				"label": "~A1",
-				"thresholdMinV": 0.,
-				"thresholdMaxV": 7.2,
+				"thresholdMin": 0.,
+				"thresholdMax": 7.2,
 				"pullup1ma": False,
 				"pullup20ma": False,
 				"outputCapable": False,
+				"motion": False,
 			},
 			"~a2": {
 				"name": "Analog 2",
 				"label": "~A2",
-				"thresholdMinV": 0.,
-				"thresholdMaxV": 7.2,
+				"thresholdMin": 0.,
+				"thresholdMax": 7.2,
 				"pullup1ma": False,
 				"pullup20ma": False,
 				"outputCapable": False,
+				"motion": False,
+			},
+			"motion": {
+				"name": "Motion",
+				"label": False,
+				"thresholdMin": False,
+				"thresholdMax": False,
+				"pullup1ma": False,
+				"pullup20ma": False,
+				"outputCapable": False,
+				"motion": True,
 			},
 		}
 	
@@ -366,26 +390,36 @@ class State():
 	def triggerState(self):
 		return {
 			"trig1": {
-				"active": random.choice((True, False)), #such modelling, so sophisticated 🖏 
-				"voltage": random.choice((2.45, 2.50, 2.50, 2.50, 2.50, 4.11, 4.12))
+				"inputIsActive": random.choice((True, False)), #such modelling, so sophisticated 🖏 
+				"level": random.choice((2.45, 2.50, 2.50, 2.50, 2.50, 4.11, 4.12))
 			},
 			"trig2": {
-				"active": random.choice((True, False)),
-				"voltage": random.choice((2.45, 2.50, 2.50, 2.50, 2.50, 4.11, 4.12))
+				"inputIsActive": random.choice((True, False)),
+				"level": random.choice((2.45, 2.50, 2.50, 2.50, 2.50, 4.11, 4.12))
 			},
 			"trig3": {
-				"active": random.choice((True, False)),
-				"voltage": random.choice((2.45, 2.50, 2.50, 2.50, 2.50, 4.11, 4.12))
+				"inputIsActive": random.choice((True, False)),
+				"level": random.choice((2.45, 2.50, 2.50, 2.50, 2.50, 4.11, 4.12))
 			},
 			"~a1": {
-				"active": random.choice((True, False)),
-				"voltage": random.choice((2.45, 2.50, 2.50, 2.50, 2.50, 4.11, 4.12))
+				"inputIsActive": random.choice((True, False)),
+				"level": random.choice((2.45, 2.50, 2.50, 2.50, 2.50, 4.11, 4.12))
 			},
 			"~a2": {
-				"active": random.choice((True, False)),
-				"voltage": random.choice((2.45, 2.50, 2.50, 2.50, 2.50, 4.11, 4.12))
+				"inputIsActive": random.choice((True, False)),
+				"level": random.choice((2.45, 2.50, 2.50, 2.50, 2.50, 4.11, 4.12))
+			},
+			"motion": {
+				"inputIsActive": random.choice((True, False)),
+				"level": random.choice((0., 0, 0.01, 0.01, 0.01, 0.01, 0.07))
 			},
 		}
+		
+	motionTriggerHOffset = 134
+	motionTriggerVOffset = 656
+	motionTriggerHRes = 64
+	motionTriggerVRes = 800
+	motionTriggerAdaption = "low" #one of high, medium, low, off
 	
 	#Overlay has moved to Video API
 	#
@@ -570,3 +604,8 @@ class ControlMock(QObject):
 			return
 		
 		print('MOCK: perform white reference calibration')
+	
+	
+	@pyqtSlot(str)
+	def takeStillReferenceForMotionTriggering(self, safeword: str):
+		print('MOCK: train stillness for motion triggering')
