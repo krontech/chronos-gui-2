@@ -81,24 +81,26 @@ class Window():
 		from screens.widget_test import WidgetTest
 		from screens.service_screen import ServiceScreenLocked, ServiceScreenUnlocked
 		
-		self._screens = {
-			'about_camera': AboutCamera(self),
-			'file_settings': FileSettings(self),
-			'main': Main(self),
-			'play_and_save': PlayAndSave(self),
-			'power': Power(self),
-			'primary_settings': PrimarySettings(self),
-			'record_mode': RecordMode(self),
-			'recording_settings': RecordingSettings(self),
-			'stamp': Stamp(self),
-			'trigger_delay': TriggerDelay(self),
-			'triggers': Triggers(self),
-			'update_firmware': UpdateFirmware(self),
-			'user_settings': UserSettings(self),
-			'widget_test': WidgetTest(self),
-			'service_screen.locked': ServiceScreenLocked(self),
-			'service_screen.unlocked': ServiceScreenUnlocked(self),
+		self._availableScreens = {
+			'main': Main, #load order, load items on main screen first, main screen submenus next, and it doesn't really matter after that. All screens get loaded in less than 10 seconds, so this is only a startup concern.
+			'primary_settings': PrimarySettings,
+			'recording_settings': RecordingSettings,
+			'triggers': Triggers,
+			'trigger_delay': TriggerDelay,
+			'record_mode': RecordMode,
+			'play_and_save': PlayAndSave,
+			'about_camera': AboutCamera,
+			'file_settings': FileSettings,
+			'power': Power,
+			'stamp': Stamp,
+			'update_firmware': UpdateFirmware,
+			'user_settings': UserSettings,
+			'widget_test': WidgetTest,
+			'service_screen.locked': ServiceScreenLocked,
+			'service_screen.unlocked': ServiceScreenUnlocked,
 		}
+		
+		self._screens = {}
 		
 		# Set the initial screen. If in dev mode, due to the frequent restarts,
 		# reopen the previous screen. If in the hands of an end-user, always
@@ -117,8 +119,39 @@ class Window():
 		
 		self._screenStack = ['main', self.currentScreen] #Start off with main loaded into history, since we don't always start on main during development and going back should get you *somewhere* useful rather than crashing.
 		
+		self._ensureInstantiated(self.currentScreen)
 		self._screens[self.currentScreen].show()
+		
 		settings.setValue('current screen', self.currentScreen)
+		
+		#Cache all screens, cached screens load about 150-200ms faster I think.
+		self._lazyLoadTimer = QtCore.QTimer()
+		self._lazyLoadTimer.timeout.connect(self._loadAScreen)
+		self._lazyLoadTimer.start(250) #ms
+		
+	def _ensureInstantiated(self, screenName: str):
+		"""Lazily load screens to shorten initial startup time."""
+		
+		if screenName in self._screens:
+			return
+		
+		if screenName not in self._availableScreens:
+			raise ValueError(f"Unknown screen {screenName}.\nAvailable screens are: {self._availableScreens.keys()}")
+		
+		self._screens[screenName] = self._availableScreens[screenName](self)
+		
+	def _uninstantiatedScreens(self):
+		"""Return (generator for) non-cached screens. (Those not in self._screens.)"""
+		return (screen for screen in self._availableScreens.keys() if screen not in self._screens.keys())
+		
+	def _loadAScreen(self):
+		screen = next(self._uninstantiatedScreens(), None)
+		if not screen:
+			self._lazyLoadTimer.stop()
+			self._lazyLoadTimer.deleteLater()
+			report("screen_cache_time", {"seconds": time.perf_counter() - perf_start_time})
+		else:
+			self._ensureInstantiated(screen)
 	
 	def show(self, screen):
 		"""Switch between the screens of the back-of-camera interface.
@@ -133,6 +166,8 @@ class Window():
 		#If you loop through to a screen again, which can easily happen because we don't always use window.back() to return from screens, discard the loop to keep history from growing forever.
 		self._screenStack += [screen]
 		self._screenStack = self._screenStack[:self._screenStack.index(screen)+1]
+		
+		self._ensureInstantiated(screen)
 		
 		self._screens[screen].show()
 		self._screens[self.currentScreen].hide()
