@@ -114,7 +114,7 @@ class Window():
 		else:
 			self.currentScreen = 'main'
 		
-		if self.currentScreen not in self._screens: 
+		if self.currentScreen not in self._availableScreens: 
 			self.currentScreen = 'main'
 		
 		self._screenStack = ['main', self.currentScreen] #Start off with main loaded into history, since we don't always start on main during development and going back should get you *somewhere* useful rather than crashing.
