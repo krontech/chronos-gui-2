@@ -166,9 +166,13 @@ class State():
 			[336, 96],
 		]]
 	
-	#Camera state.
-	externallyPowered = True
-	batteryCharge = 1. #0. to 1. inclusive
+	@property
+	def externallyPowered(self):
+		return random.choice((True, False))
+	
+	@property
+	def batteryCharge(self):
+		return random.choice((1., .99, .98, .97, .96))
 	
 	@property
 	def batteryVoltage(self):
@@ -247,8 +251,10 @@ class State():
 		
 	currentCameraState = 'normal' #Can also be 'saving' or 'recording'. When saving, the API is unresponsive?
 	currentVideoState = 'viwefinder' #eg, 'viewfinder', 'playback', etc.
-	focusPeakingColor = 0x0000ff #currently presented as red, green, blue, alpha (RGBA). 0x000000 is off
-	zebraStripesEnabled = False
+	focusPeakingColour = 0xff0000 #red, green, blue (RGB), like CSS colours.
+	focusPeakingIntensity = 'low' #One of ['off', 'low', 'medium', 'high'].
+	showWhiteClippingZebraStripes = True
+	showBlackClippingZebraStripes = True
 	disableOverwritingRingBuffer = False #In segmented mode, disable overwriting earlier recorded ring buffer segments. DDR 2018-06-19: Loial figures this was fixed, but neither of us know why it's hidden in the old UI.
 	recordedSegments = [{ #Each entry in this list a segment of recorded video. Although currently resolution/framerate is always the same having it in this data will make it easier to fix this in the future if we do.
 		"start": 0,
@@ -606,6 +612,16 @@ class ControlMock(QObject):
 		print('MOCK: perform white reference calibration')
 	
 	
-	@pyqtSlot(str)
-	def takeStillReferenceForMotionTriggering(self, safeword: str):
+	@pyqtSlot()
+	def takeStillReferenceForMotionTriggering(self):
 		print('MOCK: train stillness for motion triggering')
+	
+	
+	@pyqtSlot()
+	def setWhiteBalance(self):
+		print('MOCK: set white balance')
+	
+	
+	@pyqtSlot()
+	def doBlackCalibration(self):
+		print('MOCK: do black calibration')

@@ -7,6 +7,17 @@ from api_mock import silenceCallbacks
 import settings
 from widgets.button import Button
 
+focusPeakingIntensities = ['off', 'low', 'medium', 'high']
+focusPeakingColours = {
+	"blue": 0x0000FF,
+	"pink": 0xFF00FF,
+	"red": 0xFF0000,
+	"yellow": 0xFFFF00,
+	"green": 0x00FF00,
+	"cyan": 0x00FFFF,
+}
+
+
 class Main(QtWidgets.QDialog):
 	def __init__(self, window):
 		super().__init__()
@@ -24,21 +35,65 @@ class Main(QtWidgets.QDialog):
 		self.uiDebugC.clicked.connect(lambda: self and dbg())
 		self.uiClose.clicked.connect(QtWidgets.QApplication.closeAllWindows)
 		
+		#Only show the debug controls if enabled in factory settings.
+		settings.observe('debug controls enabled', lambda show='False':
+			self.uiDebugControls.hide() if show == 'False' else self.uiDebugControls.show() )
+		
+		
 		self.uiBattery.clicked.connect(lambda: window.show('power'))
 		
 		self.uiPrefsAndUtils.clicked.connect(lambda: window.show('primary_settings'))
 		
+		
 		closeRecordingAndTriggersMenu = self.linkButtonToMenu(
 			self.uiRecordingAndTriggers, 
 			self.uiRecordingAndTriggersMenu )
+		
 		self.uiRecordModes.clicked.connect(closeRecordingAndTriggersMenu)
 		self.uiRecordingSettings.clicked.connect(closeRecordingAndTriggersMenu)
 		self.uiTriggerDelay.clicked.connect(closeRecordingAndTriggersMenu)
 		self.uiTriggerIOSettings.clicked.connect(closeRecordingAndTriggersMenu)
 		
-		self.linkButtonToMenu(
+		
+		closeShotAssistMenu = self.linkButtonToMenu(
 			self.uiShotAssist, 
 			self.uiShotAssistMenu )
+		
+		self.uiShotAssist.clicked.connect(closeRecordingAndTriggersMenu)
+		
+		if(self.uiFocusPeakingIntensity.count() != len(focusPeakingIntensities)):
+			raise Exception("Main screen: Focus peaking dropdown has different number of options than expected.")
+		
+		api.observe('focusPeakingIntensity', self.updateFocusPeakingIntensity)
+		
+		self.uiFocusPeakingIntensity.currentIndexChanged.connect(
+			lambda index: api.set(
+				{'focusPeakingIntensity': focusPeakingIntensities[index]} ) )
+		
+		self.uiFocusPeakingIntensity.currentIndexChanged.connect(
+			self.uiShotAssistMenu.setFocus )
+		
+		api.observe('focusPeakingColour', self.updateFocusPeakingColour, saftyCheckForSilencedWidgets=False)
+		
+		self.uiBlueFocusPeaking.clicked.connect(lambda: api.set(
+			{'focusPeakingColour': focusPeakingColours['blue']} ) )
+		self.uiPinkFocusPeaking.clicked.connect(lambda: api.set(
+			{'focusPeakingColour': focusPeakingColours['pink']} ) )
+		self.uiRedFocusPeaking.clicked.connect(lambda: api.set(
+			{'focusPeakingColour': focusPeakingColours['red']} ) )
+		self.uiYellowFocusPeaking.clicked.connect(lambda: api.set(
+			{'focusPeakingColour': focusPeakingColours['yellow']} ) )
+		self.uiGreenFocusPeaking.clicked.connect(lambda: api.set(
+			{'focusPeakingColour': focusPeakingColours['green']} ) )
+		self.uiCyanFocusPeaking.clicked.connect(lambda: api.set(
+			{'focusPeakingColour': focusPeakingColours['cyan']} ) )
+		
+		self.uiBlueFocusPeaking.clicked.connect(self.uiShotAssistMenu.setFocus)
+		self.uiPinkFocusPeaking.clicked.connect(self.uiShotAssistMenu.setFocus)
+		self.uiRedFocusPeaking.clicked.connect(self.uiShotAssistMenu.setFocus)
+		self.uiYellowFocusPeaking.clicked.connect(self.uiShotAssistMenu.setFocus)
+		self.uiGreenFocusPeaking.clicked.connect(self.uiShotAssistMenu.setFocus)
+		self.uiCyanFocusPeaking.clicked.connect(self.uiShotAssistMenu.setFocus)
 		
 		
 		#Twiddle the calibration menu so it shows the right thing. It's pretty context-sensitive - you can't white-balance a black-and-white camera, and you can't do motion trigger calibration when there's no motion trigger set up.
@@ -53,10 +108,22 @@ class Main(QtWidgets.QDialog):
 				self.uiCalibration, 
 				self.uiCalibrationMenu )
 			
+			self.uiCalibration.clicked.connect(self.closeShotAssistMenu)
+			self.uiCalibration.clicked.connect(self.closeRecordingAndTriggersMenu)
+			self.uiRecordingAndTriggers.clicked.connect(self.closeCalibrationMenu)
+			self.uiShotAssist.clicked.connect(self.closeCalibrationMenu)
+			
 			#WB is either removed or becomes recalibrate motion trigger in this mode.
 			self.uiWhiteBalance1.setText(self.uiRecalibrateMotionTrigger.text())
 			self.uiWhiteBalance1.clicked.connect(self.closeCalibrationMenu)
+			self.uiWhiteBalance1.clicked.connect(self.closeShotAssistMenu)
+			self.uiWhiteBalance1.clicked.connect(self.closeRecordingAndTriggersMenu)
+			self.uiWhiteBalance1.clicked.connect(lambda: api.control('takeStillReferenceForMotionTriggering'))
+			
+			self.uiBlackCal0.clicked.connect(self.closeCalibrationMenu)
+			self.uiBlackCal0.clicked.connect(lambda: api.control('doBlackCalibration'))
 			self.uiBlackCal1.clicked.connect(self.closeCalibrationMenu)
+			self.uiBlackCal1.clicked.connect(lambda: api.control('doBlackCalibration'))
 			
 			api.observe('triggerConfiguration', self.updateBaWTriggers)
 		else:
@@ -71,17 +138,40 @@ class Main(QtWidgets.QDialog):
 				self.uiCalibration2, 
 				self.uiCalibrationMenuWithMotion )
 			
+			
 			#Calibration either opens the uiCalibrationMenu or the uiCalibrationMenuWithMotion [trigger button].
 			self.uiWhiteBalance1.clicked.connect(self.closeCalibrationMenu1)
 			self.uiWhiteBalance1.clicked.connect(self.closeCalibrationMenu2)
-			self.uiBlackCal1.clicked.connect(self.closeCalibrationMenu1)
-			self.uiBlackCal1.clicked.connect(self.closeCalibrationMenu2)
+			self.uiWhiteBalance1.clicked.connect(lambda: api.control('setWhiteBalance'))
 			self.uiWhiteBalance2.clicked.connect(self.closeCalibrationMenu1)
 			self.uiWhiteBalance2.clicked.connect(self.closeCalibrationMenu2)
+			self.uiWhiteBalance2.clicked.connect(lambda: api.control('setWhiteBalance'))
+			self.uiBlackCal1.clicked.connect(self.closeCalibrationMenu1)
+			self.uiBlackCal1.clicked.connect(self.closeCalibrationMenu2)
+			self.uiBlackCal1.clicked.connect(lambda: api.control('doBlackCalibration'))
 			self.uiBlackCal2.clicked.connect(self.closeCalibrationMenu1)
 			self.uiBlackCal2.clicked.connect(self.closeCalibrationMenu2)
+			self.uiBlackCal2.clicked.connect(lambda: api.control('doBlackCalibration'))
 			self.uiRecalibrateMotionTrigger.clicked.connect(self.closeCalibrationMenu1)
 			self.uiRecalibrateMotionTrigger.clicked.connect(self.closeCalibrationMenu2)
+			self.uiRecalibrateMotionTrigger.clicked.connect(lambda: api.control('takeStillReferenceForMotionTriggering'))
+			
+			#Close other menus and vice-versa when menu opened.
+			self.uiRecordingAndTriggers.clicked.connect(self.closeCalibrationMenu1)
+			self.uiRecordingAndTriggers.clicked.connect(self.closeCalibrationMenu2)
+			self.uiRecordingAndTriggers.clicked.connect(closeShotAssistMenu)
+			self.uiShotAssist.clicked.connect(self.closeCalibrationMenu1)
+			self.uiShotAssist.clicked.connect(self.closeCalibrationMenu2)
+			self.uiCalibration1.clicked.connect(closeRecordingAndTriggersMenu)
+			self.uiCalibration2.clicked.connect(closeRecordingAndTriggersMenu)
+			self.uiCalibration1.clicked.connect(closeShotAssistMenu)
+			self.uiCalibration2.clicked.connect(closeShotAssistMenu)
+			
+			#[TODO DDR 2018-09-13] This widget needs to support being clicked on / focussed in on, so it can close all the menus.
+			#self.uiPinchToZoomGestureInterceptionPanel.clicked.connect(self.closeCalibrationMenu1)
+			#self.uiPinchToZoomGestureInterceptionPanel.clicked.connect(self.closeCalibrationMenu2)
+			#self.uiPinchToZoomGestureInterceptionPanel.clicked.connect(closeRecordingAndTriggersMenu)
+			#self.uiPinchToZoomGestureInterceptionPanel.clicked.connect(closeShotAssistMenu)
 			
 			api.observe('triggerConfiguration', self.updateColourTriggers)
 		
@@ -94,45 +184,47 @@ class Main(QtWidgets.QDialog):
 		self.uiPlayAndSave.clicked.connect(lambda: window.show('play_and_save'))
 		
 		# Polling-based updates.
-		# self.updateBatteryStatus()
 		self._timer = QtCore.QTimer()
-		self._timer.timeout.connect(self.updateBatteryStatus)
-		self._timer.start(500) #ms
+		self._timer.timeout.connect(self.updateBatteryCharge)
+		self._timer.start(4000) #ms
 		
 		#Set up exposure slider.
+		# This slider is significantly more responsive to mouse than to touch. 🤔
 		api.observe('recordingExposureNs', self.updateExposureNs)
 		self.uiExposureSlider.setMaximum(api.get('sensorMaxExposureNs')) #TODO: This is incorrect, should use update not update_future_only since we're drawing from the wrong value -_-
 		self.uiExposureSlider.setMinimum(api.get('sensorMinExposureNs'))
 		api.observe_future_only('sensorMaxExposureNs', self.updateExposureMax)
 		api.observe_future_only('sensorMinExposureNs', self.updateExposureMin)
+		#[TODO DDR 2018-09-13] This valueChanged event is really quite slow, for some reason.
 		self.uiExposureSlider.valueChanged.connect(
-			lambda val: api.control('set', {'recordingExposureNs': val}) )
+			lambda: api.control('set', {'recordingExposureNs': self.uiExposureSlider.value()}) )
 		
-		#Only show the debug controls if enabled in factory settings.
-		settings.observe('debug controls enabled', lambda show='False':
-			self.uiDebugControls.hide() if show == 'False' else self.uiDebugControls.show() )
+		
+		#Oh god this is gonna mess up scroll wheel selection so badly. 😭
+		self.uiShowWhiteClipping.stateChanged.connect(self.uiShotAssistMenu.setFocus)
+		self.uiShowBlackClipping.stateChanged.connect(self.uiShotAssistMenu.setFocus)
 	
 	# @pyqtSlot() is not strictly needed - see http://pyqt.sourceforge.net/Docs/PyQt5/signals_slots.html#the-pyqtslot-decorator for details. (import with `from PyQt5.QtCore import pyqtSlot`)
 	def printAnalogGain(self):
 		print("Analog gain is %ins." % api.get("recordingAnalogGain"))
 	
-	def updateBatteryStatus(self):
+	def updateBatteryCharge(self):
 		charged = f"{round(api.control('get', ['batteryCharge'])['batteryCharge']*100)}%"
 		self.uiBattery.setText(charged)
 		
-	@pyqtSlot(int)
+	@pyqtSlot(int, name="updateExposureNs")
 	@silenceCallbacks('uiExposureSlider')
 	def updateExposureNs(self, newExposureNs):
 		self.uiExposureSlider.setValue(newExposureNs) #hack in the limit from the API, replace with a proper queried constant when we have state
 		self.updateExposureDependancies()
-		
-	@pyqtSlot(int)
+	
+	@pyqtSlot(int, name="updateExposureMax")
 	@silenceCallbacks('uiExposureSlider')
 	def updateExposureMax(self, newExposureNs):
 		self.uiExposureSlider.setMaximum(newExposureNs) #hack in the limit from the API, replace with a proper queried constant when we have state
 		self.updateExposureDependancies()
-		
-	@pyqtSlot(int)
+	
+	@pyqtSlot(int, name="updateExposureMin")
 	@silenceCallbacks('uiExposureSlider')
 	def updateExposureMin(self, newExposureNs):
 		self.uiExposureSlider.setValue(newExposureNs) #hack in the limit from the API, replace with a proper queried constant when we have state
@@ -148,7 +240,7 @@ class Main(QtWidgets.QDialog):
 		self.uiExposureSlider.setSingleStep(step1percent)
 	
 	
-	@pyqtSlot('QVariantMap')
+	@pyqtSlot('QVariantMap', name="updateBaWTriggers")
 	@silenceCallbacks()
 	def updateBaWTriggers(self, triggers):
 		#	VAR IF no mocal
@@ -166,7 +258,7 @@ class Main(QtWidgets.QDialog):
 		#Ensure this menu is closed, since we're about to hide the thing to close it.
 		self.closeCalibrationMenu()
 	
-	@pyqtSlot('QVariantMap')
+	@pyqtSlot('QVariantMap', name="updateColourTriggers")
 	@silenceCallbacks()
 	def updateColourTriggers(self, triggers):
 		#	VAR IF no mocal
@@ -183,6 +275,46 @@ class Main(QtWidgets.QDialog):
 		#Ensure this menu is closed, since we're about to hide the thing to close it.
 		self.closeCalibrationMenu1()
 		self.closeCalibrationMenu2()
+		
+	
+	@pyqtSlot(str, name="updateFocusPeakingIntensity")
+	@silenceCallbacks('uiFocusPeakingIntensity')
+	def updateFocusPeakingIntensity(self, focusPeakingIntensity: str):
+		self.uiFocusPeakingIntensity.setCurrentIndex(
+			focusPeakingIntensities.index(focusPeakingIntensity) )
+	
+	@pyqtSlot(int, name="updateFocusPeakingColour")
+	@silenceCallbacks() #Causes pyqtSlot to overwrite earlier function.
+	def updateFocusPeakingColour(self, colour: int):
+		QPoint = QtCore.QPoint
+		
+		box = self.uiFocusPeakingColourSelectionIndicator
+		boxSize = QPoint(
+			box.geometry().width(),
+			box.geometry().height() )
+		
+		
+		if colour == focusPeakingColours["blue"]:
+			origin = self.uiBlueFocusPeaking.geometry().bottomRight()
+			box.move(origin - boxSize + QPoint(1,1))
+		elif colour == focusPeakingColours["pink"]:
+			origin = self.uiPinkFocusPeaking.geometry().bottomLeft()
+			box.move(origin - QPoint(0, boxSize.y()-1))
+		elif colour == focusPeakingColours["red"]:
+			origin = self.uiRedFocusPeaking.geometry().bottomRight()
+			box.move(origin - boxSize + QPoint(1,1))
+		elif colour == focusPeakingColours["yellow"]:
+			origin = self.uiYellowFocusPeaking.geometry().topLeft()
+			box.move(origin)
+		elif colour == focusPeakingColours["green"]:
+			origin = self.uiGreenFocusPeaking.geometry().topRight()
+			box.move(origin - QPoint(boxSize.x()-1, 0))
+		elif colour == focusPeakingColours["cyan"]:
+			origin = self.uiCyanFocusPeaking.geometry().topLeft()
+			box.move(origin)
+		else:
+			print('unknown focus peaking colour', colour)
+			box.move(0,99999)
 	
 	
 	def linkButtonToMenu(self, button, menu):

@@ -647,7 +647,7 @@ Calibration</string>
      <height>480</height>
     </rect>
    </property>
-   <widget class="CheckBox" name="ShowWhiteClipping">
+   <widget class="CheckBox" name="uiShowWhiteClipping">
     <property name="geometry">
      <rect>
       <x>0</x>
@@ -666,8 +666,11 @@ Clipping</string>
     <property name="clickMarginBottomSetter" stdset="0">
      <enum>CheckBox::none</enum>
     </property>
+    <property name="linkedValueName" stdset="0">
+     <string>showWhiteClippingZebraStripes</string>
+    </property>
    </widget>
-   <widget class="CheckBox" name="ShowBlackClipping">
+   <widget class="CheckBox" name="uiShowBlackClipping">
     <property name="geometry">
      <rect>
       <x>0</x>
@@ -688,6 +691,9 @@ Clipping</string>
     </property>
     <property name="clickMarginBottomSetter" stdset="0">
      <enum>CheckBox::full</enum>
+    </property>
+    <property name="linkedValueName" stdset="0">
+     <string>showBlackClippingZebraStripes</string>
     </property>
    </widget>
    <widget class="HeaderLabel" name="headerlabel">
@@ -716,7 +722,7 @@ Clipping</string>
      <string>Peaking</string>
     </property>
    </widget>
-   <widget class="ComboBox" name="combobox">
+   <widget class="ComboBox" name="uiFocusPeakingIntensity">
     <property name="geometry">
      <rect>
       <x>0</x>
@@ -766,10 +772,10 @@ Clipping</string>
 					background: white;
 					
 					/* use borders instead of margins so we can see what we're doing */
-					border-left:   21px solid rgba(10, 3, 236, 39);
-					border-right:  1px solid rgba(10, 3, 236, 39);
-					border-top:    11px solid rgba(10, 3, 236, 39);
-					border-bottom: 1px solid rgba(10, 3, 236, 39);
+					border-left:   21px solid rgba(7, 12, 200, 44);
+					border-right:  1px solid rgba(7, 12, 200, 44);
+					border-top:    11px solid rgba(7, 12, 200, 44);
+					border-bottom: 1px solid rgba(7, 12, 200, 44);
 				}
 			Button { background: #7a70f7 }</string>
     </property>
@@ -950,11 +956,11 @@ Clipping</string>
     </property>
    </widget>
    <zorder>backdrop</zorder>
-   <zorder>ShowBlackClipping</zorder>
+   <zorder>uiShowBlackClipping</zorder>
    <zorder>headerlabel</zorder>
-   <zorder>ShowWhiteClipping</zorder>
+   <zorder>uiShowWhiteClipping</zorder>
    <zorder>headerlabel_2</zorder>
-   <zorder>combobox</zorder>
+   <zorder>uiFocusPeakingIntensity</zorder>
    <zorder>uiBlueFocusPeaking</zorder>
    <zorder>uiPinkFocusPeaking</zorder>
    <zorder>uiYellowFocusPeaking</zorder>
@@ -968,7 +974,7 @@ Clipping</string>
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>801</width>
+     <width>601</width>
      <height>481</height>
     </rect>
    </property>
