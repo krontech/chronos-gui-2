@@ -6,7 +6,7 @@ from PyQt5.QtWidgets import *
 
 from debugger import *; dbg
 from touch_margin_plugin import TouchMarginPlugin, MarginWidth
-
+#Can't directly link, because the API generally doesn't use capitalized values and our combo boxes generally do.
 
 class ComboBox(QComboBox, TouchMarginPlugin):
 	Q_ENUMS(MarginWidth) #This is needed here. I don't know why the definition in the TouchMarginPlugin doesn't work.

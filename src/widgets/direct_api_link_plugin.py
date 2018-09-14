@@ -29,14 +29,24 @@ class DirectAPILinkPlugin():
 		self._linkedValueName = newLinkedValueName
 		if newLinkedValueName and api: #API may not load in Qt Designer if it's not been set up.
 			api.observe(newLinkedValueName, self.__updateValue)
-				
-			self.valueChanged.connect(
-				lambda val: api.set({self._linkedValueName: val}) )
+			
+			if hasattr(self, 'setValue'): #Most inputs.
+				self.valueChanged.connect(
+					lambda val: api.set({self._linkedValueName: val}) )
+			else: #Checkbox
+				self.stateChanged.connect(
+					lambda val: api.set({self._linkedValueName: val != 0 }) )
 		
 	
 	@pyqtSlot(int, str)
 	def __updateValue(self, newValue):
 		self.blockSignals(True)
-		self.setValue(newValue)
+		
+		if hasattr(self, 'setValue'): #Most inputs
+			self.setValue(newValue)
+		else: #Checkbox
+			self.setChecked(newValue)
+			
 		self.blockSignals(False)
+	
 	__updateValue._isSilencedCallback = True #The API function that would normally set _isSilencedCallback and wrap the callback in the blockSignal() calls only works on panel-level callbacks, not component-level callbacks like this one. So, we'll just be careful and quietly disable the check ourselves. 😉
