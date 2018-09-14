@@ -36,15 +36,15 @@ class RecordingSettings(QtWidgets.QDialog):
 		self.uiHRes.setSingleStep(api.get('sensorHIncrement'))
 		self.uiVRes.setSingleStep(api.get('sensorVIncrement'))
 		
-		self.uiHRes.valueChanged.connect(lambda x: self.updateForSensorHRes(x))
-		self.uiVRes.valueChanged.connect(lambda x: self.updateForSensorVRes(x))
+		self.uiHRes.valueChanged.connect(self.updateForSensorHRes)
+		self.uiVRes.valueChanged.connect(self.updateForSensorVRes)
 		api.observe('recordingHRes', self.updateUiHRes) #DDR 2018-08-28: This screen mostly only updates on "done", since it's using the values it sets to do the preview. Gain being the exception at the moment.
 		api.observe('recordingHRes', self.updateForSensorHRes)
 		api.observe('recordingVRes', self.updateUiVRes)
 		api.observe('recordingVRes', self.updateForSensorVRes)
 		
-		self.uiHOffset.valueChanged.connect(lambda x: self.updateForSensorHOffset(x)) #Offset min implicit, max set by resolution. Offset set after res because 0 is a good default to set up res at.
-		self.uiVOffset.valueChanged.connect(lambda x: self.updateForSensorVOffset(x))
+		self.uiHOffset.valueChanged.connect(self.updateForSensorHOffset) #Offset min implicit, max set by resolution. Offset set after res because 0 is a good default to set up res at.
+		self.uiVOffset.valueChanged.connect(self.updateForSensorVOffset)
 		api.observe('recordingHOffset', self.updateUiHOffset) #Originally, this triggered valueChanged which triggered updateForSensorHOffset. However, if h and v were 0, then the change event would never happen since the fields initialize to 0. To fix this, we silence the change events, and bind the passepartout updater functions directly. It's more straightforward, so this isn't necessarily a bad thing.
 		api.observe('recordingHOffset', self.updateForSensorHOffset)
 		api.observe('recordingVOffset', self.updateUiVOffset)
@@ -56,8 +56,8 @@ class RecordingSettings(QtWidgets.QDialog):
 		self.uiFrameDuration.setMinimum(api.get('timingMinExposureNs')/1000)
 		self.uiFrameDuration.setMaximum(api.get('timingMaxExposureNs')/1000)
 		
-		self.uiFps.valueChanged.connect(self.updateFpsProxy)
-		self.uiFrameDuration.valueChanged.connect(lambda x: self.updateFrameDurationMicroseconds(x))
+		self.uiFps.valueChanged.connect(self.updateFps)
+		self.uiFrameDuration.valueChanged.connect(self.updateFrameDurationMicroseconds)
 		api.observe('recordingExposureNs', self.updateFrameDurationNanoseconds)
 		
 		#Analog gain
@@ -106,24 +106,24 @@ class RecordingSettings(QtWidgets.QDialog):
 	
 	#xywh accessor callbacks, just update the spin box values since these values require a lengthy pipeline rebuild - and because we're using them for the preview window ;)
 	
-	@pyqtSlot(int)
+	@pyqtSlot(int, name="updateUiHRes")
 	@silenceCallbacks('uiHRes')
 	def updateUiHRes(self, px: int):
 		self.uiHRes.setValue(px)
 		
 	
-	@pyqtSlot(int)
+	@pyqtSlot(int, name="updateUiVRes")
 	@silenceCallbacks('uiVRes')
 	def updateUiVRes(self, px: int):
 		self.uiVRes.setValue(px)
 		
 	
-	@pyqtSlot(int)
+	@pyqtSlot(int, name="updateUiHOffset")
 	@silenceCallbacks('uiHOffset')
 	def updateUiHOffset(self, px: int):
 		self.uiHOffset.setValue(px)
 	
-	@pyqtSlot(int)
+	@pyqtSlot(int, name="updateUiVOffset")
 	@silenceCallbacks('uiVOffset')
 	def updateUiVOffset(self, px: int):
 		self.uiVOffset.setValue(px)
@@ -131,17 +131,17 @@ class RecordingSettings(QtWidgets.QDialog):
 	
 	#side-effect callbacks, update everything *but* the spin box values
 	
-	@pyqtSlot(int)
+	@pyqtSlot(int, name="updateForSensorHOffset")
 	@silenceCallbacks()
 	def updateForSensorHOffset(self, px: int):
 		self.updatePassepartout()
 	
-	@pyqtSlot(int)
+	@pyqtSlot(int, name="updateForSensorVOffset")
 	@silenceCallbacks()
 	def updateForSensorVOffset(self, px: int):
 		self.updatePassepartout()
 	
-	@pyqtSlot(int)
+	@pyqtSlot(int, name="updateForSensorHRes")
 	@silenceCallbacks()
 	def updateForSensorHRes(self, px: int):
 		wasCentered = self.uiHOffset.value() == self.uiHOffset.maximum()//2
@@ -218,23 +218,19 @@ class RecordingSettings(QtWidgets.QDialog):
 			passepartoutHeight+2 )
 	
 	
-	@pyqtSlot(float)
+	@pyqtSlot(float, name="updateFps")
 	@silenceCallbacks('uiFps', 'uiFrameDuration')
 	def updateFps(self, fps: float):
 		self.uiFps.setValue(fps)
 		self.uiFrameDuration.setValue(1/fps*1000)
-	
-	@pyqtSlot(float)
-	def updateFpsProxy(self, *args):
-		self.updateFps(*args)
 		
-	@pyqtSlot(float)
+	@pyqtSlot(float, name="updateFrameDurationMicroseconds")
 	@silenceCallbacks('uiFps', 'uiFrameDuration')
 	def updateFrameDurationMicroseconds(self, µs: float):
 		self.uiFrameDuration.setValue(µs)
 		self.uiFps.setValue(1000/µs)
 		
-	@pyqtSlot(float)
+	@pyqtSlot(float, name="updateFrameDurationNanoseconds")
 	@silenceCallbacks() #Taken care of by Microsecond version.
 	def updateFrameDurationNanoseconds(self, ns: int):
 		self.updateFrameDurationMicroseconds(ns/1000)
@@ -262,7 +258,7 @@ class RecordingSettings(QtWidgets.QDialog):
 		api.set({'recordingAnalogGainMultiplier': 
 			self.availableRecordingAnalogGains[index]["multiplier"]})
 	
-	@pyqtSlot(int)
+	@pyqtSlot(int, name="setAnalogGain")
 	@silenceCallbacks('uiAnalogGain')
 	def setAnalogGain(self, gainMultiplier):
 		self.uiAnalogGain.setCurrentIndex(
@@ -271,17 +267,17 @@ class RecordingSettings(QtWidgets.QDialog):
 			.index(gainMultiplier)
 		)
 	
-	@pyqtSlot(int)
+	@pyqtSlot(int, name="setMaxExposure")
 	@silenceCallbacks('uiExposure')
 	def setMaxExposure(self, ns):
 		self.uiExposure.setMaximum(ns)
 	
-	@pyqtSlot(int)
+	@pyqtSlot(int, name="setMinExposure")
 	@silenceCallbacks('uiExposure')
 	def setMinExposure(self, ns):
 		self.uiExposure.setMaximum(ns)
 	
-	@pyqtSlot(int)
+	@pyqtSlot(int, name="updateExposure")
 	@silenceCallbacks('uiExposure')
 	def updateExposure(self, ns):
 		self.uiExposure.setValue(ns)
