@@ -20,6 +20,23 @@
 		</style>
 	</head>
 	<body>
-		<h1>Stats Page Placeholder</h1>
+		<h1>Startup Times</h1>
+		<canvas id=startupTimes></canvas>
+		<script>
+			(async function() {
+				(
+					await (await fetch('stats_reported/screen_cache_time.jsonl')).text() 
+					+ await (await fetch('stats_reported/start_up_time.jsonl')).text()
+				)
+				.split('\n').filter(x=>x)
+				.map(line => JSON.parse(line))
+				.map(data => { //Convert timestamp to unix time.
+					data.timestamp = new Date(data.timestamp).getTime()/1000
+					console.log(data)
+					return data
+				})
+				//Now, group and chart the data here?
+			})()
+		</script>
 	</body>
 </html>
