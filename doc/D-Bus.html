@@ -32,6 +32,12 @@
 				display: block;
 			}
 			
+			code, .codeblock {
+				background: rgba(0,0,0, 0.1);
+				border-radius: 0.2ex;
+				padding: 0 0.4ex;
+			}
+			
 			h1,h2,h3 {
 				line-height: 1.2;
 				width: 100%;
@@ -78,7 +84,7 @@
 			//Remove HTML-formatting whitespace from code snippets. (Leading newlines, indentation.)
 			document.addEventListener('DOMContentLoaded', ()=>{
 				document.querySelectorAll('code').forEach(elem => {
-					lines = elem.innerHTML
+					let lines = elem.innerHTML
 						.split('\n')
 						.filter(line=>line) //Filter to remove non-code lines, mainly the leading newline between <code> and the actual code.
 					

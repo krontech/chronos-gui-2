@@ -17,7 +17,37 @@
 			h1,h2,h3 {
 				line-height: 1.2;
 			}
+			
+			/* format code examples */ 
+			code {
+				white-space: pre;
+				overflow-x: auto;
+				display: block;
+			}
+			
+			code, tt {
+				background: rgba(0,0,0, 0.1);
+				border-radius: 0.2ex;
+				padding: 0 0.4ex;
+			}
 		</style>
+		
+		<script>
+			//Remove HTML-formatting whitespace from code snippets. (Leading newlines, indentation.)
+			document.addEventListener('DOMContentLoaded', ()=>{
+				document.querySelectorAll('code').forEach(elem => {
+					let lines = elem.innerHTML
+						.split('\n')
+						.filter(line=>line) //Filter to remove non-code lines, mainly the leading newline between <code> and the actual code.
+					minLeadingTabs = lines
+						.filter(line => line.trim())
+						.reduce((minimum, line) => Math.min(line.split(/[^\t]/)[0].length, minimum), Infinity)
+					elem.innerHTML = lines
+						.map(line => line.replace(new RegExp(`^\t{0,${minLeadingTabs}}`), '')) //Remove leading snippet-level indentation, it provides nothing.
+						.join('\n')
+				})
+			})
+		</script>
 	</head>
 	<body>
 		<h1>Chronos GUI2 Readme</h1>
@@ -88,9 +118,36 @@
 		
 		<h3>Running</h3>
 		
-		<p>Basic: Run <tt>python3 src/cam-ui.py</tt> on the camera, from the root folder of this project.</p>
+		<p>Manual: Copy this repository to the camera. Then, run <tt>python3 src/cam-ui.py</tt> on the camera, from the root folder of this project.</p>
 		
-		<p>Auto-run: Use the <tt>watch-*.sh</tt> scripts, in the <a href="util">util folder</a>, to automatically deploy and run the app as files change during development. See <a href="util/readme.txt"><tt>util/readme.txt</tt></a> for more details on that. One script will handle uploading, one script will handle actually running the camapp.</p>
+		<p>Automatic: The above is process is automated by the <tt>watch-*.sh</tt> scripts, in the <a href="util">util folder</a>, to automatically deploy and run the app as files change during development. (See <a href="util/readme.txt"><tt>util/readme.txt</tt></a> for more details on which file is what.) There are two options: Deploy to camera, or deploy to a testing VM. For each option, there are two scripts. One script automates copying the files to the destination, and the other script automatically reruns the application when it notices a file has been updated.</p>
+		
+		<p>There are two scripts because the destination side will work regardless of OS, but Mac or Windows may need to write a different upload-to-destination script. The scripts, to some extent, also deal with separate concerns.</p>
+		
+		<p>Assuming we're uploading files to the camera, as opposed to a VM, we'll want to run <tt>~util/watch-computer.sh</tt>. Looking in that file with our favourite text editor, we see it has three major components: a loop, <tt>find</tt> feeding into <tt>entr</tt>, and <tt>rsync</tt>. Entr is a program which watches the filesystem for change events, and runs a program when something changes. You may need to install with <tt>sudo apt install entr</tt>. In our script, entr watches the files which we seach for with <tt>find</tt>. The loop is because entr stops running if a folder is changed, so find can search for files in that folder and watch them too. The final component is the rsync invocation, which copies updated files to the camera.</p>
+		
+		<p><strong>Action:</strong> Rsync needs to know two things. First, where to put the changed files. By default, it uploads to <tt>cam</tt>. This preset is defined in ~/.ssh/config. You will need to add it as a preset yourself. My block looks like this:
+			<code>
+				#Debian, on the physical camera itself
+				Host cam
+				  User root
+				  HostName 192.168.12.1
+				  ConnectTimeout 1
+			</code>
+		<tt>cam</tt> is the name of the destiantion. We may need to change the HostName if the camera is not accessible via <tt>ssh root@192.168.12.1</tt>. (192.168.12.1 is the default IP address if you plug the Chronos in to your computer with MiniUSB.) You can test that your preset works by running <tt>ssh cam</tt>.</p>
+		<p>Second, rsync needs to know the login credentials to the camera. To do this, rsync is set to use <tt>sshpass</tt>. (You may need to install it with <tt>sudo apt install sshpass</tt>.) <tt>sshpass</tt> references the <tt>$CHRONOS_PASSWORD</tt> environment variable, which you can set in your <tt>~/.bashrc</tt> file. (Or whatever startup file your shell is using, for example <tt>~/.zshrc</tt> for <tt>zshell</tt>.) In my .bashrc, I have the following line to do this:
+			<code>
+				export CHRONOS_PASSWORD="chronos" #👌👌👌🔒
+			</code>
+		At some point, we'll make it so you have to actually *set* your own password before SSH is enabled at all, but for now you are simply advised to disallow incoming connections from the internet at large on the network level.</p>
+		
+		<p>In the root of the project, on your computer, you can now run <tt>util/watch-computer.sh</tt>. This will watch for file changes and upload them to the camera.</p>
+		
+		<p>The second step is running the new files on the camera. First, we'll log in to the camera. There, <tt>cd gui</tt> to go to the newly-deployed project. Instead of running <tt>python3 src/cam-ui.py</tt>, we'll run <tt>util/watch-camera.sh</tt> which will run and rerun the command for us. (Under the hood, this script starts a bash loop running the python3 command. It uses <tt>watchdog</tt> to restart the script when a file changes. Watchdog is configured in the inline python script near the bottom of the file.) To help debug the GUI script, an interactive prompt will be brought up in this ssh session when an error is encountered.</p>
+		
+		
+		
+		<h2>Editing</h2>
 		
 		<p>It is strongly encouraged to set your favourite editor up with some sort of Python linter, such as <a href="http://damnwidget.github.io/anaconda">Anaconda</a>, if it does not already support Python linting. However, <em>any</em> editor or IDE on <em>any</em> operating system may be used. This means the code may be edited using <tt>vi</tt> directly on the camera, which may be simpler than setting up your own development environment.</p>
 		
