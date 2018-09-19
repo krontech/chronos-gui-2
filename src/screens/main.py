@@ -206,7 +206,7 @@ class Main(QtWidgets.QDialog):
 	
 	# @pyqtSlot() is not strictly needed - see http://pyqt.sourceforge.net/Docs/PyQt5/signals_slots.html#the-pyqtslot-decorator for details. (import with `from PyQt5.QtCore import pyqtSlot`)
 	def printAnalogGain(self):
-		print("Analog gain is %ins." % api.get("recordingAnalogGain"))
+		print("Analog gain is %ix." % api.get("recordingAnalogGainMultiplier"))
 	
 	def updateBatteryCharge(self):
 		charged = f"{round(api.control('get', ['batteryCharge'])['batteryCharge']*100)}%"
@@ -236,8 +236,8 @@ class Main(QtWidgets.QDialog):
 		self.uiExposureOverlay.setText(f"{round(self.uiExposureSlider.value()/1000, 2)}µs ({percent}%)")
 		
 		step1percent = (self.uiExposureSlider.minimum() + self.uiExposureSlider.maximum()) // 100
-		self.uiExposureSlider.setPageStep(step1percent)
 		self.uiExposureSlider.setSingleStep(step1percent)
+		self.uiExposureSlider.setPageStep(step1percent*10)
 	
 	
 	@pyqtSlot('QVariantMap', name="updateBaWTriggers")

@@ -32,8 +32,6 @@ if not QDBusConnection.systemBus().isConnected():
 
 
 
-
-
 ########################
 #    Pure Functions    #
 ########################
@@ -461,6 +459,11 @@ class State():
 	#overlayRGBImageY = 0x0258
 	#overlayRGBImageWidth = 0x0080
 	#overlayRGBImageHeight = 0x0080
+	
+	dimScreenWhenNotInUse = False
+	saveAndPowerDownWhenLowBattery = False
+	saveAndPowerDownLowBatteryLevel = 0.02
+	powerOnWhenMainsConnected = True
 		
 	
 

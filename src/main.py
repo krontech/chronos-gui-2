@@ -120,6 +120,9 @@ class Window():
 		self._screenStack = ['main', self.currentScreen] #Start off with main loaded into history, since we don't always start on main during development and going back should get you *somewhere* useful rather than crashing.
 		
 		self._ensureInstantiated(self.currentScreen)
+		
+		if hasattr(self._screens[self.currentScreen], 'onShow'):
+			self._screens[self.currentScreen].onShow()
 		self._screens[self.currentScreen].show()
 		
 		settings.setValue('current screen', self.currentScreen)
@@ -169,8 +172,13 @@ class Window():
 		
 		self._ensureInstantiated(screen)
 		
+		if hasattr(self._screens[screen], 'onShow'):
+			self._screens[screen].onShow()	
 		self._screens[screen].show()
+		
 		self._screens[self.currentScreen].hide()
+		if hasattr(self._screens[self.currentScreen], 'onHide'):
+			self._screens[self.currentScreen].onHide()
 		# TODO: DDR 2018-06-11 Also hide the keyboard and anything else that needs cleanup.
 		
 		#Only set the setting value after everything has worked, to avoid trying to load a crashing screen.
