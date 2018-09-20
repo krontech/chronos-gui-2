@@ -149,33 +149,20 @@ class Power(QtWidgets.QDialog):
 			chartLineHeight,
 		))
 		
+		
 		p.drawText(
 			chartPadding["left"],
 			chartTotalHeight - chartPadding["bottom"] + 15,
 			"{:1.0f} hours ago".format(chartDuration/60) )
-		
 		p.drawText(
 			chartTotalWidth - chartPadding["right"] - 38,
 			chartTotalHeight - chartPadding["bottom"] + 15,
 			"Now" )
 		
-		p.rotate(-90)
 		
-		p.drawText(
-			-chartTotalHeight + chartPadding["bottom"] + 2,
-			chartPadding["left"] - 3,
-			"0%" )
-		
-		p.drawText(
-			-chartPadding["top"] - 49,
-			chartPadding["left"] - 3,
-			"100%" )
-		
-		p.rotate(90)
-			
-		chargeLabelLocation = projectToPlotSpace(-5, 
+		chargeLabelLocation = projectToPlotSpace(-5 + -15, #text offset + line hight of voltage label 
 			constrain(0.04, self.chartChargeHistory[0], 0.96) ) #Don't let labels overflow the chart vertical area during normal use. (May still overflow under exceptional circumstances when voltage is extremely high or low.)
-		voltageLabelLocation = projectToPlotSpace(-6, 
+		voltageLabelLocation = projectToPlotSpace(-6 + -15, 
 			constrain(0.04, self.chartVoltageHistory[0]/maxVoltage, 0.96) )
 		
 		
@@ -188,6 +175,7 @@ class Power(QtWidgets.QDialog):
 			voltageLabelLocation[1] = labelAverageY - copysign(minSpaceBetweenLabels/2, labelDelta)
 			print('b', chargeLabelLocation)
 		
+		
 		#Plot battery charge
 		#(An alternative possible in js' canvas - but not here - is to have a ring buffer where each point is relative to the previous, and then go along writing more points to make everything move over. That can't work here because the drawing commands are absolute, not relative. Although it might be possible to write into an array of them, it is probably more work than is worth it, assuming this performs better than "abysmally".)
 		path = QPainterPath()
@@ -197,6 +185,18 @@ class Power(QtWidgets.QDialog):
 		p.setPen(QColor(0x0d6987))
 		p.drawPath(path)
 		p.drawText(chargeLabelLocation[0], chargeLabelLocation[1]+5, "Charge")
+		
+		p.rotate(-90)
+		p.drawText(
+			-chartTotalHeight + chartPadding["bottom"] + 2,
+			chartPadding["left"] - 3,
+			"0%" )
+		p.drawText(
+			-chartPadding["top"] - 49,
+			chartPadding["left"] - 3,
+			"100%" )
+		p.rotate(90)
+		
 		
 		#Plot battery voltage
 		#(An alternative possible in js' canvas - but not here - is to have a ring buffer where each point is relative to the previous, and then go along writing more points to make everything move over. That can't work here because the drawing commands are absolute, not relative. Although it might be possible to write into an array of them, it is probably more work than is worth it, assuming this performs better than "abysmally".)
@@ -208,6 +208,20 @@ class Power(QtWidgets.QDialog):
 		p.drawPath(path)
 		p.drawText(voltageLabelLocation[0], voltageLabelLocation[1]+5, "Voltage" )
 		
+		
+		p.rotate(90)
+		
+		p.drawText(
+			-(-chartTotalHeight + chartPadding["bottom"] + 25),
+			-(chartTotalWidth - chartPadding["right"] + 4),
+			"0V" )
+		
+		p.drawText(
+			-(-chartPadding["top"] + 1),
+			-(chartTotalWidth - chartPadding["right"] + 4),
+			f"{maxVoltage}V" )
+		
+		p.rotate(-90)
 		
 		
 		p.end()
