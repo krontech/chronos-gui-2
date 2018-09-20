@@ -464,6 +464,8 @@ class State():
 	saveAndPowerDownWhenLowBattery = False
 	saveAndPowerDownLowBatteryLevel = 0.02
 	powerOnWhenMainsConnected = True
+	
+	datetime = "2018-09-20T13:23:23.036586" #iso 8601, YYYY-MM-DDTHH:MM:SS.mmmmmm as detailed at https://docs.python.org/3/library/datetime.html#datetime.datetime.isoformat
 		
 	
 

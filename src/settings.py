@@ -48,7 +48,7 @@ def setValue(key: str, value: str) -> str:
 	for callback in _callbacks[key]:
 		callback(value)
 	
-	return _settings.setValue(key, value)
+	_settings.setValue(key, value)
 
 
 def value(key: str, default: str = None) -> None:

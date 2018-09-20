@@ -248,6 +248,9 @@ Unsaved Video in RAM</string>
      <height>81</height>
     </rect>
    </property>
+   <property name="text">
+    <string>2018-09-20 02:53:41 PM</string>
+   </property>
   </widget>
   <widget class="ComboBox" name="uiAskBeforeDiscarding">
    <property name="geometry">
@@ -314,17 +317,23 @@ Unsaved Video in RAM</string>
     </property>
    </item>
   </widget>
-  <widget class="QWidget" name="uiInterfacePreview" native="true">
+  <widget class="QLabel" name="uiLayoutPreview">
    <property name="geometry">
     <rect>
-     <x>270</x>
-     <y>80</y>
-     <width>201</width>
-     <height>121</height>
+     <x>280</x>
+     <y>90</y>
+     <width>191</width>
+     <height>111</height>
     </rect>
    </property>
-   <property name="styleSheet">
-    <string notr="true">background: rgba(63,125,255, 128)</string>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap>../../assets/images/right-handed-interface.svg</pixmap>
+   </property>
+   <property name="scaledContents">
+    <bool>false</bool>
    </property>
   </widget>
  </widget>
