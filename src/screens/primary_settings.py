@@ -2,9 +2,10 @@ from datetime import datetime
 
 from PyQt5 import uic, QtWidgets, QtCore
 from PyQt5.QtGui import QPixmap
-# from PyQt5.QtCore import pyqtSlot
+from PyQt5.QtCore import pyqtSlot
 
 from debugger import *; dbg
+import api_mock as api
 from api_mock import silenceCallbacks
 import settings
 
@@ -42,7 +43,8 @@ class PrimarySettings(QtWidgets.QDialog):
 			settings.setValue('ask before discarding',
 				["always", "if not reviewed", "never"][index] ) )
 		
-		self.editingSystemTime = False
+		
+		api.observe('datetime', self.stopEditingDate) #When the date is changed, always display the update even if an edit is in progress. Someone probably set the date some other way instead of this, or this was being edited in error.
 		self.uiSystemTime.focusInEvent = self.sysTimeFocusIn
 		self.uiSystemTime.focusOutEvent = self.sysTimeFocusOut
 		self.updateDisplayedSystemTime()
@@ -76,18 +78,23 @@ class PrimarySettings(QtWidgets.QDialog):
 	def updateAskBeforeDiscarding(self, answer: str="if not reviewed"):
 		self.uiAskBeforeDiscarding.setCurrentIndex(
 			["always", "if not reviewed", "never"].index(answer))
-		
+	
+	
+	@pyqtSlot(str, name="stopEditingDate")
+	@silenceCallbacks()
+	def stopEditingDate(self, date: str=''):
+		self.editingSystemTime = False
+	
 	def sysTimeFocusIn(self, evt):
 		self.editingSystemTime = True
 		
 	def sysTimeFocusOut(self, evt):
-		try:
+		#try:
 			newTime = datetime.strptime(self.uiSystemTime.text(), "%Y-%m-%d %I:%M:%S %p")
-			api.set({'datetime': newTime})
-			self.editingSystemTime = False
-		except e: #Couldn't parse date.
-			print("couldn't parse date 😭")
-			pass
+			api.set({'datetime': newTime.isoformat()}) #This causes stopEditingDate to be called, when datetime is updated.
+		#except: #Couldn't parse date.
+		#	print("couldn't parse date 😭")
+		#	pass
 		
 	def sysTimeBeingEdited(self):
 		return self.editingSystemTime #self.uiSystemTime.hasFocus() doesn't work if invalid
