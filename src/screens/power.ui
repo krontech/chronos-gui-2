@@ -56,7 +56,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>Battery Charge: {:0.2f}%</string>
+    <string>Battery Charge: {:2.0f}%</string>
    </property>
   </widget>
   <widget class="Label" name="uiVoltageLabel">
@@ -69,7 +69,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>Battery Voltage: {:0.2f} Volts</string>
+    <string>Battery Voltage: {:0.2f}V</string>
    </property>
   </widget>
   <widget class="Label" name="label_3">
@@ -189,7 +189,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>battery remaining</string>
+    <string>charge remaining</string>
    </property>
   </widget>
   <widget class="CheckBox" name="uiStartWhenPowered">

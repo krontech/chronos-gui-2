@@ -462,7 +462,7 @@ class State():
 	
 	dimScreenWhenNotInUse = False
 	saveAndPowerDownWhenLowBattery = False
-	saveAndPowerDownLowBatteryLevel = 0.02
+	saveAndPowerDownLowBatteryLevel = 0.77
 	powerOnWhenMainsConnected = True
 	
 	datetime = "2018-09-20T13:23:23.036586" #iso 8601, YYYY-MM-DDTHH:MM:SS.mmmmmm as detailed at https://docs.python.org/3/library/datetime.html#datetime.datetime.isoformat

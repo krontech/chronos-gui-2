@@ -61,6 +61,8 @@ class Power(QtWidgets.QDialog):
 		
 		self.uiChart.paintEvent = self.paintChart
 		
+		self.uiSafelyPowerDown.stateChanged.connect(self.uiChart.update)
+		
 		#Store the original levels for updatePowerDownThreshold to use if it has to regenerate the list.
 		self.originalBatteryThresholdLevels = [
 			pct2dec(self.uiPowerDownThreshold.itemText(i))
@@ -103,11 +105,13 @@ class Power(QtWidgets.QDialog):
 				sorted(self.originalBatteryThresholdLevels + [threshold])
 			])
 			self.uiPowerDownThreshold.setCurrentText(targetText)
+		
+		self.uiChart.update()
 	
 	def updateLabels(self):
 		self.uiChargeLabel.setText(
 			self.uiChargeLabel.formatString.format(
-				api.get('batteryCharge') ) )
+				api.get('batteryCharge')*100 ) )
 		self.uiVoltageLabel.setText(
 			self.uiVoltageLabel.formatString.format(
 				api.get('batteryVoltage') ) )
@@ -120,8 +124,10 @@ class Power(QtWidgets.QDialog):
 		
 	def paintChart(self, evt):
 		QPainter = QtGui.QPainter
+		QPen = QtGui.QPen
 		QRect = QtCore.QRect
 		QColor = QtGui.QColor
+		QFont = QtGui.QFont
 		QPainterPath = QtGui.QPainterPath
 		
 		chartTotalWidth = evt.rect().width()
@@ -135,13 +141,18 @@ class Power(QtWidgets.QDialog):
 				chartPadding["top"] + chartLineHeight - y*chartLineHeight,
 			]
 		
+		
 		#evt has .rect() -> QRect and .region() -> QClipRegion functions.
 		p = QPainter(self.uiChart)
+		pen = QPen()
+		normalFont = QFont("DejaVu Sans", 11, weight=QtGui.QFont.Thin)
+		tinyFont = QFont("DejaVu Sans", 9, weight=QtGui.QFont.Thin)
 		p.setRenderHint(QPainter.Antialiasing, True)
 		p.setRenderHint(QPainter.TextAntialiasing, True)
+		p.setFont(normalFont)
 		
-		#Draw chart outline and labels
-		p.setPen(QColor(0x000))
+		#Draw chart outline
+		p.setPen(pen)
 		p.drawRect(QRect(
 			chartPadding["left"],
 			chartPadding["top"],
@@ -149,23 +160,43 @@ class Power(QtWidgets.QDialog):
 			chartLineHeight,
 		))
 		
+		#Draw power-down line
+		if self.uiSafelyPowerDown.isChecked():
+			pen.setStyle(QtCore.Qt.DashLine)
+			p.setPen(pen)
+			p.setFont(tinyFont)
+			powerDownThreshold = pct2dec(self.uiPowerDownThreshold.currentText())
+			p.drawLine(
+				*projectToPlotSpace(0, powerDownThreshold), 
+				*projectToPlotSpace(chartLineWidth-(20 if powerDownThreshold < 0.15 or powerDownThreshold > 0.77 else 0), powerDownThreshold), #Don't draw the line over the voltage labels.
+			)
+			p.drawText(
+				projectToPlotSpace(chartLineWidth, powerDownThreshold)[0] + 20,
+				projectToPlotSpace(chartLineWidth, powerDownThreshold)[1] + (-3 if powerDownThreshold < 0.90 else 12),
+				"Save & Power Down" )
+			p.setFont(normalFont)
+			pen.setStyle(QtCore.Qt.SolidLine)
+			p.setPen(pen)
 		
+		#Draw time labels
 		p.drawText(
-			chartPadding["left"],
+			chartPadding["left"] + 2,
 			chartTotalHeight - chartPadding["bottom"] + 15,
 			"{:1.0f} hours ago".format(chartDuration/60) )
+		
 		p.drawText(
-			chartTotalWidth - chartPadding["right"] - 38,
+			chartTotalWidth - chartPadding["right"] - 35,
 			chartTotalHeight - chartPadding["bottom"] + 15,
 			"Now" )
 		
 		
-		chargeLabelLocation = projectToPlotSpace(-5 + -15, #text offset + line hight of voltage label 
+		chargeLabelLocation = projectToPlotSpace(-5, 
 			constrain(0.04, self.chartChargeHistory[0], 0.96) ) #Don't let labels overflow the chart vertical area during normal use. (May still overflow under exceptional circumstances when voltage is extremely high or low.)
-		voltageLabelLocation = projectToPlotSpace(-6 + -15, 
+		voltageLabelLocation = projectToPlotSpace(-6, 
 			constrain(0.04, self.chartVoltageHistory[0]/maxVoltage, 0.96) )
 		
 		
+		#Plot and label battery charge and voltage.
 		minSpaceBetweenLabels = 14 #px
 		labelDelta = chargeLabelLocation[1] - voltageLabelLocation[1]
 		if abs(labelDelta) < minSpaceBetweenLabels:
@@ -176,53 +207,43 @@ class Power(QtWidgets.QDialog):
 			print('b', chargeLabelLocation)
 		
 		
-		#Plot battery charge
-		#(An alternative possible in js' canvas - but not here - is to have a ring buffer where each point is relative to the previous, and then go along writing more points to make everything move over. That can't work here because the drawing commands are absolute, not relative. Although it might be possible to write into an array of them, it is probably more work than is worth it, assuming this performs better than "abysmally".)
+		#Charge
 		path = QPainterPath()
-		path.moveTo(*projectToPlotSpace(0, self.chartChargeHistory[0]))
+		path.moveTo(*projectToPlotSpace(-4, self.chartChargeHistory[0]))
 		for x,y in enumerate(self.chartChargeHistory):
 			path.lineTo(*projectToPlotSpace(x,y))
 		p.setPen(QColor(0x0d6987))
 		p.drawPath(path)
-		p.drawText(chargeLabelLocation[0], chargeLabelLocation[1]+5, "Charge")
+		p.drawText(chargeLabelLocation[0], chargeLabelLocation[1]+6, "Charge")
 		
 		p.rotate(-90)
 		p.drawText(
-			-chartTotalHeight + chartPadding["bottom"] + 2,
-			chartPadding["left"] - 3,
+			-chartTotalHeight + chartPadding["bottom"] + 3,
+			chartPadding["left"] - 4,
 			"0%" )
 		p.drawText(
-			-chartPadding["top"] - 49,
-			chartPadding["left"] - 3,
+			-chartPadding["top"] - 47,
+			chartPadding["left"] - 4,
 			"100%" )
 		p.rotate(90)
 		
 		
-		#Plot battery voltage
-		#(An alternative possible in js' canvas - but not here - is to have a ring buffer where each point is relative to the previous, and then go along writing more points to make everything move over. That can't work here because the drawing commands are absolute, not relative. Although it might be possible to write into an array of them, it is probably more work than is worth it, assuming this performs better than "abysmally".)
+		#Voltage
 		path = QPainterPath()
-		path.moveTo(*projectToPlotSpace(0, self.chartVoltageHistory[0]/maxVoltage))
+		path.moveTo(*projectToPlotSpace(-4, self.chartVoltageHistory[0]/maxVoltage))
 		for x,y in enumerate(self.chartVoltageHistory):
 			path.lineTo(*projectToPlotSpace(x,y/maxVoltage))
 		p.setPen(QColor(0xd8750d))
 		p.drawPath(path)
-		p.drawText(voltageLabelLocation[0], voltageLabelLocation[1]+5, "Voltage" )
-		
-		
-		p.rotate(90)
-		
-		p.drawText(
-			-(-chartTotalHeight + chartPadding["bottom"] + 25),
-			-(chartTotalWidth - chartPadding["right"] + 4),
-			"0V" )
-		
-		p.drawText(
-			-(-chartPadding["top"] + 1),
-			-(chartTotalWidth - chartPadding["right"] + 4),
-			f"{maxVoltage}V" )
+		p.drawText(voltageLabelLocation[0], voltageLabelLocation[1]+6, "Voltage" )
 		
 		p.rotate(-90)
-		
-		
-		p.end()
-		#QtWidgets.QWidget.paintEvent(self, evt)
+		p.drawText(
+			-chartTotalHeight + chartPadding["bottom"] + 3,
+			chartPadding["left"] + 15,
+			"0V" )
+		p.drawText(
+			-chartPadding["top"] - 35,
+			chartPadding["left"] + 15,
+			f"{maxVoltage}V" )
+		p.rotate(90)
