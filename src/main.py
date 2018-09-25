@@ -27,7 +27,7 @@ QtWidgets.QApplication.setAttribute(QtCore.Qt.AA_EnableHighDpiScaling, True)
 
 
 
-class Window():
+class Window(QtCore.QObject):
 	"""Metacontrols (screen switching) for the back of camera interface.
 	
 		This class provides a high-level API to control the running application.
@@ -65,6 +65,8 @@ class Window():
 	"""
 	
 	def __init__(self):
+		super().__init__()
+		
 		from screens.about_camera import AboutCamera
 		from screens.file_settings import FileSettings
 		from screens.main import Main
@@ -117,7 +119,7 @@ class Window():
 		if self.currentScreen not in self._availableScreens: 
 			self.currentScreen = 'main'
 		
-		self._screenStack = ['main', self.currentScreen] #Start off with main loaded into history, since we don't always start on main during development and going back should get you *somewhere* useful rather than crashing.
+		self._screenStack = ['main', self.currentScreen] if self.currentScreen != 'main' else ['main'] #Start off with main loaded into history, since we don't always start on main during development and going back should get you *somewhere* useful rather than crashing.
 		
 		self._ensureInstantiated(self.currentScreen)
 		
@@ -193,6 +195,44 @@ class Window():
 			self.show(self._screenStack[-2])
 		else:
 			print('Error: No more back to navigate to.')
+	
+	e = QtCore.QEvent #documented at http://doc.qt.io/qt-5/qevent.html
+	eventsToIgnore = frozenset([
+		#Frequently-fired events and startup events. Ignored because way too many of them are fired.
+		e.Close, e.Paint, e.UpdateRequest, e.MetaCall, e.PolishRequest, e.LayoutRequest, e.UpdateLater, e.Timer, e.ApplicationStateChange, e.ApplicationActivate, e.ApplicationDeactivate, 20, e.FocusIn, e.WindowActivate, e.ActivationChange, e.Expose, e.DeferredDelete, e.PaletteChange, e.FontChange, e.StyleChange, 15, e.WindowTitleChange, e.ChildAdded, e.ParentChange, e.CursorChange, e.MouseButtonDblClick, e.MouseButtonPress, e.MouseButtonRelease, e.MouseMove, e.MouseTrackingChange, e.Move, 152, e.HideToParent, e.Hide, e.ContentsRectChange, e.Polish, e.ChildPolished, e.DynamicPropertyChange, e.ChildRemoved, e.ZOrderChange, 16, e.ShowToParent,
+		
+		#Input events, usually not important, we are after the effects.
+		e.TouchBegin, e.TouchCancel, e.TouchEnd, e.TouchUpdate,
+		e.SockAct, e.Leave, e.Enter, #SockAct is triggered by mouse movement.
+		e.FocusAboutToChange, e.FocusIn, e.FocusOut,
+		e.KeyRelease, e.ShortcutOverride,
+		
+		#Screen transition events
+		e.PlatformSurface, e.WinIdChange, e.WindowIconChange, e.WindowDeactivate, e.WindowActivate, e.Resize, e.Show,
+	])
+	
+	def eventFilter(self, obj, event):
+		"""Global keyboard shortcuts and shortcut interception.
+		
+			This function eats up about half a second total startup
+			time, about 1/10th of a second of immediate startup. It
+			is called extremely often.
+		"""
+		
+		if event.type() in self.eventsToIgnore:
+			return False
+		
+		#Stop escape from closing the camapp, if a keyboard is plugged in. Just exit the current screen, assuming widgets behave correctly.
+		if event.type() == QtCore.QEvent.KeyPress:
+			if event.key() == QtCore.Qt.Key_Escape:
+				self.back()
+				return True
+			return False
+		
+		#print('filtered', self, obj, event, event.type())
+		return False
+		
+
 
 
 if __name__ == '__main__':
@@ -200,6 +240,7 @@ if __name__ == '__main__':
 	app.setFont(QtGui.QFont("DejaVu Sans", 12)) #Fix fonts being just a little smaller by default than in Creator. This probably only applies to the old camApp .ui files.
 	
 	window = Window()
+	app.installEventFilter(window)
 	
 	report("start_up_time", {"seconds": time.perf_counter() - perf_start_time})
 	

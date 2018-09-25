@@ -204,8 +204,6 @@ class CallbackNotSilenced(Exception):
 		from (say) a web ui, it doesn't really matter where the update originates
 		from. All that matters is that it does update.
 	"""
-	
-	pass
 
 
 def observe(name: str, callback: Callable[[Any], None], saftyCheckForSilencedWidgets=True) -> None:
