@@ -772,10 +772,10 @@ Clipping</string>
 					background: white;
 					
 					/* use borders instead of margins so we can see what we're doing */
-					border-left:   21px solid rgba(7, 12, 200, 44);
-					border-right:  1px solid rgba(7, 12, 200, 44);
-					border-top:    11px solid rgba(7, 12, 200, 44);
-					border-bottom: 1px solid rgba(7, 12, 200, 44);
+					border-left:   21px solid rgba(3, 13, 219, 85);
+					border-right:  1px solid rgba(3, 13, 219, 85);
+					border-top:    11px solid rgba(3, 13, 219, 85);
+					border-bottom: 1px solid rgba(3, 13, 219, 85);
 				}
 			Button { background: #7a70f7 }</string>
     </property>
@@ -1119,6 +1119,38 @@ Calibration</string>
    <header>slider</header>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>uiRecord</tabstop>
+  <tabstop>uiExposureSlider</tabstop>
+  <tabstop>uiDebugA</tabstop>
+  <tabstop>uiDebugB</tabstop>
+  <tabstop>uiClose</tabstop>
+  <tabstop>uiDebugC</tabstop>
+  <tabstop>uiBattery</tabstop>
+  <tabstop>uiPrefsAndUtils</tabstop>
+  <tabstop>uiRecordingAndTriggers</tabstop>
+  <tabstop>uiRecordModes</tabstop>
+  <tabstop>uiRecordingSettings</tabstop>
+  <tabstop>uiTriggerIOSettings</tabstop>
+  <tabstop>uiTriggerDelay</tabstop>
+  <tabstop>uiShotAssist</tabstop>
+  <tabstop>uiShowWhiteClipping</tabstop>
+  <tabstop>uiShowBlackClipping</tabstop>
+  <tabstop>uiFocusPeakingIntensity</tabstop>
+  <tabstop>uiBlueFocusPeaking</tabstop>
+  <tabstop>uiPinkFocusPeaking</tabstop>
+  <tabstop>uiRedFocusPeaking</tabstop>
+  <tabstop>uiYellowFocusPeaking</tabstop>
+  <tabstop>uiGreenFocusPeaking</tabstop>
+  <tabstop>uiCyanFocusPeaking</tabstop>
+  <tabstop>uiCalibrationOrBlackCal</tabstop>
+  <tabstop>uiWhiteBalance1</tabstop>
+  <tabstop>uiBlackCal1</tabstop>
+  <tabstop>uiWhiteBalance2</tabstop>
+  <tabstop>uiBlackCal2</tabstop>
+  <tabstop>uiRecalibrateMotionTrigger</tabstop>
+  <tabstop>uiPlayAndSave</tabstop>
+ </tabstops>
  <resources>
   <include location="../../assets.qrc"/>
  </resources>

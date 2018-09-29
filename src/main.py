@@ -237,24 +237,68 @@ class Window(QtCore.QObject):
 
 if __name__ == '__main__':
 	app = QtWidgets.QApplication(sys.argv)
-	app.setFont(QtGui.QFont("DejaVu Sans", 12)) #Fix fonts being just a little smaller by default than in Creator. This probably only applies to the old camApp .ui files.
-	
+	hardware = Hardware()
 	window = Window()
+	
+	app.setFont(QtGui.QFont("DejaVu Sans", 12)) #Fix fonts being just a little smaller by default than in Creator. This probably only applies to the old camApp .ui files.
 	app.installEventFilter(window)
 	
-	hardware = Hardware(app)
-	hardware.recordingLightIsLit = False
 	
-	hardware.subscribe('jogWheelLowResolutionRotation', lambda delta:
-		print('rot', delta) )
-	hardware.subscribe('recordButtonDown', lambda:
-		print('rec down') )
-	hardware.subscribe('recordButtonUp', lambda:
-		print('rec up') )
-	hardware.subscribe('jogWheelDown', lambda:
-		print('jog down') )
-	hardware.subscribe('jogWheelUp', lambda:
-		print('jog up') )
+	#Inject keystrokes into application from hardware inputs, triggering default behaviour.
+	def injectPageUpDown(delta):
+		"""Send page up or page down if the jog wheel's pressed, because it's faster."""
+		if not hardware.jogWheelPressed:
+			#Only send page up/down if the jog wheel is pressed.
+			return
+		
+		app.postEvent(
+			app.focusWidget(), 
+			QtGui.QKeyEvent(
+				QtGui.QKeyEvent.KeyPress, 
+				QtCore.Qt.Key_PageUp if delta > 0 else QtCore.Qt.Key_PageDown,
+				QtCore.Qt.NoModifier,
+				"", False, 0 ) )
+	
+	hardware.subscribe('jogWheelHighResolutionRotation', injectPageUpDown)
+	
+	
+	def injectUpDownArrow(delta):
+		"""Send key up or page down if the jog wheel isn't pressed, because it's slower."""
+		
+		if hardware.jogWheelPressed:
+			#Only send key up/down if the jog wheel is not being held down.
+			return
+		
+		app.postEvent(
+			app.focusWidget(), 
+			QtGui.QKeyEvent(
+				QtGui.QKeyEvent.KeyPress, 
+				QtCore.Qt.Key_Up if delta > 0 else QtCore.Qt.Key_Down,
+				QtCore.Qt.NoModifier,
+				"", False, 0 ) )
+	
+	hardware.subscribe('jogWheelLowResolutionRotation', injectUpDownArrow)
+	
+	def linkLightToRecordButton():
+		hardware.recordingLightsAreLit = hardware.recordButtonPressed #This is dumb. Lambdas can call functions, this is a setter function, but I can't call it because it uses =. -_-
+	
+	#We don't have recording yet as a concept, so just link the record button to the recording lights. :p
+	#This should become a d-bus call at some point.
+	hardware.subscribe('recordButtonDown', linkLightToRecordButton)
+	hardware.subscribe('recordButtonUp', linkLightToRecordButton)
+	
+	def injectSelect():
+		app.postEvent(
+			app.focusWidget(), 
+			QtGui.QKeyEvent(
+				QtGui.QKeyEvent.KeyPress if hardware.jogWheelPressed else QtGui.QKeyEvent.KeyRelease,
+				QtCore.Qt.Key_Select,
+				QtCore.Qt.NoModifier,
+				"", False, 0 ) )
+	
+	hardware.subscribe('jogWheelDown', injectSelect)
+	hardware.subscribe('jogWheelUp', injectSelect)
+	
 	
 	report("start_up_time", {"seconds": time.perf_counter() - perf_start_time})
 	

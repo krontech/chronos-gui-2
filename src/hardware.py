@@ -28,7 +28,7 @@ class Hardware():
 				Invoke callback when event happens.
 	"""
 	
-	def __init__(self, app):
+	def __init__(self):
 		"""Fire events at the app as physical inputs are pressed."""
 		
 		#Create GPIO files if not existing.
