@@ -18,6 +18,7 @@ from PyQt5 import QtWidgets, QtCore, QtGui
 from stats import report
 
 import settings
+from hardware import Hardware
 
 perf_start_time = time.perf_counter()
 
@@ -231,8 +232,7 @@ class Window(QtCore.QObject):
 		
 		#print('filtered', self, obj, event, event.type())
 		return False
-		
-
+	
 
 
 if __name__ == '__main__':
@@ -241,6 +241,20 @@ if __name__ == '__main__':
 	
 	window = Window()
 	app.installEventFilter(window)
+	
+	hardware = Hardware(app)
+	hardware.recordingLightIsLit = False
+	
+	hardware.subscribe('jogWheelLowResolutionRotation', lambda delta:
+		print('rot', delta) )
+	hardware.subscribe('recordButtonDown', lambda:
+		print('rec down') )
+	hardware.subscribe('recordButtonUp', lambda:
+		print('rec up') )
+	hardware.subscribe('jogWheelDown', lambda:
+		print('jog down') )
+	hardware.subscribe('jogWheelUp', lambda:
+		print('jog up') )
 	
 	report("start_up_time", {"seconds": time.perf_counter() - perf_start_time})
 	
