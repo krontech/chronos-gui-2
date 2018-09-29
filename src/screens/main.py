@@ -32,7 +32,8 @@ class Main(QtWidgets.QDialog):
 		# Widget behavour.
 		self.uiDebugA.clicked.connect(self.printAnalogGain)
 		self.uiDebugB.clicked.connect(lambda: window.show('widget_test'))
-		self.uiDebugC.clicked.connect(lambda: self and dbg())
+		self.uiDebugC.setFocusPolicy(QtCore.Qt.NoFocus) #Break into debugger without loosing focus, so you can debug focus issues.
+		self.uiDebugC.clicked.connect(lambda: self and dbg()) #"self" is needed here, won't be available otherwise.
 		self.uiClose.clicked.connect(QtWidgets.QApplication.closeAllWindows)
 		
 		#Only show the debug controls if enabled in factory settings.
