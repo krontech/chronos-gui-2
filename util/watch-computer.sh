@@ -12,6 +12,7 @@ while true; do
 		rsync -ir ./ \"cam:/opt/camera/chronos-gui-2/\" --delete --links \
 			--rsh=\"/usr/bin/sshpass -p $CHRONOS_PASSWORD ssh -l root\" --times --inplace \
 			--exclude \"__pycache__\" --exclude \"/.git\" \
-			--exclude \"util/stats_reported\"
+			--exclude \"util/stats_reported\" \
+			--exclude \"src/read_jog_wheel_encoder\"
 	"
 done

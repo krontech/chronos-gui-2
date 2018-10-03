@@ -251,13 +251,13 @@ if __name__ == '__main__':
 			#Only send page up/down if the jog wheel is pressed.
 			return
 		
-		app.postEvent(
-			app.focusWidget(), 
-			QtGui.QKeyEvent(
-				QtGui.QKeyEvent.KeyPress, 
-				QtCore.Qt.Key_PageUp if delta > 0 else QtCore.Qt.Key_PageDown,
-				QtCore.Qt.NoModifier,
-				"", False, 0 ) )
+		for i in range(abs(delta)):
+			app.postEvent(
+				app.focusWidget(), 
+				QtGui.QKeyEvent(
+					QtGui.QKeyEvent.KeyPress, 
+					QtCore.Qt.Key_PageUp if delta > 0 else QtCore.Qt.Key_PageDown,
+					QtCore.Qt.NoModifier ) )
 	
 	hardware.subscribe('jogWheelHighResolutionRotation', injectPageUpDown)
 	
@@ -269,13 +269,13 @@ if __name__ == '__main__':
 			#Only send key up/down if the jog wheel is not being held down.
 			return
 		
-		app.postEvent(
-			app.focusWidget(), 
-			QtGui.QKeyEvent(
-				QtGui.QKeyEvent.KeyPress, 
-				QtCore.Qt.Key_Up if delta > 0 else QtCore.Qt.Key_Down,
-				QtCore.Qt.NoModifier,
-				"", False, 0 ) )
+		for i in range(abs(delta)):
+			app.postEvent(
+				app.focusWidget(), 
+				QtGui.QKeyEvent(
+					QtGui.QKeyEvent.KeyPress, 
+					QtCore.Qt.Key_Up if delta > 0 else QtCore.Qt.Key_Down,
+					QtCore.Qt.NoModifier ) )
 	
 	hardware.subscribe('jogWheelLowResolutionRotation', injectUpDownArrow)
 	
@@ -293,8 +293,7 @@ if __name__ == '__main__':
 			QtGui.QKeyEvent(
 				QtGui.QKeyEvent.KeyPress if hardware.jogWheelPressed else QtGui.QKeyEvent.KeyRelease,
 				QtCore.Qt.Key_Select,
-				QtCore.Qt.NoModifier,
-				"", False, 0 ) )
+				QtCore.Qt.NoModifier ) )
 	
 	hardware.subscribe('jogWheelDown', injectSelect)
 	hardware.subscribe('jogWheelUp', injectSelect)
