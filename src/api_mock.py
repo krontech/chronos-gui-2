@@ -24,6 +24,7 @@ from PyQt5.QtDBus import QDBusConnection, QDBusInterface, QDBusReply
 from typing import Callable, Any
 
 from control_api_mock import ControlMock
+from video_api_mock import VideoMock
 
 # Set up d-bus interface. Connect to mock system buses. Check everything's working.
 if not QDBusConnection.systemBus().isConnected():
@@ -45,7 +46,7 @@ if not QDBusConnection.systemBus().registerService('com.krontech.chronos.video.m
 	sys.stderr.write(f"Could not register video service: {QDBusConnection.systemBus().lastError().message() or '(no message)'}\n")
 	raise Exception("D-Bus Setup Error")
 
-videoMock = ControlMock() #This absolutely, positively can't be inlined or it throws error "No such object path '/'".
+videoMock = VideoMock() #This absolutely, positively can't be inlined or it throws error "No such object path '/'".
 QDBusConnection.systemBus().registerObject('/', videoMock, QDBusConnection.ExportAllSlots)
 
 

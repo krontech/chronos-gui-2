@@ -474,7 +474,7 @@ state = State()
 
 class ControlMock(QObject):
 	def __init__(self):
-		super(ControlMock, self).__init__()
+		super().__init__()
 		
 		# Inject some fake update events.
 		def test1():
