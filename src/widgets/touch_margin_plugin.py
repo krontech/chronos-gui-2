@@ -27,7 +27,8 @@ class TouchMarginPlugin(MarginWidth):
 	
 	Q_ENUMS(MarginWidth)
 	
-	def __init__(self, showHitRects=False):
+	def __init__(self, *args, showHitRects=False, **kwargs):
+		super().__init__(*args, **kwargs)
 		self.showHitRects = showHitRects
 		#self._customStyleSheet = self.styleSheet() #This is always blank during init, don't know why. Set up another custom property to cover for it, since those do seem to have a story for retrieval.
 		

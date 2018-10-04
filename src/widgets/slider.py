@@ -6,8 +6,9 @@ from PyQt5.QtWidgets import *
 
 from debugger import *; dbg
 
+from focusable_plugin import FocusablePlugin
 
-class Slider(QSlider):
+class Slider(QSlider, FocusablePlugin):
 	def __init__(self, parent=None, showHitRects=False):
 		super().__init__(parent)
 		

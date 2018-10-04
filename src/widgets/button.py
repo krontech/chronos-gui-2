@@ -6,9 +6,10 @@ from PyQt5.QtWidgets import *
 
 from debugger import *; dbg
 from touch_margin_plugin import TouchMarginPlugin, MarginWidth
+from focusable_plugin import FocusablePlugin
 
 
-class Button(QPushButton, TouchMarginPlugin):
+class Button(QPushButton, TouchMarginPlugin, FocusablePlugin):
 	Q_ENUMS(MarginWidth) #This is needed here. I don't know why the definition in the TouchMarginPlugin doesn't work.
 	
 	def __init__(self, parent=None, showHitRects=False):

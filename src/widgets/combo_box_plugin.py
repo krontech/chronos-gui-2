@@ -4,8 +4,9 @@ from plugin_settings import showHitRects
 
 from combo_box import ComboBox
 
+from focusable_plugin import FocusablePlugin
 
-class ComboBoxPlugin(QPyDesignerCustomWidgetPlugin):
+class ComboBoxPlugin(QPyDesignerCustomWidgetPlugin, FocusablePlugin):
 
 	def __init__(self, parent=None):
 		super().__init__(parent)

@@ -36,7 +36,7 @@
     <string>Test Screen</string>
    </property>
   </widget>
-  <widget class="Button" name="button">
+  <widget class="Button" name="uiDebug">
    <property name="geometry">
     <rect>
      <x>0</x>
@@ -46,7 +46,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>A Button</string>
+    <string>Debug</string>
    </property>
    <property name="clickMarginLeftSetter" stdset="0">
     <enum>Button::full</enum>
@@ -128,19 +128,6 @@
    </property>
    <property name="clickMarginBottomSetter" stdset="0">
     <enum>SpinBox::full</enum>
-   </property>
-  </widget>
-  <widget class="Label" name="label">
-   <property name="geometry">
-    <rect>
-     <x>390</x>
-     <y>250</y>
-     <width>91</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>label</string>
    </property>
   </widget>
   <widget class="RadioButton" name="radiobutton">
@@ -616,28 +603,6 @@
     <enum>Button::half</enum>
    </property>
   </widget>
-  <widget class="CheckBox" name="checkbox_2">
-   <property name="geometry">
-    <rect>
-     <x>190</x>
-     <y>310</y>
-     <width>161</width>
-     <height>61</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>checkbox #2</string>
-   </property>
-   <property name="clickMarginLeftSetter" stdset="0">
-    <enum>CheckBox::half</enum>
-   </property>
-   <property name="clickMarginTopSetter" stdset="0">
-    <enum>CheckBox::half</enum>
-   </property>
-   <property name="clickMarginBottomSetter" stdset="0">
-    <enum>CheckBox::half</enum>
-   </property>
-  </widget>
   <widget class="RadioButton" name="radiobutton_2">
    <property name="geometry">
     <rect>
@@ -659,640 +624,6 @@
    <property name="clickMarginBottomSetter" stdset="0">
     <enum>RadioButton::half</enum>
    </property>
-  </widget>
-  <widget class="ComboBox" name="combobox_2">
-   <property name="geometry">
-    <rect>
-     <x>180</x>
-     <y>380</y>
-     <width>181</width>
-     <height>81</height>
-    </rect>
-   </property>
-   <property name="currentText">
-    <string>test 444, foo, bar, baz, make it long
-make it tall
-so tall</string>
-   </property>
-   <property name="currentIndex">
-    <number>3</number>
-   </property>
-   <property name="clickMarginLeftSetter" stdset="0">
-    <enum>ComboBox::full</enum>
-   </property>
-   <property name="clickMarginRightSetter" stdset="0">
-    <enum>ComboBox::full</enum>
-   </property>
-   <property name="clickMarginTopSetter" stdset="0">
-    <enum>ComboBox::full</enum>
-   </property>
-   <property name="clickMarginBottomSetter" stdset="0">
-    <enum>ComboBox::full</enum>
-   </property>
-   <item>
-    <property name="text">
-     <string extracomment="comment 1">test 1</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>test 2</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>test 3</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>test 444, foo, bar, baz, make it long
-make it tall
-so tall</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>test 5</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>test 6</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>test 7</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>test 8</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>test 9</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>test 10</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>test 7</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>test 8</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>test 9</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>test 10</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>test 7</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>test 8</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>test 9</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>test 10</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>test 7</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>test 8</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>test 9</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>test 10</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>test 7</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>test 8</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>test 9</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>test 10</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>test 7</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>test 8</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>test 9</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>test 10</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>test 7</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>test 8</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>test 9</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>test 10</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>test 7</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>test 8</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>test 9</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>test 10</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>test 7</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>test 8</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>test 9</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>test 10</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>test 7</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>test 8</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>test 9</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>test 10</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>test 7</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>test 8</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>test 9</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>test 10</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>test 7</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>test 8</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>test 9</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>test 10</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>test 7</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>test 8</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>test 9</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>test 10</string>
-    </property>
-   </item>
-  </widget>
-  <widget class="ComboBox" name="combobox_3">
-   <property name="geometry">
-    <rect>
-     <x>360</x>
-     <y>300</y>
-     <width>181</width>
-     <height>81</height>
-    </rect>
-   </property>
-   <property name="clickMarginLeftSetter" stdset="0">
-    <enum>ComboBox::full</enum>
-   </property>
-   <property name="clickMarginRightSetter" stdset="0">
-    <enum>ComboBox::full</enum>
-   </property>
-   <property name="clickMarginTopSetter" stdset="0">
-    <enum>ComboBox::full</enum>
-   </property>
-   <property name="clickMarginBottomSetter" stdset="0">
-    <enum>ComboBox::full</enum>
-   </property>
-   <item>
-    <property name="text">
-     <string extracomment="comment 1">test 1</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>test 2</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>test 3</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>test 444</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>test 5</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>test 6</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>test 7</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>test 8</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>test 9</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>test 10</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>test 7</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>test 8</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>test 9</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>test 10</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>test 7</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>test 8</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>test 9</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>test 10</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>test 7</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>test 8</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>test 9</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>test 10</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>test 7</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>test 8</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>test 9</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>test 10</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>test 7</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>test 8</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>test 9</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>test 10</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>test 7</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>test 8</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>test 9</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>test 10</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>test 7</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>test 8</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>test 9</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>test 10</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>test 7</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>test 8</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>test 9</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>test 10</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>test 7</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>test 8</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>test 9</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>test 10</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>test 7</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>test 8</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>test 9</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>test 10</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>test 7</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>test 8</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>test 9</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>test 10</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>test 7</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>test 8</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>test 9</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>test 10</string>
-    </property>
-   </item>
   </widget>
   <widget class="ComboBox" name="combobox_4">
    <property name="geometry">
@@ -1619,6 +950,22 @@ so tall</string>
     <string>Back</string>
    </property>
   </widget>
+  <widget class="QLabel" name="uiTriangle">
+   <property name="geometry">
+    <rect>
+     <x>400</x>
+     <y>340</y>
+     <width>111</width>
+     <height>101</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap>../../assets/images/rotating-triangle.svg</pixmap>
+   </property>
+  </widget>
   <zorder>white_4</zorder>
   <zorder>combobox_4</zorder>
   <zorder>white_2</zorder>
@@ -1628,7 +975,6 @@ so tall</string>
   <zorder>checkbox</zorder>
   <zorder>decimalspinbox</zorder>
   <zorder>spinbox</zorder>
-  <zorder>label</zorder>
   <zorder>radiobutton</zorder>
   <zorder>label_2</zorder>
   <zorder>combobox</zorder>
@@ -1636,13 +982,11 @@ so tall</string>
   <zorder>button_2</zorder>
   <zorder>button_3</zorder>
   <zorder>button_5</zorder>
-  <zorder>checkbox_2</zorder>
   <zorder>radiobutton_2</zorder>
-  <zorder>combobox_2</zorder>
-  <zorder>combobox_3</zorder>
   <zorder>slider</zorder>
   <zorder>uiBack</zorder>
-  <zorder>button</zorder>
+  <zorder>uiDebug</zorder>
+  <zorder>uiTriangle</zorder>
  </widget>
  <customwidgets>
   <customwidget>
