@@ -28,11 +28,12 @@ def report(tag: str, data: dict):
 	data["serial_number"] = serial_number #Always append this (hopefully) unique identifier.
 	try:
 		urlopen(
-			'http://192.168.1.174:19861', 
+			'http://192.168.1.55:19861', 
 			bytes(json.dumps(data), 'utf-8'),
 			0.1,
 		)
 	except Exception:
+		print('Could not contact local stats server.')
 		pass
 	
 def report_mock(tag: str, data: dict):
