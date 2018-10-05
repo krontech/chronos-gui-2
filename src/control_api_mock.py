@@ -508,7 +508,7 @@ class ControlAPIMock(QObject):
 	
 	def emitControlSignal(self, name, value=None):
 		"""Emit an update signal, usually for indicating a value has changed."""
-		signal = QDBusMessage.createSignal('/', 'com.krontech.chronos.control.mock', name)
+		signal = QDBusMessage.createSignal('/com/krontech/chronos/control/mock', 'com.krontech.chronos.control.mock', name)
 		signal << getattr(state, name) if value is None else value
 		QDBusConnection.systemBus().send(signal)
 	

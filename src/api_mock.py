@@ -40,14 +40,14 @@ if not QDBusConnection.systemBus().registerService('com.krontech.chronos.control
 	raise Exception("D-Bus Setup Error")
 
 controlAPI = ControlAPI() #This absolutely, positively can't be inlined or it throws error "No such object path '/'". Possibly, this is because a live reference must be kept so GC doesn't eat it?
-QDBusConnection.systemBus().registerObject('/', controlAPI, QDBusConnection.ExportAllSlots)
+QDBusConnection.systemBus().registerObject('/com/krontech/chronos/control/mock', controlAPI, QDBusConnection.ExportAllSlots)
 
 if not QDBusConnection.systemBus().registerService('com.krontech.chronos.video.mock'):
 	sys.stderr.write(f"Could not register video service: {QDBusConnection.systemBus().lastError().message() or '(no message)'}\n")
 	raise Exception("D-Bus Setup Error")
 
 videoAPI = VideoAPI() #This absolutely, positively can't be inlined or it throws error "No such object path '/'".
-QDBusConnection.systemBus().registerObject('/', videoAPI, QDBusConnection.ExportAllSlots)
+QDBusConnection.systemBus().registerObject('/com/krontech/chronos/video/mock', videoAPI, QDBusConnection.ExportAllSlots)
 
 
 
@@ -61,12 +61,12 @@ QDBusConnection.systemBus().registerObject('/', videoAPI, QDBusConnection.Export
 
 cameraControlAPI = QDBusInterface(
 	'com.krontech.chronos.control.mock', #Service
-	'/', #Path
+	'/com/krontech/chronos/control/mock', #Path
 	'', #Interface
 	QDBusConnection.systemBus() )
 cameraVideoAPI = QDBusInterface(
 	'com.krontech.chronos.video.mock', #Service
-	'/', #Path
+	'/com/krontech/chronos/video/mock', #Path
 	'', #Interface
 	QDBusConnection.systemBus() )
 
@@ -74,14 +74,14 @@ cameraControlAPI.setTimeout(16) #Default is -1, which means 25000ms. 25 seconds 
 cameraVideoAPI.setTimeout(16)
 
 if not cameraControlAPI.isValid():
-	print("Error: Can not connect to Camera D-Bus API at %s. (%s: %s)" % (
+	print("Error: Can not connect to Mock Camera Control D-Bus API at %s. (%s: %s)" % (
 		cameraControlAPI.service(), 
 		cameraControlAPI.lastError().name(), 
 		cameraControlAPI.lastError().message(),
 	), file=sys.stderr)
 	raise Exception("D-Bus Setup Error")
 if not cameraVideoAPI.isValid():
-	print("Error: Can not connect to Camera D-Bus API at %s. (%s: %s)" % (
+	print("Error: Can not connect to Mock Camera Video D-Bus API at %s. (%s: %s)" % (
 		cameraVideoAPI.service(), 
 		cameraVideoAPI.lastError().name(), 
 		cameraVideoAPI.lastError().message(),
@@ -241,7 +241,7 @@ def observe(name: str, callback: Callable[[Any], None], saftyCheckForSilencedWid
 		raise CallbackNotSilenced(f"{callback} must consider silencing. Decorate with @silenceCallbacks(callback_name, …).")
 	
 	callback(_camState[name])
-	QDBusConnection.systemBus().connect('com.krontech.chronos.control.mock', '/', '',
+	QDBusConnection.systemBus().connect('com.krontech.chronos.control.mock', '/com/krontech/chronos/control/mock', '',
 		name, callback)
 
 
@@ -254,7 +254,7 @@ def observe_future_only(name: str, callback: Callable[[Any], None], saftyCheckFo
 	if not hasattr(callback, '_isSilencedCallback') and saftyCheckForSilencedWidgets:
 		raise CallbackNotSilenced(f"{callback} must consider silencing. Decorate with @silenceCallbacks(callback_name, …).")
 	
-	QDBusConnection.systemBus().connect('com.krontech.chronos.control.mock', '/', '',
+	QDBusConnection.systemBus().connect('com.krontech.chronos.control.mock', '/com/krontech/chronos/control/mock', '',
 		name, callback)
 
 

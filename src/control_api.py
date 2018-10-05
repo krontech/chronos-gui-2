@@ -476,7 +476,7 @@ class ControlAPI(QObject):
 	
 	def emitControlSignal(self, name, value=None):
 		"""Emit an update signal, usually for indicating a value has changed."""
-		signal = QDBusMessage.createSignal('/', 'com.krontech.chronos.control', name)
+		signal = QDBusMessage.createSignal('/com/krontech/chronos/control', 'com.krontech.chronos.control', name)
 		signal << getattr(state, name) if value is None else value
 		QDBusConnection.systemBus().send(signal)
 	
