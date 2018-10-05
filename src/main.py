@@ -1,11 +1,6 @@
 """
 Launch point for the Python QT back-of-camera interface.
 
-Usage:
-	With the camera dbus api running, run python3 cam-ui.py. Python 3.6 is
-required. The dbus api, and dbus api mock, is available from the chronos-cli
-repository.
-
 See readme.md for more details.
 """
 
@@ -188,7 +183,7 @@ class Window(QtCore.QObject):
 		self.currentScreen = screen
 		settings.setValue('current screen', screen)
 		
-		print(f'current breadcrumb: {self._screenStack}')
+		#print(f'current breadcrumb: {self._screenStack}')
 		
 	def back(self):
 		"""Return to a previous screen."""

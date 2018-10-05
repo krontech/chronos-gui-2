@@ -3,7 +3,7 @@ from PyQt5 import uic, QtWidgets, QtCore
 from PyQt5.QtSvg import QSvgWidget
 
 from debugger import *; dbg
-# import api_mock as api
+# import api as api
 
 
 class WidgetTest(QtWidgets.QDialog):

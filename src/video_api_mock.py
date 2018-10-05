@@ -15,5 +15,5 @@ if not QDBusConnection.systemBus().isConnected():
 	print("Error: Can not connect to D-Bus. Is D-Bus itself running?", file=sys.stderr)
 	sys.exit(-1)
 
-class VideoMock(QObject):
+class VideoAPIMock(QObject):
 	pass

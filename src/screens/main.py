@@ -2,8 +2,8 @@ from PyQt5 import uic, QtWidgets, QtCore
 from PyQt5.QtCore import pyqtSlot, QPropertyAnimation, QPoint
 
 from debugger import *; dbg
-import api_mock as api
-from api_mock import silenceCallbacks
+import api as api
+from api import silenceCallbacks
 import settings
 from widgets.button import Button
 
@@ -185,6 +185,7 @@ class Main(QtWidgets.QDialog):
 		self.uiPlayAndSave.clicked.connect(lambda: window.show('play_and_save'))
 		
 		# Polling-based updates.
+		self.updateBatteryCharge()
 		self._timer = QtCore.QTimer()
 		self._timer.timeout.connect(self.updateBatteryCharge)
 		self._timer.start(4000) #ms

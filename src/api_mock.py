@@ -23,8 +23,8 @@ from PyQt5.QtCore import pyqtSlot, QObject
 from PyQt5.QtDBus import QDBusConnection, QDBusInterface, QDBusReply
 from typing import Callable, Any
 
-from control_api_mock import ControlMock
-from video_api_mock import VideoMock
+from control_api_mock import ControlAPIMock as ControlAPI
+from video_api_mock import VideoAPIMock as VideoAPI
 
 # Set up d-bus interface. Connect to mock system buses. Check everything's working.
 if not QDBusConnection.systemBus().isConnected():
@@ -39,15 +39,15 @@ if not QDBusConnection.systemBus().registerService('com.krontech.chronos.control
 	sys.stderr.write(f"Could not register control service: {QDBusConnection.systemBus().lastError().message() or '(no message)'}\n")
 	raise Exception("D-Bus Setup Error")
 
-controlMock = ControlMock() #This absolutely, positively can't be inlined or it throws error "No such object path '/'".
-QDBusConnection.systemBus().registerObject('/', controlMock, QDBusConnection.ExportAllSlots)
+controlAPI = ControlAPI() #This absolutely, positively can't be inlined or it throws error "No such object path '/'". Possibly, this is because a live reference must be kept so GC doesn't eat it?
+QDBusConnection.systemBus().registerObject('/', controlAPI, QDBusConnection.ExportAllSlots)
 
 if not QDBusConnection.systemBus().registerService('com.krontech.chronos.video.mock'):
 	sys.stderr.write(f"Could not register video service: {QDBusConnection.systemBus().lastError().message() or '(no message)'}\n")
 	raise Exception("D-Bus Setup Error")
 
-videoMock = VideoMock() #This absolutely, positively can't be inlined or it throws error "No such object path '/'".
-QDBusConnection.systemBus().registerObject('/', videoMock, QDBusConnection.ExportAllSlots)
+videoAPI = VideoAPI() #This absolutely, positively can't be inlined or it throws error "No such object path '/'".
+QDBusConnection.systemBus().registerObject('/', videoAPI, QDBusConnection.ExportAllSlots)
 
 
 
@@ -287,12 +287,18 @@ def silenceCallbacks(*elements):
 __all__ = ['control', 'video', 'observe'] #This doesn't work. Why?
 
 
+#Launch the API if not imported as a library.
 if __name__ == '__main__':
 	from PyQt5.QtCore import QCoreApplication
+	import signal
+	
 	app = QCoreApplication(sys.argv)
 	
-	print("Self-test: echo service")
-	print(f"min recording period: {control('get_timing_limits')['tMinPeriod']}")
-	print("Self-test passed. Python mock API is running.")
+	#Quit on ctrl-c.
+	signal.signal(signal.SIGINT, signal.SIG_DFL)
+	
+	print("Self-test: Retrieve battery charge.")
+	print(f"Battery charge: {get('batteryCharge')}")
+	print("Self-test passed. Python API is up and running!")
 	
 	sys.exit(app.exec_())

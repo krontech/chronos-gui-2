@@ -169,7 +169,7 @@ class State():
 	
 	@property
 	def batteryCharge(self):
-		return random.choice((1., .99, .98, .97, .96))
+		return random.choice((.23, .22, .22, .21, .21))
 	
 	@property
 	def batteryVoltage(self):
@@ -471,44 +471,12 @@ class State():
 state = State()
 
 
-class ControlAPIMock(QObject):
+class ControlAPI(QObject):
 	"""Function calls of the camera control D-Bus API."""
-	
-	def __init__(self):
-		super().__init__()
-		
-		# Inject some fake update events.
-		def test1():
-			state.recordingExposureNs = int(8e8)
-			self.emitControlSignal('recordingExposureNs')
-			
-		self._timer1 = QTimer()
-		self._timer1.timeout.connect(test1)
-		self._timer1.setSingleShot(True)
-		self._timer1.start(1000) #ms
-		
-		def test2():
-			state.recordingExposureNs = int(2e8)
-			self.emitControlSignal('recordingExposureNs')
-			
-		self._timer2 = QTimer()
-		self._timer2.timeout.connect(test2)
-		self._timer2.setSingleShot(True)
-		self._timer2.start(2000) #ms
-		
-		def test3():
-			state.recordingExposureNs = int(8.5e8)
-			self.emitControlSignal('recordingExposureNs')
-			
-		self._timer3 = QTimer()
-		self._timer3.timeout.connect(test3)
-		self._timer3.setSingleShot(True)
-		self._timer3.start(3000) #ms
-	
 	
 	def emitControlSignal(self, name, value=None):
 		"""Emit an update signal, usually for indicating a value has changed."""
-		signal = QDBusMessage.createSignal('/', 'com.krontech.chronos.control.mock', name)
+		signal = QDBusMessage.createSignal('/', 'com.krontech.chronos.control', name)
 		signal << getattr(state, name) if value is None else value
 		QDBusConnection.systemBus().send(signal)
 	

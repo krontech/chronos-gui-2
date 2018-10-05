@@ -4,7 +4,7 @@ from math import copysign
 from PyQt5 import uic, QtWidgets, QtCore, QtGui
 
 from debugger import *; dbg
-import api_mock as api
+import api
 
 
 chartDuration = 120 #minutes
