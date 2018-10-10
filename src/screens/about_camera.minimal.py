@@ -1,3 +1,5 @@
+# Run like `python3 screens/about_camera.minimal.py` in ~src/.
+
 import sys
 from PyQt5 import uic, QtWidgets, QtCore, QtGui
 from debugger import *; dbg
