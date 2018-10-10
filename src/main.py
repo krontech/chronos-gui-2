@@ -206,7 +206,9 @@ class Window(QtCore.QObject):
 		#Screen transition events
 		e.PlatformSurface, e.WinIdChange, e.WindowIconChange, e.WindowDeactivate, e.WindowActivate, e.Resize, e.Show,
 	])
-	
+
+
+class GlobalFilter(QtCore.QObject):
 	def eventFilter(self, obj, event):
 		"""Global keyboard shortcuts and shortcut interception.
 		
@@ -215,8 +217,8 @@ class Window(QtCore.QObject):
 			is called extremely often.
 		"""
 		
-		if event.type() in self.eventsToIgnore:
-			return False
+		#if event.type() in self.eventsToIgnore:
+		#	return False
 		
 		#Stop escape from closing the camapp, if a keyboard is plugged in. Just exit the current screen, assuming widgets behave correctly.
 		if event.type() == QtCore.QEvent.KeyPress:
@@ -230,15 +232,7 @@ class Window(QtCore.QObject):
 	
 
 
-if __name__ == '__main__':
-	app = QtWidgets.QApplication(sys.argv)
-	hardware = Hardware()
-	window = Window()
-	
-	app.setFont(QtGui.QFont("DejaVu Sans", 12)) #Fix fonts being just a little smaller by default than in Creator. This probably only applies to the old camApp .ui files.
-	app.installEventFilter(window)
-	
-	
+def connectHardwareEvents(app, hardware):
 	#Inject keystrokes into application from hardware inputs, triggering default behaviour.
 	def injectPageUpDown(delta):
 		"""Send page up or page down if the jog wheel's pressed, because it's faster."""
@@ -292,7 +286,21 @@ if __name__ == '__main__':
 	
 	hardware.subscribe('jogWheelDown', injectSelect)
 	hardware.subscribe('jogWheelUp', injectSelect)
+
+
+
+if __name__ == '__main__':
+	app = QtWidgets.QApplication(sys.argv)
+	app.setFont(QtGui.QFont("DejaVu Sans", 12)) #Fix fonts being just a little smaller by default than in Creator. This probably only applies to the old camApp .ui files.
+	app.installEventFilter(GlobalFilter())
 	
+	try:
+		connectHardwareEvents(app, Hardware())
+	except Exception as e:
+		#We're probably in the VM, just print a message.
+		print('Could not initialize camera hardware.')
+	
+	window = Window()
 	
 	report("start_up_time", {"seconds": time.perf_counter() - perf_start_time})
 	
