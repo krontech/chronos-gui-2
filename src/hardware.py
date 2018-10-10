@@ -60,10 +60,10 @@ class Hardware():
 		fcntl(self._jogWheelEncoders, F_SETFL, flags | os.O_NONBLOCK)
 		
 		#This was sort of ported from the C++ app, but with fewer threads because I couldn't figure out what it was doing. Take caution: This is probably "working incorrect" code.
-		self._jogWheelSwitch     = os.fdopen(os.open(gpioPath/"gpio27/value", os.O_RDONLY,                 0), 'rb', buffering=0)
-		self._recordButtonSwitch = os.fdopen(os.open(gpioPath/"gpio66/value", os.O_RDONLY,                 0), 'rb', buffering=0)
-		self._topLED             = os.fdopen(os.open(gpioPath/"gpio41/value", os.O_WRONLY,                 0), 'wb', buffering=0)
-		self._backLED            = os.fdopen(os.open(gpioPath/"gpio25/value", os.O_WRONLY,                 0), 'wb', buffering=0)
+		self._jogWheelSwitch     = os.fdopen(os.open(gpioPath/"gpio27/value", os.O_RDONLY, 0), 'rb', buffering=0)
+		self._recordButtonSwitch = os.fdopen(os.open(gpioPath/"gpio66/value", os.O_RDONLY, 0), 'rb', buffering=0)
+		self._topLED             = os.fdopen(os.open(gpioPath/"gpio41/value", os.O_WRONLY, 0), 'wb', buffering=0)
+		self._backLED            = os.fdopen(os.open(gpioPath/"gpio25/value", os.O_WRONLY, 0), 'wb', buffering=0)
 		
 		#Remember state to detect edges.
 		self._jogWheelEncoderALast = 0
