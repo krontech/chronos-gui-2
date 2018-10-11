@@ -1,8 +1,11 @@
-installing on a new VM
+#!/bin/bash
+set -euxo pipefail #enable "safe mode"
+
+#installing on a new camera:
 
 # swap space to alleviate memory restrictions (If memory < 2gb. Somewhat manual, your UUID is probably different. Use UUID to avoid overwriting another storage by accident. Printed by mkswap.)
     mkswap /dev/sda #run once to format media
-    swapon UUID=b9f83cdc-f390-4c18-84de-da25526cd1cb #run on startup
+    swapon UUID=2da08454-2ea6-4555-b775-5290d727347d #run on startup
 
 # fix HTTPS for downloading stuff
     apt-get update
@@ -34,7 +37,7 @@ installing on a new VM
     cd ../
     mkdir gcc-8-build
     cd gcc-8-build
-    ../gcc-8.1.0/configure --enable-languages=c,c++
+    ../gcc-8.1.0/configure --enable-languages=c,c++ --disable-libsanitizer --disable-libcilkrts #Enable only the two languages we'll use, disable two things which don't compile due to sanitizer error.
     export C_INCLUDE_PATH=/usr/include/$(gcc -print-multiarch) #fix fatal error: bits/predefs.h: No such file or directory #include <bits/predefs.h>
     #export LIBRARY_PATH=/usr/lib/arm-linux-gnueabihf:$LIBRARY_PATH #fix /usr/bin/ld: cannot find crti.o: No such file or directory
     nohup bash -c "time make -j$(nproc)" #build server has 4 cores, camera has 1 - takes 4-6 days to run on camera
