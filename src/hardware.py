@@ -1,4 +1,4 @@
-import os
+import os, signal
 from pathlib import Path
 from typing import Callable, Optional
 from subprocess import run, Popen, PIPE
@@ -55,7 +55,14 @@ class Hardware():
 				raise Exception('Could not compile required jog wheel reader application.')
 			print('Done.')
 		
-		self._jogWheelEncoders = Popen([encoderReader], stdout=PIPE).stdout
+		#Clean up after previous runs, if any spare jog wheel readers are left over.
+		for pid in str(run(['pgrep', 'read_jog_wheel'], stdout=PIPE).stdout, 'utf-8').split('\n'):
+			pid and run(['kill', pid])
+		
+		encoderProcess = Popen([encoderReader], stdout=PIPE)
+		signal.signal(signal.SIGINT, #Kill encoder process when we exit.
+			lambda sig, frame: os.kill(encoderProcess.pid, signal.SIGTERM))
+		self._jogWheelEncoders = encoderProcess.stdout
 		flags = fcntl(self._jogWheelEncoders, F_GETFL)
 		fcntl(self._jogWheelEncoders, F_SETFL, flags | os.O_NONBLOCK)
 		
