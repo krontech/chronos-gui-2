@@ -108,7 +108,14 @@ def ReadSerial():
 
 		return
 
+
+battVoltage = 0
+battCapacityPercent = 0
+
+
 def ParseBatteryData(dlist):
+
+	global battVoltage, battCapacityPercent
 
 	#now set power variables
 	battCapacityPercent = dlist[4]
@@ -124,6 +131,28 @@ def ParseBatteryData(dlist):
 		battmbTemperature = dlist[18] << 8 | dlist[19]
 		battflags = dlist[20]
 		battfanPWM = dlist[21]
+
+	# Now estimate percent:
+
+	# def mapFromTo(x,a,b,c,d):
+	#    y=(x-a)/(b-a)*(d-c)+c
+	#    return y
+
+	def within(x,mn, mx):
+		if x < mn:
+			return mn
+		if x > mx:
+			return mx
+		return x
+
+	if battflags & 4:
+		# charging:
+		battCapacityPercent = within((battVoltageCam/1000.0 - 10.75) / (12.4 - 10.75) * 80, 0.0, 80.0) + \
+							20 - 20*within((battCurrentCam/1000.0 - 0.1) / (1.28 - 0.1), 0.0, 1.0)
+	else:
+		battCapacityPercent = within((battVoltageCam/1000.0 - 9.75) / (11.8 - 9.75) * 100, 0.0, 100.0)
+
+
 
 	'''
 	print ("battCapacityPercent =", battCapacityPercent)

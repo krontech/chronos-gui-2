@@ -171,11 +171,13 @@ class State():
 	
 	@property
 	def batteryCharge(self):
-		return random.choice((1., .99, .98, .97, .96))
-	
+		# return random.choice((1., .99, .98, .97, .96))
+		return battCapacityPercent
+
 	@property
 	def batteryVoltage(self):
-		return random.choice((12.38, 12.38, 12.39, 12.39, 12.40))
+		# return random.choice((12.38, 12.38, 12.39, 12.39, 12.40))
+		return battVoltage 
 	
 	_recordingHRes = 200 #rebuilds video pipeline
 	
