@@ -15,7 +15,8 @@
 	api is desired. While there is a more complete C-based mock, in chronos-cli, it
 	is exceptionally hard to add new calls to.
 """
-
+from pwrserial import *
+import serial
 import sys
 import random
 from debugger import *; dbg
@@ -169,11 +170,13 @@ class State():
 	
 	@property
 	def batteryCharge(self):
-		return random.choice((.23, .22, .22, .21, .21))
+		# return random.choice((.23, .22, .22, .21, .21))
+		return battCapacityPercent
 	
 	@property
 	def batteryVoltage(self):
-		return random.choice((12.38, 12.38, 12.39, 12.39, 12.40))
+		# return random.choice((12.38, 12.38, 12.39, 12.39, 12.40))
+		return battVoltage 
 	
 	_recordingHRes = 200 #rebuilds video pipeline
 	
