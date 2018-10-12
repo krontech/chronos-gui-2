@@ -7,7 +7,7 @@ from debugger import *; dbg
 import api
 
 
-chartDuration = 120 #minutes
+chartDuration = 90 #minutes
 chartPadding = { #in px
 	"top": 20,
 	"bottom": 40,
@@ -118,14 +118,21 @@ class Power(QtWidgets.QDialog):
 		
 	def updateChartData(self):
 		"""Always update the chart data, even when hidden, so we can look at it later."""
-		self.chartChargeHistory.appendleft(api.get('batteryCharge'))
-		self.chartVoltageHistory.appendleft(api.get('batteryVoltage'))
+		charge = api.get('batteryCharge')
+		voltage = api.get('batteryVoltage')
+		
+		if charge < 0 or voltage < 0:
+			return #Charge/voltage haven't initialized yet, don't record anything.
+		
+		self.chartChargeHistory.appendleft(charge)
+		self.chartVoltageHistory.appendleft(voltage)
+		
 		self.uiChart.update() #Invokes the paintChart method below if needed, where Qt decides "if needed".
 		
 	def paintChart(self, evt):
 		QPainter = QtGui.QPainter
 		QPen = QtGui.QPen
-		QRect = QtCore.QRect
+		QRectF = QtCore.QRectF
 		QColor = QtGui.QColor
 		QFont = QtGui.QFont
 		QPainterPath = QtGui.QPainterPath
@@ -153,9 +160,9 @@ class Power(QtWidgets.QDialog):
 		
 		#Draw chart outline
 		p.setPen(pen)
-		p.drawRect(QRect(
-			chartPadding["left"],
-			chartPadding["top"],
+		p.drawRect(QRectF(
+			chartPadding["left"]+0.5, #So, drawing on the pixel x,y with a line width 1 means that x,y and x-1, y-1 each get coloured in 0.5 of a line-width. Add 0.5 to the offset to make it crisp, so one pixel gets the whole line.
+			chartPadding["top"]+0.5,
 			chartLineWidth,
 			chartLineHeight,
 		))
@@ -182,7 +189,7 @@ class Power(QtWidgets.QDialog):
 		p.drawText(
 			chartPadding["left"] + 2,
 			chartTotalHeight - chartPadding["bottom"] + 15,
-			"{:1.0f} hours ago".format(chartDuration/60) )
+			"{:1.0f} minutes ago".format(chartDuration) )
 		
 		p.drawText(
 			chartTotalWidth - chartPadding["right"] - 35,
@@ -190,11 +197,14 @@ class Power(QtWidgets.QDialog):
 			"Now" )
 		
 		
+		#Charge and voltage take a moment to initialize.
+		if not self.chartChargeHistory or not self.chartVoltageHistory:
+			return
+		
 		chargeLabelLocation = projectToPlotSpace(-5, 
 			constrain(0.04, self.chartChargeHistory[0], 0.96) ) #Don't let labels overflow the chart vertical area during normal use. (May still overflow under exceptional circumstances when voltage is extremely high or low.)
 		voltageLabelLocation = projectToPlotSpace(-6, 
 			constrain(0.04, self.chartVoltageHistory[0]/maxVoltage, 0.96) )
-		
 		
 		#Plot and label battery charge and voltage.
 		minSpaceBetweenLabels = 14 #px
@@ -209,7 +219,7 @@ class Power(QtWidgets.QDialog):
 		
 		#Charge
 		path = QPainterPath()
-		path.moveTo(*projectToPlotSpace(-4, self.chartChargeHistory[0]))
+		path.moveTo(projectToPlotSpace(-4, 0)[0], chargeLabelLocation[1])
 		for x,y in enumerate(self.chartChargeHistory):
 			path.lineTo(*projectToPlotSpace(x,y))
 		p.setPen(QColor(0x0d6987))
@@ -230,7 +240,7 @@ class Power(QtWidgets.QDialog):
 		
 		#Voltage
 		path = QPainterPath()
-		path.moveTo(*projectToPlotSpace(-4, self.chartVoltageHistory[0]/maxVoltage))
+		path.moveTo(projectToPlotSpace(-4, 0)[0], voltageLabelLocation[1])
 		for x,y in enumerate(self.chartVoltageHistory):
 			path.lineTo(*projectToPlotSpace(x,y/maxVoltage))
 		p.setPen(QColor(0xd8750d))

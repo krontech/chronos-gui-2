@@ -16,13 +16,11 @@
 	is exceptionally hard to add new calls to.
 """
 
-from pwrserial import *
-import serial
 import sys
 import random
 from debugger import *; dbg
 
-from PyQt5.QtCore import pyqtSlot, QObject, QTimer
+from PyQt5.QtCore import pyqtSlot, QObject, QTimer, Qt
 from PyQt5.QtDBus import QDBusConnection, QDBusMessage, QDBusError
 
 
@@ -171,16 +169,14 @@ class State():
 	
 	@property
 	def batteryCharge(self):
-		# return random.choice((1., .99, .98, .97, .96))
-		return battCapacityPercent
+		return random.choice((1., .99, .98, .97, .96))
 
 	@property
 	def batteryVoltage(self):
-		# return random.choice((12.38, 12.38, 12.39, 12.39, 12.40))
-		return battVoltage 
+		return random.choice((12.38, 12.38, 12.39, 12.39, 12.40))
+	
 	
 	_recordingHRes = 200 #rebuilds video pipeline
-	
 	
 	@property
 	def recordingHRes(self): #rebuilds video pipeline
@@ -192,8 +188,8 @@ class State():
 		self._recordingHRes = value
 		pendingCallbacks += [changeRecordingResolution, notifyExposureChange]
 	
-	_recordingVRes = 300 
 	
+	_recordingVRes = 300 
 	
 	@property
 	def recordingVRes(self): 
@@ -487,6 +483,7 @@ class ControlAPIMock(QObject):
 			self.emitControlSignal('recordingExposureNs')
 			
 		self._timer1 = QTimer()
+		self._timer1.setTimerType(Qt.PreciseTimer)
 		self._timer1.timeout.connect(test1)
 		self._timer1.setSingleShot(True)
 		self._timer1.start(1000) #ms
@@ -496,6 +493,7 @@ class ControlAPIMock(QObject):
 			self.emitControlSignal('recordingExposureNs')
 			
 		self._timer2 = QTimer()
+		self._timer2.setTimerType(Qt.PreciseTimer)
 		self._timer2.timeout.connect(test2)
 		self._timer2.setSingleShot(True)
 		self._timer2.start(2000) #ms
@@ -505,27 +503,10 @@ class ControlAPIMock(QObject):
 			self.emitControlSignal('recordingExposureNs')
 			
 		self._timer3 = QTimer()
+		self._timer3.setTimerType(Qt.PreciseTimer)
 		self._timer3.timeout.connect(test3)
 		self._timer3.setSingleShot(True)
-		self._timer3.start(3000) #ms 
-	
-		def test4():
-			#print ("-------------------------------TIMER 4------------------")
-			DoSendSerial()
-			
-		self._timer4 = QTimer()
-		self._timer4.timeout.connect(test4)
-		self._timer4.setSingleShot(False)
-		self._timer4.start(2000) #ms
-
-		def test5():
-			#print ("-------------------------------TIMER 5------------------")
-			DoReceiveSerial()
-			
-		self._timer5 = QTimer()
-		self._timer5.timeout.connect(test5)
-		self._timer5.setSingleShot(False)
-		self._timer5.start(200) #ms
+		self._timer3.start(3000) #ms
 
 	
 	def emitControlSignal(self, name, value=None):

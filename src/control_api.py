@@ -15,15 +15,13 @@
 	api is desired. While there is a more complete C-based mock, in chronos-cli, it
 	is exceptionally hard to add new calls to.
 """
-from pwrserial import *
-import serial
-import sys
-import random
-from debugger import *; dbg
+import sys, random
 
-from PyQt5.QtCore import pyqtSlot, QObject, QTimer
+from PyQt5.QtCore import pyqtSlot, QObject
 from PyQt5.QtDBus import QDBusConnection, QDBusMessage, QDBusError
 
+from debugger import *; dbg
+from power_serial import getBatteryCapacityPercent, getBatteryVoltage, getBatteryIsCharging
 
 # Set up d-bus interface. Connect to mock system buses. Check everything's working.
 if not QDBusConnection.systemBus().isConnected():
@@ -166,17 +164,15 @@ class State():
 	
 	@property
 	def externallyPowered(self):
-		return random.choice((True, False))
+		return bool(getBatteryIsCharging())
 	
 	@property
 	def batteryCharge(self):
-		# return random.choice((.23, .22, .22, .21, .21))
-		return battCapacityPercent
+		return getBatteryCapacityPercent()/100
 	
 	@property
 	def batteryVoltage(self):
-		# return random.choice((12.38, 12.38, 12.39, 12.39, 12.40))
-		return battVoltage 
+		return getBatteryVoltage()/1000
 	
 	_recordingHRes = 200 #rebuilds video pipeline
 	
@@ -476,7 +472,7 @@ state = State()
 
 class ControlAPI(QObject):
 	"""Function calls of the camera control D-Bus API."""
-	
+
 	def emitControlSignal(self, name, value=None):
 		"""Emit an update signal, usually for indicating a value has changed."""
 		signal = QDBusMessage.createSignal('/com/krontech/chronos/control', 'com.krontech.chronos.control', name)

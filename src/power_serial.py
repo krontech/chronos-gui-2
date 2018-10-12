@@ -6,7 +6,9 @@ batt* variables sent by the power controller
 
 """
 
-import	time, serial
+import serial
+from PyQt5.QtCore import QTimer
+from debugger import *; dbg
 
 # Set up serial port for power controller
 
@@ -109,13 +111,19 @@ def ReadSerial():
 		return
 
 
-battVoltage = 0
-battCapacityPercent = 0
-
+battVoltageCam = -1
+battCapacityPercent = -1
+batteryIsCharging = None
+def getBatteryVoltage():
+	return battVoltageCam
+def getBatteryCapacityPercent():
+	return battCapacityPercent
+def getBatteryIsCharging():
+	return batteryIsCharging
 
 def ParseBatteryData(dlist):
 
-	global battVoltage, battCapacityPercent
+	global battVoltageCam, battCapacityPercent, batteryIsCharging
 
 	#now set power variables
 	battCapacityPercent = dlist[4]
@@ -145,7 +153,8 @@ def ParseBatteryData(dlist):
 			return mx
 		return x
 
-	if battflags & 4:
+	batteryIsCharging = battflags & 4
+	if batteryIsCharging:
 		# charging:
 		battCapacityPercent = within((battVoltageCam/1000.0 - 10.75) / (12.4 - 10.75) * 80, 0.0, 80.0) + \
 							20 - 20*within((battCurrentCam/1000.0 - 0.1) / (1.28 - 0.1), 0.0, 1.0)
@@ -263,5 +272,19 @@ def CheckCRC(clist):
 	if  crc == (clist[-2] << 8) + clist[-1]:
 		return True
 	print ("CRC from power controller failed!")
- 
 
+
+
+
+
+timer4 = QTimer()
+timer4.timeout.connect(DoSendSerial)
+timer4.setSingleShot(False)
+timer4.start(2000) #ms
+DoSendSerial()
+	
+timer5 = QTimer()
+timer5.timeout.connect(DoReceiveSerial)
+timer5.setSingleShot(False)
+timer5.start(200) #ms
+DoReceiveSerial()
