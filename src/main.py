@@ -295,7 +295,8 @@ if __name__ == '__main__':
 	app.installEventFilter(GlobalFilter())
 	
 	try:
-		connectHardwareEvents(app, Hardware())
+		hardware = Hardware() #Must be instantiated like this, I think the event pump timer gets eaten by GC otherwise.
+		connectHardwareEvents(app, hardware)
 	except Exception as e:
 		#We're probably in the VM, just print a message.
 		print('Could not initialize camera hardware.')
