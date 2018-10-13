@@ -1,11 +1,22 @@
 #!/bin/bash
 set -euxo pipefail #enable "safe mode"
 
-#installing on a new camera:
+#Installing GUI2 on a New Camera or Build Server:
+#   Prerequisites:
+#       1 Chronos Camera running Debian (or build server)
+#       1 USB stick (if using camera)
+#       Ethernet cable for internet access
+#       Optional: MiniUSB cable for SSH access
+#
+#   To run this script, SSH onto your camera. Then, block by block,
+#   read this script. Follow any instructions in the block, and run
+#   the block by pasting it into your SSH session.
 
-# swap space to alleviate memory restrictions (If memory < 2gb. Somewhat manual, your UUID is probably different. Use UUID to avoid overwriting another storage by accident. Printed by mkswap.)
-    mkswap /dev/sda #run once to format media
-    swapon UUID=2da08454-2ea6-4555-b775-5290d727347d #run on startup
+
+# swap space to alleviate memory restrictions (Ignore this part if using a build server. Somewhat manual, as your UUID is probably different. Use UUID to avoid overwriting another storage by accident.)
+    #Insert your USB stick into the camera's eSATA port.
+    mkswap /dev/sda #run once to format media as linuxswap, this may be done before the previous step if desired
+    swapon UUID=2da08454-2ea6-4555-b775-5290d727347d #run on startup, with UUID from mkswap
 
 # fix HTTPS for downloading stuff
     apt-get update
@@ -40,7 +51,7 @@ set -euxo pipefail #enable "safe mode"
     ../gcc-8.1.0/configure --enable-languages=c,c++ --disable-libsanitizer --disable-libcilkrts #Enable only the two languages we'll use, disable two things which don't compile due to sanitizer error.
     export C_INCLUDE_PATH=/usr/include/$(gcc -print-multiarch) #fix fatal error: bits/predefs.h: No such file or directory #include <bits/predefs.h>
     #export LIBRARY_PATH=/usr/lib/arm-linux-gnueabihf:$LIBRARY_PATH #fix /usr/bin/ld: cannot find crti.o: No such file or directory
-    nohup bash -c "time make -j$(nproc)" #build server has 4 cores, camera has 1 - takes 4-6 days to run on camera
+    nohup bash -c "time make -j$(nproc)" #Runtime: ~6 days. Build server has 4 cores, so is faster.
     make install
     export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
     
@@ -68,7 +79,7 @@ set -euxo pipefail #enable "safe mode"
     tar xvf qt-everywhere-src-5.11.1.tar.xz
     cd qt-everywhere-src-5.11.1
     rm ../qt-everywhere-src-5.11.1.tar.xz
-    #Comment out the line containing "drmSetClientCap" in /root/qt-everywhere-src-5.11.1/qtbase/src/platformsupport/kmsconvenience/qkmsdevice.cpp:523
+    #Comment out (prepend "//") the line containing "drmSetClientCap" in /root/qt-everywhere-src-5.11.1/qtbase/src/platformsupport/kmsconvenience/qkmsdevice.cpp:523
     #Compile this, and everything else, with -release when we release it?
     ./configure -prefix $PWD/qtbase -qt-zlib -qt-libpng -qt-libjpeg -no-cups -no-opengl -skip qt3d -skip qtx11extras -skip qtwayland -skip qtserialbus -skip qtconnectivity -skip qtdeclarative -skip qtlocation -skip qtmultimedia -skip qtquick1 -skip qtquickcontrols -skip qttools -skip qtwebsockets -skip qtwinextras -skip qtwebchannel -skip qtwebengine -nomake examples -nomake tests -opensource -confirm-license
     nohup bash -c "time make -j$(nproc)"
