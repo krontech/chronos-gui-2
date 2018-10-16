@@ -82,7 +82,7 @@ set -euxo pipefail #enable "safe mode"
     #Comment out (prepend "//") the line containing "drmSetClientCap" in /root/qt-everywhere-src-5.11.1/qtbase/src/platformsupport/kmsconvenience/qkmsdevice.cpp:523
     #Compile this, and everything else, with -release when we release it?
     ./configure -prefix $PWD/qtbase -qt-zlib -qt-libpng -qt-libjpeg -no-cups -no-opengl -skip qt3d -skip qtx11extras -skip qtwayland -skip qtserialbus -skip qtconnectivity -skip qtdeclarative -skip qtlocation -skip qtmultimedia -skip qtquick1 -skip qtquickcontrols -skip qttools -skip qtwebsockets -skip qtwinextras -skip qtwebchannel -skip qtwebengine -nomake examples -nomake tests -opensource -confirm-license
-    nohup bash -c "time make -j$(nproc)"
+    nohup bash -c "time make -j$(nproc)" #Runtime: 8h43m
     export LD_LIBRARY_PATH=/root/qt-everywhere-src-5.11.1/qtbase/lib:$LD_LIBRARY_PATH
     
     #Sip, for PyQt5
@@ -105,7 +105,6 @@ set -euxo pipefail #enable "safe mode"
     nohup bash -c "time make install -j$(nproc)"
     # NOTE: If you get an error saying libstdc++ is the wrong version or not found, it cannot be fixed by tweaking LD_EXPORT_PATH. You need to run `cd /usr/lib && ln -s gcc-4.9-backport/lib/libstdc++* .` to fix it. I don't know why, but it seems QT *really* wants to look for the files there.
     # NOTE: If you get an error saying No module named 'PyQt5.sip', rebuild SIP as detailed above and rebuild PyQt5.
-    pip install --upgrade pip
     
     
 
