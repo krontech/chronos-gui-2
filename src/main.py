@@ -141,6 +141,7 @@ class Window(QtCore.QObject):
 			raise ValueError(f"Unknown screen {screenName}.\nAvailable screens are: {self._availableScreens.keys()}")
 		
 		self._screens[screenName] = self._availableScreens[screenName](self)
+		self._screens[screenName].app = self.app
 		
 	def _uninstantiatedScreens(self):
 		"""Return (generator for) non-cached screens. (Those not in self._screens.)"""
@@ -273,7 +274,7 @@ def connectHardwareEvents(app, hardware):
 					QtCore.Qt.Key_PageUp if delta > 0 else QtCore.Qt.Key_PageDown,
 					QtCore.Qt.NoModifier ) )
 	
-	hardware.subscribe('jogWheelHighResolutionRotation', injectPageUpDown)
+	#hardware.subscribe('jogWheelHighResolutionRotation', injectPageUpDown)
 	
 	
 	def injectUpDownArrow(delta):
@@ -291,7 +292,7 @@ def connectHardwareEvents(app, hardware):
 					QtCore.Qt.Key_Up if delta > 0 else QtCore.Qt.Key_Down,
 					QtCore.Qt.NoModifier ) )
 	
-	hardware.subscribe('jogWheelLowResolutionRotation', injectUpDownArrow)
+	#hardware.subscribe('jogWheelLowResolutionRotation', injectUpDownArrow)
 	
 	def linkLightToRecordButton():
 		hardware.recordingLightsAreLit = hardware.recordButtonPressed #This is dumb. Lambdas can call functions, this is a setter function, but I can't call it because it uses =. -_-
@@ -325,9 +326,13 @@ def connectHardwareEvents(app, hardware):
 	hardware.subscribe('jogWheelDown', jogWheelLongClickTimer.start)
 	hardware.subscribe('jogWheelDown', lambda: app.focusWidget().jogWheelDown.emit())
 	hardware.subscribe('jogWheelUp', lambda: app.focusWidget().jogWheelUp.emit())
-	hardware.subscribe('jogWheelUp', endPress)
-	hardware.subscribe('jogWheelLowResolutionRotation', lambda _: jogWheelLongClickTimer.stop()) #High resolution rotation to cancel a click or long press is too finicky.
-			
+	hardware.subscribe('jogWheelUp', endPress) #Must be after jogWheelUp event.
+	hardware.subscribe('jogWheelHighResolutionRotation', lambda direction:
+		app.focusWidget().jogWheelHighResolutionRotation.emit(direction, hardware.jogWheelPressed) )
+	hardware.subscribe('jogWheelLowResolutionRotation', lambda _:
+		jogWheelLongClickTimer.stop() ) #High resolution rotation to cancel a click or long press is too finicky.
+	hardware.subscribe('jogWheelLowResolutionRotation', lambda direction:
+		app.focusWidget().jogWheelLowResolutionRotation.emit(direction, hardware.jogWheelPressed) )
 	
 
 

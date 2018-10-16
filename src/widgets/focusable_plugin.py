@@ -11,7 +11,8 @@ class FocusablePlugin():
 	#Subscribe to these signals in the parent class.
 	jogWheelDown = pyqtSignal()
 	jogWheelUp = pyqtSignal() #fired before click
-	jogWheelRotate = pyqtSignal(int) #direction, -1 or +1
+	jogWheelLowResolutionRotation = pyqtSignal(int, bool) #direction, -1 or +1
+	jogWheelHighResolutionRotation = pyqtSignal(int, bool) #direction, -1 or +1
 	jogWheelClick = pyqtSignal() #a tap on the jog wheel, cancelled by rotation or long press
 	jogWheelLongPress = pyqtSignal() #long press of jog wheel, cancelled by rotation or click
 	
@@ -24,7 +25,8 @@ class FocusablePlugin():
 		
 		self.jogWheelDown.connect(lambda: print(self, 'jogWheelDown'))
 		self.jogWheelUp.connect(lambda: print(self, 'jogWheelUp'))
-		self.jogWheelRotate.connect(lambda: print(self, 'jogWheelRotate'))
+		self.jogWheelLowResolutionRotation.connect(lambda clicks, pressed: 
+			(not pressed) and self.selectWidget(clicks) )
 		self.jogWheelClick.connect(lambda: print(self, 'jogWheelClick'))
 		self.jogWheelLongPress.connect(lambda: print(self, 'jogWheelLongPress'))
 	
@@ -45,6 +47,24 @@ class FocusablePlugin():
 			QKeyEvent(keyAction, Qt.Key_Select, Qt.NoModifier)
 		)
 		
+	def selectWidget(self, direction):
+		"""Select the nth widget in the direction specified.
+		
+			example: `myWidget.selectWidget(2)` selects the widget
+				_after_ the next widget in the focus chain.
+		"""
+		
+		if not direction:
+			raise ValueError('Must select widget in non-zero direction. (Try 1 or -1.)')
+		
+		#Can't do this, selects non-chained widgets: widgetToFocus = widgetToFocus.nextInFocusChain()
+		key = Qt.Key_Down if direction > 0 else Qt.Key_Up
+		for keystroke in range(abs(direction)):
+			self.window().app.postEvent(
+				self.window().app.focusWidget(), #window._screens[window.currentScreen],
+				QKeyEvent(QKeyEvent.KeyPress, key, Qt.NoModifier) )
+	
+	
 	
 	#This prevents, among many other things, mouse up from firing for stylesheets.
 	#def mouseReleaseEvent(self, event) -> None:
