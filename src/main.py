@@ -60,8 +60,9 @@ class Window(QtCore.QObject):
 				int-indexed interface.
 	"""
 	
-	def __init__(self):
+	def __init__(self, app):
 		super().__init__()
+		self.app = app
 		
 		from screens.about_camera import AboutCamera
 		from screens.file_settings import FileSettings
@@ -191,24 +192,34 @@ class Window(QtCore.QObject):
 			self.show(self._screenStack[-2])
 		else:
 			print('Error: No more back to navigate to.')
-	
+
+
+
+class GlobalFilter(QtCore.QObject):
 	e = QtCore.QEvent #documented at http://doc.qt.io/qt-5/qevent.html
-	eventsToIgnore = frozenset([
+	knownEvents = frozenset([
 		#Frequently-fired events and startup events. Ignored because way too many of them are fired.
-		e.Close, e.Paint, e.UpdateRequest, e.MetaCall, e.PolishRequest, e.LayoutRequest, e.UpdateLater, e.Timer, e.ApplicationStateChange, e.ApplicationActivate, e.ApplicationDeactivate, 20, e.FocusIn, e.WindowActivate, e.ActivationChange, e.Expose, e.DeferredDelete, e.PaletteChange, e.FontChange, e.StyleChange, 15, e.WindowTitleChange, e.ChildAdded, e.ParentChange, e.CursorChange, e.MouseButtonDblClick, e.MouseButtonPress, e.MouseButtonRelease, e.MouseMove, e.MouseTrackingChange, e.Move, 152, e.HideToParent, e.Hide, e.ContentsRectChange, e.Polish, e.ChildPolished, e.DynamicPropertyChange, e.ChildRemoved, e.ZOrderChange, 16, e.ShowToParent,
+		e.Close, e.Paint, e.UpdateRequest, e.MetaCall, e.PolishRequest, e.LayoutRequest, e.UpdateLater, e.Timer, e.ApplicationStateChange, e.ApplicationActivate, e.ApplicationDeactivate, 20, e.FocusIn, e.WindowActivate, e.ActivationChange, e.Expose, e.DeferredDelete, e.PaletteChange, e.FontChange, e.StyleChange, 15, e.WindowTitleChange, e.ChildAdded, e.ParentChange, e.CursorChange, e.MouseButtonDblClick, e.MouseButtonPress, e.MouseButtonRelease, e.MouseMove, e.MouseTrackingChange, e.Move, 152, e.HideToParent, e.Hide, e.ContentsRectChange, e.Polish, e.ChildPolished, e.DynamicPropertyChange, e.ChildRemoved, e.ZOrderChange, 16, e.ShowToParent, e.ApplicationPaletteChange, e.ThreadChange, e.ToolTip,
 		
 		#Input events, usually not important, we are after the effects.
 		e.TouchBegin, e.TouchCancel, e.TouchEnd, e.TouchUpdate,
 		e.SockAct, e.Leave, e.Enter, #SockAct is triggered by mouse movement.
 		e.FocusAboutToChange, e.FocusIn, e.FocusOut,
-		e.KeyRelease, e.ShortcutOverride,
+		e.KeyPress, e.KeyRelease, e.ShortcutOverride,
 		
 		#Screen transition events
 		e.PlatformSurface, e.WinIdChange, e.WindowIconChange, e.WindowDeactivate, e.WindowActivate, e.Resize, e.Show,
 	])
-
-
-class GlobalFilter(QtCore.QObject):
+	
+	
+	def __init__(self, app, window):
+		super().__init__()
+		
+		self.app = app
+		self.window = window
+		
+		self.touchStartTarget = None
+	
 	def eventFilter(self, obj, event):
 		"""Global keyboard shortcuts and shortcut interception.
 		
@@ -217,17 +228,31 @@ class GlobalFilter(QtCore.QObject):
 			is called extremely often.
 		"""
 		
-		#if event.type() in self.eventsToIgnore:
-		#	return False
+		events = QtCore.QEvent
+		keys = QtCore.Qt
 		
 		#Stop escape from closing the camapp, if a keyboard is plugged in. Just exit the current screen, assuming widgets behave correctly.
-		if event.type() == QtCore.QEvent.KeyPress:
-			if event.key() == QtCore.Qt.Key_Escape:
-				self.back()
+		if event.type() == events.KeyPress:
+			if event.key() == keys.Key_Escape:
+				window.back()
 				return True
 			return False
 		
-		#print('filtered', self, obj, event, event.type())
+		#Take note of the (focussable) target we touched. If we're still over it in the release event, then we accept it as having activated.
+		if event.type() == events.TouchBegin:
+			if hasattr(obj, 'isFocussable'):
+				self.touchStartTarget = obj
+			return False
+			
+		if event.type() == events.TouchEnd:
+			#This only ever gets called with QWindows, so use the starter object and test geometry.
+			#dbg()
+			return False
+		
+		if event.type() in self.knownEvents:
+			return False
+		
+		print('filtered', self, obj, event, event.type())
 		return False
 	
 
@@ -278,30 +303,62 @@ def connectHardwareEvents(app, hardware):
 	
 	def injectSelect():
 		app.postEvent(
-			app.focusWidget(), 
+			app.focusWidget(), #window._screens[window.currentScreen],
 			QtGui.QKeyEvent(
 				QtGui.QKeyEvent.KeyPress if hardware.jogWheelPressed else QtGui.QKeyEvent.KeyRelease,
 				QtCore.Qt.Key_Select,
 				QtCore.Qt.NoModifier ) )
 	
-	hardware.subscribe('jogWheelDown', injectSelect)
-	hardware.subscribe('jogWheelUp', injectSelect)
+	
+	#Jog wheel has some composite input events; in addition to down and up and rotate, there's also click (which is cancelled by a rotation or long-press) and long-press (which is cancelled by rotation or click).
+	jogWheelLongClickTimer = QtCore.QTimer()
+	jogWheelLongClickTimer.setTimerType(QtCore.Qt.PreciseTimer)
+	jogWheelLongClickTimer.setInterval(750)
+	jogWheelLongClickTimer.timeout.connect(lambda: app.focusWidget().jogWheelLongPress.emit())
+	jogWheelLongClickTimer.setSingleShot(True)
+	
+	def endPress():
+		if jogWheelLongClickTimer.isActive(): #Long-press timer hasn't expired, just a click.
+			app.focusWidget().jogWheelClick.emit()
+			jogWheelLongClickTimer.stop() #Suppress jog wheel long press.
+	
+	hardware.subscribe('jogWheelDown', jogWheelLongClickTimer.start)
+	hardware.subscribe('jogWheelDown', lambda: app.focusWidget().jogWheelDown.emit())
+	hardware.subscribe('jogWheelUp', lambda: app.focusWidget().jogWheelUp.emit())
+	hardware.subscribe('jogWheelUp', endPress)
+	hardware.subscribe('jogWheelLowResolutionRotation', lambda _: jogWheelLongClickTimer.stop()) #High resolution rotation to cancel a click or long press is too finicky.
+			
+	
 
 
 
 if __name__ == '__main__':
 	app = QtWidgets.QApplication(sys.argv)
 	app.setFont(QtGui.QFont("DejaVu Sans", 12)) #Fix fonts being just a little smaller by default than in Creator. This probably only applies to the old camApp .ui files.
-	app.installEventFilter(GlobalFilter())
 	
-	try:
-		hardware = Hardware() #Must be instantiated like this, I think the event pump timer gets eaten by GC otherwise.
+	window = Window(app)
+	
+	eventFilter = GlobalFilter(app, window)
+	app.installEventFilter(eventFilter)
+	#app.setStyleSheet("""
+	#	/* Remove the little dotted focus ring. It's too hard to see. */
+	#	*:focus {
+	#		outline: none;
+	#	}
+	#""")
+	
+	forceHardwareInstantiation = True
+	if forceHardwareInstantiation:
+		hardware = Hardware()
 		connectHardwareEvents(app, hardware)
-	except Exception as e:
-		#We're probably in the VM, just print a message.
-		print('Could not initialize camera hardware.')
+	else:
+		try:
+			hardware = Hardware() #Must be instantiated like this, I think the event pump timer gets eaten by GC otherwise.
+			connectHardwareEvents(app, hardware)
+		except Exception as e:
+			#We're probably in the VM, just print a message.
+			print('Could not initialize camera hardware.')
 	
-	window = Window()
 	
 	report("start_up_time", {"seconds": time.perf_counter() - perf_start_time})
 	
