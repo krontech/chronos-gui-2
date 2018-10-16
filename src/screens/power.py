@@ -102,7 +102,7 @@ class Power(QtWidgets.QDialog):
 			self.uiPowerDownThreshold.addItems([
 				dec2pct(threshold)
 				for threshold in
-				sorted(self.originalBatteryThresholdLevels + [threshold])
+				sorted(self.originalBatteryThresholdLevels + [threshold], reverse=True)
 			])
 			self.uiPowerDownThreshold.setCurrentText(targetText)
 		

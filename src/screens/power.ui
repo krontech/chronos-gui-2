@@ -150,22 +150,7 @@
    </property>
    <item>
     <property name="text">
-     <string>0%</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>5%</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>10%</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>15%</string>
+     <string>100%</string>
     </property>
    </item>
    <item>
@@ -175,7 +160,22 @@
    </item>
    <item>
     <property name="text">
-     <string>100%</string>
+     <string>15%</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>10%</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>5%</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>0%</string>
     </property>
    </item>
   </widget>
