@@ -25,6 +25,11 @@ class CheckBox(QCheckBox, TouchMarginPlugin, DirectAPILinkPlugin, FocusablePlugi
 		self.refreshStyle()
 		
 		self.setMouseTracking(True)
+		
+		
+		self.jogWheelLowResolutionRotation.connect(lambda clicks, pressed: 
+			not pressed and self.selectWidget(clicks) )
+		self.jogWheelClick.connect(lambda: self.injectKeystrokes(Qt.Key_Space))
 	
 	
 	def mousePressEvent(self, ev):

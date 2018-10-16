@@ -2,7 +2,7 @@ from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtGui import QKeyEvent
 
 class FocusablePlugin():
-	"""Some behaviour to make focussable widgets work correctly.
+	"""Some behaviour to make focusable widgets work correctly.
 	
 		Touch and jog wheel have subtly different requirements. Jog wheel can
 		focus in to a widget and then have sub-focusses, for example.
@@ -20,32 +20,21 @@ class FocusablePlugin():
 		super().__init__(*args, **kwargs)
 		
 		self.isFocussable = True
-		#self.setFocusPolicy(Qt.TabFocus)
+		self.setFocusPolicy(Qt.TabFocus)
 		self.setAttribute(Qt.WA_AcceptTouchEvents)
-		
-		self.jogWheelDown.connect(lambda: print(self, 'jogWheelDown'))
-		self.jogWheelUp.connect(lambda: print(self, 'jogWheelUp'))
-		self.jogWheelLowResolutionRotation.connect(lambda clicks, pressed: 
-			(not pressed) and self.selectWidget(clicks) )
-		self.jogWheelClick.connect(lambda: print(self, 'jogWheelClick'))
-		self.jogWheelLongPress.connect(lambda: print(self, 'jogWheelLongPress'))
 	
 	#TODO: write useful common functions here, such as "select next".
 	#Can maybe use self.parent.window.app.postEvent(…) here, like in main.py?
 	
-	def injectSelect(self, *, state):
-		app = self.parent.window.app
-		if state == "down":
-			keyAction = QKeyEvent.KeyPress
-		elif state == "up":
-			keyAction = QKeyEvent.KeyRelease
-		else:
-			raise ValueError(f'Select key state, "{state}", must be "down" or "up".')
-		
-		app.postEvent(
-			app.focusWidget(), #window._screens[window.currentScreen],
-			QKeyEvent(keyAction, Qt.Key_Select, Qt.NoModifier)
-		)
+	def injectKeystrokes(self, key, count=1, modifier=Qt.NoModifier):
+		"""Inject n keystrokes into the app, to the focused widget."""
+		for _ in range(count):
+			self.window().app.postEvent(
+				self.window().app.focusWidget(), #window._screens[window.currentScreen],
+				QKeyEvent(QKeyEvent.KeyPress, key, modifier) )
+			self.window().app.postEvent(
+				self.window().app.focusWidget(),
+				QKeyEvent(QKeyEvent.KeyRelease, key, modifier) )
 		
 	def selectWidget(self, direction):
 		"""Select the nth widget in the direction specified.
@@ -54,15 +43,15 @@ class FocusablePlugin():
 				_after_ the next widget in the focus chain.
 		"""
 		
-		if not direction:
-			raise ValueError('Must select widget in non-zero direction. (Try 1 or -1.)')
-		
 		#Can't do this, selects non-chained widgets: widgetToFocus = widgetToFocus.nextInFocusChain()
-		key = Qt.Key_Down if direction > 0 else Qt.Key_Up
-		for keystroke in range(abs(direction)):
-			self.window().app.postEvent(
-				self.window().app.focusWidget(), #window._screens[window.currentScreen],
-				QKeyEvent(QKeyEvent.KeyPress, key, Qt.NoModifier) )
+		self.injectKeystrokes(Qt.Key_Tab, count=abs(direction),
+			modifier=Qt.NoModifier if direction > 0 else Qt.ShiftModifier )
+		
+	def selectOption(self, direction):
+		"""Select the nth option in the direction specified."""
+		self.injectKeystrokes(
+			Qt.Key_Down if direction > 0 else Qt.Key_Up,
+			count=abs(direction) )
 	
 	
 	
