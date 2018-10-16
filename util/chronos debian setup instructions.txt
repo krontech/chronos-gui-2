@@ -119,7 +119,6 @@ set -euxo pipefail #enable "safe mode"
     #Set up environment.
     cp /etc/skel/.bash_profile ~
     cp /etc/skel/.bashrc ~
-    # Add the following to ~/.bashrc, less the leading # of course.
     cat >> ~/.bashrc <<'EOL'
 
 #paths required by Python 3
