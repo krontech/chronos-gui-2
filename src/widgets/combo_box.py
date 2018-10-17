@@ -15,6 +15,15 @@ class ComboBox(QComboBox, TouchMarginPlugin, FocusablePlugin):
 	def __init__(self, parent=None, showHitRects=False):
 		super().__init__(parent, showHitRects=showHitRects)
 		self.clickMarginColor = f"rgba({randint(128, 255)}, {randint(0, 32)}, {randint(0, 32)}, {randint(32,96)})"
+		
+		def onLowResRotate(delta, pressed):
+			if pressed:
+				self.injectKeystrokes(Qt.Key_Down if delta < 0 else Qt.Key_Up)
+			else:
+				self.selectWidget(delta)
+		self.jogWheelLowResolutionRotation.connect(onLowResRotate)
+		
+		self.jogWheelClick.connect(lambda: self.injectKeystrokes(Qt.Key_Space))
 	
 	
 	def sizeHint(self):

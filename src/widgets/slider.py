@@ -17,6 +17,10 @@ class Slider(QSlider, FocusablePlugin):
 		self.clickMarginColorSlider = f"rgba({randint(0, 32)}, {randint(128, 255)}, {randint(0, 32)}, {randint(32,96)})"
 		self.clickMarginColorHandle = f"rgba({randint(0, 32)}, {randint(128, 255)}, {randint(0, 32)}, {randint(32,96)})"
 		self.refreshStyle()
+		
+		self.jogWheelLowResolutionRotation.connect(lambda delta, pressed: 
+			not pressed and self.selectWidget(delta) )
+		self.jogWheelClick.connect(lambda: self.injectKeystrokes(Qt.Key_Space))
 
 	def sizeHint(self):
 		return QSize(81, 201)

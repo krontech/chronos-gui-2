@@ -281,6 +281,13 @@
    <header>label</header>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>uiDone</tabstop>
+  <tabstop>uiDimScreen</tabstop>
+  <tabstop>uiSafelyPowerDown</tabstop>
+  <tabstop>uiPowerDownThreshold</tabstop>
+  <tabstop>uiStartWhenPowered</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

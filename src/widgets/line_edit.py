@@ -22,6 +22,10 @@ class LineEdit(QLineEdit, TouchMarginPlugin, FocusablePlugin):
 			self.setText('')
 			
 		self.clickMarginColor = f"rgba({randint(128, 255)}, {randint(64, 128)}, {randint(0, 32)}, {randint(32,96)})"
+		
+		self.jogWheelLowResolutionRotation.connect(lambda delta, pressed: 
+			not pressed and self.selectWidget(delta) )
+		self.jogWheelClick.connect(lambda: self.injectKeystrokes(Qt.Key_Space))
 	
 	def sizeHint(self):
 		return QSize(361, 81)

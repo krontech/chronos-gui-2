@@ -537,7 +537,7 @@
     <string>hole</string>
    </property>
   </widget>
-  <widget class="Button" name="button_2">
+  <widget class="Button" name="uiAnimateTriangle">
    <property name="geometry">
     <rect>
      <x>370</x>
@@ -545,6 +545,9 @@
      <width>161</width>
      <height>61</height>
     </rect>
+   </property>
+   <property name="text">
+    <string>Animate Triangle</string>
    </property>
    <property name="clickMarginLeftSetter" stdset="0">
     <enum>Button::half</enum>
@@ -601,28 +604,6 @@
    </property>
    <property name="clickMarginBottomSetter" stdset="0">
     <enum>Button::half</enum>
-   </property>
-  </widget>
-  <widget class="RadioButton" name="radiobutton_2">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>390</y>
-     <width>161</width>
-     <height>61</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Another Radio</string>
-   </property>
-   <property name="clickMarginLeftSetter" stdset="0">
-    <enum>RadioButton::half</enum>
-   </property>
-   <property name="clickMarginTopSetter" stdset="0">
-    <enum>RadioButton::half</enum>
-   </property>
-   <property name="clickMarginBottomSetter" stdset="0">
-    <enum>RadioButton::half</enum>
    </property>
   </widget>
   <widget class="ComboBox" name="combobox_4">
@@ -966,6 +947,31 @@
     <pixmap>../../assets/images/rotating-triangle.svg</pixmap>
    </property>
   </widget>
+  <widget class="RadioButton" name="radiobutton_2">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>380</y>
+     <width>251</width>
+     <height>81</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Another Radio B&amp;utton</string>
+   </property>
+   <property name="clickMarginLeftSetter" stdset="0">
+    <enum>RadioButton::full</enum>
+   </property>
+   <property name="clickMarginRightSetter" stdset="0">
+    <enum>RadioButton::full</enum>
+   </property>
+   <property name="clickMarginTopSetter" stdset="0">
+    <enum>RadioButton::full</enum>
+   </property>
+   <property name="clickMarginBottomSetter" stdset="0">
+    <enum>RadioButton::full</enum>
+   </property>
+  </widget>
   <zorder>white_4</zorder>
   <zorder>combobox_4</zorder>
   <zorder>white_2</zorder>
@@ -979,14 +985,14 @@
   <zorder>label_2</zorder>
   <zorder>combobox</zorder>
   <zorder>label_4</zorder>
-  <zorder>button_2</zorder>
+  <zorder>uiAnimateTriangle</zorder>
   <zorder>button_3</zorder>
   <zorder>button_5</zorder>
-  <zorder>radiobutton_2</zorder>
   <zorder>slider</zorder>
   <zorder>uiBack</zorder>
   <zorder>uiDebug</zorder>
   <zorder>uiTriangle</zorder>
+  <zorder>radiobutton_2</zorder>
  </widget>
  <customwidgets>
   <customwidget>
@@ -1040,6 +1046,20 @@
    <header>spin_box</header>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>uiBack</tabstop>
+  <tabstop>uiDebug</tabstop>
+  <tabstop>checkbox</tabstop>
+  <tabstop>uiAnimateTriangle</tabstop>
+  <tabstop>combobox_4</tabstop>
+  <tabstop>decimalspinbox</tabstop>
+  <tabstop>spinbox</tabstop>
+  <tabstop>button_3</tabstop>
+  <tabstop>button_5</tabstop>
+  <tabstop>slider</tabstop>
+  <tabstop>radiobutton</tabstop>
+  <tabstop>combobox</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

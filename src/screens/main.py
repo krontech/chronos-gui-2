@@ -1,5 +1,6 @@
-from PyQt5 import uic, QtWidgets, QtCore
+from PyQt5 import uic, QtCore
 from PyQt5.QtCore import pyqtSlot, QPropertyAnimation, QPoint
+from PyQt5.QtWidgets import QWidget, QApplication
 
 from debugger import *; dbg
 import api_mock as api
@@ -18,7 +19,7 @@ focusPeakingColours = {
 }
 
 
-class Main(QtWidgets.QDialog):
+class Main(QWidget):
 	def __init__(self, window):
 		super().__init__()
 		uic.loadUi('src/screens/main.right-handed.ui', self)
@@ -34,7 +35,7 @@ class Main(QtWidgets.QDialog):
 		self.uiDebugB.clicked.connect(lambda: window.show('widget_test'))
 		self.uiDebugC.setFocusPolicy(QtCore.Qt.NoFocus) #Break into debugger without loosing focus, so you can debug focus issues.
 		self.uiDebugC.clicked.connect(lambda: self and dbg()) #"self" is needed here, won't be available otherwise.
-		self.uiClose.clicked.connect(QtWidgets.QApplication.closeAllWindows)
+		self.uiClose.clicked.connect(QApplication.closeAllWindows)
 		
 		#Only show the debug controls if enabled in factory settings.
 		settings.observe('debug controls enabled', lambda show='False':

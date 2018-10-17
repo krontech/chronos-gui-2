@@ -1,4 +1,4 @@
-from PyQt5.QtCore import Qt, pyqtSignal
+from PyQt5.QtCore import Qt, pyqtSignal, QTimer
 from PyQt5.QtGui import QKeyEvent
 
 class FocusablePlugin():
@@ -20,8 +20,11 @@ class FocusablePlugin():
 		super().__init__(*args, **kwargs)
 		
 		self.isFocussable = True
-		self.setFocusPolicy(Qt.TabFocus)
-		self.setAttribute(Qt.WA_AcceptTouchEvents)
+		try:
+			#self.setFocusPolicy(Qt.TabFocus)
+			self.setAttribute(Qt.WA_AcceptTouchEvents)
+		except Exception as e:
+			pass #DNE in in Designer.
 	
 	#TODO: write useful common functions here, such as "select next".
 	#Can maybe use self.parent.window.app.postEvent(…) here, like in main.py?
@@ -47,11 +50,10 @@ class FocusablePlugin():
 		self.injectKeystrokes(Qt.Key_Tab, count=abs(direction),
 			modifier=Qt.NoModifier if direction > 0 else Qt.ShiftModifier )
 		
-	def selectOption(self, direction):
-		"""Select the nth option in the direction specified."""
-		self.injectKeystrokes(
-			Qt.Key_Down if direction > 0 else Qt.Key_Up,
-			count=abs(direction) )
+		#Show the focus ring here, since this is the function used by the jog
+		#wheel to navigate widgets. We don't yet know which widget will be
+		#focused next, that will dealt with by a refocus callback on the app.
+		self.window().focusRing.show()
 	
 	
 	

@@ -2,7 +2,7 @@ from PyQt5 import uic, QtWidgets, QtCore
 # from PyQt5.QtCore import pyqtSlot
 
 from debugger import *; dbg
-import api as api
+import api_mock as api
 from stats import app_version
 
 

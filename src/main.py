@@ -14,6 +14,7 @@ from stats import report
 
 import settings
 from hardware import Hardware
+from widgets.focus_ring import FocusRing
 
 perf_start_time = time.perf_counter()
 
@@ -140,8 +141,9 @@ class Window(QtCore.QObject):
 		if screenName not in self._availableScreens:
 			raise ValueError(f"Unknown screen {screenName}.\nAvailable screens are: {self._availableScreens.keys()}")
 		
-		self._screens[screenName] = self._availableScreens[screenName](self)
-		self._screens[screenName].app = self.app
+		screen = self._screens[screenName] = self._availableScreens[screenName](self)
+		screen.app = self.app
+		screen.focusRing = FocusRing(self._screens[screenName])
 		
 	def _uninstantiatedScreens(self):
 		"""Return (generator for) non-cached screens. (Those not in self._screens.)"""
@@ -304,7 +306,7 @@ def connectHardwareEvents(app, hardware):
 	
 	def injectSelect():
 		app.postEvent(
-			app.focusWidget(), #window._screens[window.currentScreen],
+			app.focusWidget() and app.focusWidget(), #window._screens[window.currentScreen],
 			QtGui.QKeyEvent(
 				QtGui.QKeyEvent.KeyPress if hardware.jogWheelPressed else QtGui.QKeyEvent.KeyRelease,
 				QtCore.Qt.Key_Select,
@@ -320,7 +322,7 @@ def connectHardwareEvents(app, hardware):
 	
 	def endPress():
 		if jogWheelLongClickTimer.isActive(): #Long-press timer hasn't expired, just a click.
-			app.focusWidget().jogWheelClick.emit()
+			app.focusWidget() and app.focusWidget().jogWheelClick.emit()
 			jogWheelLongClickTimer.stop() #Suppress jog wheel long press.
 	
 	hardware.subscribe('jogWheelDown', jogWheelLongClickTimer.start)
@@ -328,11 +330,11 @@ def connectHardwareEvents(app, hardware):
 	hardware.subscribe('jogWheelUp', lambda: app.focusWidget().jogWheelUp.emit())
 	hardware.subscribe('jogWheelUp', endPress) #Must be after jogWheelUp event.
 	hardware.subscribe('jogWheelHighResolutionRotation', lambda direction:
-		app.focusWidget().jogWheelHighResolutionRotation.emit(direction, hardware.jogWheelPressed) )
+		app.focusWidget() and app.focusWidget().jogWheelHighResolutionRotation.emit(direction, hardware.jogWheelPressed) )
 	hardware.subscribe('jogWheelLowResolutionRotation', lambda _:
 		jogWheelLongClickTimer.stop() ) #High resolution rotation to cancel a click or long press is too finicky.
 	hardware.subscribe('jogWheelLowResolutionRotation', lambda direction:
-		app.focusWidget().jogWheelLowResolutionRotation.emit(direction, hardware.jogWheelPressed) )
+		app.focusWidget() and app.focusWidget().jogWheelLowResolutionRotation.emit(direction, hardware.jogWheelPressed) )
 	
 
 
@@ -345,14 +347,21 @@ if __name__ == '__main__':
 	
 	eventFilter = GlobalFilter(app, window)
 	app.installEventFilter(eventFilter)
-	#app.setStyleSheet("""
-	#	/* Remove the little dotted focus ring. It's too hard to see. */
-	#	*:focus {
-	#		outline: none;
-	#	}
-	#""")
+	app.setStyleSheet("""
+		/* Remove the little dotted focus ring. It's too hard to see. */
+		*:focus {
+			outline: 2px double blue; /*Debugging, show system focus ring.*/
+			outline: none;
+			outline-offset: 5px; /* This doesn't work. 😑 */
+			/*outline-radius: 5px;*/
+		}
+	""")
+	app.focusChanged.connect(lambda old, new: 
+		window._screens[window.currentScreen].focusRing.focusOn(new)
+		if new else #hide on screen transition?
+		window._screens[window.currentScreen].focusRing.hide() )
 	
-	forceHardwareInstantiation = True
+	forceHardwareInstantiation = True #This should be an env var.
 	if forceHardwareInstantiation:
 		hardware = Hardware()
 		connectHardwareEvents(app, hardware)

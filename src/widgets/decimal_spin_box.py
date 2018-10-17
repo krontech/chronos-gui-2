@@ -16,6 +16,10 @@ class DecimalSpinBox(QDoubleSpinBox, TouchMarginPlugin, DirectAPILinkPlugin, Foc
 	def __init__(self, parent=None, showHitRects=False):
 		super().__init__(parent, showHitRects=showHitRects)
 		self.clickMarginColor = f"rgba({randint(0, 32)}, {randint(128, 255)}, {randint(128, 255)}, {randint(32,96)})"
+		
+		self.jogWheelLowResolutionRotation.connect(lambda delta, pressed: 
+			not pressed and self.selectWidget(delta) )
+		self.jogWheelClick.connect(lambda: self.injectKeystrokes(Qt.Key_Space))
 
 
 	def sizeHint(self):

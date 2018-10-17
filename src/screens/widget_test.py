@@ -6,7 +6,7 @@ from debugger import *; dbg
 # import api as api
 
 
-class WidgetTest(QtWidgets.QDialog):
+class WidgetTest(QtWidgets.QWidget):
 	def __init__(self, window):
 		super().__init__()
 		uic.loadUi("src/screens/widget_test.ui", self)
@@ -25,3 +25,13 @@ class WidgetTest(QtWidgets.QDialog):
 		self.animWidget.move(200,300)
 		self.anim = self.animWidget.children()[0]
 		self.animTimer = self.anim.children()[0]
+		
+		self.uiAnimateTriangle.clicked.connect(self.animateTriangle)
+	
+	def animateTriangle(self):
+		#self.animTimer.stop()
+		print('cf', self.anim.currentFrame())
+		self.anim.setCurrentFrame(0)
+		print('nf', self.anim.currentFrame())
+		#self.anim.repaintNeeded.emit()
+		dbg()

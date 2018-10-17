@@ -22,6 +22,10 @@ class Button(QPushButton, TouchMarginPlugin, FocusablePlugin):
 			self.setText('Button')
 			
 		self.clickMarginColor = f"rgba({randint(0, 32)}, {randint(0, 32)}, {randint(128, 255)}, {randint(32,96)})"
+		
+		self.jogWheelLowResolutionRotation.connect(lambda delta, pressed: 
+			not pressed and self.selectWidget(delta) )
+		self.jogWheelClick.connect(lambda: self.injectKeystrokes(Qt.Key_Space))
 	
 	def sizeHint(self):
 		return QSize(181, 81)
