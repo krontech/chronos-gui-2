@@ -17,9 +17,27 @@ class SpinBox(QSpinBox, TouchMarginPlugin, DirectAPILinkPlugin, FocusablePlugin)
 		super().__init__(parent, showHitRects=showHitRects)
 		self.clickMarginColor = f"rgba({randint(0, 32)}, {randint(128, 255)}, {randint(128, 255)}, {randint(32,96)})"
 		
-		self.jogWheelLowResolutionRotation.connect(lambda delta, pressed: 
-			not pressed and self.selectWidget(delta) )
-		self.jogWheelClick.connect(lambda: self.injectKeystrokes(Qt.Key_Space))
+		#Jog wheel-based state.
+		self.isFocussed = False
+		self.jogWheelMagnitude = 0
+		
+		def onLowResRotate(delta, pressed):
+			if not self.isFocussed:
+				if pressed:
+					self.injectKeystrokes(Qt.Key_Down if delta < 0 else Qt.Key_Up)
+				else:
+					self.selectWidget(delta)
+			else:
+				if pressed:
+					#select the place
+					pass
+				else: 
+					self.injectKeystrokes(Qt.Key_Down if delta < 0 else Qt.Key_Up)
+		self.jogWheelLowResolutionRotation.connect(onLowResRotate)
+		
+		def toggleFocussed():
+			self.isFocussed = not self.isFocussed
+		self.jogWheelClick.connect(toggleFocussed)
 
 
 	def sizeHint(self):

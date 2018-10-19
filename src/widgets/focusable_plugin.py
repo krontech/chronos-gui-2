@@ -49,9 +49,6 @@ class FocusablePlugin():
 				_after_ the next widget in the focus chain.
 		"""
 		
-		# Can't do this, backtab doesn't work reliably when looping over, arrow keys don't work unless compiled for apparently?
-		#self.injectKeystrokes(Qt.Key_Tab, count=abs(direction),
-		#	modifier=Qt.NoModifier if direction > 0 else Qt.ShiftModifier )
 		
 		nextFn = 'previousInFocusChain' if direction < 0 else 'nextInFocusChain'
 		
@@ -62,10 +59,16 @@ class FocusablePlugin():
 			widgetToFocus = getattr(widgetToFocus, nextFn)()
 		widgetToFocus.setFocus()
 		
+		# Can't do this for focus, backtab doesn't work reliably when looping
+		# over, arrow keys don't work unless compiled for apparently?
+		#self.injectKeystrokes(Qt.Key_Tab, count=abs(direction),
+		#	modifier=Qt.NoModifier if direction > 0 else Qt.ShiftModifier )
+		
 		#Show the focus ring here, since this is the function used by the jog
 		#wheel to navigate widgets. We don't yet know which widget will be
 		#focused next, that will dealt with by a refocus callback on the app.
 		self.window().focusRing.show()
+		
 	
 	
 	
