@@ -18,7 +18,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>201</width>
+     <width>381</width>
      <height>481</height>
     </rect>
    </property>
@@ -117,6 +117,12 @@
      <height>81</height>
     </rect>
    </property>
+   <property name="suffix">
+    <string>fps</string>
+   </property>
+   <property name="prefix">
+    <string>$</string>
+   </property>
    <property name="clickMarginLeftSetter" stdset="0">
     <enum>SpinBox::full</enum>
    </property>
@@ -133,8 +139,8 @@
   <widget class="RadioButton" name="radiobutton">
    <property name="geometry">
     <rect>
-     <x>0</x>
-     <y>220</y>
+     <x>180</x>
+     <y>300</y>
      <width>181</width>
      <height>81</height>
     </rect>
@@ -185,9 +191,9 @@
   <widget class="Backdrop" name="white_2">
    <property name="geometry">
     <rect>
-     <x>200</x>
+     <x>380</x>
      <y>280</y>
-     <width>601</width>
+     <width>421</width>
      <height>201</height>
     </rect>
    </property>
@@ -195,7 +201,7 @@
   <widget class="Backdrop" name="white_3">
    <property name="geometry">
     <rect>
-     <x>200</x>
+     <x>380</x>
      <y>0</y>
      <width>141</width>
      <height>241</height>
@@ -205,9 +211,9 @@
   <widget class="Backdrop" name="white_4">
    <property name="geometry">
     <rect>
-     <x>340</x>
+     <x>520</x>
      <y>0</y>
-     <width>461</width>
+     <width>281</width>
      <height>281</height>
     </rect>
    </property>
@@ -527,7 +533,7 @@
   <widget class="Label" name="label_4">
    <property name="geometry">
     <rect>
-     <x>210</x>
+     <x>390</x>
      <y>240</y>
      <width>51</width>
      <height>41</height>
@@ -972,6 +978,40 @@
     <enum>RadioButton::full</enum>
    </property>
   </widget>
+  <widget class="QWidget" name="widget" native="true">
+   <property name="geometry">
+    <rect>
+     <x>460</x>
+     <y>240</y>
+     <width>61</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background: rgba(0,0,0,128)</string>
+   </property>
+  </widget>
+  <widget class="DecimalSpinBox" name="decimalspinbox_2">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>220</y>
+     <width>181</width>
+     <height>81</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="DecimalSpinBox" name="decimalspinbox_3">
+   <property name="geometry">
+    <rect>
+     <x>180</x>
+     <y>220</y>
+     <width>181</width>
+     <height>81</height>
+    </rect>
+   </property>
+  </widget>
+  <zorder>widget</zorder>
   <zorder>white_4</zorder>
   <zorder>combobox_4</zorder>
   <zorder>white_2</zorder>
@@ -993,6 +1033,8 @@
   <zorder>uiDebug</zorder>
   <zorder>uiTriangle</zorder>
   <zorder>radiobutton_2</zorder>
+  <zorder>decimalspinbox_2</zorder>
+  <zorder>decimalspinbox_3</zorder>
  </widget>
  <customwidgets>
   <customwidget>
@@ -1057,8 +1099,11 @@
   <tabstop>button_3</tabstop>
   <tabstop>button_5</tabstop>
   <tabstop>slider</tabstop>
-  <tabstop>radiobutton</tabstop>
+  <tabstop>decimalspinbox_2</tabstop>
+  <tabstop>decimalspinbox_3</tabstop>
   <tabstop>combobox</tabstop>
+  <tabstop>radiobutton</tabstop>
+  <tabstop>radiobutton_2</tabstop>
  </tabstops>
  <resources/>
  <connections/>
