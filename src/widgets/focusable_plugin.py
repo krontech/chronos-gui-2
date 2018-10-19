@@ -1,6 +1,8 @@
 from PyQt5.QtCore import Qt, pyqtSignal, QTimer
 from PyQt5.QtGui import QKeyEvent
 
+from debugger import *; dbg
+
 class FocusablePlugin():
 	"""Some behaviour to make focusable widgets work correctly.
 	
@@ -39,6 +41,7 @@ class FocusablePlugin():
 				self.window().app.focusWidget(),
 				QKeyEvent(QKeyEvent.KeyRelease, key, modifier) )
 		
+		
 	def selectWidget(self, direction):
 		"""Select the nth widget in the direction specified.
 		
@@ -46,9 +49,18 @@ class FocusablePlugin():
 				_after_ the next widget in the focus chain.
 		"""
 		
-		#Can't do this, selects non-chained widgets: widgetToFocus = widgetToFocus.nextInFocusChain()
-		self.injectKeystrokes(Qt.Key_Tab, count=abs(direction),
-			modifier=Qt.NoModifier if direction > 0 else Qt.ShiftModifier )
+		# Can't do this, backtab doesn't work reliably when looping over, arrow keys don't work unless compiled for apparently?
+		#self.injectKeystrokes(Qt.Key_Tab, count=abs(direction),
+		#	modifier=Qt.NoModifier if direction > 0 else Qt.ShiftModifier )
+		
+		nextFn = 'previousInFocusChain' if direction < 0 else 'nextInFocusChain'
+		
+		widgetToFocus = getattr(self, nextFn)()
+		while (not issubclass(type(widgetToFocus), FocusablePlugin) or
+				not widgetToFocus.isVisible() or
+				widgetToFocus.focusPolicy() not in (Qt.TabFocus, Qt.WheelFocus, Qt.StrongFocus) ):
+			widgetToFocus = getattr(widgetToFocus, nextFn)()
+		widgetToFocus.setFocus()
 		
 		#Show the focus ring here, since this is the function used by the jog
 		#wheel to navigate widgets. We don't yet know which widget will be

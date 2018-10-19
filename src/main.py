@@ -208,7 +208,7 @@ class GlobalFilter(QtCore.QObject):
 		e.TouchBegin, e.TouchCancel, e.TouchEnd, e.TouchUpdate,
 		e.SockAct, e.Leave, e.Enter, #SockAct is triggered by mouse movement.
 		e.FocusAboutToChange, e.FocusIn, e.FocusOut,
-		e.KeyPress, e.KeyRelease, e.ShortcutOverride,
+		e.KeyPress, e.KeyRelease, e.ShortcutOverride, e.InputMethodQuery,
 		
 		#Screen transition events
 		e.PlatformSurface, e.WinIdChange, e.WindowIconChange, e.WindowDeactivate, e.WindowActivate, e.Resize, e.Show,

@@ -143,7 +143,7 @@
 		
 		<p>In the root of the project, on your computer, you can now run <tt>util/watch-computer.sh</tt>. This will watch for file changes and upload them to the camera.</p>
 		
-		<p>The second step is running the new files on the camera. First, we'll log in to the camera. There, <tt>cd gui</tt> to go to the newly-deployed project. Instead of running <tt>python3 src/cam-ui.py</tt>, we'll run <tt>util/watch-camera.sh</tt> which will run and rerun the command for us. (Under the hood, this script starts a bash loop running the python3 command. It uses <tt>watchdog</tt> to restart the script when a file changes. Watchdog is configured in the inline python script near the bottom of the file.) To help debug the GUI script, an interactive prompt will be brought up in this ssh session when an error is encountered.</p>
+		<p>The second step is running the new files on the camera. First, we'll log in to the camera. There, <tt>cd gui</tt> to go to the newly-deployed project. Instead of running <tt>python3 src/cam-ui.py</tt>, we'll run <tt>util/watch-camera.sh</tt> which will run and rerun the command for us. (Under the hood, this script starts a bash loop running the python3 command. It uses <tt>watchdog</tt> (<tt>pip3 install watchdog</tt>) to restart the script when a file changes. Watchdog is configured in the inline python script near the bottom of the file.) To help debug the GUI script, an interactive prompt will be brought up in this ssh session when an error is encountered.</p>
 		
 		
 		

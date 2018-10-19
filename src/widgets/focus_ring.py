@@ -3,7 +3,6 @@ from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 
 from debugger import *; dbg
-from widgets.touch_margin_plugin import TouchMarginPlugin
 
 
 class FocusRing(QLabel):

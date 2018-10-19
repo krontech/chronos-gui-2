@@ -606,6 +606,23 @@
    <header>spin_box</header>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>uiDone</tabstop>
+  <tabstop>uiPresets</tabstop>
+  <tabstop>uiHRes</tabstop>
+  <tabstop>uiVRes</tabstop>
+  <tabstop>uiHOffset</tabstop>
+  <tabstop>uiVOffset</tabstop>
+  <tabstop>uiFps</tabstop>
+  <tabstop>uiMaximizeFramerate</tabstop>
+  <tabstop>uiCenterRecording</tabstop>
+  <tabstop>uiFrameDuration</tabstop>
+  <tabstop>uiExposure</tabstop>
+  <tabstop>uiMaximizeExposure</tabstop>
+  <tabstop>uiAnalogGain</tabstop>
+  <tabstop>uiRecordModes</tabstop>
+  <tabstop>uiSavePreset</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>
