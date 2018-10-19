@@ -1,4 +1,4 @@
-from PyQt5.QtCore import *
+from PyQt5.QtCore import Q_ENUMS, pyqtProperty
 
 from random import randint
 

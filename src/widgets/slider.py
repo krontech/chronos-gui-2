@@ -1,12 +1,11 @@
 from random import randint
 
-from PyQt5.QtCore import *
-from PyQt5.QtGui import *
-from PyQt5.QtWidgets import *
+from PyQt5.QtWidgets import QSlider
+from PyQt5.QtCore import QSize
 
 from debugger import *; dbg
-
 from focusable_plugin import FocusablePlugin
+
 
 class Slider(QSlider, FocusablePlugin):
 	def __init__(self, parent=None, showHitRects=False):

@@ -1,8 +1,7 @@
 from random import randint
 
-from PyQt5.QtCore import *
-from PyQt5.QtGui import *
-from PyQt5.QtWidgets import *
+from PyQt5.QtCore import Q_ENUMS, QSize
+from PyQt5.QtWidgets import QLineEdit
 
 from debugger import *; dbg
 from touch_margin_plugin import TouchMarginPlugin, MarginWidth
