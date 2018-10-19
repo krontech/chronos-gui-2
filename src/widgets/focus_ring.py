@@ -43,7 +43,6 @@ class FocusRing(QLabel):
 			margins = None
 		
 		if margins:
-			print('margins', margins)
 			xy += QPoint(
 				margins["left"], 
 				margins["top"],

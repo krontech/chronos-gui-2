@@ -55,7 +55,8 @@ class FocusablePlugin():
 		widgetToFocus = getattr(self, nextFn)()
 		while (not issubclass(type(widgetToFocus), FocusablePlugin) or
 				not widgetToFocus.isVisible() or
-				widgetToFocus.focusPolicy() not in (Qt.TabFocus, Qt.WheelFocus, Qt.StrongFocus) ):
+				widgetToFocus.focusPolicy() == Qt.NoFocus or 
+				widgetToFocus.focusPolicy() == Qt.ClickFocus ): #Focus policy mask is not inclusive of "none" or "click". See http://doc.qt.io/qt-5/qt.html#FocusPolicy-enum. Can't just test for equality, since radio buttons are weird - the dominate radio button's focusPolicy is 10, the unselected button is 11 I think. The only time we actually *care* wrt the jog wheel is when the focus is set to none or mouse, though. Ideally, we'd check for wheel focus, but that doesn't default and it would be a real pain in the neck changing the focus of everything from the default of 'strong'.
 			widgetToFocus = getattr(widgetToFocus, nextFn)()
 		widgetToFocus.setFocus()
 		
