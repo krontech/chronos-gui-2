@@ -107,7 +107,7 @@ class State():
 	sensorVIncrement = 32
 	sensorPixelRate = 1920 * 1080 * 1000
 	sensorPixelFormat = "BYR2" #Or "y12" for mono models.
-	sensorRecordsColour = True
+	sensorRecordsColor = True
 	sensorFramerate = 1000
 	
 		
@@ -248,7 +248,7 @@ class State():
 		
 	currentCameraState = 'normal' #Can also be 'saving' or 'recording'. When saving, the API is unresponsive?
 	currentVideoState = 'viwefinder' #eg, 'viewfinder', 'playback', etc.
-	focusPeakingColour = 0xff0000 #red, green, blue (RGB), like CSS colours.
+	focusPeakingColor = 0xff0000 #red, green, blue (RGB), like CSS colors.
 	focusPeakingIntensity = 'low' #One of ['off', 'low', 'medium', 'high'].
 	showWhiteClippingZebraStripes = True
 	showBlackClippingZebraStripes = True
@@ -430,7 +430,7 @@ class State():
 	#
 	#overlayTextbox0Content = 'textbox 0 sample text'
 	#overlayTextbox0Font = list(b'<binary font data here>')
-	#overlayTextbox0Colour = 0xFFFFFF20 #RGBA
+	#overlayTextbox0Color = 0xFFFFFF20 #RGBA
 	#overlayTextbox0X = 0x0008
 	#overlayTextbox0Y = 0x0010
 	#overlayTextbox0W = 0x02D0
@@ -440,7 +440,7 @@ class State():
 	#
 	#overlayTextbox1Content = 'textbox 1 sample text'
 	#overlayTextbox1Font = list(b'<binary data here>')
-	#overlayTextbox1Colour = 0xFFFFFF20 #RGBA
+	#overlayTextbox1Color = 0xFFFFFF20 #RGBA
 	#overlayTextbox1X = 0x0110
 	#overlayTextbox1Y = 0x03D8
 	#overlayTextbox1W = 0x0320
@@ -448,7 +448,7 @@ class State():
 	#overlayTextbox1OffsetX = 0x08
 	#overlayTextbox1OffsetY = 0x08
 	#
-	#overlayChronosWatermarkColour = 0x20202020 #RGBA
+	#overlayChronosWatermarkColor = 0x20202020 #RGBA
 	#overlayChronosWatermarkX = 0x0008
 	#overlayChronosWatermarkY = 0x02F8
 	#

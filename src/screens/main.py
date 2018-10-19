@@ -9,7 +9,7 @@ import settings
 from widgets.button import Button
 
 focusPeakingIntensities = ['off', 'low', 'medium', 'high']
-focusPeakingColours = {
+focusPeakingColors = {
 	"blue": 0x0000FF,
 	"pink": 0xFF00FF,
 	"red": 0xFF0000,
@@ -75,20 +75,20 @@ class Main(QWidget):
 		self.uiFocusPeakingIntensity.currentIndexChanged.connect(
 			self.uiShotAssistMenu.setFocus )
 		
-		api.observe('focusPeakingColour', self.updateFocusPeakingColour, saftyCheckForSilencedWidgets=False)
+		api.observe('focusPeakingColor', self.updateFocusPeakingColor, saftyCheckForSilencedWidgets=False)
 		
 		self.uiBlueFocusPeaking.clicked.connect(lambda: api.set(
-			{'focusPeakingColour': focusPeakingColours['blue']} ) )
+			{'focusPeakingColor': focusPeakingColors['blue']} ) )
 		self.uiPinkFocusPeaking.clicked.connect(lambda: api.set(
-			{'focusPeakingColour': focusPeakingColours['pink']} ) )
+			{'focusPeakingColor': focusPeakingColors['pink']} ) )
 		self.uiRedFocusPeaking.clicked.connect(lambda: api.set(
-			{'focusPeakingColour': focusPeakingColours['red']} ) )
+			{'focusPeakingColor': focusPeakingColors['red']} ) )
 		self.uiYellowFocusPeaking.clicked.connect(lambda: api.set(
-			{'focusPeakingColour': focusPeakingColours['yellow']} ) )
+			{'focusPeakingColor': focusPeakingColors['yellow']} ) )
 		self.uiGreenFocusPeaking.clicked.connect(lambda: api.set(
-			{'focusPeakingColour': focusPeakingColours['green']} ) )
+			{'focusPeakingColor': focusPeakingColors['green']} ) )
 		self.uiCyanFocusPeaking.clicked.connect(lambda: api.set(
-			{'focusPeakingColour': focusPeakingColours['cyan']} ) )
+			{'focusPeakingColor': focusPeakingColors['cyan']} ) )
 		
 		self.uiBlueFocusPeaking.clicked.connect(self.uiShotAssistMenu.setFocus)
 		self.uiPinkFocusPeaking.clicked.connect(self.uiShotAssistMenu.setFocus)
@@ -100,7 +100,7 @@ class Main(QWidget):
 		
 		#Twiddle the calibration menu so it shows the right thing. It's pretty context-sensitive - you can't white-balance a black-and-white camera, and you can't do motion trigger calibration when there's no motion trigger set up.
 		#I think the sanest approach is to duplicate the button, one for each menu, since opening the menu is pretty complex and I don't want to try dynamically rebind menus.
-		if not api.get('sensorRecordsColour'):
+		if not api.get('sensorRecordsColor'):
 			self.uiCalibration = self.uiCalibrationOrBlackCal
 			self.uiBlackCal0 = Button(parent=self.uiCalibrationOrBlackCal.parent())
 			self.copyButton(src=self.uiCalibrationOrBlackCal, dest=self.uiBlackCal0)
@@ -175,7 +175,7 @@ class Main(QWidget):
 			#self.uiPinchToZoomGestureInterceptionPanel.clicked.connect(closeRecordingAndTriggersMenu)
 			#self.uiPinchToZoomGestureInterceptionPanel.clicked.connect(closeShotAssistMenu)
 			
-			api.observe('triggerConfiguration', self.updateColourTriggers)
+			api.observe('triggerConfiguration', self.updateColorTriggers)
 		
 		
 		self.uiRecordModes.clicked.connect(lambda: window.show('record_mode'))
@@ -263,9 +263,9 @@ class Main(QWidget):
 		#Ensure this menu is closed, since we're about to hide the thing to close it.
 		self.closeCalibrationMenu()
 	
-	@pyqtSlot('QVariantMap', name="updateColourTriggers")
+	@pyqtSlot('QVariantMap', name="updateColorTriggers")
 	@silenceCallbacks()
-	def updateColourTriggers(self, triggers):
+	def updateColorTriggers(self, triggers):
 		#	VAR IF no mocal
 		#		show cal menu button → wb/bc menu
 		#	ELSE
@@ -288,37 +288,37 @@ class Main(QWidget):
 		self.uiFocusPeakingIntensity.setCurrentIndex(
 			focusPeakingIntensities.index(focusPeakingIntensity) )
 	
-	@pyqtSlot(int, name="updateFocusPeakingColour")
+	@pyqtSlot(int, name="updateFocusPeakingColor")
 	@silenceCallbacks() #Causes pyqtSlot to overwrite earlier function.
-	def updateFocusPeakingColour(self, colour: int):
+	def updateFocusPeakingColor(self, color: int):
 		QPoint = QtCore.QPoint
 		
-		box = self.uiFocusPeakingColourSelectionIndicator
+		box = self.uiFocusPeakingColorSelectionIndicator
 		boxSize = QPoint(
 			box.geometry().width(),
 			box.geometry().height() )
 		
 		
-		if colour == focusPeakingColours["blue"]:
+		if color == focusPeakingColors["blue"]:
 			origin = self.uiBlueFocusPeaking.geometry().bottomRight()
 			box.move(origin - boxSize + QPoint(1,1))
-		elif colour == focusPeakingColours["pink"]:
+		elif color == focusPeakingColors["pink"]:
 			origin = self.uiPinkFocusPeaking.geometry().bottomLeft()
 			box.move(origin - QPoint(0, boxSize.y()-1))
-		elif colour == focusPeakingColours["red"]:
+		elif color == focusPeakingColors["red"]:
 			origin = self.uiRedFocusPeaking.geometry().bottomRight()
 			box.move(origin - boxSize + QPoint(1,1))
-		elif colour == focusPeakingColours["yellow"]:
+		elif color == focusPeakingColors["yellow"]:
 			origin = self.uiYellowFocusPeaking.geometry().topLeft()
 			box.move(origin)
-		elif colour == focusPeakingColours["green"]:
+		elif color == focusPeakingColors["green"]:
 			origin = self.uiGreenFocusPeaking.geometry().topRight()
 			box.move(origin - QPoint(boxSize.x()-1, 0))
-		elif colour == focusPeakingColours["cyan"]:
+		elif color == focusPeakingColors["cyan"]:
 			origin = self.uiCyanFocusPeaking.geometry().topLeft()
 			box.move(origin)
 		else:
-			print('unknown focus peaking colour', colour)
+			print('unknown focus peaking color', color)
 			box.move(0,99999)
 	
 	

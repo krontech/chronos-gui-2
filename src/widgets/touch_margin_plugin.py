@@ -42,8 +42,8 @@ class TouchMarginPlugin(MarginWidth):
 		self._customStyleSheet = ''
 		
 		# self._clickMarginColor = f"rgba({randint(0, 32)}, {randint(0, 32)}, {randint(128, 255)}, {randint(32,96)})"
-		colour = randint(100, 227)
-		self._clickMarginColor = f"rgba({colour}, {colour}, {colour}, {randint(32,96)})"
+		color = randint(100, 227)
+		self._clickMarginColor = f"rgba({color}, {color}, {color}, {randint(32,96)})"
 		
 		
 	def refreshStyle(self):

@@ -46,7 +46,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>This screen allows you to save and restore how you've set up your camera so far. Some examples of user settings are: saved video framerate, focus peaking colour, trigger settings, and so on. If you're selling the camera, it is recommend to reset it to the default factory settings.</string>
+    <string>This screen allows you to save and restore how you've set up your camera so far. Some examples of user settings are: saved video framerate, focus peaking color, trigger settings, and so on. If you're selling the camera, it is recommend to reset it to the default factory settings.</string>
    </property>
    <property name="wordWrap">
     <bool>true</bool>

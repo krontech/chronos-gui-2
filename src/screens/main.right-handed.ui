@@ -942,7 +942,7 @@ Clipping</string>
      <string>border-left: 1px solid black;</string>
     </property>
    </widget>
-   <widget class="QWidget" name="uiFocusPeakingColourSelectionIndicator" native="true">
+   <widget class="QWidget" name="uiFocusPeakingColorSelectionIndicator" native="true">
     <property name="geometry">
      <rect>
       <x>20</x>
@@ -967,7 +967,7 @@ Clipping</string>
    <zorder>uiRedFocusPeaking</zorder>
    <zorder>uiGreenFocusPeaking</zorder>
    <zorder>uiCyanFocusPeaking</zorder>
-   <zorder>uiFocusPeakingColourSelectionIndicator</zorder>
+   <zorder>uiFocusPeakingColorSelectionIndicator</zorder>
   </widget>
   <widget class="Backdrop" name="uiPinchToZoomGestureInterceptionPanel">
    <property name="geometry">

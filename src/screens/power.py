@@ -161,7 +161,7 @@ class Power(QtWidgets.QDialog):
 		#Draw chart outline
 		p.setPen(pen)
 		p.drawRect(QRectF(
-			chartPadding["left"]+0.5, #So, drawing on the pixel x,y with a line width 1 means that x,y and x-1, y-1 each get coloured in 0.5 of a line-width. Add 0.5 to the offset to make it crisp, so one pixel gets the whole line.
+			chartPadding["left"]+0.5, #So, drawing on the pixel x,y with a line width 1 means that x,y and x-1, y-1 each get colored in 0.5 of a line-width. Add 0.5 to the offset to make it crisp, so one pixel gets the whole line.
 			chartPadding["top"]+0.5,
 			chartLineWidth,
 			chartLineHeight,

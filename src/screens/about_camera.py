@@ -19,7 +19,7 @@ class AboutCamera(QtWidgets.QDialog):
 		#Substitute constants into header bit.
 		self.uiText.setText(
 			self.uiText.text()
-			.replace('{MODEL}', f"{api.get('cameraModel')}, {api.get('cameraMemoryGB')}, {'colour' if api.get('sensorRecordsColour') else 'mono'}")
+			.replace('{MODEL}', f"{api.get('cameraModel')}, {api.get('cameraMemoryGB')}, {'color' if api.get('sensorRecordsColor') else 'mono'}")
 			.replace('{SERIAL_NUMBER}', api.get('cameraSerial'))
 			.replace('{UI_VERSION}', app_version)
 			.replace('{API_VERSION}', api.get('cameraApiVersion'))

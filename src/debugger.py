@@ -28,7 +28,7 @@ def brk():
 	pdb.set_trace()
 	# QtCore.pyqtRestoreInputHook() #Hm, can't restore input here - since we hid this frame, I think execution continues until the end of the function. Perhaps we can subclass and call setup()? Just run it manually for now.
 
-# @pdb.hideframe #Provided by pdbpp, which also gives colour and nice tab-completion.
+# @pdb.hideframe #Provided by pdbpp, which also gives color and nice tab-completion.
 # pdbpp segfaults Designer on my desktop computer, but works on my laptop so we'll only use it if available.
 if hasattr(pdb, 'hideframe'):
 	brk = pdb.hideframe(brk)

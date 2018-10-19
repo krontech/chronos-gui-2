@@ -298,16 +298,16 @@
 					<td>integer</td>
 					<td>variable</td>
 					<td>
-						An integer specifying the colour of focus peaking, one of the available focus aids. Like HTML/CSS, this value is composed of four packed 8-bit channels, representing Red, Green, Blue, and Alpha (strength). In <a href="https://en.wikipedia.org/wiki/Hexadecimal">hexadecimal</a>, this is formatted as 0x<span style="color: #D00F;">RR</span><span style="color: #0B0F;">GG</span><span style="color: #00DF;">BB</span><span style="color: #000F;">AA</span>. For example, <code style="color: #AA00AAFF;">0xAA00AAFF</code> is maximum-strength purple, because red and blue are both set to AA, and alpha is set to FF. <code style="color: #C1681988;">0xC1681988</code> is half-strength brown.
+						An integer specifying the color of focus peaking, one of the available focus aids. Like HTML/CSS, this value is composed of four packed 8-bit channels, representing Red, Green, Blue, and Alpha (strength). In <a href="https://en.wikipedia.org/wiki/Hexadecimal">hexadecimal</a>, this is formatted as 0x<span style="color: #D00F;">RR</span><span style="color: #0B0F;">GG</span><span style="color: #00DF;">BB</span><span style="color: #000F;">AA</span>. For example, <code style="color: #AA00AAFF;">0xAA00AAFF</code> is maximum-strength purple, because red and blue are both set to AA, and alpha is set to FF. <code style="color: #C1681988;">0xC1681988</code> is half-strength brown.
 						<br>
 						To turn off/disable focus peaking, set this value to 0.
 					</td>
 				</tr>
 				<tr>
-					<td><code>overlayChronosWatermarkColour</code></td>
+					<td><code>overlayChronosWatermarkColor</code></td>
 					<td>integer</td>
 					<td>variable</td>
-					<td>8 bit per channel RGBA value indicating the colour for the Chronos logo overlay. The watermark is burned into saved video. See <a href="#focusPeakingColor">focusPeakingColor</a> for more information about colour.</td>
+					<td>8 bit per channel RGBA value indicating the color for the Chronos logo overlay. The watermark is burned into saved video. See <a href="#focusPeakingColor">focusPeakingColor</a> for more information about color.</td>
 				</tr>
 				<tr>
 					<td><code>overlayChronosWatermarkX</code></td>
@@ -324,7 +324,7 @@
 					<td><a name="overlayRGBImage"><code>overlayRGBImage</code></a></td>
 					<td>binary</td>
 					<td>variable</td>
-					<td>An image to burn on to the video. <a href="https://en.wikipedia.org/wiki/Indexed_color">Indexed colour</a> (like a gif), 20480 pixels maximum. Dimensions are given by the <a href="#overlayRGBImageHeight">overlayRGBImageHeight</a> and <a href="#overlayRGBImageWidth">overlayRGBImageWidth</a> variables. Colour index is given by <a href="#overlayRGBLogoPalette">overlayRGBLogoPalette</a>.</td>
+					<td>An image to burn on to the video. <a href="https://en.wikipedia.org/wiki/Indexed_color">Indexed color</a> (like a gif), 20480 pixels maximum. Dimensions are given by the <a href="#overlayRGBImageHeight">overlayRGBImageHeight</a> and <a href="#overlayRGBImageWidth">overlayRGBImageWidth</a> variables. Color index is given by <a href="#overlayRGBLogoPalette">overlayRGBLogoPalette</a>.</td>
 				</td>
 				<tr>
 					<td><a name="#overlayRGBImageHeight"><code>overlayRGBImageHeight</code></a></td>
@@ -353,7 +353,7 @@
 					<td>binary</td>
 					<td>variable</td>
 					<td>
-						The colour index for the <a href="#overlayRGBImage">indexed overlay image</a>. Planar format, 256 8-bit bytes each for Red, Green, and Blue. (If you had two colours in your overlay image, pink and black, your colour index might look like:
+						The color index for the <a href="#overlayRGBImage">indexed overlay image</a>. Planar format, 256 8-bit bytes each for Red, Green, and Blue. (If you had two colors in your overlay image, pink and black, your color index might look like:
 						<code class=codeblock>
 							[
 								0xFF, 0x00, «254 more entries»,
@@ -361,19 +361,19 @@
 								0xFF, 0x00, «254 more entries»
 							]
 						</code>
-						The first column represents the first colour, pink, with it's red and blue components. The second column represents black.
+						The first column represents the first color, pink, with it's red and blue components. The second column represents black.
 						<br>
-						True black is rendered transparent. If you want to actually draw black, the colour <code style="color: #000001;">0x000001</code> may be used instead of <code style="color: #000000;">0x000000</code>.
+						True black is rendered transparent. If you want to actually draw black, the color <code style="color: #000001;">0x000001</code> may be used instead of <code style="color: #000000;">0x000000</code>.
 					</td>
 				</td>
 				<tr>
-					<td><code>overlayTextbox0Colour</code></td>
+					<td><code>overlayTextbox0Color</code></td>
 					<td>integer</td>
 					<td>variable</td>
-					<td rowspan=2>Set the textbox's background colour. (Text is always white.) Format RGBA. See <a href="#focusPeakingColor">focusPeakingColor</a> for more information about colour.</td>
+					<td rowspan=2>Set the textbox's background color. (Text is always white.) Format RGBA. See <a href="#focusPeakingColor">focusPeakingColor</a> for more information about color.</td>
 				</td>
 				<tr>
-					<td><code>overlayTextbox1Colour</code></td>
+					<td><code>overlayTextbox1Color</code></td>
 					<td>integer</td>
 					<td>variable</td>
 				</td>
@@ -569,7 +569,7 @@
 					<td><code>sensorPixelFormat</code></td>
 					<td>string</td>
 					<td>constant</td>
-					<td>Either <code>BYR2</code> for colour cameras or <code>y12</code> for monochromatic cameras. This corresponds to the Color or Mono information printed on the bottom of the Chronos.</td>
+					<td>Either <code>BYR2</code> for color cameras or <code>y12</code> for monochromatic cameras. This corresponds to the Color or Mono information printed on the bottom of the Chronos.</td>
 				</td>
 				<tr>
 					<td><code>sensorPixelRate</code></td>
