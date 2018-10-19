@@ -3,7 +3,6 @@ from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 
 from debugger import *; dbg
-from widgets.touch_margin_plugin import TouchMarginPlugin
 
 
 class FocusRing(QLabel):
@@ -13,10 +12,13 @@ class FocusRing(QLabel):
 		not placable in Qt Designer.
 	"""
 	
-	padding = 10 #This can't seem to be assigned via CSS.
+	unfocussedPadding = 10 #This can't seem to be assigned via CSS.
+	focussedPadding = 2
 	
 	def __init__(self, *args, **kwargs):
 		super().__init__(*args, **kwargs)
+		
+		self.currentPadding = self.unfocussedPadding
 		
 		self.setAttribute(Qt.WA_TransparentForMouseEvents)
 		self.setFocusPolicy(Qt.NoFocus)
@@ -24,24 +26,33 @@ class FocusRing(QLabel):
 		self.setStyleSheet(f"""
 			border: 2px solid #1D6262;
 			background: rgba(196,196,255,32);
-			border-radius: {self.padding}px;
+			border-radius: {self.currentPadding}px;
 		""")
-		self.setGeometry(-999,-999, 0,0)
+		self.hide()
 	
 	
 	def focusOn(self, widget):
 		"""Move focus to a widget."""
 		xy = widget.parentWidget().mapToGlobal(widget.pos())
 		wh = widget.size()
-		if hasattr(widget, '_clickMarginLeft'):
+		
+		#Subtract the invisible touch margins, *usually* supplied by TouchMarginPlugin.
+		try:
+			margins = widget.touchMargins()
+		except AttributeError:
+			margins = None
+		
+		if margins:
+			print('margins', margins)
 			xy += QPoint(
-				widget._clickMarginLeft, 
-				widget._clickMarginTop,
-			)*10 - QPoint(self.padding, self.padding)
+				margins["left"], 
+				margins["top"],
+			) - QPoint(self.currentPadding, self.currentPadding)
 			wh -= QSize(
-				widget._clickMarginLeft + widget._clickMarginRight, 
-				widget._clickMarginBottom + widget._clickMarginTop,
-			)*10 - QSize(self.padding, self.padding)*2
+				margins["left"] + margins["right"], 
+				margins["bottom"] + margins["top"],
+			) - QSize(self.currentPadding, self.currentPadding)*2
+			
 		self.window().focusRing.setGeometry(QRect(xy, wh))
 	
 	def focusIn(self):

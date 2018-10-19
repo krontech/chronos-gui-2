@@ -201,7 +201,9 @@ class Main(QWidget):
 		#[TODO DDR 2018-09-13] This valueChanged event is really quite slow, for some reason.
 		self.uiExposureSlider.valueChanged.connect(
 			lambda: api.control('set', {'recordingExposureNs': self.uiExposureSlider.value()}) )
-		
+		self.uiExposureSlider.touchMargins = lambda: {
+			"top": 10, "left": 30, "bottom": 10, "right": 30
+		}
 		
 		#Oh god this is gonna mess up scroll wheel selection so badly. 😭
 		self.uiShowWhiteClipping.stateChanged.connect(self.uiShotAssistMenu.setFocus)

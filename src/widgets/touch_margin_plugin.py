@@ -56,7 +56,17 @@ class TouchMarginPlugin(MarginWidth):
 	
 	def originalStyleSheet(self):
 		return self._customStyleSheet
-
+	
+	
+	def touchMargins(self):
+		return {
+			"top": self._clickMarginTop * 10,
+			"left": self._clickMarginLeft * 10,
+			"bottom": self._clickMarginBottom * 10,
+			"right": self._clickMarginRight * 10,
+		}
+	
+	
 	@pyqtProperty(MarginWidth)
 	def clickMarginLeft(self):
 		return self._clickMarginLeft

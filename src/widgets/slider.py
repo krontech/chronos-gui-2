@@ -48,3 +48,12 @@ class Slider(QSlider, FocusablePlugin):
 				border-radius: 7.5px; /* Half of width. More turns it off. */
 			}}
 		""" + self.styleSheet())
+		
+		
+	def touchMargins(self):
+		return {
+			"top": 10, #cool that looks about right
+			"left": 20,
+			"bottom": 10,
+			"right": 20,
+		}
