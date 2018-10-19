@@ -772,10 +772,10 @@ Clipping</string>
 					background: white;
 					
 					/* use borders instead of margins so we can see what we're doing */
-					border-left:   21px solid rgba(3, 13, 219, 85);
-					border-right:  1px solid rgba(3, 13, 219, 85);
-					border-top:    11px solid rgba(3, 13, 219, 85);
-					border-bottom: 1px solid rgba(3, 13, 219, 85);
+					border-left:   21px solid rgba(20, 5, 231, 53);
+					border-right:  1px solid rgba(20, 5, 231, 53);
+					border-top:    11px solid rgba(20, 5, 231, 53);
+					border-bottom: 1px solid rgba(20, 5, 231, 53);
 				}
 			Button { background: #7a70f7 }</string>
     </property>
@@ -1121,11 +1121,11 @@ Calibration</string>
  </customwidgets>
  <tabstops>
   <tabstop>uiRecord</tabstop>
-  <tabstop>uiExposureSlider</tabstop>
+  <tabstop>uiDebugC</tabstop>
+  <tabstop>uiClose</tabstop>
   <tabstop>uiDebugA</tabstop>
   <tabstop>uiDebugB</tabstop>
-  <tabstop>uiClose</tabstop>
-  <tabstop>uiDebugC</tabstop>
+  <tabstop>uiExposureSlider</tabstop>
   <tabstop>uiBattery</tabstop>
   <tabstop>uiPrefsAndUtils</tabstop>
   <tabstop>uiRecordingAndTriggers</tabstop>
