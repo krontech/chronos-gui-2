@@ -33,6 +33,7 @@ class DecimalSpinBox(QDoubleSpinBox, TouchMarginPlugin, DirectAPILinkPlugin, Foc
 					font-size: 16px;
 					border: 1px solid black;
 					padding-right: 40px;
+					padding-right: 10px;
 					padding-left: 10px;
 					background: white;
 					
@@ -47,14 +48,14 @@ class DecimalSpinBox(QDoubleSpinBox, TouchMarginPlugin, DirectAPILinkPlugin, Foc
 				}}
 				DecimalSpinBox::up-button {{ 
 					subcontrol-position: right; 
-					right: 40px; 
+					right: 40px;
 					image: url(../../assets/images/wedge-up-enabled.png);
 				}}
 				DecimalSpinBox::up-button:disabled {{ 
 					image: url(../../assets/images/wedge-up-disabled.png);
 				}}
 				DecimalSpinBox::down-button {{ 
-					subcontrol-position: right; 
+					subcontrol-position: right;
 					image: url(../../assets/images/wedge-down-enabled.png);
 				}}
 				DecimalSpinBox::down-button:disabled {{ 
@@ -66,6 +67,8 @@ class DecimalSpinBox(QDoubleSpinBox, TouchMarginPlugin, DirectAPILinkPlugin, Foc
 					border-left-width: 1px;
 					width: 40px; 
 					height: 40px;
+					width: 0px; /*These buttons just take up room. We have a jog wheel for them.*/
+					height: 0px;
 				}}
 			""" + self.originalStyleSheet())
 		else:
@@ -107,5 +110,16 @@ class DecimalSpinBox(QDoubleSpinBox, TouchMarginPlugin, DirectAPILinkPlugin, Foc
 					border-left-width: 1px;
 					width: 40px; 
 					height: 40px;
+					width: 0px; /*These buttons just take up room. We have a jog wheel for them.*/
+					height: 0px;
 				}}
 			""" + self.originalStyleSheet())
+	
+	
+	@pyqtProperty(str)
+	def units(self):
+		return self._units
+	
+	@units.setter
+	def units(self, newUnitCSVList):
+		self._units = newUnitCSVList

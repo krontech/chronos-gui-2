@@ -32,10 +32,12 @@ class DirectAPILinkPlugin():
 			
 			if hasattr(self, 'setValue'): #Most inputs.
 				self.valueChanged.connect(
-					lambda val: api.set({self._linkedValueName: val}) )
+					lambda val: api.set({
+						self._linkedValueName: self.realValue(val) }) )
 			else: #Checkbox
 				self.stateChanged.connect(
-					lambda val: api.set({self._linkedValueName: val != 0 }) )
+					lambda val: api.set({
+						self._linkedValueName: val != 0 }) )
 		
 	
 	@pyqtSlot(int, str)

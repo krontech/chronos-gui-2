@@ -32,7 +32,7 @@ class Main(QWidget):
 		
 		# Widget behavour.
 		self.uiDebugA.clicked.connect(self.printAnalogGain)
-		self.uiDebugB.clicked.connect(lambda: window.show('widget_test'))
+		self.uiDebugB.clicked.connect(lambda: window.show('test'))
 		self.uiDebugC.setFocusPolicy(QtCore.Qt.NoFocus) #Break into debugger without loosing focus, so you can debug focus issues.
 		self.uiDebugC.clicked.connect(lambda: self and dbg()) #"self" is needed here, won't be available otherwise.
 		self.uiClose.clicked.connect(QApplication.closeAllWindows)

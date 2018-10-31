@@ -42,3 +42,24 @@ def dump(val, label=None):
 	print(label, val) if label else print(val)
 	
 	return val
+	
+
+def breakIf(widget):
+	"""If a keyboard modifier is held, start an interactive debugger.
+		
+		Args:
+			widget: A Qt Widget, in a GUI2 screen which has app set
+				to the global application variable. The application
+				variable gets the keyboard modifier state.
+	
+		Useful for debugging input-driven events going off the rails
+			half-way through. Note that due to the call to
+			pyqtRemoveInputHook in brk(), this is only a trigger-on
+			deal. You can't stop triggering it.
+		"""
+	
+	if int(widget.parent().app.keyboardModifiers()) != QtCore.Qt.NoModifier: #33554432: #heck if I know
+		brk()
+
+if hasattr(pdb, 'hideframe'):
+	breakIf = pdb.hideframe(breakIf)

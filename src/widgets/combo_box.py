@@ -17,7 +17,7 @@ class ComboBox(QComboBox, TouchMarginPlugin, FocusablePlugin):
 		
 		def onLowResRotate(delta, pressed):
 			if pressed:
-				self.injectKeystrokes(Qt.Key_Down if delta < 0 else Qt.Key_Up)
+				self.injectKeystrokes(Qt.Key_Up if delta < 0 else Qt.Key_Down)
 			else:
 				self.selectWidget(delta)
 		self.jogWheelLowResolutionRotation.connect(onLowResRotate)

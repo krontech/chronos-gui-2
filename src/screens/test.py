@@ -6,10 +6,10 @@ from debugger import *; dbg
 # import api as api
 
 
-class WidgetTest(QtWidgets.QWidget):
+class Test(QtWidgets.QWidget):
 	def __init__(self, window):
 		super().__init__()
-		uic.loadUi("src/screens/widget_test.ui", self)
+		uic.loadUi("src/screens/test.spin_box.ui", self)
 		
 		# Panel init.
 		self.move(0, 0)
@@ -18,6 +18,7 @@ class WidgetTest(QtWidgets.QWidget):
 		
 		# Button binding.
 		self.uiDebug.clicked.connect(lambda: self and dbg()) #"self" is needed here, won't be available otherwise.
+		#self.uiDebug.clicked.connect(lambda: self.decimalspinbox_3.availableUnits()) #"self" is needed here, won't be available otherwise.
 		self.uiBack.clicked.connect(window.back)
 		
 		#QSvgWidget('assets/images/rotating-triangle.svg')
@@ -26,7 +27,9 @@ class WidgetTest(QtWidgets.QWidget):
 		self.anim = self.animWidget.children()[0]
 		self.animTimer = self.anim.children()[0]
 		
-		self.uiAnimateTriangle.clicked.connect(self.animateTriangle)
+		self.spinbox_2.setFocus()
+		
+		#self.uiAnimateTriangle.clicked.connect(self.animateTriangle)
 	
 	def animateTriangle(self):
 		#self.animTimer.stop()

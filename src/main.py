@@ -78,7 +78,7 @@ class Window(QtCore.QObject):
 		from screens.triggers import Triggers
 		from screens.update_firmware import UpdateFirmware
 		from screens.user_settings import UserSettings
-		from screens.widget_test import WidgetTest
+		from screens.test import Test
 		from screens.service_screen import ServiceScreenLocked, ServiceScreenUnlocked
 		
 		self._availableScreens = {
@@ -95,7 +95,7 @@ class Window(QtCore.QObject):
 			'stamp': Stamp,
 			'update_firmware': UpdateFirmware,
 			'user_settings': UserSettings,
-			'widget_test': WidgetTest,
+			'test': Test,
 			'service_screen.locked': ServiceScreenLocked,
 			'service_screen.unlocked': ServiceScreenUnlocked,
 		}
@@ -130,7 +130,7 @@ class Window(QtCore.QObject):
 		#Cache all screens, cached screens load about 150-200ms faster I think.
 		self._lazyLoadTimer = QtCore.QTimer()
 		self._lazyLoadTimer.timeout.connect(self._loadAScreen)
-		self._lazyLoadTimer.start(250) #ms
+		#self._lazyLoadTimer.start(250) #ms
 		
 	def _ensureInstantiated(self, screenName: str):
 		"""Lazily load screens to shorten initial startup time."""
@@ -261,41 +261,6 @@ class GlobalFilter(QtCore.QObject):
 
 
 def connectHardwareEvents(app, hardware):
-	#Inject keystrokes into application from hardware inputs, triggering default behaviour.
-	def injectPageUpDown(delta):
-		"""Send page up or page down if the jog wheel's pressed, because it's faster."""
-		if not hardware.jogWheelPressed:
-			#Only send page up/down if the jog wheel is pressed.
-			return
-		
-		for i in range(abs(delta)):
-			app.postEvent(
-				app.focusWidget(), 
-				QtGui.QKeyEvent(
-					QtGui.QKeyEvent.KeyPress, 
-					QtCore.Qt.Key_PageUp if delta > 0 else QtCore.Qt.Key_PageDown,
-					QtCore.Qt.NoModifier ) )
-	
-	#hardware.subscribe('jogWheelHighResolutionRotation', injectPageUpDown)
-	
-	
-	def injectUpDownArrow(delta):
-		"""Send key up or page down if the jog wheel isn't pressed, because it's slower."""
-		
-		if hardware.jogWheelPressed:
-			#Only send key up/down if the jog wheel is not being held down.
-			return
-		
-		for i in range(abs(delta)):
-			app.postEvent(
-				app.focusWidget(), 
-				QtGui.QKeyEvent(
-					QtGui.QKeyEvent.KeyPress, 
-					QtCore.Qt.Key_Up if delta > 0 else QtCore.Qt.Key_Down,
-					QtCore.Qt.NoModifier ) )
-	
-	#hardware.subscribe('jogWheelLowResolutionRotation', injectUpDownArrow)
-	
 	def linkLightToRecordButton():
 		hardware.recordingLightsAreLit = hardware.recordButtonPressed #This is dumb. Lambdas can call functions, this is a setter function, but I can't call it because it uses =. -_-
 	
@@ -321,6 +286,7 @@ def connectHardwareEvents(app, hardware):
 	jogWheelLongClickTimer.setSingleShot(True)
 	
 	def endPress():
+		print('isactive', jogWheelLongClickTimer.isActive())
 		if jogWheelLongClickTimer.isActive(): #Long-press timer hasn't expired, just a click.
 			app.focusWidget() and app.focusWidget().jogWheelClick.emit()
 			jogWheelLongClickTimer.stop() #Suppress jog wheel long press.

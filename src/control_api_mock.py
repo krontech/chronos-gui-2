@@ -187,6 +187,10 @@ class State():
 		global pendingCallbacks
 		self._recordingHRes = value
 		pendingCallbacks += [changeRecordingResolution, notifyExposureChange]
+		
+	@property
+	def recordingHStep(self): #constant, we only have the one sensor
+		return 16
 	
 	
 	_recordingVRes = 300 
@@ -201,8 +205,12 @@ class State():
 		self._recordingVRes = value
 		pendingCallbacks += [changeRecordingResolution, notifyExposureChange]
 	
-	_recordingHOffset = 800 #rebuilds video pipeline
+	@property
+	def recordingVStep(self): #constant, we only have the one sensor
+		return 2
 	
+	
+	_recordingHOffset = 800 #rebuilds video pipeline
 	
 	@property
 	def recordingHOffset(self): #rebuilds video pipeline
@@ -214,8 +222,8 @@ class State():
 		self._recordingHOffset = value
 		pendingCallbacks += [changeRecordingResolution]
 	
-	_recordingVOffset = 480
 	
+	_recordingVOffset = 480
 	
 	@property
 	def recordingVOffset(self):
@@ -226,6 +234,7 @@ class State():
 		global pendingCallbacks
 		self._recordingVOffset = value
 		pendingCallbacks += [changeRecordingResolution]
+	
 	
 	recordingAnalogGainMultiplier = 2 #doesn't rebuild video pipeline, only takes gain multiplier
 	
@@ -267,8 +276,7 @@ class State():
 		"trig1": {
 			"action": "none",
 			"threshold": 2.50,
-			"invertInput": False,
-			"invertOutput": False,
+			"invert": False,
 			"debounce": True,
 			"pullup1ma": False,
 			"pullup20ma": True,
@@ -276,8 +284,7 @@ class State():
 		"trig2": {
 			"action": "none",
 			"threshold": 2.75,
-			"invertInput": True,
-			"invertOutput": False,
+			"invert": True,
 			"debounce": True,
 			"pullup1ma": False,
 			"pullup20ma": False,
@@ -285,8 +292,7 @@ class State():
 		"trig3": {
 			"action": "none",
 			"threshold": 2.50,
-			"invertInput": False,
-			"invertOutput": False,
+			"invert": False,
 			"debounce": False,
 			"pullup1ma": True,
 			"pullup20ma": True,
@@ -294,8 +300,7 @@ class State():
 		"~a1": {
 			"action": "record end",
 			"threshold": 2.50,
-			"invertInput": False,
-			"invertOutput": False,
+			"invert": False,
 			"debounce": True,
 			"pullup1ma": False,
 			"pullup20ma": True,
@@ -303,8 +308,7 @@ class State():
 		"~a2": {
 			"action": "none",
 			"threshold": 2.50,
-			"invertInput": False,
-			"invertOutput": False,
+			"invert": False,
 			"debounce": True,
 			"pullup1ma": False,
 			"pullup20ma": True,
@@ -312,8 +316,7 @@ class State():
 		"motion": {
 			"action": "none",
 			"threshold": 2.50,
-			"invertInput": False,
-			"invertOutput": False,
+			"invert": False,
 			"debounce": True,
 			"pullup1ma": False,
 			"pullup20ma": True,
@@ -375,7 +378,7 @@ class State():
 			},
 			"motion": {
 				"name": "Motion",
-				"label": False,
+				"label": "",
 				"thresholdMin": False,
 				"thresholdMax": False,
 				"pullup1ma": False,
@@ -417,7 +420,7 @@ class State():
 				"level": random.choice((0., 0, 0.01, 0.01, 0.01, 0.01, 0.07))
 			},
 		}
-		 
+	
 	motionTriggerHOffset = 134
 	motionTriggerVOffset = 656
 	motionTriggerHRes = 64

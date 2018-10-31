@@ -17,25 +17,25 @@ class SpinBox(QSpinBox, TouchMarginPlugin, DirectAPILinkPlugin, FocusablePlugin)
 		self.clickMarginColor = f"rgba({randint(0, 32)}, {randint(128, 255)}, {randint(128, 255)}, {randint(32,96)})"
 		
 		#Jog wheel-based state.
-		self.isFocussed = False
-		self.jogWheelMagnitude = 0
+		self.isFocused = False
 		
 		def onLowResRotate(delta, pressed):
-			if not self.isFocussed:
+			if self.isFocused:
 				if pressed:
-					self.injectKeystrokes(Qt.Key_Down if delta < 0 else Qt.Key_Up)
-				else:
-					self.selectWidget(delta)
+					self.changeJogWheelCharacterSelection(delta)
+				else: 
+					self.incrementJogWheelCharacterSelection(self.jogWheelIndex, delta, keepOrderOfMagnitude=True)
 			else:
 				if pressed:
-					#select the place
-					pass
-				else: 
-					self.injectKeystrokes(Qt.Key_Down if delta < 0 else Qt.Key_Up)
+					self.incrementJogWheelCharacterSelection(1, delta)
+				else:
+					self.selectWidget(delta)
 		self.jogWheelLowResolutionRotation.connect(onLowResRotate)
 		
 		def toggleFocussed():
-			self.isFocussed = not self.isFocussed
+			self.isFocused = not self.isFocused
+			if(self.isFocused):
+				self.changeJogWheelCharacterSelection(0)
 		self.jogWheelClick.connect(toggleFocussed)
 
 
@@ -51,6 +51,7 @@ class SpinBox(QSpinBox, TouchMarginPlugin, DirectAPILinkPlugin, FocusablePlugin)
 					font-size: 16px;
 					border: 1px solid black;
 					padding-right: 40px;
+					padding-right: 10px;
 					padding-left: 10px;
 					background: white;
 					
@@ -84,6 +85,8 @@ class SpinBox(QSpinBox, TouchMarginPlugin, DirectAPILinkPlugin, FocusablePlugin)
 					border-left-width: 1px;
 					width: 40px; 
 					height: 40px;
+					width: 0px; /*These buttons just take up room. We have a jog wheel for them.*/
+					height: 0px;
 				}}
 			""" + self.originalStyleSheet())
 		else:
@@ -91,6 +94,7 @@ class SpinBox(QSpinBox, TouchMarginPlugin, DirectAPILinkPlugin, FocusablePlugin)
 				SpinBox {{ 
 					border: 1px solid black;
 					padding-right: 40px;
+					padding-right: 10px;
 					padding-left: 10px;
 					font-size: 16px;
 					background: white;
@@ -107,13 +111,14 @@ class SpinBox(QSpinBox, TouchMarginPlugin, DirectAPILinkPlugin, FocusablePlugin)
 				SpinBox::up-button {{ 
 					subcontrol-position: right; 
 					right: 40px; 
+					right: 0px; 
 					image: url(assets/images/wedge-up-enabled.png);
 				}}
 				SpinBox::up-button:disabled {{ 
 					image: url(assets/images/wedge-up-disabled.png);
 				}}
 				SpinBox::down-button {{ 
-					subcontrol-position: right; 
+					subcontrol-position: right;
 					image: url(assets/images/wedge-down-enabled.png);
 				}}
 				SpinBox::down-button:disabled {{ 
@@ -121,9 +126,16 @@ class SpinBox(QSpinBox, TouchMarginPlugin, DirectAPILinkPlugin, FocusablePlugin)
 					image: url(assets/images/wedge-down-disabled.png);
 				}}
 				SpinBox::up-button, SpinBox::down-button {{
-					border: 0px solid black;
-					border-left-width: 1px;
-					width: 40px; 
-					height: 40px;
+					width: 0px; /*These buttons just take up room. We have a jog wheel for them.*/
+					height: 0px;
 				}}
 			""" + self.originalStyleSheet())
+	
+	
+	@pyqtProperty(str)
+	def units(self):
+		return self._units
+	
+	@units.setter
+	def units(self, newUnitCSVList):
+		self._units = newUnitCSVList

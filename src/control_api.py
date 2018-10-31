@@ -186,9 +186,13 @@ class State():
 		global pendingCallbacks
 		self._recordingHRes = value
 		pendingCallbacks += [changeRecordingResolution, notifyExposureChange]
+
+	@property
+	def recordingHStep(self): #constant, we only have the one sensor
+		return 16
+	
 	
 	_recordingVRes = 300 
-	
 	
 	@property
 	def recordingVRes(self): 
@@ -200,8 +204,12 @@ class State():
 		self._recordingVRes = value
 		pendingCallbacks += [changeRecordingResolution, notifyExposureChange]
 	
-	_recordingHOffset = 800 #rebuilds video pipeline
+	@property
+	def recordingVStep(self): #constant, we only have the one sensor
+		return 2
 	
+	
+	_recordingHOffset = 800 #rebuilds video pipeline
 	
 	@property
 	def recordingHOffset(self): #rebuilds video pipeline
