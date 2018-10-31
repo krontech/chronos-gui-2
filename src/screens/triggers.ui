@@ -23,7 +23,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>3</number>
+    <number>1</number>
    </property>
    <widget class="QWidget" name="uiTrigger1">
     <widget class="HeaderLabel" name="headerlabel_2">
@@ -156,9 +156,9 @@
      <property name="geometry">
       <rect>
        <x>440</x>
-       <y>140</y>
+       <y>130</y>
        <width>341</width>
-       <height>251</height>
+       <height>231</height>
       </rect>
      </property>
      <property name="styleSheet">
@@ -311,9 +311,9 @@
      <property name="geometry">
       <rect>
        <x>440</x>
-       <y>140</y>
+       <y>130</y>
        <width>341</width>
-       <height>251</height>
+       <height>231</height>
       </rect>
      </property>
      <property name="styleSheet">
@@ -479,7 +479,7 @@
        <x>20</x>
        <y>160</y>
        <width>141</width>
-       <height>25</height>
+       <height>31</height>
       </rect>
      </property>
      <property name="text">
@@ -522,9 +522,9 @@
      <property name="geometry">
       <rect>
        <x>440</x>
-       <y>140</y>
+       <y>130</y>
        <width>341</width>
-       <height>251</height>
+       <height>231</height>
       </rect>
      </property>
      <property name="styleSheet">
@@ -621,7 +621,7 @@
        <x>0</x>
        <y>150</y>
        <width>21</width>
-       <height>171</height>
+       <height>201</height>
       </rect>
      </property>
     </widget>
@@ -629,9 +629,9 @@
      <property name="geometry">
       <rect>
        <x>0</x>
-       <y>320</y>
+       <y>350</y>
        <width>801</width>
-       <height>81</height>
+       <height>51</height>
       </rect>
      </property>
     </widget>
@@ -641,15 +641,15 @@
        <x>330</x>
        <y>150</y>
        <width>471</width>
-       <height>171</height>
+       <height>201</height>
       </rect>
      </property>
     </widget>
     <widget class="Button" name="uiMotionTriggerConfigure">
      <property name="geometry">
       <rect>
-       <x>0</x>
-       <y>320</y>
+       <x>170</x>
+       <y>85</y>
        <width>181</width>
        <height>81</height>
       </rect>
@@ -671,26 +671,13 @@
       <string>Debounce</string>
      </property>
     </widget>
-    <widget class="CheckBox" name="uiMotionTriggerInvert">
-     <property name="geometry">
-      <rect>
-       <x>600</x>
-       <y>320</y>
-       <width>201</width>
-       <height>81</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Invert Signal</string>
-     </property>
-    </widget>
     <widget class="QWidget" name="uiMotionTriggerVisualization" native="true">
      <property name="geometry">
       <rect>
        <x>440</x>
        <y>140</y>
        <width>361</width>
-       <height>181</height>
+       <height>191</height>
       </rect>
      </property>
      <property name="styleSheet">
@@ -769,6 +756,32 @@
       <string>icon</string>
      </property>
     </widget>
+    <widget class="CheckBox" name="uiMotionTriggerInvert">
+     <property name="geometry">
+      <rect>
+       <x>600</x>
+       <y>320</y>
+       <width>201</width>
+       <height>81</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Invert Signal</string>
+     </property>
+    </widget>
+    <zorder>backdrop_5</zorder>
+    <zorder>backdrop_6</zorder>
+    <zorder>backdrop_7</zorder>
+    <zorder>backdrop_8</zorder>
+    <zorder>uiMotionTriggerVisualization</zorder>
+    <zorder>headerlabel_12</zorder>
+    <zorder>headerlabel_13</zorder>
+    <zorder>uiMotionTriggerAction</zorder>
+    <zorder>headerlabel_14</zorder>
+    <zorder>uiTriggerMotionIcon</zorder>
+    <zorder>uiMotionTriggerConfigure</zorder>
+    <zorder>uiMotionTriggerInvert</zorder>
+    <zorder>uiMotionTriggerDebounce</zorder>
    </widget>
   </widget>
   <widget class="ComboBox" name="uiActiveTrigger">
@@ -777,8 +790,11 @@
      <x>0</x>
      <y>30</y>
      <width>311</width>
-     <height>81</height>
+     <height>71</height>
     </rect>
+   </property>
+   <property name="clickMarginBottomSetter" stdset="0">
+    <enum>ComboBox::half</enum>
    </property>
    <item>
     <property name="text">
@@ -837,38 +853,6 @@
     <string>* you have unsaved changes</string>
    </property>
   </widget>
-  <widget class="Button" name="uiTriggerDelay">
-   <property name="geometry">
-    <rect>
-     <x>0</x>
-     <y>400</y>
-     <width>171</width>
-     <height>81</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Trigger Delay</string>
-   </property>
-   <property name="clickMarginRightSetter" stdset="0">
-    <enum>Button::half</enum>
-   </property>
-  </widget>
-  <widget class="Button" name="uiRecordMode">
-   <property name="geometry">
-    <rect>
-     <x>170</x>
-     <y>400</y>
-     <width>171</width>
-     <height>81</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Record Mode</string>
-   </property>
-   <property name="clickMarginLeftSetter" stdset="0">
-    <enum>Button::half</enum>
-   </property>
-  </widget>
   <widget class="Button" name="uiApply">
    <property name="geometry">
     <rect>
@@ -901,15 +885,83 @@
     <enum>Button::half</enum>
    </property>
   </widget>
+  <widget class="Label" name="uiTrig1Status">
+   <property name="geometry">
+    <rect>
+     <x>30</x>
+     <y>400</y>
+     <width>141</width>
+     <height>30</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Trig1⇄: %s</string>
+   </property>
+  </widget>
+  <widget class="Label" name="uiTrig2Status">
+   <property name="geometry">
+    <rect>
+     <x>190</x>
+     <y>400</y>
+     <width>140</width>
+     <height>30</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Trig2⇄: %s</string>
+   </property>
+  </widget>
+  <widget class="Label" name="uiTrig3Status">
+   <property name="geometry">
+    <rect>
+     <x>30</x>
+     <y>430</y>
+     <width>140</width>
+     <height>30</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Trig3+: %s</string>
+   </property>
+  </widget>
+  <widget class="Label" name="uiMotionTriggerStatus">
+   <property name="geometry">
+    <rect>
+     <x>190</x>
+     <y>430</y>
+     <width>140</width>
+     <height>30</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Motion: %s</string>
+   </property>
+  </widget>
+  <widget class="HeaderLabel" name="headerlabel_16">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>370</y>
+     <width>241</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Trigger Status</string>
+   </property>
+  </widget>
   <zorder>backdrop</zorder>
   <zorder>uiTriggerScreens</zorder>
   <zorder>headerlabel</zorder>
   <zorder>uiActiveTrigger</zorder>
   <zorder>uiUnsavedChangesWarning</zorder>
-  <zorder>uiTriggerDelay</zorder>
-  <zorder>uiRecordMode</zorder>
   <zorder>uiApply</zorder>
   <zorder>uiDone</zorder>
+  <zorder>uiTrig1Status</zorder>
+  <zorder>uiTrig2Status</zorder>
+  <zorder>uiTrig3Status</zorder>
+  <zorder>uiMotionTriggerStatus</zorder>
+  <zorder>headerlabel_16</zorder>
  </widget>
  <customwidgets>
   <customwidget>
@@ -969,8 +1021,6 @@
   <tabstop>uiMotionTriggerConfigure</tabstop>
   <tabstop>uiMotionTriggerDebounce</tabstop>
   <tabstop>uiMotionTriggerInvert</tabstop>
-  <tabstop>uiTriggerDelay</tabstop>
-  <tabstop>uiRecordMode</tabstop>
   <tabstop>uiApply</tabstop>
  </tabstops>
  <resources>

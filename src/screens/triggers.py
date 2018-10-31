@@ -54,6 +54,10 @@ class Triggers(QtWidgets.QDialog):
 		self.uiUnsavedChangesWarning.hide()
 		
 		self.trigger3VoltageTextTemplate = self.uiTrigger3ThresholdVoltage.text()
+		self.uiTrig1StatusTextTemplate = self.uiTrig1Status.text()
+		self.uiTrig2StatusTextTemplate = self.uiTrig2Status.text()
+		self.uiTrig3StatusTextTemplate = self.uiTrig3Status.text()
+		self.uiMotionTriggerStatusTextTemplate = self.uiMotionTriggerStatus.text()
 		
 		# Set up panel switching.
 		#DDR 2018-07-24 It's impossible to associate an identifier with anything in QT Designer. Painfully load the identifiers here. Also check everything because I will mess this up next time I add a trigger.
@@ -74,8 +78,6 @@ class Triggers(QtWidgets.QDialog):
 		self.uiActiveTrigger.currentIndexChanged.connect(self.changeShownTrigger)
 		
 		#Set up state init & events.
-		self.uiRecordMode.clicked.connect(lambda: window.show('record_mode'))
-		self.uiTriggerDelay.clicked.connect(lambda: window.show('trigger_delay'))
 		self.uiApply.clicked.connect(lambda: self and dbg())
 		#self.uiDebugC.clicked.connect(saveEverything()) TODO: This.
 		self.uiDone.clicked.connect(window.back)
@@ -177,4 +179,19 @@ class Triggers(QtWidgets.QDialog):
 	
 	def updateTriggerState(self):
 		state = api.get('triggerState')
-		#TODO: Update state here.
+		
+		self.uiTrig1Status.setText(
+			self.uiTrig1StatusTextTemplate
+				% ('● high' if state['trig1']['inputIsActive'] else '○ low') )
+		
+		self.uiTrig2Status.setText(
+			self.uiTrig2StatusTextTemplate
+				% ('● high' if state['trig2']['inputIsActive'] else '○ low') )
+		
+		self.uiTrig3Status.setText(
+			self.uiTrig3StatusTextTemplate
+				% ('● high' if state['trig3']['inputIsActive'] else '○ low') )
+		
+		self.uiMotionTriggerStatus.setText(
+			self.uiMotionTriggerStatusTextTemplate
+				% ('● high' if state['motion']['inputIsActive'] else '○ low') )
