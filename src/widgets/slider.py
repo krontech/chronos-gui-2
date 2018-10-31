@@ -1,7 +1,7 @@
 from random import randint
 
+from PyQt5.QtCore import QSize, Qt
 from PyQt5.QtWidgets import QSlider
-from PyQt5.QtCore import QSize
 
 from debugger import *; dbg
 from focusable_plugin import FocusablePlugin

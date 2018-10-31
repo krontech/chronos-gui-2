@@ -1,6 +1,6 @@
 from random import randint
 
-from PyQt5.QtCore import Q_ENUMS, QSize
+from PyQt5.QtCore import Q_ENUMS, QSize, Qt, pyqtProperty
 from PyQt5.QtWidgets import QDoubleSpinBox
 
 from debugger import *; dbg

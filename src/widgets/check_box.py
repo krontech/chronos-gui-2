@@ -1,6 +1,6 @@
 from random import randint
 
-from PyQt5.QtCore import Q_ENUMS, QSize
+from PyQt5.QtCore import Q_ENUMS, QSize, Qt
 from PyQt5.QtWidgets import QCheckBox
 
 from debugger import *; dbg
