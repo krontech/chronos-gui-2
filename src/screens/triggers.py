@@ -55,9 +55,10 @@ class Triggers(QtWidgets.QDialog):
 		
 		self.trigger3VoltageTextTemplate = self.uiTrigger3ThresholdVoltage.text()
 		
-		
 		# Set up panel switching.
 		#DDR 2018-07-24 It's impossible to associate an identifier with anything in QT Designer. Painfully load the identifiers here. Also check everything because I will mess this up next time I add a trigger.
+		if(self.uiActiveTrigger.count() != len(self.availableTriggerIds)):
+			raise Exception("Trigger screen available trigger IDs does not match the number of textual entries in uiActiveTrigger.")
 		if(self.uiTriggerScreens.count() != len(self.availableTriggerIds)):
 			raise Exception("Trigger screen available trigger IDs does not match the number of uiTriggerScreens screens.")
 		
@@ -66,12 +67,11 @@ class Triggers(QtWidgets.QDialog):
 			print(f'{currentScreenId} is not a known trigger ID, defaulting to {self.availableTriggerIds[0]}')
 			currentScreenId = self.availableTriggerIds[0]
 		
-		self.changeShownTrigger(currentScreenId)
-		self.uiTrig1Tab.clicked.connect(lambda: self.changeShownTrigger('trig1'))
-		self.uiTrig2Tab.clicked.connect(lambda: self.changeShownTrigger('trig2'))
-		self.uiTrig3Tab.clicked.connect(lambda: self.changeShownTrigger('trig3'))
-		self.uiMotionTriggerTab.clicked.connect(lambda: self.changeShownTrigger('motion'))
+		currentScreenIndex = self.availableTriggerIds.index(currentScreenId)
+		self.uiActiveTrigger.setCurrentIndex(currentScreenIndex)
+		self.changeShownTrigger(currentScreenIndex)
 		
+		self.uiActiveTrigger.currentIndexChanged.connect(self.changeShownTrigger)
 		
 		#Set up state init & events.
 		self.uiRecordMode.clicked.connect(lambda: window.show('record_mode'))
@@ -116,21 +116,9 @@ class Triggers(QtWidgets.QDialog):
 		self.triggerStateUpdateTimer.stop()
 	
 	
-	def changeShownTrigger(self, triggerId):
-		tabs = [
-			(self.availableTriggerIds[0], self.uiTrig1Tab),
-			(self.availableTriggerIds[1], self.uiTrig2Tab),
-			(self.availableTriggerIds[2], self.uiTrig3Tab),
-			(self.availableTriggerIds[3], self.uiMotionTriggerTab) ]
-		for id, tab in tabs:
-			tab.keepActiveLook = id == triggerId
-			tab.refreshStyle()
-			
-		
-		self.uiTriggerScreens.setCurrentIndex(
-			self.availableTriggerIds.index(triggerId) )
-		
-		settings.setValue('active trigger', triggerId)
+	def changeShownTrigger(self, index):
+		self.uiTriggerScreens.setCurrentIndex(index)
+		settings.setValue('active trigger', self.availableTriggerIds[index])
 	
 	
 	def setCapabilities(self, config):
