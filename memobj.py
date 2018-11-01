@@ -18,17 +18,34 @@ class MemObject:
 	#print ("Created!")
 	fpga_mmio = MMIO(0x01000000, 0x3000)
 
-	def mm_write16(self, addr, data):
-		self.fpga_mmio.write16(addr, data)
+	# don't use these ones
+	# def mm_write16(self, addr, data):
+	# 	self.fpga_mmio.write16(addr, data)
 
-	def mm_write32(self, addr, data):
-		self.fpga_mmio.write32(addr, data)
+	# def mm_write32(self, addr, data):
+	# 	self.fpga_mmio.write32(addr, data)
+
+	# use these two functions to write to the (16 bit) FPGA address
+	def fpga_write16(self, addr, data):
+		self.fpga_mmio.write16(2 * addr, data)
+
+	def fpga_write32(self, addr, data):
+		self.fpga_mmio.write32(2 * addr, data)
+
+
+	def fpga_read32(self, addr):
+		return self.mem.fpga_mmio.read32(2 * addr)
+
+	def fpga_read16(self, addr):
+		return self.mem.fpga_mmio.read16(2 * addr)
+
+
 
 	def mm_open(self):
 		# Open FPGA memory map
 		#rint("Open!")
-		self.mm_write32(IMAGER_FRAME_PERIOD_ADDR, 100*4000)  #Disable integration
-		self.mm_write32(IMAGER_INT_TIME_ADDR, 100*4100)
+		self.fpga_write32(IMAGER_FRAME_PERIOD, 100*4000)  #Disable integration
+		self.fpga_write32(IMAGER_INT_TIME, 100*4100)
 
 		#print (self.fpga_mmio.read32(IMAGER_INT_TIME_ADDR))
 

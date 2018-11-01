@@ -92,12 +92,11 @@ class CamObject:
 
 	def TestLive(self):
 		print("!!!!!")
-		tfunc = self.sensor.OpsDict["SetPeriod"]
-		tfunc()
+		self.sensor.OpsDict["SetPeriod"](self, 1000000)
 		self.sensor.OpsDict["SetExposure"]()
 		self.sensor.OpsDict["CalSuffix"]()
-		self.sensor.OpsDict["SetGain"](12)
-
+		self.sensor.OpsDict["SetGain"](self, 12)
+		
 		# self.CamInit()
 
 	def SetLiveTiming(self, geometry, hOutRes, vOutRes, maxFPS):
@@ -141,10 +140,10 @@ class CamObject:
 
 		# Configure the FIFO threshold and image sequencer
 
-		self.mem.fpga_mmio.write32(SEQ_LIVE_ADDR_0, MAX_FRAME_LENGTH)
-		self.mem.fpga_mmio.write32(SEQ_LIVE_ADDR_1, MAX_FRAME_LENGTH * 2)
-		self.mem.fpga_mmio.write32(SEQ_LIVE_ADDR_2, MAX_FRAME_LENGTH * 3)
-		self.mem.fpga_mmio.write32(SEQ_REC_REGION_START_ADDR, MAX_FRAME_LENGTH * 3)
+		self.mem.fpga_write32(SEQ_LIVE_ADDR_0, MAX_FRAME_LENGTH)
+		self.mem.fpga_write32(SEQ_LIVE_ADDR_1, MAX_FRAME_LENGTH * 2)
+		self.mem.fpga_write32(SEQ_LIVE_ADDR_2, MAX_FRAME_LENGTH * 3)
+		self.mem.fpga_write32(SEQ_REC_REGION_START, MAX_FRAME_LENGTH * 3)
 
 
 

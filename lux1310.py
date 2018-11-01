@@ -6,7 +6,7 @@ from mmapregisters import *
 import time
 from dataclasses import dataclass
 import struct
-
+from lux1310waves import *
 from lux1310sensor import *
 
 '''
@@ -31,98 +31,194 @@ class FPGA1310Sensor:
 
 '''
 
-Lux1310GainData = [
-    {   # x1 - 0dB 
-        "vrstb": 2700,
-        "vrst": 3300,
-        "vrsth": 3600,
-        "sampling": 0x7f,
-        "feedback": 0x7f,
-        "gain_bit": 3,
-        "analog_gain": 0,
-    },
-    { # x2 - 6dB 
-        "vrstb": 2700,
-        "vrst": 3300,
-        "vrsth": 3600,
-        "sampling": 0xfff,
-        "feedback": 0x7f,
-        "gain_bit": 3,
-        "analog_gain": 6,
-    },
-    { # x4 - 12dB 
-        "vrstb": 2700,
-        "vrst": 3300,
-        "vrsth": 3600,
-        "sampling": 0xfff,
-        "feedback": 0x7f,
-        "gain_bit": 0,
-        "analog_gain": 12,
-    },
-    { # x8 - 18dB 
-        "vrstb": 1700,
-        "vrst": 2300,
-        "vrsth": 2600,
-        "sampling": 0xfff,
-        "feedback": 0x7,
-        "gain_bit": 0,
-        "analog_gain": 18,
-    },
-    { # x16 - 24dB 
-        "vrstb": 1700,
-        "vrst": 2300,
-        "vrsth": 2600,
-        "sampling": 0xfff,
-        "feedback": 0x1,
-        "gain_bit": 0,
-        "analog_gain": 24,
-    }
-]
 
-
-
-def Lux1310SetExposure():
-	print ("Lux1310SetExposure")
-
-def Lux1310SetPeriod():
-	print ("Lux1310SetPeriod")
-
-def Lux1310SetResolutions():
-	pass
-
-def Lux1310GetConstraints():
-	pass
-
-def Lux1310SetGain(gain):
-	print ("Lux1310SetGain")
-	for gdict in Lux1310GainData:
-		if gdict["analog_gain"] == gain:
-			print (gdict)
-			break
-	pass
-
-def Lux1310CalGain():
-	pass
-
-def Lux1310CalSuffix():
-	pass
-
-
-
-Lux1310OpsDict = {
-	"SetExposure": Lux1310SetExposure,
-	"SetPeriod": Lux1310SetPeriod,
-	"SetResolutions": Lux1310SetResolutions,
-	"GetConstraints": Lux1310GetConstraints,
-	"SetGain": Lux1310SetGain,
-	"CalGain": Lux1310CalGain,
-	"CalSuffix": Lux1310CalSuffix
-}
 
 
 
 
 class Lux1310Object(SensorObject):
+
+
+
+	# Gain parameters
+	Lux1310GainData = [
+		{   # x1 - 0dB 
+			"vrstb": 2700,
+			"vrst": 3300,
+			"vrsth": 3600,
+			"sampling": 0x7f,
+			"feedback": 0x7f,
+			"gain_bit": 3,
+			"analog_gain": 0,
+		},
+		{ # x2 - 6dB 
+			"vrstb": 2700,
+			"vrst": 3300,
+			"vrsth": 3600,
+			"sampling": 0xfff,
+			"feedback": 0x7f,
+			"gain_bit": 3,
+			"analog_gain": 6,
+		},
+		{ # x4 - 12dB 
+			"vrstb": 2700,
+			"vrst": 3300,
+			"vrsth": 3600,
+			"sampling": 0xfff,
+			"feedback": 0x7f,
+			"gain_bit": 0,
+			"analog_gain": 12,
+		},
+		{ # x8 - 18dB 
+			"vrstb": 1700,
+			"vrst": 2300,
+			"vrsth": 2600,
+			"sampling": 0xfff,
+			"feedback": 0x7,
+			"gain_bit": 0,
+			"analog_gain": 18,
+		},
+		{ # x16 - 24dB 
+			"vrstb": 1700,
+			"vrst": 2300,
+			"vrsth": 2600,
+			"sampling": 0xfff,
+			"feedback": 0x1,
+			"gain_bit": 0,
+			"analog_gain": 24,
+		}
+	]
+
+	def Lux1310SCIWrite(self, addr, value):
+		pass
+
+
+	def FPGAAndBits(self, addr, mask):
+		readdata = self.fpga_read16(addr)
+		readdata &= mask
+		self.fpga_write16(addr, readdata)
+
+	def FPGAOrBits(self, addr, mask):
+		readdata = self.fpga_read16(addr)
+		readdata |= mask
+		self.fpga_write16(addr, readdata)
+
+	def Lux1310SCIWrite(self, addr, value):
+		'''Perform a simple 16bit register write'''
+		# Clear RW, and setup the transfer and fill the FIFO
+		FPGAAndBits(SENSOR_SCI_CONTROL, ~SENSOR_SCI_CONTROL_RW_MASK)
+		self.fpga_write16(SENSOR_SCI_ADDRESS, addr)
+		self.fpga_write16(SENSOR_SCI_DATALEN, 2)
+		self.fpga_write16(SENSOR_SCI_FIFO_WR_ADDR, (value >> 8) & 0xff)
+		self.fpga_write16(SENSOR_SCI_FIFO_WR_ADDR, value & 0xff)
+
+		# Start the transfer and then wait for completion.
+		FPGAOrBits(SENSOR_SCI_CONTROL, SENSOR_SCI_CONTROL_RUN_MASK)
+		while self.fpga_read16(SENSOR_SCI_CONTROL) & SENSOR_SCI_CONTROL_RUN_MASK:
+			pass
+
+	def Lux1310SCIWriteBuf(self, addr, values):
+		'''Perform a series of 8 bit register writes'''
+		# Clear RW, and setup the transfer and fill the FIFO
+		FPGAAndBits(SENSOR_SCI_CONTROL, ~SENSOR_SCI_CONTROL_RW_MASK)
+		self.fpga_write16(SENSOR_SCI_ADDRESS, addr)
+		self.fpga_write16(SENSOR_SCI_DATALEN, len(values))
+		for b in values:
+			self.fpga_write16(SENSOR_SCI_FIFO_WR_ADDR, b)
+
+		# Start the transfer and then wait for completion.
+		FPGAOrBits(SENSOR_SCI_CONTROL, SENSOR_SCI_CONTROL_RUN_MASK)
+		while self.fpga_read16(SENSOR_SCI_CONTROL) & SENSOR_SCI_CONTROL_RUN_MASK:
+			pass
+
+	def Lux1310SCIRead(self, addr, value):
+		'''Perform a simple 16bit register read'''
+		# Set RW, address and length.
+		FPGAOrBits(SENSOR_SCI_CONTROL, SENSOR_SCI_CONTROL_RW_MASK)
+		self.fpga_write16(SENSOR_SCI_ADDRESS, addr)
+		self.fpga_write16(SENSOR_SCI_DATALEN, 2)
+		
+		# Start the transfer and then wait for completion.
+		Lux1310OrBits(SENSOR_SCI_CONTROL, SENSOR_SCI_CONTROL_RUN_MASK)
+		while self.fpga+read16(SENSOR_SCI_CONTROL) & SENSOR_SCI_CONTROL_RUN_MASK:
+			pass
+
+		return self.fpga_read16(SENSOR_SCI_READ_DATA)
+	
+
+	def Lux1310WriteWaveTab(self, wavedict):
+		waves = wavedict["table"]
+		#Lux1310Write()
+
+	def lux1310_min_period(self, wavelen):
+	
+		t_hblank = 2
+		t_tx = 25
+		t_fovf = 50
+		t_fovb = 50 # Duration between PRSTN falling and TXN falling (I think) 
+		
+		#print (self)
+		
+		g = self.ImageGeometry
+		# Sum up the minimum number of clocks to read a frame at this resolution 
+		t_read = (g.hres / LUX1310_HRES_INCREMENT)
+		t_row = max(t_read + t_hblank, wavelen + 3)
+		print (f"comparing {t_read + t_hblank} and {wavelen + 3}")
+		minperiod =  (t_row * g.vres) + t_tx + t_fovf + t_fovb
+		# print (f" minperiod = {minperiod}")
+		return minperiod
+
+	def Lux1310SetExposure():
+		print ("Lux1310SetExposure")
+
+	def Lux1310SetPeriod(self, nsec):
+		print (f"Lux1310SetPeriod: {nsec}")
+		t_frame = ((nsec * LUX1310_TIMING_CLOCK_RATE) + 999999999) / 1000000000
+		print (f" t_frame = {t_frame}")
+		
+		self.mem.fpga_write32(IMAGER_FRAME_PERIOD, int(t_frame))
+		for i in Lux1310WaveTables:
+			# if t_frame >= self.lux1310_min_period(i[""])
+			#print (i["read_delay"])
+			min_period = self.sensor.lux1310_min_period(i["read_delay"])
+			print (f"{i['read_delay']}: min period is {min_period}")
+			if t_frame >= min_period:
+				self.sensor.Lux1310WriteWaveTab(i)
+				break
+		
+	def Lux1310SetResolutions():
+		pass
+
+	def Lux1310GetConstraints():
+		pass
+
+	def Lux1310SetGain(self, gain):
+		print (f"Lux1310SetGain: {gain}")
+		for gdict in self.sensor.Lux1310GainData:
+			if gdict["analog_gain"] == gain:
+				print (gdict)
+				break
+		pass
+
+	def Lux1310CalGain():
+		pass
+
+	def Lux1310CalSuffix():
+		pass
+
+
+
+
+	Lux1310OpsDict = {
+		"SetExposure": Lux1310SetExposure,
+		"SetPeriod": Lux1310SetPeriod,
+		"SetResolutions": Lux1310SetResolutions,
+		"GetConstraints": Lux1310GetConstraints,
+		"SetGain": Lux1310SetGain,
+		"CalGain": Lux1310CalGain,
+		"CalSuffix": Lux1310CalSuffix
+	}
+
 
 	OpsDict = Lux1310OpsDict
 
@@ -225,11 +321,11 @@ class Lux1310Object(SensorObject):
 
 		# Set up DAC with SPI
 	def lux1310SetReset(self, value):
-		readvalue = self.mem.fpga_mmio.read16(IMAGE_SENSOR_CONTROL_ADDR)
+		readvalue = self.mem.fpga_mmio.read16(IMAGE_SENSOR_CONTROL)
 		if value:
-			self.mem.fpga_mmio.write16(IMAGE_SENSOR_CONTROL_ADDR, readvalue | IMAGE_SENSOR_RESET_MASK)
+			self.mem.fpga_write16(IMAGE_SENSOR_CONTROL, readvalue | IMAGE_SENSOR_RESET_MASK)
 		else:
-			self.mem.fpga_mmio.write16(IMAGE_SENSOR_CONTROL_ADDR, readvalue & ~IMAGE_SENSOR_RESET_MASK)
+			self.mem.fpga_write16(IMAGE_SENSOR_CONTROL, readvalue & ~IMAGE_SENSOR_RESET_MASK)
 
 	def SensorInit(self):
 		#self.ImageSensor = ImageSensorData()
