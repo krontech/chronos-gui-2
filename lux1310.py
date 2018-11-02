@@ -1,4 +1,5 @@
 
+from periphery import GPIO
 from sensorobj import SensorObject
 import spi
 from lux1310h import *
@@ -88,9 +89,6 @@ class Lux1310Object(SensorObject):
 			"analog_gain": 24,
 		}
 	]
-
-	def Lux1310SCIWrite(self, addr, value):
-		pass
 
 
 	def FPGAAndBits(self, addr, mask):
@@ -233,7 +231,7 @@ class Lux1310Object(SensorObject):
 		SensorObject.__init__(self)
 		self.mem = mem
 		self.lux1310num()
-		self.initlux1310()		
+		self.Lux1310Init()		
 		self.SensorInit()
 		#self.OpsDict = Lux1310OpsDict
 		print ("Lux1310 initialized!")
@@ -243,12 +241,22 @@ class Lux1310Object(SensorObject):
 
 
 	def setDACCS(self, flag):
+		board_chronos14_gpio["lux1310-dac-cs"]
 		pass	
 
+	def WriteGPIO(name, value):
+		pass
+		#GPIOset
+
+	def _htole16(bigend):
+		return ((bigend & 0xff) << 8) | ((bigend & 0xff00) >> 8)
+
+	def Lux1310SetVoltage(channel, mv, mul, div):
+		vdac = (LUX1310_DAC_FULL_SCALE * mv * mul) / (LUX1310_DAC_VREF * div)
+		reg = _htole16(((channel & 0x7) << 12) | vdac)
 
 
-
-	def writeDACVoltage(self, chan, voltage):
+	def _writeDACVoltage(self, chan, voltage):
 		if chan == VDR3_VOLTAGE:
 			self.writeDAC(voltage * VDR3_SCALE, VDR3_VOLTAGE)
 		elif chan == VABL_VOLTAGE:
@@ -277,35 +285,35 @@ class Lux1310Object(SensorObject):
 		spi.spi_transfer(data)
 
 
-	def initDAC(self):
+	def _initDAC(self):
 		spi.spi_open()
 		spi.spi_transfer(0x9000)
 
-	def writeDACVoltages(self):
-		self.initDAC();
-		self.writeDACVoltage(VABL_VOLTAGE, 0.3);
-		self.writeDACVoltage(VRSTB_VOLTAGE, 2.7);
-		self.writeDACVoltage(VRST_VOLTAGE, 3.3);
-		self.writeDACVoltage(VRSTL_VOLTAGE, 0.7);
-		self.writeDACVoltage(VRSTH_VOLTAGE, 3.6);
-		self.writeDACVoltage(VDR1_VOLTAGE, 2.5);
-		self.writeDACVoltage(VDR2_VOLTAGE, 2);
-		self.writeDACVoltage(VDR3_VOLTAGE, 1.5);
+	def _writeDACVoltages(self):
+		self._initDAC();
+		self._writeDACVoltage(VABL_VOLTAGE, 0.3);
+		self._writeDACVoltage(VRSTB_VOLTAGE, 2.7);
+		self._writeDACVoltage(VRST_VOLTAGE, 3.3);
+		self._writeDACVoltage(VRSTL_VOLTAGE, 0.7);
+		self._writeDACVoltage(VRSTH_VOLTAGE, 3.6);
+		self._writeDACVoltage(VDR1_VOLTAGE, 2.5);
+		self._writeDACVoltage(VDR2_VOLTAGE, 2);
+		self._writeDACVoltage(VDR3_VOLTAGE, 1.5);
 
 
 
 
 
 
-	def initlux1310(self):
+	def Lux1310Init(self):
 
-		print ("initlux1310")
+		print ("Lux1310Init")
 
 		self.mem.mm_open()
 		#self.mem.initlux()
 
-		self.initDAC()
-		self.writeDACVoltages()
+		#self.initDAC()
+		self._writeDACVoltages()
 
 
 		# Now do rest of lux init

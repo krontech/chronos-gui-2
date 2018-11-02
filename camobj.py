@@ -1,6 +1,8 @@
 
 # Camera class
 #from mem import fpga_mmio
+from periphery import GPIO
+
 from mmapregisters import *
 from memobj import MemObject
 from sensorobj import SensorObject
@@ -42,11 +44,11 @@ def i2c_eeprom_do_read(addr,  offset,  leng):
 	# print ("huh?")
 
 	with SMBusWrapper(1) as bus:
-	    # Read a block of 16 bytes from address 80, offset 0
-	    # block = bus.read_i2c_block_data(addr, offset, leng)
-	    block = bus.read_i2c_block_data(84 , 30, leng)
-	    # Returned value is a list of 16 bytes
-	    print(block)
+		# Read a block of 16 bytes from address 80, offset 0
+		# block = bus.read_i2c_block_data(addr, offset, leng)
+		block = bus.read_i2c_block_data(84 , 30, leng)
+		# Returned value is a list of 16 bytes
+		print(block)
 
 
 
@@ -62,26 +64,26 @@ class CamObject:
 
 
 	'''
-    int err;
-    err = ioctl(fd, I2C_SLAVE, addr);
-    if (err < 0) {
-        return err;
-    }
+	int err;
+	err = ioctl(fd, I2C_SLAVE, addr);
+	if (err < 0) {
+		return err;
+	}
 
-    err = i2c_eeprom_write_chunk(fd, addr, offset, NULL, 0, offsz);
-    if (err < 0) {
-        return err;
-    }
-    usleep(1000);
-    err = read(fd, buf, len);
-    return err;
+	err = i2c_eeprom_write_chunk(fd, addr, offset, NULL, 0, offsz);
+	if (err < 0) {
+		return err;
+	}
+	usleep(1000);
+	err = read(fd, buf, len);
+	return err;
 	'''
 
 	def i2c_eeprom_read16(fd, addr, offset, leng):
-	    return i2c_eeprom_do_read(fd, addr, offset, leng, 2);
-	    pass
-	    #print ("EEPROM")
-	    #print (pyi2cflash.read(addr, offset, leng))
+		return i2c_eeprom_do_read(fd, addr, offset, leng, 2);
+		pass
+		#print ("EEPROM")
+		#print (pyi2cflash.read(addr, offset, leng))
 
 
 	def ReadSerial():
@@ -146,6 +148,41 @@ class CamObject:
 		self.mem.fpga_write32(SEQ_REC_REGION_START, MAX_FRAME_LENGTH * 3)
 
 
+	def GPIOWrite(self, pin_name, value):
+		gpio = self._GPIO_ports[pin_name]
+		gpio.write(bool(value))
+
+	def GPIORead(self, pin_name):
+		gpio = self._GPIO_ports[pin_name]
+		return gpio.read()
+
+
+	_board_chronos14_gpio = {
+	"lux1310-dac-cs" : (33, "out"),
+	"lux1310-color" :  (66, "in"),
+	"encoder-a" :      (20, "in"),
+	"encoder-b" :      (26, "in"),
+	"encoder-sw" :     (27, "in"),
+	"shutter-sw" :     (66, "in"),
+	"record-led.0" :   (41, "out"),
+	"record-led.1" :   (25, "out"),
+	"trigger-pin" :    (127, "in"),
+	"frame-irq" :      (51, "in"),
+	# FPGA Programming Pins 
+	# "ecp5-progn" :     (47, ""),
+	# "ecp5-init" :      (45, ""),
+	# "ecp5-done" :      (52, ""),
+	# "ecp5-cs" :        (58, ""),
+	# "ecp5-holdn" :     (58  ""),
+	}
+
+	_GPIO_ports = {}
+
+	for key, value in _board_chronos14_gpio.items():
+		gpioaccess = GPIO(value[0], value[1])
+		_GPIO_ports.update({key : gpioaccess})
+
+	print(_GPIO_ports)
 
 	print ("begin")
 	mem = MemObject()

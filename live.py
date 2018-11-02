@@ -1,5 +1,5 @@
 
-
+import time
 from camobj import CamObject
 
 print ("Live Video Testing")
@@ -31,6 +31,19 @@ print ("LIVE!")
 print (cam.sensor.ImageGeometry.hres)
 print (cam.sensor.numfunc())
 
+
+sw = cam.GPIORead("encoder-sw")
+print(f"Encoder switch is {sw}")
+
+for x in range(40):
+	cam.GPIOWrite("record-led.0", x & 1)
+	cam.GPIOWrite("record-led.1", not (x & 1))
+	time.sleep(0.05)
+
+while True:
+	sw = cam.GPIORead("encoder-sw")
+	cam.GPIOWrite("record-led.0", sw)
+	cam.GPIOWrite("record-led.1", not sw)
 
 
 
