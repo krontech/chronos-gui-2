@@ -127,6 +127,18 @@ class Triggers(QtWidgets.QDialog):
 		self.triggerStateUpdateTimer.start(1000/3+0) #Update at 30fps since we're somewhat cpu-bound on this task.
 		
 		
+		def setTrigger1ModifierVisibility(index: int) -> None:
+			action = 'hide' if self.availableTrigger1Actions[index] == 'frame sync' else 'show'
+			getattr(self.uiTrigger11mAPullup, action)()
+			getattr(self.uiTrigger120mAPullup, action)()
+			getattr(self.uiTrigger1Debounce, action)()
+		self.uiTrigger1Action.currentIndexChanged.connect(setTrigger1ModifierVisibility)
+		
+		def setTrigger2ModifierVisibility(index: int) -> None:
+			action = 'hide' if self.availableTrigger1Actions[index] == 'frame sync' else 'show'
+			getattr(self.uiTrigger220mAPullup, action)()
+			getattr(self.uiTrigger2Debounce, action)()
+		self.uiTrigger2Action.currentIndexChanged.connect(setTrigger2ModifierVisibility)
 	
 	
 	def onShow(self):

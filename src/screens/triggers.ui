@@ -23,7 +23,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>0</number>
+    <number>1</number>
    </property>
    <widget class="QWidget" name="uiTrigger1">
     <widget class="HeaderLabel" name="headerlabel_2">
@@ -78,9 +78,9 @@
     <widget class="CheckBox" name="uiTrigger11mAPullup">
      <property name="geometry">
       <rect>
-       <x>10</x>
+       <x>210</x>
        <y>230</y>
-       <width>201</width>
+       <width>191</width>
        <height>61</height>
       </rect>
      </property>
@@ -178,9 +178,9 @@
     <widget class="CheckBox" name="uiTrigger1Invert">
      <property name="geometry">
       <rect>
-       <x>210</x>
+       <x>10</x>
        <y>230</y>
-       <width>191</width>
+       <width>201</width>
        <height>61</height>
       </rect>
      </property>
@@ -194,9 +194,9 @@
     <widget class="CheckBox" name="uiTrigger1Debounce">
      <property name="geometry">
       <rect>
-       <x>210</x>
+       <x>10</x>
        <y>290</y>
-       <width>191</width>
+       <width>201</width>
        <height>71</height>
       </rect>
      </property>
@@ -210,9 +210,9 @@
     <widget class="CheckBox" name="uiTrigger120mAPullup">
      <property name="geometry">
       <rect>
-       <x>10</x>
+       <x>210</x>
        <y>290</y>
-       <width>201</width>
+       <width>191</width>
        <height>71</height>
       </rect>
      </property>
@@ -359,6 +359,19 @@
     <widget class="CheckBox" name="uiTrigger220mAPullup">
      <property name="geometry">
       <rect>
+       <x>210</x>
+       <y>230</y>
+       <width>201</width>
+       <height>81</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>20mA Pullup</string>
+     </property>
+    </widget>
+    <widget class="CheckBox" name="uiTrigger2Debounce">
+     <property name="geometry">
+      <rect>
        <x>10</x>
        <y>290</y>
        <width>201</width>
@@ -366,23 +379,10 @@
       </rect>
      </property>
      <property name="text">
-      <string>20mA Pullup</string>
+      <string>Debounce</string>
      </property>
      <property name="clickMarginTopSetter" stdset="0">
       <enum>CheckBox::half</enum>
-     </property>
-    </widget>
-    <widget class="CheckBox" name="uiTrigger2Debounce">
-     <property name="geometry">
-      <rect>
-       <x>210</x>
-       <y>230</y>
-       <width>191</width>
-       <height>81</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Debounce</string>
      </property>
     </widget>
     <widget class="Backdrop" name="backdrop_3">
