@@ -15,6 +15,7 @@ class SpinBox(QSpinBox, TouchMarginPlugin, DirectAPILinkPlugin, FocusablePlugin)
 	def __init__(self, parent=None, showHitRects=False):
 		super().__init__(parent, showHitRects=showHitRects)
 		self.clickMarginColor = f"rgba({randint(0, 32)}, {randint(128, 255)}, {randint(128, 255)}, {randint(32,96)})"
+		self._units = ''
 		
 		#Jog wheel-based state.
 		self.isFocused = False
