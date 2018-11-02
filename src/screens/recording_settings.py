@@ -69,7 +69,6 @@ class RecordingSettings(QtWidgets.QDialog):
 		
 		# Button binding.
 		self.uiDone.clicked.connect(window.back)
-		self.uiRecordModes.clicked.connect(lambda: window.show('record_mode'))
 		self.uiCenterRecording.clicked.connect(self.centerRecording)
 		
 		api.observe('sensorMinExposureNs', self.setMinExposure)

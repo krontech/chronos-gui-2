@@ -254,19 +254,6 @@
     <string>Analog Gain</string>
    </property>
   </widget>
-  <widget class="Button" name="uiRecordModes">
-   <property name="geometry">
-    <rect>
-     <x>0</x>
-     <y>400</y>
-     <width>181</width>
-     <height>81</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Record Modes</string>
-   </property>
-  </widget>
   <widget class="Button" name="uiSavePreset">
    <property name="geometry">
     <rect>
@@ -422,16 +409,6 @@
    <zorder>uiPassepartoutBottom</zorder>
    <zorder>uiPassepartoutInnerBorder</zorder>
   </widget>
-  <widget class="Backdrop" name="uiAmbiguityHiderBecauseThereWasNoGoodWayToOverlapTheseCorners">
-   <property name="geometry">
-    <rect>
-     <x>140</x>
-     <y>401</y>
-     <width>41</width>
-     <height>19</height>
-    </rect>
-   </property>
-  </widget>
   <widget class="Label" name="label_3">
    <property name="geometry">
     <rect>
@@ -536,6 +513,22 @@
     </property>
    </item>
   </widget>
+  <widget class="Label" name="uiUnsavedChangesWarning">
+   <property name="geometry">
+    <rect>
+     <x>440</x>
+     <y>400</y>
+     <width>341</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>* Press Done to apply resolution.</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+   </property>
+  </widget>
   <zorder>backdrop</zorder>
   <zorder>label_3</zorder>
   <zorder>label_4</zorder>
@@ -555,7 +548,6 @@
   <zorder>label_2</zorder>
   <zorder>widget</zorder>
   <zorder>uiExposure</zorder>
-  <zorder>uiRecordModes</zorder>
   <zorder>uiSavePreset</zorder>
   <zorder>uiDone</zorder>
   <zorder>uiCenterRecording</zorder>
@@ -567,7 +559,7 @@
   <zorder>uiMaximizeExposure</zorder>
   <zorder>uiFrameDuration</zorder>
   <zorder>uiAnalogGain</zorder>
-  <zorder>uiAmbiguityHiderBecauseThereWasNoGoodWayToOverlapTheseCorners</zorder>
+  <zorder>uiUnsavedChangesWarning</zorder>
  </widget>
  <customwidgets>
   <customwidget>
@@ -620,7 +612,6 @@
   <tabstop>uiExposure</tabstop>
   <tabstop>uiMaximizeExposure</tabstop>
   <tabstop>uiAnalogGain</tabstop>
-  <tabstop>uiRecordModes</tabstop>
   <tabstop>uiSavePreset</tabstop>
  </tabstops>
  <resources/>
