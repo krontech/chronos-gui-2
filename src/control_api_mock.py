@@ -282,7 +282,7 @@ class State():
 			"pullup20ma": True,
 		},
 		"trig2": {
-			"action": "none",
+			"action": "record end",
 			"threshold": 2.75,
 			"invert": True,
 			"debounce": True,

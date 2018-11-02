@@ -1,3 +1,5 @@
+from copy import deepcopy
+
 from PyQt5 import uic, QtWidgets, QtCore
 from PyQt5.QtCore import pyqtSlot
 
@@ -7,6 +9,13 @@ from api_mock import silenceCallbacks
 
 
 settings = QtCore.QSettings('Krontech', 'back-of-camera interface')
+
+allInputIds = [
+	'uiTrigger1Action', 'uiTrigger1ThresholdVoltage', 'uiTrigger11mAPullup', 'uiTrigger120mAPullup', 'uiTrigger1Invert', 'uiTrigger1Debounce',
+	'uiTrigger2Action', 'uiTrigger2ThresholdVoltage', 'uiTrigger2Invert', 'uiTrigger2Debounce', 'uiTrigger220mAPullup',
+	'uiTrigger3Action', 'uiTrigger3ThresholdVoltage', 'uiTrigger3Invert', 'uiTrigger3Debounce',
+	'uiMotionTriggerAction', 'uiMotionTriggerDebounce', 'uiMotionTriggerInvert',
+]
 
 
 class Triggers(QtWidgets.QDialog):
@@ -52,6 +61,12 @@ class Triggers(QtWidgets.QDialog):
 		self.setAttribute(QtCore.Qt.WA_TranslucentBackground, True)
 		
 		self.uiUnsavedChangesWarning.hide()
+		for id in allInputIds:
+			obj = getattr(self, id)
+			changedSignal = getattr(obj, 'currentIndexChanged', getattr(obj, 'valueChanged', getattr(obj, 'stateChanged', None))) #Couldn't just choose one, could we, QT. 😑
+			changedSignal and changedSignal.connect(self.uiUnsavedChangesWarning.show)
+		self.uiApply.clicked.connect(self.uiUnsavedChangesWarning.hide)
+		self.uiDone.clicked.connect(self.uiUnsavedChangesWarning.hide)
 		
 		self.trigger3VoltageTextTemplate = self.uiTrigger3ThresholdVoltage.text()
 		self.uiTrig1StatusTextTemplate = self.uiTrig1Status.text()
@@ -78,9 +93,13 @@ class Triggers(QtWidgets.QDialog):
 		self.uiActiveTrigger.currentIndexChanged.connect(self.changeShownTrigger)
 		
 		#Set up state init & events.
-		self.uiApply.clicked.connect(lambda: self and dbg())
-		#self.uiDebugC.clicked.connect(saveEverything()) TODO: This.
-		self.uiDone.clicked.connect(window.back)
+		#self.uiApply.clicked.connect(lambda: self and dbg())
+		self.uiApply.clicked.connect(lambda: api.set({
+			'triggerConfiguration': self.changedTriggerState()
+		}))
+		self.uiDone.clicked.connect(lambda: (api.set({
+			'triggerConfiguration': self.changedTriggerState()
+		}), window.back()))
 		
 		#OK, so, triggerCapabilities is a constant, that's good. Then
 		#we have triggerConfiguration, which is one variable. We'll
@@ -100,11 +119,12 @@ class Triggers(QtWidgets.QDialog):
 		#This shows the three times of data we have. One updates only once, one updates whenever the data is changed, and the final updates every frame.
 		self.setCapabilities(api.get('triggerCapabilities'))
 		
+		self.lastTriggerState = None #Holds the state to update to when we hit save - not everything is directly representable in the interface, so we don't want to round-trip this out into the UI widgets and then back again.
 		api.observe('triggerConfiguration', self.updateTriggerConfiguration)
 		
 		self.triggerStateUpdateTimer = QtCore.QTimer()
 		self.triggerStateUpdateTimer.timeout.connect(self.updateTriggerState)
-		self.triggerStateUpdateTimer.start(1000/30) #Update at 30fps since we're somewhat cpu-bound on this task.
+		self.triggerStateUpdateTimer.start(1000/3+0) #Update at 30fps since we're somewhat cpu-bound on this task.
 		
 		
 	
@@ -118,12 +138,12 @@ class Triggers(QtWidgets.QDialog):
 		self.triggerStateUpdateTimer.stop()
 	
 	
-	def changeShownTrigger(self, index):
+	def changeShownTrigger(self, index: int) -> None:
 		self.uiTriggerScreens.setCurrentIndex(index)
 		settings.setValue('active trigger', self.availableTriggerIds[index])
 	
 	
-	def setCapabilities(self, config):
+	def setCapabilities(self, config: dict) -> None:
 		"""Configure the UI with the capabilities reported by the API.
 		
 			Note: Most of the capabilities are hard-coded into the .ui
@@ -139,14 +159,14 @@ class Triggers(QtWidgets.QDialog):
 	
 	
 	@pyqtSlot('QVariantMap', name="updateTriggerConfiguration")
-	@silenceCallbacks(
-		'uiTrigger1Action', 'uiTrigger1ThresholdVoltage', 'uiTrigger11mAPullup', 'uiTrigger120mAPullup', 'uiTrigger1Invert', 'uiTrigger1Debounce',
-		'uiTrigger2Action', 'uiTrigger2ThresholdVoltage', 'uiTrigger2Invert', 'uiTrigger2Debounce', 'uiTrigger220mAPullup',
-		'uiTrigger3Action', 'uiTrigger3ThresholdVoltage', 'uiTrigger3Invert', 'uiTrigger3Debounce',
-		'uiMotionTriggerAction', 'uiMotionTriggerDebounce', 'uiMotionTriggerInvert',
-	)
-	def updateTriggerConfiguration(self, config):
-		"""Update the displayed trigger settings."""
+	@silenceCallbacks(*allInputIds)
+	def updateTriggerConfiguration(self, config: dict) -> None:
+		"""Update the displayed trigger settings.
+			
+			Inverse of changedTriggerState.
+			"""
+		
+		self.lastTriggerState = config #We're currently resetting all our inputs here, so reset trigger state too.
 		
 		self.uiTrigger1Action.setCurrentIndex(
 			self.availableTrigger1Actions.index(config['trig1']['action']) )
@@ -176,6 +196,38 @@ class Triggers(QtWidgets.QDialog):
 		self.uiMotionTriggerDebounce.setChecked(config['motion']['debounce'])
 		self.uiMotionTriggerInvert.setChecked(config['motion']['invert'])
 	
+	def changedTriggerState(self) -> dict:
+		"""Return trigger state, with the modifications made in the UI.
+			
+			Inverse of updateTriggerConfiguration.
+			"""
+		
+		config = deepcopy(self.lastTriggerState) #Don't mutate the input, keep the model simple.
+		
+		config['trig1']['action'] = self.availableTrigger1Actions[self.uiTrigger1Action.currentIndex()]
+		config['trig1']['threshold'] = self.uiTrigger1ThresholdVoltage.value()
+		config['trig1']['pullup1ma'] = self.uiTrigger11mAPullup.checkState() == 2     #0 is unchecked [ ]
+		config['trig1']['pullup20ma'] = self.uiTrigger120mAPullup.checkState() == 2   #1 is semi-checked [-]
+		config['trig1']['invert'] = self.uiTrigger1Invert.checkState() == 2           #2 is checked [✓]
+		config['trig1']['debounce'] = self.uiTrigger1Debounce.checkState() == 2
+		
+		config['trig2']['action'] = self.availableTrigger2Actions[self.uiTrigger2Action.currentIndex()]
+		config['trig2']['threshold'] = self.uiTrigger2ThresholdVoltage.value()
+		config['trig2']['invert'] = self.uiTrigger2Invert.checkState() == 2
+		config['trig2']['debounce'] = self.uiTrigger2Debounce.checkState() == 2
+		config['trig2']['pullup20ma'] = self.uiTrigger220mAPullup.checkState() == 2
+		
+		config['trig3']['action'] = self.availableTrigger3Actions[self.uiTrigger3Action.currentIndex()]
+		config['trig3']['invert'] = self.uiTrigger3Invert.checkState() == 2
+		config['trig3']['debounce'] = self.uiTrigger3Debounce.checkState() == 2
+		
+		#Most motion trigger settings are displayed in the motion trigger configuration screen.
+		config['motion']['action'] = self.availableMotionTriggerActions[self.uiMotionTriggerAction.currentIndex()]
+		config['motion']['debounce'] = self.uiMotionTriggerDebounce.checkState() == 2
+		config['motion']['invert'] = self.uiMotionTriggerInvert.checkState() == 2
+		
+		return config
+	
 	
 	def updateTriggerState(self):
 		state = api.get('triggerState')
@@ -183,15 +235,12 @@ class Triggers(QtWidgets.QDialog):
 		self.uiTrig1Status.setText(
 			self.uiTrig1StatusTextTemplate
 				% ('● high' if state['trig1']['inputIsActive'] else '○ low') )
-		
 		self.uiTrig2Status.setText(
 			self.uiTrig2StatusTextTemplate
 				% ('● high' if state['trig2']['inputIsActive'] else '○ low') )
-		
 		self.uiTrig3Status.setText(
 			self.uiTrig3StatusTextTemplate
 				% ('● high' if state['trig3']['inputIsActive'] else '○ low') )
-		
 		self.uiMotionTriggerStatus.setText(
 			self.uiMotionTriggerStatusTextTemplate
 				% ('● high' if state['motion']['inputIsActive'] else '○ low') )

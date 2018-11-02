@@ -286,7 +286,6 @@ def connectHardwareEvents(app, hardware):
 	jogWheelLongClickTimer.setSingleShot(True)
 	
 	def endPress():
-		print('isactive', jogWheelLongClickTimer.isActive())
 		if jogWheelLongClickTimer.isActive(): #Long-press timer hasn't expired, just a click.
 			app.focusWidget() and app.focusWidget().jogWheelClick.emit()
 			jogWheelLongClickTimer.stop() #Suppress jog wheel long press.
