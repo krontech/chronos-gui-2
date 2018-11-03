@@ -38,7 +38,7 @@ def callback(evt):
 	killingProcess = subprocess.Popen(f"sleep {timeout} && pkill --signal SIGKILL --parent {sys.argv[1]} --full main.py", shell=True)
 	
 event_handler = PatternMatchingEventHandler(
-	patterns=["*.py","*.ui"],
+	patterns=["*.py","*.ui","*.svg","*.png"],
 	ignore_directories=True )
 event_handler.on_any_event = callback
 	

@@ -548,8 +548,6 @@
   <zorder>label_2</zorder>
   <zorder>widget</zorder>
   <zorder>uiExposure</zorder>
-  <zorder>uiSavePreset</zorder>
-  <zorder>uiDone</zorder>
   <zorder>uiCenterRecording</zorder>
   <zorder>uiPreviewPanel</zorder>
   <zorder>uiMaximizeFramerate</zorder>
@@ -560,6 +558,8 @@
   <zorder>uiFrameDuration</zorder>
   <zorder>uiAnalogGain</zorder>
   <zorder>uiUnsavedChangesWarning</zorder>
+  <zorder>uiDone</zorder>
+  <zorder>uiSavePreset</zorder>
  </widget>
  <customwidgets>
   <customwidget>
