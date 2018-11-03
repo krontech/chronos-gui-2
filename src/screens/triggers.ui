@@ -1020,15 +1020,15 @@
   <tabstop>uiActiveTrigger</tabstop>
   <tabstop>uiTrigger1Action</tabstop>
   <tabstop>uiTrigger1ThresholdVoltage</tabstop>
-  <tabstop>uiTrigger11mAPullup</tabstop>
   <tabstop>uiTrigger1Invert</tabstop>
-  <tabstop>uiTrigger120mAPullup</tabstop>
+  <tabstop>uiTrigger11mAPullup</tabstop>
   <tabstop>uiTrigger1Debounce</tabstop>
+  <tabstop>uiTrigger120mAPullup</tabstop>
   <tabstop>uiTrigger2Action</tabstop>
   <tabstop>uiTrigger2ThresholdVoltage</tabstop>
   <tabstop>uiTrigger2Invert</tabstop>
-  <tabstop>uiTrigger2Debounce</tabstop>
   <tabstop>uiTrigger220mAPullup</tabstop>
+  <tabstop>uiTrigger2Debounce</tabstop>
   <tabstop>uiTrigger3Action</tabstop>
   <tabstop>uiTrigger3Invert</tabstop>
   <tabstop>uiTrigger3Debounce</tabstop>
