@@ -2,6 +2,7 @@ from copy import deepcopy
 
 from PyQt5 import uic, QtWidgets, QtCore
 from PyQt5.QtCore import pyqtSlot
+from PyQt5.QtWidgets import QGraphicsOpacityEffect
 
 from debugger import *; dbg
 import api_mock as api
@@ -93,10 +94,10 @@ class Triggers(QtWidgets.QDialog):
 		self.uiActiveTrigger.currentIndexChanged.connect(self.changeShownTrigger)
 		
 		#Set up state init & events.
-		#self.uiApply.clicked.connect(lambda: self and dbg())
-		self.uiApply.clicked.connect(lambda: api.set({
-			'triggerConfiguration': self.changedTriggerState()
-		}))
+		self.uiApply.clicked.connect(lambda: self and dbg())
+		# self.uiApply.clicked.connect(lambda: api.set({
+		# 	'triggerConfiguration': self.changedTriggerState()
+		# }))
 		self.uiDone.clicked.connect(lambda: (api.set({
 			'triggerConfiguration': self.changedTriggerState()
 		}), window.back()))
@@ -119,12 +120,24 @@ class Triggers(QtWidgets.QDialog):
 		#This shows the three times of data we have. One updates only once, one updates whenever the data is changed, and the final updates every frame.
 		self.setCapabilities(api.get('triggerCapabilities'))
 		
-		self.lastTriggerState = None #Holds the state to update to when we hit save - not everything is directly representable in the interface, so we don't want to round-trip this out into the UI widgets and then back again.
+		self.lastTriggerConfiguration = None #Holds the state to update to when we hit save - not everything is directly representable in the interface, so we don't want to round-trip this out into the UI widgets and then back again.
 		api.observe('triggerConfiguration', self.updateTriggerConfiguration)
+		
+		self.lastTriggerState = None
+		
+		#Set up the little fade effect on the trigger icons, indicating high and low.
+		self.trigger1IconLevelEffect = QGraphicsOpacityEffect(self.uiTrigger1Icon)
+		self.trigger2IconLevelEffect = QGraphicsOpacityEffect(self.uiTrigger2Icon)
+		self.trigger3IconLevelEffect = QGraphicsOpacityEffect(self.uiTrigger3Icon)
+		self.motionTriggerIconLevelEffect = QGraphicsOpacityEffect(self.uiMotionTriggerIcon)
+		self.uiTrigger1Icon.setGraphicsEffect(self.trigger1IconLevelEffect)
+		self.uiTrigger2Icon.setGraphicsEffect(self.trigger2IconLevelEffect)
+		self.uiTrigger3Icon.setGraphicsEffect(self.trigger3IconLevelEffect)
+		self.uiMotionTriggerIcon.setGraphicsEffect(self.motionTriggerIconLevelEffect)
 		
 		self.triggerStateUpdateTimer = QtCore.QTimer()
 		self.triggerStateUpdateTimer.timeout.connect(self.updateTriggerState)
-		self.triggerStateUpdateTimer.start(1000/3+0) #Update at 30fps since we're somewhat cpu-bound on this task.
+		self.triggerStateUpdateTimer.setInterval(1000/3+0) #Update at 30fps since we're somewhat cpu-bound on this task.
 		
 		
 		def setTrigger1ModifierVisibility(index: int) -> None:
@@ -178,7 +191,7 @@ class Triggers(QtWidgets.QDialog):
 			Inverse of changedTriggerState.
 			"""
 		
-		self.lastTriggerState = config #We're currently resetting all our inputs here, so reset trigger state too.
+		self.lastTriggerConfiguration = config #We're currently resetting all our inputs here, so reset trigger state too.
 		
 		self.uiTrigger1Action.setCurrentIndex(
 			self.availableTrigger1Actions.index(config['trig1']['action']) )
@@ -214,7 +227,7 @@ class Triggers(QtWidgets.QDialog):
 			Inverse of updateTriggerConfiguration.
 			"""
 		
-		config = deepcopy(self.lastTriggerState) #Don't mutate the input, keep the model simple.
+		config = deepcopy(self.lastTriggerConfiguration) #Don't mutate the input, keep the model simple.
 		
 		config['trig1']['action'] = self.availableTrigger1Actions[self.uiTrigger1Action.currentIndex()]
 		config['trig1']['threshold'] = self.uiTrigger1ThresholdVoltage.value()
@@ -244,6 +257,11 @@ class Triggers(QtWidgets.QDialog):
 	def updateTriggerState(self):
 		state = api.get('triggerState')
 		
+		if state == self.lastTriggerState:
+			return #No action needed, nothing changed.
+		
+		self.lastTriggerState = state
+		
 		self.uiTrig1Status.setText(
 			self.uiTrig1StatusTextTemplate
 				% ('● high' if state['trig1']['inputIsActive'] else '○ low') )
@@ -256,3 +274,11 @@ class Triggers(QtWidgets.QDialog):
 		self.uiMotionTriggerStatus.setText(
 			self.uiMotionTriggerStatusTextTemplate
 				% ('● high' if state['motion']['inputIsActive'] else '○ low') )
+		
+		
+		#We don't seem to be able to store these effects Python-side, since they really like to be deleted in C++.
+		
+		self.trigger1IconLevelEffect.setOpacity(1.0 if state['trig1']['inputIsActive'] else 0.5)
+		self.trigger2IconLevelEffect.setOpacity(1.0 if state['trig2']['inputIsActive'] else 0.5)
+		self.trigger3IconLevelEffect.setOpacity(1.0 if state['trig3']['inputIsActive'] else 0.5)
+		self.motionTriggerIconLevelEffect.setOpacity(1.0 if state['motion']['inputIsActive'] else 0.5)

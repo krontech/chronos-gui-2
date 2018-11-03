@@ -23,7 +23,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>0</number>
+    <number>3</number>
    </property>
    <widget class="QWidget" name="uiTrigger1">
     <widget class="HeaderLabel" name="headerlabel_2">
@@ -752,7 +752,7 @@
       <string>Trigger Area</string>
      </property>
     </widget>
-    <widget class="QLabel" name="uiTriggerMotionIcon">
+    <widget class="QLabel" name="uiMotionTriggerIcon">
      <property name="geometry">
       <rect>
        <x>305</x>
@@ -790,7 +790,7 @@
     <zorder>headerlabel_13</zorder>
     <zorder>uiMotionTriggerAction</zorder>
     <zorder>headerlabel_14</zorder>
-    <zorder>uiTriggerMotionIcon</zorder>
+    <zorder>uiMotionTriggerIcon</zorder>
     <zorder>uiMotionTriggerConfigure</zorder>
     <zorder>uiMotionTriggerInvert</zorder>
     <zorder>uiMotionTriggerDebounce</zorder>
