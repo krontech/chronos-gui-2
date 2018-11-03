@@ -274,7 +274,7 @@ class State():
 	
 	triggerConfiguration = { #read/write, what the triggers do
 		"trig1": {
-			"action": "none",
+			"action": random.choice(['none', 'record end', 'exposure gating', 'genlock in', 'genlock out']),
 			"threshold": 2.50,
 			"invert": False,
 			"debounce": True,
@@ -282,7 +282,7 @@ class State():
 			"pullup20ma": True,
 		},
 		"trig2": {
-			"action": "record end",
+			"action": random.choice(['none', 'record end', 'exposure gating', 'genlock in', 'genlock out']),
 			"threshold": 2.75,
 			"invert": True,
 			"debounce": True,
@@ -290,7 +290,7 @@ class State():
 			"pullup20ma": False,
 		},
 		"trig3": {
-			"action": "none",
+			"action": random.choice(['none', 'record end']),
 			"threshold": 2.50,
 			"invert": False,
 			"debounce": False,
@@ -298,7 +298,7 @@ class State():
 			"pullup20ma": True,
 		},
 		"~a1": {
-			"action": "record end",
+			"action": "none",
 			"threshold": 2.50,
 			"invert": False,
 			"debounce": True,
@@ -314,7 +314,7 @@ class State():
 			"pullup20ma": True,
 		},
 		"motion": {
-			"action": "none",
+			"action": random.choice(['none', 'record end']),
 			"threshold": 2.50,
 			"invert": False,
 			"debounce": True,

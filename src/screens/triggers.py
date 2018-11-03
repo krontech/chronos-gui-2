@@ -44,8 +44,8 @@ class Triggers(QtWidgets.QDialog):
 	#Save current screen by ID, not by index or display text because those are UI changes.
 	#These map IDs to indexes, and must be updated when the .ui file combo box is updated!
 	availableTriggerIds = ['trig1', 'trig2', 'trig3', 'motion']
-	availableTrigger1Actions = ['none', 'record end', 'exposure', 'shutter gating', 'frame sync']
-	availableTrigger2Actions = ['none', 'record end', 'exposure', 'shutter gating', 'frame sync']
+	availableTrigger1Actions = ['none', 'record end', 'exposure gating', 'genlock in', 'genlock out']
+	availableTrigger2Actions = ['none', 'record end', 'exposure gating', 'genlock in', 'genlock out']
 	availableTrigger3Actions = ['none', 'record end']
 	#Analog triggers can take no action.
 	availableMotionTriggerActions = ['none', 'record end']

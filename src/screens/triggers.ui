@@ -23,7 +23,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>3</number>
+    <number>0</number>
    </property>
    <widget class="QWidget" name="uiTrigger1">
     <widget class="HeaderLabel" name="headerlabel_2">
@@ -107,22 +107,22 @@
      </item>
      <item>
       <property name="text">
-       <string>Record End Trigger</string>
+       <string>Stop Recording</string>
       </property>
      </item>
      <item>
       <property name="text">
-       <string>Exposure Trigger</string>
+       <string>Exposure Gating</string>
       </property>
      </item>
      <item>
       <property name="text">
-       <string>Shutter Gating</string>
+       <string>Genlock Input</string>
       </property>
      </item>
      <item>
       <property name="text">
-       <string>Frame Sync Output</string>
+       <string>Genlock Output</string>
       </property>
      </item>
     </widget>
@@ -398,41 +398,6 @@
       </rect>
      </property>
     </widget>
-    <widget class="ComboBox" name="uiTrigger2Action">
-     <property name="geometry">
-      <rect>
-       <x>440</x>
-       <y>30</y>
-       <width>341</width>
-       <height>81</height>
-      </rect>
-     </property>
-     <item>
-      <property name="text">
-       <string>None</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>Record End Trigger</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>Exposure Trigger</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>Shutter Gating</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>Frame Sync Output</string>
-      </property>
-     </item>
-    </widget>
     <widget class="QLabel" name="uiTrigger2Icon">
      <property name="geometry">
       <rect>
@@ -454,6 +419,41 @@
       <pixmap>../../assets/images/green-connector.svg</pixmap>
      </property>
     </widget>
+    <widget class="ComboBox" name="uiTrigger2Action">
+     <property name="geometry">
+      <rect>
+       <x>440</x>
+       <y>30</y>
+       <width>341</width>
+       <height>81</height>
+      </rect>
+     </property>
+     <item>
+      <property name="text">
+       <string>None</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Stop Recording</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Exposure Gating</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Genlock Input</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Genlock Output</string>
+      </property>
+     </item>
+    </widget>
     <zorder>backdrop_3</zorder>
     <zorder>headerlabel_6</zorder>
     <zorder>uiTrigger2Invert</zorder>
@@ -463,10 +463,10 @@
     <zorder>headerlabel_9</zorder>
     <zorder>label_3</zorder>
     <zorder>uiTrigger2ThresholdVoltage</zorder>
-    <zorder>uiTrigger2Action</zorder>
     <zorder>uiTrigger2Icon</zorder>
     <zorder>uiTrigger220mAPullup</zorder>
     <zorder>uiTrigger2Debounce</zorder>
+    <zorder>uiTrigger2Action</zorder>
    </widget>
    <widget class="QWidget" name="uiTrigger3">
     <widget class="Backdrop" name="backdrop_4">
@@ -579,7 +579,7 @@
      </item>
      <item>
       <property name="text">
-       <string>Record End Trigger</string>
+       <string>Stop Recording</string>
       </property>
      </item>
     </widget>
@@ -735,7 +735,7 @@
      </item>
      <item>
       <property name="text">
-       <string>Record End Trigger</string>
+       <string>Stop Recording</string>
       </property>
      </item>
     </widget>
