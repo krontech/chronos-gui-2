@@ -1,8 +1,9 @@
 from copy import deepcopy
 
-from PyQt5 import uic, QtWidgets, QtCore
+from PyQt5 import uic, QtWidgets, QtCore, QtGui
 from PyQt5.QtCore import pyqtSlot
-from PyQt5.QtWidgets import QGraphicsOpacityEffect
+from PyQt5.QtWidgets import QGraphicsOpacityEffect #Also available: QGraphicsBlurEffect, QGraphicsColorizeEffect, QGraphicsDropShadowEffect
+from PyQt5.QtSvg import QGraphicsSvgItem
 
 from debugger import *; dbg
 import api_mock as api
@@ -18,6 +19,10 @@ allInputIds = [
 	'uiMotionTriggerAction', 'uiMotionTriggerDebounce', 'uiMotionTriggerInvert',
 ]
 
+visualizationPadding = [15, 20, 0, 20] #top, right, bottom, left; like CSS
+
+highStrength = 1.0
+lowStrength = 0.5
 
 class Triggers(QtWidgets.QDialog):
 	"""Trigger screen. Configure one IO trigger at a time.
@@ -61,11 +66,13 @@ class Triggers(QtWidgets.QDialog):
 		self.setWindowFlags(QtCore.Qt.FramelessWindowHint)
 		self.setAttribute(QtCore.Qt.WA_TranslucentBackground, True)
 		
-		self.uiUnsavedChangesWarning.hide()
 		for id in allInputIds:
 			obj = getattr(self, id)
 			changedSignal = getattr(obj, 'currentIndexChanged', getattr(obj, 'valueChanged', getattr(obj, 'stateChanged', None))) #Couldn't just choose one, could we, QT. 😑
+			changedSignal and changedSignal.connect(self.queueVisualizationRepaint)
 			changedSignal and changedSignal.connect(self.uiUnsavedChangesWarning.show)
+		
+		self.uiUnsavedChangesWarning.hide()
 		self.uiApply.clicked.connect(self.uiUnsavedChangesWarning.hide)
 		self.uiDone.clicked.connect(self.uiUnsavedChangesWarning.hide)
 		
@@ -130,10 +137,20 @@ class Triggers(QtWidgets.QDialog):
 		self.trigger2IconLevelEffect = QGraphicsOpacityEffect(self.uiTrigger2Icon)
 		self.trigger3IconLevelEffect = QGraphicsOpacityEffect(self.uiTrigger3Icon)
 		self.motionTriggerIconLevelEffect = QGraphicsOpacityEffect(self.uiMotionTriggerIcon)
-		self.uiTrigger1Icon.setGraphicsEffect(self.trigger1IconLevelEffect)
-		self.uiTrigger2Icon.setGraphicsEffect(self.trigger2IconLevelEffect)
-		self.uiTrigger3Icon.setGraphicsEffect(self.trigger3IconLevelEffect)
-		self.uiMotionTriggerIcon.setGraphicsEffect(self.motionTriggerIconLevelEffect)
+		
+		#self.uiTrigger1Icon.setGraphicsEffect(self.trigger1IconLevelEffect)
+		#self.uiTrigger2Icon.setGraphicsEffect(self.trigger2IconLevelEffect)
+		#self.uiTrigger3Icon.setGraphicsEffect(self.trigger3IconLevelEffect)
+		#self.uiMotionTriggerIcon.setGraphicsEffect(self.motionTriggerIconLevelEffect)
+		
+		self.uiTrigger1Visualization.paintEvent = (lambda evt:
+			self.paintVisualization(self.uiTrigger1Visualization, evt, 'trig1'))
+		self.uiTrigger2Visualization.paintEvent = (lambda evt:
+			self.paintVisualization(self.uiTrigger2Visualization, evt, 'trig2'))
+		self.uiTrigger3Visualization.paintEvent = (lambda evt:
+			self.paintVisualization(self.uiTrigger3Visualization, evt, 'trig3'))
+		self.uiMotionTriggerVisualization.paintEvent = (lambda evt:
+			self.paintVisualization(self.uiMotionTriggerVisualization, evt, 'motion'))
 		
 		self.triggerStateUpdateTimer = QtCore.QTimer()
 		self.triggerStateUpdateTimer.timeout.connect(self.updateTriggerState)
@@ -256,12 +273,11 @@ class Triggers(QtWidgets.QDialog):
 	
 	def updateTriggerState(self):
 		state = api.get('triggerState')
-		
 		if state == self.lastTriggerState:
 			return #No action needed, nothing changed.
-		
 		self.lastTriggerState = state
 		
+		#Set trigger status indicators.
 		self.uiTrig1Status.setText(
 			self.uiTrig1StatusTextTemplate
 				% ('● high' if state['trig1']['inputIsActive'] else '○ low') )
@@ -275,10 +291,237 @@ class Triggers(QtWidgets.QDialog):
 			self.uiMotionTriggerStatusTextTemplate
 				% ('● high' if state['motion']['inputIsActive'] else '○ low') )
 		
+		#Set trigger icon effect.
+		self.trigger1IconLevelEffect.setOpacity(highStrength if state['trig1']['inputIsActive'] else lowStrength)
+		self.trigger2IconLevelEffect.setOpacity(highStrength if state['trig2']['inputIsActive'] else lowStrength)
+		self.trigger3IconLevelEffect.setOpacity(highStrength if state['trig3']['inputIsActive'] else lowStrength)
+		self.motionTriggerIconLevelEffect.setOpacity(highStrength if state['motion']['inputIsActive'] else lowStrength)
 		
-		#We don't seem to be able to store these effects Python-side, since they really like to be deleted in C++.
+		#Mark visualization panes dirty, so they update appropriately.
+		self.queueVisualizationRepaint()
+	
+	def queueVisualizationRepaint(self):
+		self.uiTrigger1Visualization.update()
+		self.uiTrigger2Visualization.update()
+		self.uiTrigger3Visualization.update()
+		self.uiMotionTriggerVisualization.update()
+	
+	def paintVisualization(self, pane, event, triggerId):
+		"""Paint the trigger level visualization pane.
+			
+			If the element + padding (which includes arrows) is wider
+			than the remaining space, loop back to a new line. For each
+			step of the process, highlight (or not) the trigger level.
+			"""
 		
-		self.trigger1IconLevelEffect.setOpacity(1.0 if state['trig1']['inputIsActive'] else 0.5)
-		self.trigger2IconLevelEffect.setOpacity(1.0 if state['trig2']['inputIsActive'] else 0.5)
-		self.trigger3IconLevelEffect.setOpacity(1.0 if state['trig3']['inputIsActive'] else 0.5)
-		self.motionTriggerIconLevelEffect.setOpacity(1.0 if state['motion']['inputIsActive'] else 0.5)
+		#print('paint', pane, event)
+		#QPixmap("../../assets/qt_creator/check_box.svg")
+		QPainter = QtGui.QPainter
+		QPen = QtGui.QPen
+		QPoint = QtCore.QPoint
+		QColor = QtGui.QColor
+		QFont = QtGui.QFont
+		QPainterPath = QtGui.QPainterPath
+		QImage = QtGui.QImage
+		Qt = QtCore.Qt
+		
+		tinyFont = QFont("DejaVu Sans", 9, weight=QtGui.QFont.Thin)
+		normalFont = QFont("DejaVu Sans", 11, weight=QtGui.QFont.Thin)
+		
+		visWidth = event.rect().width()
+		
+		def strength(triggerIsActive: bool) -> float:
+			return highStrength if triggerIsActive else lowStrength
+		
+		triggerState = self.lastTriggerState[triggerId]
+		
+		painter = QPainter(pane)
+		
+		painter.setRenderHint(QPainter.Antialiasing, True)
+		painter.setRenderHint(QPainter.TextAntialiasing, True)
+		
+		pen = QPen(QColor(0), 1, join=Qt.MiterJoin) #Miter join makes arrows look good.
+		painter.setPen(pen)
+		
+		#x and y are the layout cursor. If we don't have enough room on a line (all elements are fixed-width) then we go to the next line.
+		x = visualizationPadding[3]
+		y = visualizationPadding[0]
+		
+		#Compute height of icon + icon label, used for line height.
+		painter.setFont(tinyFont)
+		icon = QImage({
+			'trig1': 'assets/images/bnc-connector.svg',
+			'trig2': 'assets/images/green-connector.svg',
+			'trig3': 'assets/images/green-connector-bottom.svg',
+			'motion': 'assets/images/motion.svg',
+		}[triggerId])
+		if triggerId == 'motion':
+			ioText = '{0:.1f}%'.format(triggerState["level"]*100)
+		else:
+			ioText = '{0:.2f}V'.format(triggerState["level"])
+		iconWidth = icon.width()
+		textHeight = painter.fontMetrics().height()
+		lineHeight = icon.height()-3+textHeight
+		textWidth = painter.fontMetrics().width(ioText)
+		totalWidth = max(iconWidth, textWidth)
+		
+		
+		def drawArrow(toElementOfWidth: int) -> None:
+			"""Draw an arrow to the next element, line-wrapping if needed."""
+			nonlocal x, y 
+			
+			if x == visualizationPadding[3] and y == visualizationPadding[0]:
+				return #We have not moved, must be at start. So don't draw arrow from nothing.
+			
+			arrowLength = 20 #px, always px
+			arrowPadding = 10
+			headSize = 5
+			linePadding = 20
+			
+			painter.save()
+			painter.translate(-0.5, -0.5) #Align 1px-width lines to the *center* of pixels when integer position specified, instead of the edges of pixels. If the line is exactly on a pixel edge, it will draw half the line on one pixel and the other half on the other, at half-strength due to the AA algorithm. 😑
+			path = QPainterPath() #arrow line → or the ꙅ-type
+			
+			
+			#Initial — of the arrow.
+			x += arrowPadding
+			path.moveTo(x, y + lineHeight//2)
+			
+			x += arrowLength
+			path.lineTo(x, y + lineHeight//2)
+			
+			#Arrow wrap around to new-line.
+			if x + arrowPadding + toElementOfWidth + arrowPadding + arrowLength > visWidth - visualizationPadding[1]: #Test if element + another arrow is over the right margin.
+				path.lineTo(x, y + lineHeight + linePadding//2)
+				x = visualizationPadding[3] + 5 #+ indent
+				path.lineTo(x, y + lineHeight + linePadding//2)
+				y += lineHeight + linePadding
+				path.lineTo(x, y + lineHeight//2)
+				x += arrowLength #Draw the arrow head again.
+				path.lineTo(x, y + lineHeight//2)
+			
+			path.moveTo(x - headSize - 0.5, y + lineHeight//2 - headSize) #-0.5 to make AA line up just a little better for a more consistent line thickness
+			path.lineTo(x, y + lineHeight//2)
+			path.lineTo(x - headSize - 0.5, y + lineHeight//2 + headSize)
+			
+			x += arrowPadding
+			
+			painter.drawPath(path)
+			painter.restore()
+		
+		#Draw the pullup that gets sent to IO.
+		pullupAmount = 0
+		if triggerId == 'trig1':
+			pullupAmount += self.uiTrigger11mAPullup.isChecked()*1
+			pullupAmount += self.uiTrigger120mAPullup.isChecked()*20
+		if triggerId == 'trig2':
+			pullupAmount += self.uiTrigger220mAPullup.isChecked()*20
+			
+		if pullupAmount:
+			#Draw the pullup amount.
+			
+			text = "5V at up to %imA" % pullupAmount
+			painter.setFont(normalFont)
+			textHeight = painter.fontMetrics().height()
+			painter.drawText(QPoint(
+				x,
+				y+lineHeight/2 + textHeight/4
+			), text)
+			
+			x += painter.fontMetrics().width(text)
+			
+			drawArrow(totalWidth)
+		
+		
+		#Draw the IO icon.
+		triggerIsActive = triggerState["inputIsActive"]
+		painter.setOpacity(strength(triggerIsActive))
+		
+		painter.drawImage(QPoint(
+			x+(totalWidth-iconWidth)/2,
+			y+0,
+		), icon)
+		
+		painter.setFont(tinyFont)
+		painter.drawText(QPoint(
+			x+(totalWidth-textWidth)/2, 
+			y+lineHeight,
+		), ioText)
+		
+		x += totalWidth
+		
+		#Draw the invert.
+		if {
+			'trig1': self.uiTrigger1Invert,
+			'trig2': self.uiTrigger2Invert,
+			'trig3': self.uiTrigger3Invert,
+			'motion': self.uiMotionTriggerInvert,
+		}[triggerId].isChecked():
+			text = "Invert Signal"
+			painter.setFont(normalFont)
+			textHeight = painter.fontMetrics().height()
+			textWidth = painter.fontMetrics().width(text)
+			
+			drawArrow(textWidth)
+			
+			painter.drawText(QPoint(
+				x,
+				y + lineHeight/2 + textHeight/4
+			), text)
+			
+			triggerIsActive = not triggerIsActive
+			painter.setOpacity(strength(triggerIsActive))
+			
+			x += textWidth
+		
+		
+		#Draw the debounce. Draw the debounce period under it.
+		if {
+			'trig1': self.uiTrigger1Debounce,
+			'trig2': self.uiTrigger2Debounce,
+			'trig3': self.uiTrigger3Debounce,
+			'motion': self.uiMotionTriggerDebounce,
+		}[triggerId].isChecked():
+			text = "Debounce"
+			painter.setFont(normalFont)
+			textHeight = painter.fontMetrics().height()
+			textWidth = painter.fontMetrics().width(text)
+			
+			drawArrow(textWidth)
+			
+			painter.drawText(QPoint(
+				x,
+				y + lineHeight/2
+			), text)
+			painter.setFont(tinyFont)
+			painter.drawText(QPoint(
+				x,
+				y + lineHeight/2 + painter.fontMetrics().height()
+			), "   (10ms)   ") #cheap-o center justification
+			
+			x += textWidth
+			
+		
+		#Draw the trigger action.
+		text = {
+			'trig1': self.uiTrigger1Action,
+			'trig2': self.uiTrigger2Action,
+			'trig3': self.uiTrigger3Action,
+			'motion': self.uiMotionTriggerAction,
+		}[triggerId].currentText()
+		
+		if text == "None":
+			text = "No Action"
+		
+		painter.setFont(normalFont)
+		textHeight = painter.fontMetrics().height()
+		textWidth = painter.fontMetrics().width(text)
+		
+		drawArrow(textWidth)
+		
+		painter.drawText(QPoint(
+			x,
+			y + lineHeight/2 + textHeight/4
+		), text)
+		
+		x += textWidth

@@ -23,7 +23,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>3</number>
+    <number>0</number>
    </property>
    <widget class="QWidget" name="uiTrigger1">
     <widget class="HeaderLabel" name="headerlabel_2">
@@ -160,9 +160,6 @@
        <width>341</width>
        <height>231</height>
       </rect>
-     </property>
-     <property name="styleSheet">
-      <string notr="true">background: rgba(255, 244, 123, 105)</string>
      </property>
     </widget>
     <widget class="Backdrop" name="backdrop_2">
@@ -318,9 +315,6 @@
        <width>341</width>
        <height>231</height>
       </rect>
-     </property>
-     <property name="styleSheet">
-      <string notr="true">background: rgba(255, 244, 123, 105)</string>
      </property>
     </widget>
     <widget class="HeaderLabel" name="headerlabel_9">
@@ -533,9 +527,6 @@
        <height>231</height>
       </rect>
      </property>
-     <property name="styleSheet">
-      <string notr="true">background: rgba(255, 244, 123, 105)</string>
-     </property>
     </widget>
     <widget class="HeaderLabel" name="headerlabel_11">
      <property name="geometry">
@@ -612,6 +603,16 @@
       <pixmap>../../assets/images/green-connector-bottom.svg</pixmap>
      </property>
     </widget>
+    <zorder>backdrop_4</zorder>
+    <zorder>headerlabel_10</zorder>
+    <zorder>uiTrigger3Debounce</zorder>
+    <zorder>uiTrigger3Invert</zorder>
+    <zorder>headerlabel_11</zorder>
+    <zorder>headerlabel_15</zorder>
+    <zorder>uiTrigger3Action</zorder>
+    <zorder>uiTrigger3ThresholdVoltage</zorder>
+    <zorder>uiTrigger3Icon</zorder>
+    <zorder>uiTrigger3Visualization</zorder>
    </widget>
    <widget class="QWidget" name="uiMotionTrigger">
     <widget class="Backdrop" name="backdrop_5">
@@ -684,13 +685,10 @@
      <property name="geometry">
       <rect>
        <x>440</x>
-       <y>140</y>
+       <y>130</y>
        <width>361</width>
        <height>191</height>
       </rect>
-     </property>
-     <property name="styleSheet">
-      <string notr="true">background: rgba(255, 244, 123, 105)</string>
      </property>
     </widget>
     <widget class="HeaderLabel" name="headerlabel_12">
@@ -785,7 +783,6 @@
     <zorder>backdrop_6</zorder>
     <zorder>backdrop_7</zorder>
     <zorder>backdrop_8</zorder>
-    <zorder>uiMotionTriggerVisualization</zorder>
     <zorder>headerlabel_12</zorder>
     <zorder>headerlabel_13</zorder>
     <zorder>uiMotionTriggerAction</zorder>
@@ -794,6 +791,7 @@
     <zorder>uiMotionTriggerConfigure</zorder>
     <zorder>uiMotionTriggerInvert</zorder>
     <zorder>uiMotionTriggerDebounce</zorder>
+    <zorder>uiMotionTriggerVisualization</zorder>
    </widget>
   </widget>
   <widget class="ComboBox" name="uiActiveTrigger">
