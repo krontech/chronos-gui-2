@@ -113,7 +113,7 @@ class SensorObject():
 		print ("SensorObject Init")
 		#self.mem = mem
 		#print (mem)
-		# self.SensorInit()
+		self.SensorInit()
 
 	# print ("class SensorObject")
 	# print (mem)
@@ -125,4 +125,5 @@ class SensorObject():
 	# ImageGeometry.hres = 500000001
 	# ImageSensor = ImageSensorData
 	numfunc = luxnum
-
+	hMaxRes = 0;
+	vMaxRes = 0;

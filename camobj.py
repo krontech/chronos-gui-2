@@ -56,8 +56,9 @@ class CamObject:
 	def __init__(self):
 		print ("CamObject Init")
 		self.CamInit()
-
-
+		thiscam = self
+	
+		
 	#print("CamObject created")
 	# mem = MemObject()
 
@@ -79,6 +80,10 @@ class CamObject:
 	return err;
 	'''
 
+	def image_sensor_bpp(self):
+		return 12
+
+
 	def i2c_eeprom_read16(fd, addr, offset, leng):
 		return i2c_eeprom_do_read(fd, addr, offset, leng, 2);
 		pass
@@ -93,16 +98,23 @@ class CamObject:
 		i2c_eeprom_do_read(CAMERA_SERIAL_I2CADDR, CAMERA_SERIAL_OFFSET, CAMERA_SERIAL_LENGTH)
 
 	def TestLive(self):
-		print("!!!!!")
-		self.sensor.OpsDict["SetPeriod"](self, 1000000)
-		self.sensor.OpsDict["SetExposure"]()
+		print("TESTING LIVE!!!!!")
+		self.sensor.OpsDict["SetPeriod"](self.sensor, 1000000)
+		self.sensor.OpsDict["SetExposure"](self.sensor, 100000)
 		self.sensor.OpsDict["CalSuffix"]()
-		self.sensor.OpsDict["SetGain"](self, 12)
+		self.sensor.OpsDict["SetGain"](self.sensor, 12)
+		self.sensor.OpsDict["SetResolutions"](self.sensor)
+		self.sensor.OpsDict["GetConstraints"](self.sensor)
+		self.sensor.OpsDict["CalGain"]()
+		print("END TESTING LIVE!!!!!")
+
+
 		
 		# self.CamInit()
 
-	def SetLiveTiming(self, geometry, hOutRes, vOutRes, maxFPS):
+	def SetLiveTiming(self, hOutRes, vOutRes, maxFPS):
 
+		print("SETLIVETIMING!!")
 		pxClock = 100000000
 		hSync = 50
 		hPorch = 166
@@ -114,20 +126,28 @@ class CamObject:
 		# Calculate minimum hPeriod to fit within the max vertical
 		# resolution and make sure hPeriod is equal to or larger
 	 
-		minHPeriod = (pxClock / ((sensor.v_max_res + vPorch + vSync + vSync) * maxFps)) + 1; # the +1 is just to round up
+		minHPeriod = (pxClock / ((self.sensor.vMaxRes + vPorch + vSync + vSync) * maxFPS)) + 1; # the +1 is just to round up
 		if hPeriod < minHPeriod: 
 			hPeriod = minHPeriod
 
 		# calculate vPeriod and make sure it's large enough for the frame
-		vPeriod = pxClock / (hPeriod * maxFps)
+		vPeriod = pxClock / (hPeriod * maxFPS)
 		if vPeriod < (vOutRes + vSync + vPorch + vSync):
 			vPeriod = vOutRes + vSync + vPorch + vSync
 	
 		# calculate FPS for debug output
 		fps = pxClock / (vPeriod * hPeriod)
+		print (f"FPS = {fps}")
 		print ("Timing: %d*%d@%d (%d*%d max: %d)\n", \
 			   (hPeriod - hSync - hPorch - hSync), (vPeriod - vSync - vPorch - vSync), \
-			   fps, hOutRes, vOutRes, maxFps)
+			   fps, hOutRes, vOutRes, maxFPS)
+
+		g = self.sensor.ImageGeometry
+		self.mem.fpga_write32(DISPLAY_H_RES, g.hres)
+		self.mem.fpga_write32(DISPLAY_V_RES, g.vres)
+		print (f"ImageGeometry: {g}")
+
+
 
 	 
 	def CamInit(self):
@@ -139,14 +159,47 @@ class CamObject:
 		maxfps = self.sensor.ImageSensor.pixel_rate / \
 			(self.sensor.ImageSensor.h_max_res * self.sensor.ImageSensor.v_max_res);
 		print (f"maxfps is {maxfps}")
+		
+		g = self.sensor.ImageGeometry 
+		g.hres = self.sensor.ImageSensor.h_max_res
+		g.vres = self.sensor.ImageSensor.v_max_res
+		g.hoffset = 0
+		g.voffset = 0
 
+		print (f"h_max_res = {self.sensor.ImageSensor.h_max_res}")
+
+		#TODO: move this to somewhere better
+		self.sensor.hMaxRes = self.sensor.ImageSensor.h_max_res
+		self.sensor.vMaxRes = self.sensor.ImageSensor.v_max_res
+
+		print (self.sensor)
 		# Configure the FIFO threshold and image sequencer
 
 		self.mem.fpga_write32(SEQ_LIVE_ADDR_0, MAX_FRAME_LENGTH)
 		self.mem.fpga_write32(SEQ_LIVE_ADDR_1, MAX_FRAME_LENGTH * 2)
 		self.mem.fpga_write32(SEQ_LIVE_ADDR_2, MAX_FRAME_LENGTH * 3)
-		self.mem.fpga_write32(SEQ_REC_REGION_START, MAX_FRAME_LENGTH * 3)
+		self.mem.fpga_write32(SEQ_REC_REGION_START, REC_START_ADDR)
 
+		frame_words = int(((self.sensor.hMaxRes * self.sensor.vMaxRes * self.image_sensor_bpp()) / 8 + (32 - 1)) / 32)
+		print(f"frame_words = {frame_words}")
+		print(f"hMaxRes = {self.sensor.hMaxRes}")
+		self.mem.fpga_write32(SEQ_FRAME_SIZE, (frame_words + 0x3f) & ~0x3f)
+		
+
+
+		#temporary single definition; move to fpgah.py
+		DISPLAY_CTL_READOUT_INHIBIT = (1 << 3)
+
+		dctrl = self.mem.fpga_read32(DISPLAY_CTL)
+		dctrl &= ~DISPLAY_CTL_READOUT_INHIBIT
+		self.mem.fpga_write32(DISPLAY_CTL, dctrl)
+
+
+
+
+		self.SetLiveTiming(self.sensor.hMaxRes, self.sensor.vMaxRes, 60)
+		print ("--> SENSOR:")
+		print (self.sensor.ImageGeometry)
 
 	def GPIOWrite(self, pin_name, value):
 		gpio = self._GPIO_ports[pin_name]
@@ -182,11 +235,12 @@ class CamObject:
 		gpioaccess = GPIO(value[0], value[1])
 		_GPIO_ports.update({key : gpioaccess})
 
-	print(_GPIO_ports)
+	#print(_GPIO_ports)
 
 	print ("begin")
 	mem = MemObject()
 	#sensor = SensorObject(mem)
+	#sensor = Lux1310Object(mem)
 	sensor = Lux1310Object(mem)
 
 	

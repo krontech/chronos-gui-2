@@ -1,5 +1,6 @@
 #from periphery import GPIO
 
+# the following are not used!
 board_chronos14_ioports = {
     "ddr3-i2c" :       "/dev/i2c-0",
     "eeprom-i2c" :     "/dev/i2c-1",

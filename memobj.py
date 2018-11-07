@@ -34,10 +34,10 @@ class MemObject:
 
 
 	def fpga_read32(self, addr):
-		return self.mem.fpga_mmio.read32(2 * addr)
+		return self.fpga_mmio.read32(2 * addr)
 
 	def fpga_read16(self, addr):
-		return self.mem.fpga_mmio.read16(2 * addr)
+		return self.fpga_mmio.read16(2 * addr)
 
 
 
