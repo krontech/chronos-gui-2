@@ -3,7 +3,6 @@ from copy import deepcopy
 from PyQt5 import uic, QtWidgets, QtCore, QtGui
 from PyQt5.QtCore import pyqtSlot
 from PyQt5.QtWidgets import QGraphicsOpacityEffect #Also available: QGraphicsBlurEffect, QGraphicsColorizeEffect, QGraphicsDropShadowEffect
-from PyQt5.QtSvg import QGraphicsSvgItem
 
 from debugger import *; dbg
 import api_mock as api
@@ -12,14 +11,14 @@ from api_mock import silenceCallbacks
 
 settings = QtCore.QSettings('Krontech', 'back-of-camera interface')
 
-allInputIds = [
+allInputIds = (
 	'uiTrigger1Action', 'uiTrigger1ThresholdVoltage', 'uiTrigger11mAPullup', 'uiTrigger120mAPullup', 'uiTrigger1Invert', 'uiTrigger1Debounce',
 	'uiTrigger2Action', 'uiTrigger2ThresholdVoltage', 'uiTrigger2Invert', 'uiTrigger2Debounce', 'uiTrigger220mAPullup',
 	'uiTrigger3Action', 'uiTrigger3ThresholdVoltage', 'uiTrigger3Invert', 'uiTrigger3Debounce',
 	'uiMotionTriggerAction', 'uiMotionTriggerDebounce', 'uiMotionTriggerInvert',
-]
+)
 
-visualizationPadding = [15, 20, 0, 20] #top, right, bottom, left; like CSS
+visualizationPadding = (15, 20, 0, 20) #top, right, bottom, left; like CSS
 
 highStrength = 1.0
 lowStrength = 0.5
@@ -49,12 +48,19 @@ class Triggers(QtWidgets.QDialog):
 	
 	#Save current screen by ID, not by index or display text because those are UI changes.
 	#These map IDs to indexes, and must be updated when the .ui file combo box is updated!
-	availableTriggerIds = ['trig1', 'trig2', 'trig3', 'motion']
-	availableTrigger1Actions = ['none', 'record end', 'exposure gating', 'genlock in', 'genlock out']
-	availableTrigger2Actions = ['none', 'record end', 'exposure gating', 'genlock in', 'genlock out']
-	availableTrigger3Actions = ['none', 'record end']
-	#Analog triggers can take no action.
-	availableMotionTriggerActions = ['none', 'record end']
+	availableTriggerIds = ('trig1', 'trig2', 'trig3', 'motion')
+	availableTrigger1Actions = ('none', 'record end', 'exposure gating', 'genlock in', 'genlock out')
+	availableTrigger2Actions = ('none', 'record end', 'exposure gating', 'genlock in', 'genlock out')
+	availableTrigger3Actions = ('none', 'record end')
+	availableAnalog1Actions = ('none') #Analog triggers will be able to take action in the next version of triggers.
+	availableAnalog2Actions = ('none') 
+	availableMotionTriggerActions = ('none', 'record end')
+	
+	#Signals don't get to be debounced, that only applies to level-based triggers.
+	signalBasedTriggers = ('exposure gating', 'genlock in', 'genlock out')
+	
+	#Output triggers are visualized differently than input triggers. They don't listen, they tell; so they output to their trigger instead of taking it as input.
+	outputTriggers = ('genlock out')
 	
 	
 	def __init__(self, window):
@@ -156,17 +162,13 @@ class Triggers(QtWidgets.QDialog):
 		self.triggerStateUpdateTimer.timeout.connect(self.updateTriggerState)
 		self.triggerStateUpdateTimer.setInterval(1000/3+0) #Update at 30fps since we're somewhat cpu-bound on this task.
 		
-		
 		def setTrigger1ModifierVisibility(index: int) -> None:
-			action = 'hide' if self.availableTrigger1Actions[index] == 'frame sync' else 'show'
-			getattr(self.uiTrigger11mAPullup, action)()
-			getattr(self.uiTrigger120mAPullup, action)()
+			action = 'hide' if self.availableTrigger1Actions[index] in self.signalBasedTriggers else 'show'
 			getattr(self.uiTrigger1Debounce, action)()
 		self.uiTrigger1Action.currentIndexChanged.connect(setTrigger1ModifierVisibility)
 		
 		def setTrigger2ModifierVisibility(index: int) -> None:
-			action = 'hide' if self.availableTrigger1Actions[index] == 'frame sync' else 'show'
-			getattr(self.uiTrigger220mAPullup, action)()
+			action = 'hide' if self.availableTrigger1Actions[index] in self.signalBasedTriggers else 'show'
 			getattr(self.uiTrigger2Debounce, action)()
 		self.uiTrigger2Action.currentIndexChanged.connect(setTrigger2ModifierVisibility)
 	
@@ -217,6 +219,8 @@ class Triggers(QtWidgets.QDialog):
 		self.uiTrigger120mAPullup.setChecked(config['trig1']['pullup20ma'])
 		self.uiTrigger1Invert.setChecked(config['trig1']['invert'])
 		self.uiTrigger1Debounce.setChecked(config['trig1']['debounce'])
+		self.uiTrigger1Debounce.setVisible(
+			config['trig1']['action'] not in self.signalBasedTriggers )
 		
 		self.uiTrigger2Action.setCurrentIndex(
 			self.availableTrigger2Actions.index(config['trig2']['action']) )
@@ -224,6 +228,8 @@ class Triggers(QtWidgets.QDialog):
 		self.uiTrigger2Invert.setChecked(config['trig2']['invert'])
 		self.uiTrigger2Debounce.setChecked(config['trig2']['debounce'])
 		self.uiTrigger220mAPullup.setChecked(config['trig2']['pullup20ma'])
+		self.uiTrigger2Debounce.setVisible(
+			config['trig2']['action'] not in self.signalBasedTriggers )
 		
 		self.uiTrigger3Action.setCurrentIndex(
 			self.availableTrigger3Actions.index(config['trig3']['action']) )
@@ -330,10 +336,20 @@ class Triggers(QtWidgets.QDialog):
 		
 		visWidth = event.rect().width()
 		
+		#Output is assumed to always be high, so just always draw it black. There's some more work that needs to be done here.
+		#Basically, we need a state that shows that something is a ~waveform~, not a level-based trigger. (eg, high/low)
+		#We don't really have that at the moment, aside from "flickering madly".
+		isOutputTrigger = False
+		
 		def strength(triggerIsActive: bool) -> float:
-			return highStrength if triggerIsActive else lowStrength
+			return (
+				highStrength 
+				if triggerIsActive or isOutputTrigger else
+				lowStrength
+			)
 		
 		triggerState = self.lastTriggerState[triggerId]
+		triggerIsActive = triggerState["inputIsActive"]
 		
 		painter = QPainter(pane)
 		
@@ -347,24 +363,7 @@ class Triggers(QtWidgets.QDialog):
 		x = visualizationPadding[3]
 		y = visualizationPadding[0]
 		
-		#Compute height of icon + icon label, used for line height.
-		painter.setFont(tinyFont)
-		icon = QImage({
-			'trig1': 'assets/images/bnc-connector.svg',
-			'trig2': 'assets/images/green-connector.svg',
-			'trig3': 'assets/images/green-connector-bottom.svg',
-			'motion': 'assets/images/motion.svg',
-		}[triggerId])
-		if triggerId == 'motion':
-			ioText = '{0:.1f}%'.format(triggerState["level"]*100)
-		else:
-			ioText = '{0:.2f}V'.format(triggerState["level"])
-		iconWidth = icon.width()
-		textHeight = painter.fontMetrics().height()
-		lineHeight = icon.height()-3+textHeight
-		textWidth = painter.fontMetrics().width(ioText)
-		totalWidth = max(iconWidth, textWidth)
-		
+		lineHeight = 42 #Calculated from the trigger icon + text.
 		
 		def drawArrow(toElementOfWidth: int) -> None:
 			"""Draw an arrow to the next element, line-wrapping if needed."""
@@ -409,55 +408,148 @@ class Triggers(QtWidgets.QDialog):
 			painter.drawPath(path)
 			painter.restore()
 		
-		#Draw the pullup that gets sent to IO.
-		pullupAmount = 0
-		if triggerId == 'trig1':
-			pullupAmount += self.uiTrigger11mAPullup.isChecked()*1
-			pullupAmount += self.uiTrigger120mAPullup.isChecked()*20
-		if triggerId == 'trig2':
-			pullupAmount += self.uiTrigger220mAPullup.isChecked()*20
+		
+		def drawPullup() -> None:
+			"""Draw the pullup that gets sent to IO."""
+			nonlocal x
 			
-		if pullupAmount:
-			#Draw the pullup amount.
+			painter.setOpacity(strength(1))
 			
-			text = "5V at up to %imA" % pullupAmount
-			painter.setFont(normalFont)
+			pullupAmount = 0
+			if triggerId == 'trig1':
+				pullupAmount += self.uiTrigger11mAPullup.isChecked()*1
+				pullupAmount += self.uiTrigger120mAPullup.isChecked()*20
+			if triggerId == 'trig2':
+				pullupAmount += self.uiTrigger220mAPullup.isChecked()*20
+				
+			if pullupAmount:
+				#Draw the pullup amount.
+				
+				text = "5V at ≤%imA" % pullupAmount
+				painter.setFont(normalFont)
+				textHeight = painter.fontMetrics().height()
+				textWidth = painter.fontMetrics().width(text)
+				
+				drawArrow(textWidth)
+				
+				painter.drawText(QPoint(
+					x,
+					y+lineHeight/2 + textHeight/4
+				), text)
+				
+				x += textWidth
+		
+		
+		def drawIoIcon() -> None:
+			"""Compute height of icon + icon label, used for line height."""
+			nonlocal x
+			
+			painter.setOpacity(strength(triggerIsActive))
+			
+			icon = QImage({
+				'trig1': 'assets/images/bnc-connector.svg',
+				'trig2': 'assets/images/green-connector.svg',
+				'trig3': 'assets/images/green-connector-bottom.svg',
+				'motion': 'assets/images/motion.svg',
+			}[triggerId])
+			if triggerId == 'motion':
+				ioText = '{0:.1f}%'.format(triggerState["level"]*100)
+			else:
+				ioText = '{0:.2f}V'.format(triggerState["level"])
+			iconWidth = icon.width()
+			
+			painter.setFont(tinyFont)
 			textHeight = painter.fontMetrics().height()
-			painter.drawText(QPoint(
-				x,
-				y+lineHeight/2 + textHeight/4
-			), text)
-			
-			x += painter.fontMetrics().width(text)
+			lineHeight = icon.height()-3+textHeight
+			textWidth = painter.fontMetrics().width(ioText)
+			totalWidth = max(iconWidth, textWidth)
 			
 			drawArrow(totalWidth)
+			
+			painter.drawImage(QPoint(
+				x+(totalWidth-iconWidth)/2,
+				y+3, #hack, visual weight was off though geometry was ok I think
+			), icon)
+			
+			painter.setFont(tinyFont)
+			painter.drawText(QPoint(
+				x+(totalWidth-textWidth)/2, 
+				y+3+lineHeight,
+			), ioText)
+			
+			x += totalWidth
 		
 		
-		#Draw the IO icon.
-		triggerIsActive = triggerState["inputIsActive"]
-		painter.setOpacity(strength(triggerIsActive))
+		def drawInversion() -> None:
+			"""Draw "invert". Flip the active state."""
+			nonlocal x, triggerIsActive
+			
+			if {
+				'trig1': self.uiTrigger1Invert,
+				'trig2': self.uiTrigger2Invert,
+				'trig3': self.uiTrigger3Invert,
+				'motion': self.uiMotionTriggerInvert,
+			}[triggerId].isChecked():
+				text = "Invert Signal"
+				painter.setFont(normalFont)
+				textHeight = painter.fontMetrics().height()
+				textWidth = painter.fontMetrics().width(text)
+				
+				drawArrow(textWidth)
+				
+				painter.drawText(QPoint(
+					x,
+					y + lineHeight/2 + textHeight/4
+				), text)
+				
+				triggerIsActive = not triggerIsActive
+				painter.setOpacity(strength(triggerIsActive))
+				
+				x += textWidth
 		
-		painter.drawImage(QPoint(
-			x+(totalWidth-iconWidth)/2,
-			y+0,
-		), icon)
 		
-		painter.setFont(tinyFont)
-		painter.drawText(QPoint(
-			x+(totalWidth-textWidth)/2, 
-			y+lineHeight,
-		), ioText)
+		def drawDebounce() -> None:
+			"""Draw the debounce. Draw the debounce period under it."""
+			nonlocal x
+			
+			if {
+				'trig1': self.uiTrigger1Debounce,
+				'trig2': self.uiTrigger2Debounce,
+				'trig3': self.uiTrigger3Debounce,
+				'motion': self.uiMotionTriggerDebounce,
+			}[triggerId].isChecked():
+				text = "Debounce"
+				painter.setFont(normalFont)
+				textWidth = painter.fontMetrics().width(text)
+				
+				drawArrow(textWidth)
+				
+				painter.drawText(QPoint(
+					x,
+					y + lineHeight/2
+				), text)
+				painter.setFont(tinyFont)
+				painter.drawText(QPoint(
+					x,
+					y + lineHeight/2 + painter.fontMetrics().height()
+				), "   (10ms)   ") #cheap-o center justification
+				
+				x += textWidth
 		
-		x += totalWidth
 		
-		#Draw the invert.
-		if {
-			'trig1': self.uiTrigger1Invert,
-			'trig2': self.uiTrigger2Invert,
-			'trig3': self.uiTrigger3Invert,
-			'motion': self.uiMotionTriggerInvert,
-		}[triggerId].isChecked():
-			text = "Invert Signal"
+		def drawTriggerAction() -> None:
+			nonlocal x
+			
+			text = {
+				'trig1': self.uiTrigger1Action,
+				'trig2': self.uiTrigger2Action,
+				'trig3': self.uiTrigger3Action,
+				'motion': self.uiMotionTriggerAction,
+			}[triggerId].currentText()
+			
+			if text == "None":
+				text = "No Action"
+			
 			painter.setFont(normalFont)
 			textHeight = painter.fontMetrics().height()
 			textWidth = painter.fontMetrics().width(text)
@@ -469,59 +561,26 @@ class Triggers(QtWidgets.QDialog):
 				y + lineHeight/2 + textHeight/4
 			), text)
 			
-			triggerIsActive = not triggerIsActive
-			painter.setOpacity(strength(triggerIsActive))
-			
 			x += textWidth
 		
 		
-		#Draw the debounce. Draw the debounce period under it.
-		if {
-			'trig1': self.uiTrigger1Debounce,
-			'trig2': self.uiTrigger2Debounce,
-			'trig3': self.uiTrigger3Debounce,
-			'motion': self.uiMotionTriggerDebounce,
-		}[triggerId].isChecked():
-			text = "Debounce"
-			painter.setFont(normalFont)
-			textHeight = painter.fontMetrics().height()
-			textWidth = painter.fontMetrics().width(text)
+		action = {
+			'trig1': self.availableTrigger1Actions[self.uiTrigger1Action.currentIndex()],
+			'trig2': self.availableTrigger2Actions[self.uiTrigger2Action.currentIndex()],
+			'trig3': self.availableTrigger3Actions[self.uiTrigger3Action.currentIndex()],
+			'motion': self.availableMotionTriggerActions[self.uiMotionTriggerAction.currentIndex()],
+		}[triggerId]
+		
+		if action in self.outputTriggers:
+			isOutputTrigger = True
 			
-			drawArrow(textWidth)
-			
-			painter.drawText(QPoint(
-				x,
-				y + lineHeight/2
-			), text)
-			painter.setFont(tinyFont)
-			painter.drawText(QPoint(
-				x,
-				y + lineHeight/2 + painter.fontMetrics().height()
-			), "   (10ms)   ") #cheap-o center justification
-			
-			x += textWidth
-			
-		
-		#Draw the trigger action.
-		text = {
-			'trig1': self.uiTrigger1Action,
-			'trig2': self.uiTrigger2Action,
-			'trig3': self.uiTrigger3Action,
-			'motion': self.uiMotionTriggerAction,
-		}[triggerId].currentText()
-		
-		if text == "None":
-			text = "No Action"
-		
-		painter.setFont(normalFont)
-		textHeight = painter.fontMetrics().height()
-		textWidth = painter.fontMetrics().width(text)
-		
-		drawArrow(textWidth)
-		
-		painter.drawText(QPoint(
-			x,
-			y + lineHeight/2 + textHeight/4
-		), text)
-		
-		x += textWidth
+			drawTriggerAction()
+			drawPullup()
+			drawInversion()
+			drawIoIcon()
+		else:
+			drawPullup()
+			drawIoIcon()
+			drawInversion()
+			drawDebounce() if action not in self.signalBasedTriggers else None
+			drawTriggerAction()

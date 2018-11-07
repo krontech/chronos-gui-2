@@ -23,7 +23,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>0</number>
+    <number>2</number>
    </property>
    <widget class="QWidget" name="uiTrigger1">
     <widget class="HeaderLabel" name="headerlabel_2">
@@ -78,7 +78,7 @@
     <widget class="CheckBox" name="uiTrigger11mAPullup">
      <property name="geometry">
       <rect>
-       <x>210</x>
+       <x>10</x>
        <y>230</y>
        <width>191</width>
        <height>61</height>
@@ -176,24 +176,24 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>230</y>
-       <width>201</width>
-       <height>61</height>
+       <y>290</y>
+       <width>191</width>
+       <height>71</height>
       </rect>
      </property>
      <property name="text">
       <string>Invert</string>
      </property>
-     <property name="clickMarginBottomSetter" stdset="0">
-      <enum>CheckBox::none</enum>
+     <property name="clickMarginTopSetter" stdset="0">
+      <enum>CheckBox::half</enum>
      </property>
     </widget>
     <widget class="CheckBox" name="uiTrigger1Debounce">
      <property name="geometry">
       <rect>
-       <x>10</x>
+       <x>200</x>
        <y>290</y>
-       <width>201</width>
+       <width>191</width>
        <height>71</height>
       </rect>
      </property>
@@ -207,17 +207,17 @@
     <widget class="CheckBox" name="uiTrigger120mAPullup">
      <property name="geometry">
       <rect>
-       <x>210</x>
-       <y>290</y>
+       <x>200</x>
+       <y>230</y>
        <width>191</width>
-       <height>71</height>
+       <height>61</height>
       </rect>
      </property>
      <property name="text">
       <string>20mA Pullup</string>
      </property>
-     <property name="clickMarginTopSetter" stdset="0">
-      <enum>CheckBox::half</enum>
+     <property name="clickMarginBottomSetter" stdset="0">
+      <enum>CheckBox::none</enum>
      </property>
     </widget>
     <widget class="QLabel" name="uiTrigger1Icon">
@@ -268,17 +268,14 @@
     <widget class="CheckBox" name="uiTrigger2Invert">
      <property name="geometry">
       <rect>
-       <x>10</x>
+       <x>200</x>
        <y>230</y>
-       <width>201</width>
-       <height>61</height>
+       <width>191</width>
+       <height>81</height>
       </rect>
      </property>
      <property name="text">
       <string>Invert</string>
-     </property>
-     <property name="clickMarginBottomSetter" stdset="0">
-      <enum>CheckBox::none</enum>
      </property>
     </widget>
     <widget class="HeaderLabel" name="headerlabel_7">
@@ -356,9 +353,9 @@
     <widget class="CheckBox" name="uiTrigger220mAPullup">
      <property name="geometry">
       <rect>
-       <x>210</x>
+       <x>10</x>
        <y>230</y>
-       <width>201</width>
+       <width>191</width>
        <height>81</height>
       </rect>
      </property>
@@ -371,7 +368,7 @@
       <rect>
        <x>10</x>
        <y>290</y>
-       <width>201</width>
+       <width>191</width>
        <height>71</height>
       </rect>
      </property>
@@ -450,7 +447,6 @@
     </widget>
     <zorder>backdrop_3</zorder>
     <zorder>headerlabel_6</zorder>
-    <zorder>uiTrigger2Invert</zorder>
     <zorder>headerlabel_7</zorder>
     <zorder>headerlabel_8</zorder>
     <zorder>uiTrigger2Visualization</zorder>
@@ -461,6 +457,7 @@
     <zorder>uiTrigger220mAPullup</zorder>
     <zorder>uiTrigger2Debounce</zorder>
     <zorder>uiTrigger2Action</zorder>
+    <zorder>uiTrigger2Invert</zorder>
    </widget>
    <widget class="QWidget" name="uiTrigger3">
     <widget class="Backdrop" name="backdrop_4">
@@ -601,6 +598,9 @@
      </property>
      <property name="pixmap">
       <pixmap>../../assets/images/green-connector-bottom.svg</pixmap>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
      </property>
     </widget>
     <zorder>backdrop_4</zorder>
@@ -1018,14 +1018,14 @@
   <tabstop>uiActiveTrigger</tabstop>
   <tabstop>uiTrigger1Action</tabstop>
   <tabstop>uiTrigger1ThresholdVoltage</tabstop>
-  <tabstop>uiTrigger1Invert</tabstop>
   <tabstop>uiTrigger11mAPullup</tabstop>
-  <tabstop>uiTrigger1Debounce</tabstop>
   <tabstop>uiTrigger120mAPullup</tabstop>
+  <tabstop>uiTrigger1Invert</tabstop>
+  <tabstop>uiTrigger1Debounce</tabstop>
   <tabstop>uiTrigger2Action</tabstop>
   <tabstop>uiTrigger2ThresholdVoltage</tabstop>
-  <tabstop>uiTrigger2Invert</tabstop>
   <tabstop>uiTrigger220mAPullup</tabstop>
+  <tabstop>uiTrigger2Invert</tabstop>
   <tabstop>uiTrigger2Debounce</tabstop>
   <tabstop>uiTrigger3Action</tabstop>
   <tabstop>uiTrigger3Invert</tabstop>

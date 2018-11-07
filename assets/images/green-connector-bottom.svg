@@ -10,8 +10,8 @@
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    width="40"
-   height="40"
-   viewBox="0 0 10.584069 10.583333"
+   height="30"
+   viewBox="0 0 10.584069 7.9374997"
    version="1.1"
    id="svg986"
    inkscape:version="0.92.3 (2405546, 2018-03-11)"
@@ -63,14 +63,14 @@
      inkscape:label="Layer 1"
      inkscape:groupmode="layer"
      id="layer1"
-     transform="translate(-29.482162,-259.95813)">
+     transform="translate(-29.482162,-262.60415)">
     <rect
        style="opacity:1;vector-effect:none;fill:#002800;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:0.35910228px;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:normal"
        id="rect2192"
        width="10.054866"
        height="7.1442394"
        x="29.746763"
-       y="261.54538"
+       y="262.86847"
        clip-path="none" />
     <circle
        style="opacity:1;vector-effect:none;fill:#7f7f7f;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:0.26460171px;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:normal"
@@ -81,7 +81,7 @@
     <g
        id="g1510"
        clip-path="none"
-       transform="translate(0,-0.26459302)">
+       transform="translate(4.9562988e-7,1.0585073)">
       <rect
          y="261.80997"
          x="29.746763"
@@ -157,13 +157,13 @@
        width="1.0584074"
        height="2.1829355"
        x="29.746763"
-       y="266.50668" />
+       y="267.82977" />
     <rect
        style="opacity:1;vector-effect:none;fill:#007a00;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:0.35910228px;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:normal"
        id="rect1528"
        width="10.054866"
        height="0.79382026"
        x="29.746763"
-       y="268.1604" />
+       y="269.48349" />
   </g>
 </svg>
