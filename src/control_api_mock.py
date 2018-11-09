@@ -468,10 +468,44 @@ class State():
 	powerOnWhenMainsConnected = True
 	
 	datetime = "2018-09-20T13:23:23.036586" #iso 8601, YYYY-MM-DDTHH:MM:SS.mmmmmm as detailed at https://docs.python.org/3/library/datetime.html#datetime.datetime.isoformat
-		
 	
+	@property
+	def externalStorage(self) -> [{str:any}]:
+		"""External storage device partitions.
+			
+			Returns a list of maps, one map per partition on each
+				external storage device. (Storage devices are things
+				like SD cards, USB thumb sticks, etc.)
+			
+			Maps contain the following keys:
+				name: The given name of the partition.
+				device: The name of the device the partition is on. If
+					a device has more than one partition, each
+					partition will have the same device name.
+				path: Where in the [camera] filesystem the device is
+					mounted to. Unlike name, guaranteed to be unique.
+				size: The amount of space on the partition, in bytes.
+				free: The amount of available space on the partition,
+					in bytes. Note that size and free may not fit in
+					a 32-bit integer.
+			"""
+		
+		return [{
+			"name": "Testdisk",
+			"device": "mmcblk0p1",
+			"path": "/dev/sda",
+			"size": 1294839100, #bytes, 64-bit positive integer
+			"free": 4591,
+		},{
+			"name": "Toastdesk",
+			"device": "sdc1",
+			"path": "/dev/sdc1",
+			"size": 2930232316000,
+			"free": 1418341032982,
+		}]
 
-state = State()
+
+state = State() #Must be instantiated for QDBusMarshaller. 🙂
 
 
 class ControlAPIMock(QObject):
@@ -637,3 +671,19 @@ class ControlAPIMock(QObject):
 	@pyqtSlot()
 	def doBlackCalibration(self):
 		print('MOCK: do black calibration')
+	
+	
+	@pyqtSlot(str, result='QVariantMap')
+	def saveCalibrationData(self, toFolder: str):
+		print(f'MOCK: Save calibration data to {toFolder}.')
+		return {"message": "Out of space."} if 'sda' in toFolder else None
+	
+	@pyqtSlot(str, result='QVariantMap')
+	def loadCalibrationData(self, fromFolderHint: str):
+		print(f'MOCK: Load calibration data, trying {fromFolderHint} first and then any other attached storage devices.')
+		return None
+	
+	@pyqtSlot(str)
+	def applySoftwareUpdate(self, fromFolderHint: str):
+		print(f'MOCK: Apply software update, checking {fromFolderHint} first and then any other attached storage devices.')
+		return None

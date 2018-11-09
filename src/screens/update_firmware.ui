@@ -172,6 +172,51 @@
     <string>Done</string>
    </property>
   </widget>
+  <widget class="ErrorLabel" name="uiSaveCalDataError">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>130</y>
+     <width>741</width>
+     <height>21</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="ErrorLabel" name="uiApplyUpdateError">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>230</y>
+     <width>741</width>
+     <height>21</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="ErrorLabel" name="uiLoadCalDataError">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>330</y>
+     <width>741</width>
+     <height>21</height>
+    </rect>
+   </property>
+  </widget>
+  <zorder>backdrop</zorder>
+  <zorder>headerlabel</zorder>
+  <zorder>label</zorder>
+  <zorder>label_2</zorder>
+  <zorder>label_3</zorder>
+  <zorder>label_4</zorder>
+  <zorder>uiSaveCalData</zorder>
+  <zorder>button_2</zorder>
+  <zorder>uiMediaSelect</zorder>
+  <zorder>uiApplyUpdate</zorder>
+  <zorder>uiLoadCalData</zorder>
+  <zorder>uiDone</zorder>
+  <zorder>uiApplyUpdateError</zorder>
+  <zorder>uiSaveCalDataError</zorder>
+  <zorder>uiLoadCalDataError</zorder>
  </widget>
  <customwidgets>
   <customwidget>
@@ -188,6 +233,11 @@
    <class>ComboBox</class>
    <extends>QComboBox</extends>
    <header>combo_box</header>
+  </customwidget>
+  <customwidget>
+   <class>ErrorLabel</class>
+   <extends>QLabel</extends>
+   <header>error_label</header>
   </customwidget>
   <customwidget>
    <class>HeaderLabel</class>
