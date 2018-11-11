@@ -263,27 +263,14 @@ Settings</string>
   <widget class="QWidget" name="uiTimelineVisualization" native="true">
    <property name="geometry">
     <rect>
-     <x>-1</x>
-     <y>420</y>
-     <width>801</width>
-     <height>61</height>
+     <x>0</x>
+     <y>421</y>
+     <width>800</width>
+     <height>60</height>
     </rect>
    </property>
    <property name="styleSheet">
-    <string notr="true">background: rgba(36,200,150,128)</string>
-   </property>
-  </widget>
-  <widget class="QSlider" name="uiTimelineSlider">
-   <property name="geometry">
-    <rect>
-     <x>0</x>
-     <y>420</y>
-     <width>801</width>
-     <height>61</height>
-    </rect>
-   </property>
-   <property name="orientation">
-    <enum>Qt::Horizontal</enum>
+    <string notr="true">background:qlineargradient( x1:0 y1:0, x2:1 y2:0, stop:0 yellow, stop:1 cyan);</string>
    </property>
   </widget>
   <widget class="Label" name="uiEditMarkedRegions">
@@ -336,7 +323,7 @@ Settings</string>
      <x>600</x>
      <y>0</y>
      <width>201</width>
-     <height>421</height>
+     <height>420</height>
     </rect>
    </property>
    <property name="customStyleSheet" stdset="0">
@@ -359,18 +346,34 @@ Settings</string>
 		</string>
    </property>
    <property name="text">
-    <string>Battery %i%%</string>
+    <string>Battery {:2.0f}%</string>
    </property>
    <property name="alignment">
     <set>Qt::AlignRight|Qt::AlignTop|Qt::AlignTrailing</set>
    </property>
   </widget>
+  <widget class="Slider" name="uiSeekSlider">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>400</y>
+     <width>800</width>
+     <height>101</height>
+    </rect>
+   </property>
+   <property name="maximum">
+    <number>1000</number>
+   </property>
+   <property name="orientation">
+    <enum>Qt::Horizontal</enum>
+   </property>
+  </widget>
+  <zorder>uiTimelineVisualization</zorder>
+  <zorder>uiSeekSlider</zorder>
   <zorder>uiBatteryReadout</zorder>
   <zorder>backdrop</zorder>
   <zorder>uiFrameReadout</zorder>
   <zorder>gridLayoutWidget</zorder>
-  <zorder>uiTimelineVisualization</zorder>
-  <zorder>uiTimelineSlider</zorder>
   <zorder>uiEditMarkedRegions</zorder>
  </widget>
  <customwidgets>
@@ -389,7 +392,24 @@ Settings</string>
    <extends>QLabel</extends>
    <header>label</header>
   </customwidget>
+  <customwidget>
+   <class>Slider</class>
+   <extends>QSlider</extends>
+   <header>slider</header>
+  </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>uiDone</tabstop>
+  <tabstop>uiSeekFaster</tabstop>
+  <tabstop>uiSeekSlower</tabstop>
+  <tabstop>uiSeekBackward</tabstop>
+  <tabstop>uiSeekForward</tabstop>
+  <tabstop>uiMarkStart</tabstop>
+  <tabstop>uiMarkEnd</tabstop>
+  <tabstop>uiSave</tabstop>
+  <tabstop>uiSavedFileSettings</tabstop>
+  <tabstop>uiSeekSlider</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

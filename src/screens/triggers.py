@@ -106,11 +106,15 @@ class Triggers(QtWidgets.QDialog):
 		
 		self.uiActiveTrigger.currentIndexChanged.connect(self.changeShownTrigger)
 		
+		#We don't have motion triggering working yet, so we'll just remove it here…
+		if currentScreenId != 'motion':
+			self.uiActiveTrigger.removeItem(self.availableTriggerIds.index('motion'))
+		
 		#Set up state init & events.
-		self.uiApply.clicked.connect(lambda: self and dbg())
-		# self.uiApply.clicked.connect(lambda: api.set({
-		# 	'triggerConfiguration': self.changedTriggerState()
-		# }))
+		#self.uiApply.clicked.connect(lambda: self and dbg()) #Debug! \o/
+		self.uiApply.clicked.connect(lambda: api.set({
+			'triggerConfiguration': self.changedTriggerState()
+		}))
 		self.uiDone.clicked.connect(lambda: (api.set({
 			'triggerConfiguration': self.changedTriggerState()
 		}), window.back()))

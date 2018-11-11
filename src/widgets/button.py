@@ -62,7 +62,7 @@ class Button(QPushButton, TouchMarginPlugin, FocusablePlugin):
 				}}
 				
 				Button{'' if self.keepActiveLook else ':pressed'} {{
-					border: 1px solid rgb(50,50,50);
+					border-color: rgb(50,50,50);
 					border-top-color: black;
 					border-left-color: black;
 					background: rgb(240,240,240);
