@@ -43,13 +43,22 @@ class UpdateFirmware(QtWidgets.QDialog):
 	
 	def onSaveCalibrationData(self):
 		error = api.control('saveCalibrationData', self.uiMediaSelect.currentData())
-		self.uiSaveCalDataError.showMessage(f'Could not save calibration data: {error["message"]}') if error else self.uiSaveCalDataError.hide()
+		if error:
+			self.uiSaveCalDataError.showError(f'Could not save calibration data: {error["message"]}')
+		else:
+			self.uiSaveCalDataError.showMessage(f'Saved calibration to external storage.')
 			
 	def onApplySoftwareUpdate(self):
 		error = api.control('applySoftwareUpdate', self.uiMediaSelect.currentData())
-		self.uiApplyUpdateError.showMessage(f'Could not apply software update: {error["message"]}') if error else self.uiApplyUpdateError.hide()
+		if error:
+			self.uiApplyUpdateError.showError(f'Could not apply software update: {error["message"]}')
+		else:
+			self.uiApplyUpdateError.hide()
 	
 	def onLoadCalibrationData(self):
 		error = api.control('loadCalibrationData', self.uiMediaSelect.currentData())
-		self.uiLoadCalDataError.showMessage(f'Could not load calibration data: {error["message"]}') if error else self.uiLoadCalDataError.hide()
+		if error:
+			self.uiLoadCalDataError.showError(f'Could not load calibration data: {error["message"]}')
+		else:
+			self.uiLoadCalDataError.showMessage(f'Loaded previous calibration.')
 	

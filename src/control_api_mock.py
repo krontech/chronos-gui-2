@@ -552,6 +552,11 @@ class ControlAPIMock(QObject):
 		signal << getattr(state, name) if value is None else value
 		QDBusConnection.systemBus().send(signal)
 	
+	def emitError(self, message):
+		error = QDBusMessage.createError(QDBusError.Other, message)
+		QDBusConnection.systemBus().send(error)
+		return error
+	
 	
 	@pyqtSlot(QDBusMessage, result='QVariantMap')
 	def get(self, msg):
@@ -642,7 +647,7 @@ class ControlAPIMock(QObject):
 	
 	@pyqtSlot(str)
 	def blackCalAllStandard(self, safeword: str):
-		if(safeword != 'tempest shadow'): 
+		if(safeword != 'tempest shadow'):
 			print('incorrect safeword specified')
 			return
 		
@@ -675,6 +680,7 @@ class ControlAPIMock(QObject):
 	
 	@pyqtSlot(str, result='QVariantMap')
 	def saveCalibrationData(self, toFolder: str):
+		#return self.emitError('A fire! Oh no!') #Doesn't work.
 		print(f'MOCK: Save calibration data to {toFolder}.')
 		return {"message": "Out of space."} if 'sda' in toFolder else None
 	

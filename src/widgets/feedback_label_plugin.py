@@ -2,7 +2,7 @@ from PyQt5.QtGui import QIcon, QPixmap
 from PyQt5.QtDesigner import QPyDesignerCustomWidgetPlugin
 from plugin_settings import showHitRects
 
-from error_label import ErrorLabel
+from feedback_label import FeedbackLabel
 
 
 class LabelPlugin(QPyDesignerCustomWidgetPlugin):
@@ -20,21 +20,22 @@ class LabelPlugin(QPyDesignerCustomWidgetPlugin):
 		return self.initialized
 
 	def createWidget(self, parent):
-		return ErrorLabel(parent, showHitRects=showHitRects)
+		return FeedbackLabel(parent, showHitRects=showHitRects)
 
 	def name(self):
-		return "ErrorLabel"
+		return "FeedbackLabel"
 
 	def group(self):
 		return "Chronos"
 
 	def icon(self):
-		return QIcon(QPixmap("../../assets/qt_creator/error_label.svg"))
+		return QIcon(QPixmap("../../assets/qt_creator/feedback_label.svg"))
 
 	def toolTip(self):
-		return """An error label in the Chronos style.
+		return """An feedback label in the Chronos style.
 			
-Shows text only when showMsg(str) is called. Hidden by default."""
+Shows text only when showError(str) or showMessage(str) is called.
+Hidden by default!"""
 
 	def whatsThis(self):
 		return self.toolTip() # ¯\_(ツ)_/¯ I have no idea how to trigger this.
@@ -43,4 +44,4 @@ Shows text only when showMsg(str) is called. Hidden by default."""
 		return False
 
 	def includeFile(self):
-		return "error_label"
+		return "feedback_label"

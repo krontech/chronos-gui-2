@@ -72,7 +72,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>Step 3: Restore the camera calibration from step 1.</string>
+    <string>Step 3: Restore the camera calibration from step 1, if needed.</string>
    </property>
   </widget>
   <widget class="Label" name="label_4">
@@ -172,7 +172,7 @@
     <string>Done</string>
    </property>
   </widget>
-  <widget class="ErrorLabel" name="uiSaveCalDataError">
+  <widget class="FeedbackLabel" name="uiSaveCalDataError">
    <property name="geometry">
     <rect>
      <x>20</x>
@@ -182,7 +182,7 @@
     </rect>
    </property>
   </widget>
-  <widget class="ErrorLabel" name="uiApplyUpdateError">
+  <widget class="FeedbackLabel" name="uiApplyUpdateError">
    <property name="geometry">
     <rect>
      <x>20</x>
@@ -192,7 +192,7 @@
     </rect>
    </property>
   </widget>
-  <widget class="ErrorLabel" name="uiLoadCalDataError">
+  <widget class="FeedbackLabel" name="uiLoadCalDataError">
    <property name="geometry">
     <rect>
      <x>20</x>
@@ -235,11 +235,6 @@
    <header>combo_box</header>
   </customwidget>
   <customwidget>
-   <class>ErrorLabel</class>
-   <extends>QLabel</extends>
-   <header>error_label</header>
-  </customwidget>
-  <customwidget>
    <class>HeaderLabel</class>
    <extends>QLabel</extends>
    <header>header_label</header>
@@ -248,6 +243,11 @@
    <class>Label</class>
    <extends>QLabel</extends>
    <header>label</header>
+  </customwidget>
+  <customwidget>
+   <class>FeedbackLabel</class>
+   <extends>QLabel</extends>
+   <header>feedback_label</header>
   </customwidget>
  </customwidgets>
  <resources/>
