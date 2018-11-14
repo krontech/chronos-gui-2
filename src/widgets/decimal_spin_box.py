@@ -36,7 +36,7 @@ class DecimalSpinBox(QDoubleSpinBox, TouchMarginPlugin, DirectAPILinkPlugin, Foc
 					padding-right: 40px;
 					padding-right: 10px;
 					padding-left: 10px;
-					background: white;
+					background: rgba(255,255,255,127); /* The background is drawn under the button borders, so they are opaque if the background is opaque. */
 					
 					/* use borders instead of margins so we can see what we're doing */
 					border-left:   {self.clickMarginLeft   * 10 + 1}px solid {self.clickMarginColor};
