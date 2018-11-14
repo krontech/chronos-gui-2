@@ -33,6 +33,7 @@ class UpdateFirmware(QtWidgets.QDialog):
 	@pyqtSlot('QVariantMap', name="updateExternalStorageDevices")
 	@silenceCallbacks('uiMediaSelect')
 	def updateExternalStorageDevices(self, partitionList):
+		"""Refresh the external storage drop-down list."""
 		self.uiMediaSelect.clear()
 		for p in partitionList:
 			self.uiMediaSelect.addItem(
@@ -45,8 +46,19 @@ class UpdateFirmware(QtWidgets.QDialog):
 		error = api.control('saveCalibrationData', self.uiMediaSelect.currentData())
 		if error:
 			self.uiSaveCalDataError.showError(f'Could not save calibration data: {error["message"]}')
+			self.uiLoadCalDataError.hide() #This message overlaps our message. Clear it.
 		else:
 			self.uiSaveCalDataError.showMessage(f'Saved calibration to external storage.')
+			self.uiLoadCalDataError.hide()
+	
+	def onLoadCalibrationData(self):
+		error = api.control('loadCalibrationData', self.uiMediaSelect.currentData())
+		if error:
+			self.uiLoadCalDataError.showError(f'Could not load calibration data: {error["message"]}')
+			self.uiSaveCalDataError.hide()
+		else:
+			self.uiLoadCalDataError.showMessage(f'Loaded previous calibration.')
+			self.uiSaveCalDataError.hide()
 			
 	def onApplySoftwareUpdate(self):
 		error = api.control('applySoftwareUpdate', self.uiMediaSelect.currentData())
@@ -54,11 +66,4 @@ class UpdateFirmware(QtWidgets.QDialog):
 			self.uiApplyUpdateError.showError(f'Could not apply software update: {error["message"]}')
 		else:
 			self.uiApplyUpdateError.hide()
-	
-	def onLoadCalibrationData(self):
-		error = api.control('loadCalibrationData', self.uiMediaSelect.currentData())
-		if error:
-			self.uiLoadCalDataError.showError(f'Could not load calibration data: {error["message"]}')
-		else:
-			self.uiLoadCalDataError.showMessage(f'Loaded previous calibration.')
 	

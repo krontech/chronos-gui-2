@@ -685,13 +685,13 @@ class ControlAPIMock(QObject):
 		return {"message": "Out of space."} if 'sda' in toFolder else None
 	
 	@pyqtSlot(str, result='QVariantMap')
-	def loadCalibrationData(self, fromFolderHint: str):
-		print(f'MOCK: Load calibration data, trying {fromFolderHint} first and then any other attached storage devices.')
+	def loadCalibrationData(self, fromFolder: str):
+		print(f'MOCK: Load calibration data.')
 		return None
 	
 	@pyqtSlot(str)
-	def applySoftwareUpdate(self, fromFolderHint: str):
-		print(f'MOCK: Apply software update, checking {fromFolderHint} first and then any other attached storage devices.')
+	def applySoftwareUpdate(self, fromFolder: str):
+		print(f'MOCK: Apply software update.')
 		return None
 	
 	@pyqtSlot(str, int)
