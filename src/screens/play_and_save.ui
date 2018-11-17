@@ -266,7 +266,7 @@ Settings</string>
      <x>0</x>
      <y>421</y>
      <width>800</width>
-     <height>60</height>
+     <height>59</height>
     </rect>
    </property>
    <property name="styleSheet">
