@@ -23,6 +23,30 @@ class PlayAndSave(QtWidgets.QDialog):
 		self.updateBatteryTimer.timeout.connect(self.updateBattery)
 		self.updateBatteryTimer.setInterval(2000) #ms
 		
+		self.uiFrameReadout.formatString = self.uiFrameReadout.text()
+		
+		self.seekRate = 60
+		self.uiSeekRateDisplay.formatString = self.uiSeekRateDisplay.text()
+		self.seekFaster(), self.seekSlower() #Initialize dependant state by wiggling the value around. Ideally, we'd just have a setSeekRate function. ¯\_(ツ)_/¯
+		
+		
+		self.seekForwardTimer = QtCore.QTimer()
+		self.seekForwardTimer.timeout.connect(self.updateBattery)
+		self.seekForwardTimer.setInterval(16) #ms, 1/frame hopefully
+		
+		self.uiSeekBackward.pressed.connect( lambda: api.set({'playbackFrameDelta': -self.seekRate }))
+		self.uiSeekBackward.released.connect(lambda: api.set({'playbackFrameDelta': 0 }))
+		self.uiSeekForward.pressed.connect(  lambda: api.set({'playbackFrameDelta': +self.seekRate }))
+		self.uiSeekForward.released.connect( lambda: api.set({'playbackFrameDelta': 0 }))
+		
+		self.uiSeekFaster.clicked.connect(self.seekFaster)
+		self.uiSeekSlower.clicked.connect(self.seekSlower)
+		
+		self.uiSave.clicked.connect(lambda: api.control('saveRegions', [{}, {}]))
+		
+		self.uiSavedFileSettings.clicked.connect(lambda: window.show('file_settings'))
+		self.uiDone.clicked.connect(window.back)
+		
 		self.uiSeekSlider.setStyleSheet(
 			self.uiSeekSlider.styleSheet() + f"""
 				/* ----- Play And Save Screen Styling ----- */
@@ -36,32 +60,32 @@ class PlayAndSave(QtWidgets.QDialog):
 					border: none;
 				}}
 			""")
-		self.uiSeekSlider.valueChanged.connect(print)
+		self.uiSeekSlider.valueChanged.connect(lambda f: api.set({'playbackFrame': f}))
+		api.observe('totalPlaybackFrames', self.onRecordingLengthChange)
+		api.observe('playbackFrame', self.updateCurrentFrame)
 		
 		self.motionHeatmap = QImage() #Updated by updateMotionHeatmap, used by self.paintMotionHeatmap.
 		self.uiTimelineVisualization.paintEvent = self.paintMotionHeatmap
 		
-		# Button binding.
-		self.uiSavedFileSettings.clicked.connect(lambda: window.show('file_settings'))
-		self.uiDone.clicked.connect(window.back)
-		
 		
 	def onShow(self):
 		#Don't update the labels while hidden. But do show with accurate info when we start.
-		self.updateBattery()
+		api.set({'currentCameraState': 'playback'})
 		self.updateBatteryTimer.start()
-		self.updateMotionHeatmap(api.control('waterfallMotionMap', 'placeholder', 0))
-		#Set camera to video playback mode here. This will be janky as heeeeeeeck.
+		self.updateBattery()
+		self.updateMotionHeatmap()
+		#Set camera to video playback mode here.
 		
 	def onHide(self):
 		self.updateBatteryTimer.stop()
+		api.set({'currentCameraState': 'pre-recording'})
 	
 	def updateBattery(self):
 		self.uiBatteryReadout.setText(
 			self.uiBatteryReadout.formatString.format(
 				api.get('batteryCharge')*100 ) )
 	
-	def updateMotionHeatmap(self, motionData: {"startFrame": int, "endFrame": int, "heatmap": QByteArray}) -> None:
+	def updateMotionHeatmap(self) -> None:
 		"""Repaint the motion heatmap when we enter this screen.
 			
 			We never record while on the playback screen, so we don't
@@ -71,7 +95,7 @@ class PlayAndSave(QtWidgets.QDialog):
 		
 		heatmapHeight = 16
 		
-		motionData = QByteArray.fromRawData(motionData["heatmap"]) # n×16 heatmap
+		motionData = QByteArray.fromRawData(api.control('waterfallMotionMap', 'placeholder', 0)["heatmap"]) # 16×(n<1024) heatmap. motionData: {"startFrame": int, "endFrame": int, "heatmap": QByteArray}
 		assert len(motionData) % heatmapHeight == 0, f"Incompatible heatmap size {len(motionData)}; must be a multiple of {heatmapHeight}."
 		
 		self.motionHeatmap = (
@@ -92,3 +116,44 @@ class PlayAndSave(QtWidgets.QDialog):
 		p = QPainter(self.uiTimelineVisualization)
 		p.setCompositionMode(QPainter.CompositionMode_Darken)
 		p.drawImage(QtCore.QPoint(0,0), self.motionHeatmap)
+	
+	@pyqtSlot(int, name="onRecordingLengthChange")
+	@silenceCallbacks('uiSeekSlider')
+	def onRecordingLengthChange(self, newRecordingLength):
+		self.uiSeekSlider.setMaximum(newRecordingLength)
+		self.isVisible() and self.updateMotionHeatmap() #Don't update motion heatmap if not visible. It's actually a little expensive.
+	
+	@pyqtSlot(int, name="setCurrentFrame")
+	@silenceCallbacks('uiSeekSlider', 'uiFrameReadout')
+	def updateCurrentFrame(self, frame):
+		self.uiSeekSlider.setValue(frame)
+		
+		#TODO DDR 2018-11-19: This is very slow, tanking the framerate. Why is that?
+		self.uiFrameReadout.setText(self.uiFrameReadout.formatString % (frame, self.uiSeekSlider.maximum()))
+	
+	def seekFaster(self):
+		if self.seekRate < 2000:
+			self.seekRate *= 2
+			self.uiSeekSlower.setEnabled(True)	
+		
+		if self.seekRate < 2000:
+			self.uiSeekFaster.setEnabled(True)
+		else:
+			self.uiSeekFaster.setEnabled(False)
+		
+		self.uiSeekSlider.setPageStep(self.seekRate * 5) #Multiplier: Compensate for key repeat delay.
+		self.uiSeekRateDisplay.setText(self.uiSeekRateDisplay.formatString % self.seekRate)
+		
+	def seekSlower(self):
+		if self.seekRate / 2 == self.seekRate // 2:
+			self.seekRate //= 2
+			self.uiSeekFaster.setEnabled(True)
+		
+		if self.seekRate / 2 == self.seekRate // 2:
+			self.uiSeekSlower.setEnabled(True)
+		else:
+			self.uiSeekSlower.setEnabled(False)
+		
+		self.uiSeekSlider.setPageStep(self.seekRate * 5) #Multiplier: Compensate for key repeat delay.
+		self.uiSeekRateDisplay.setText(self.uiSeekRateDisplay.formatString % self.seekRate)
+			

@@ -26,7 +26,7 @@
     <property name="spacing">
      <number>0</number>
     </property>
-    <item row="2" column="1">
+    <item row="0" column="1">
      <widget class="Button" name="uiSeekForward">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Ignored" vsizetype="Ignored">
@@ -35,7 +35,7 @@
        </sizepolicy>
       </property>
       <property name="text">
-       <string>&gt;</string>
+       <string>▶▶</string>
       </property>
       <property name="clickMarginLeftSetter" stdset="0">
        <enum>Button::none</enum>
@@ -47,7 +47,7 @@
        <enum>Button::none</enum>
       </property>
       <property name="customStyleSheet" stdset="0">
-       <string>Button { border-left-width: 0px; }</string>
+       <string>Button { border-top-width: 0px; border-left-width: 0px; font-size: 20pt; }</string>
       </property>
      </widget>
     </item>
@@ -147,7 +147,7 @@ Save Start</string>
       </property>
      </widget>
     </item>
-    <item row="2" column="0">
+    <item row="0" column="0">
      <widget class="Button" name="uiSeekBackward">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Ignored" vsizetype="Ignored">
@@ -156,7 +156,7 @@ Save Start</string>
        </sizepolicy>
       </property>
       <property name="text">
-       <string>&lt;</string>
+       <string>◀◀</string>
       </property>
       <property name="clickMarginRightSetter" stdset="0">
        <enum>Button::none</enum>
@@ -166,6 +166,9 @@ Save Start</string>
       </property>
       <property name="clickMarginBottomSetter" stdset="0">
        <enum>Button::none</enum>
+      </property>
+      <property name="customStyleSheet" stdset="0">
+       <string>Button { border-top-width: 0px; font-size: 20pt; }</string>
       </property>
      </widget>
     </item>
@@ -208,7 +211,7 @@ Settings</string>
       </property>
      </widget>
     </item>
-    <item row="0" column="1">
+    <item row="2" column="0">
      <widget class="Button" name="uiSeekSlower">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Ignored" vsizetype="Ignored">
@@ -218,31 +221,6 @@ Settings</string>
       </property>
       <property name="text">
        <string>-</string>
-      </property>
-      <property name="clickMarginLeftSetter" stdset="0">
-       <enum>Button::none</enum>
-      </property>
-      <property name="clickMarginTopSetter" stdset="0">
-       <enum>Button::none</enum>
-      </property>
-      <property name="clickMarginBottomSetter" stdset="0">
-       <enum>Button::none</enum>
-      </property>
-      <property name="customStyleSheet" stdset="0">
-       <string>Button { border-top-width: 0px; }</string>
-      </property>
-     </widget>
-    </item>
-    <item row="0" column="0">
-     <widget class="Button" name="uiSeekFaster">
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Ignored" vsizetype="Ignored">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
-      </property>
-      <property name="text">
-       <string>+</string>
       </property>
       <property name="clickMarginRightSetter" stdset="0">
        <enum>Button::none</enum>
@@ -254,7 +232,32 @@ Settings</string>
        <enum>Button::none</enum>
       </property>
       <property name="customStyleSheet" stdset="0">
-       <string>Button { border-top-width: 0px; border-right-width: 0; }</string>
+       <string>Button { font-size: 20pt; }</string>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="1">
+     <widget class="Button" name="uiSeekFaster">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Ignored" vsizetype="Ignored">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="text">
+       <string>+</string>
+      </property>
+      <property name="clickMarginLeftSetter" stdset="0">
+       <enum>Button::none</enum>
+      </property>
+      <property name="clickMarginTopSetter" stdset="0">
+       <enum>Button::none</enum>
+      </property>
+      <property name="clickMarginBottomSetter" stdset="0">
+       <enum>Button::none</enum>
+      </property>
+      <property name="customStyleSheet" stdset="0">
+       <string>Button { border-left-width: 0; font-size: 20pt; }</string>
       </property>
      </widget>
     </item>
@@ -313,8 +316,14 @@ Settings</string>
    <property name="text">
     <string>Frame %i/%i</string>
    </property>
+   <property name="textFormat">
+    <enum>Qt::PlainText</enum>
+   </property>
    <property name="alignment">
     <set>Qt::AlignRight|Qt::AlignTop|Qt::AlignTrailing</set>
+   </property>
+   <property name="textInteractionFlags">
+    <set>Qt::NoTextInteraction</set>
    </property>
   </widget>
   <widget class="Backdrop" name="backdrop">
@@ -348,8 +357,14 @@ Settings</string>
    <property name="text">
     <string>Battery {:2.0f}%</string>
    </property>
+   <property name="textFormat">
+    <enum>Qt::PlainText</enum>
+   </property>
    <property name="alignment">
     <set>Qt::AlignRight|Qt::AlignTop|Qt::AlignTrailing</set>
+   </property>
+   <property name="textInteractionFlags">
+    <set>Qt::NoTextInteraction</set>
    </property>
   </widget>
   <widget class="Slider" name="uiSeekSlider">
@@ -400,10 +415,10 @@ Settings</string>
  </customwidgets>
  <tabstops>
   <tabstop>uiDone</tabstop>
-  <tabstop>uiSeekFaster</tabstop>
-  <tabstop>uiSeekSlower</tabstop>
   <tabstop>uiSeekBackward</tabstop>
   <tabstop>uiSeekForward</tabstop>
+  <tabstop>uiSeekSlower</tabstop>
+  <tabstop>uiSeekFaster</tabstop>
   <tabstop>uiMarkStart</tabstop>
   <tabstop>uiMarkEnd</tabstop>
   <tabstop>uiSave</tabstop>

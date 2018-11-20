@@ -252,7 +252,6 @@ class Main(QWidget):
 		#		show black cal button
 		#	ELSE
 		#		show cal menu button → recal motion menu
-		#dbg()
 		if triggers['motion']['action'] == 'none':
 			self.uiCalibration.hide()
 			self.uiBlackCal0.show()

@@ -14,6 +14,9 @@
 	The service provider component can be extracted if interaction with the HTTP
 	api is desired. While there is a more complete C-based mock, in chronos-cli, it
 	is exceptionally hard to add new calls to.
+	
+	Any comment or call in this file should be considered a proposal. It can all be
+	changed if need be.
 """
 
 import sys
@@ -242,6 +245,7 @@ class State():
 	def availableRecordingAnalogGains(self): 
 		return [{"multiplier":2**i, "dB":6*i} for i in range(0,5)]
 	
+	
 	recordingExposureNs = int(850) #These don't have to have the pipeline torn down, so they don't need the hack where we set video settings atomically.
 		
 	@property
@@ -255,8 +259,22 @@ class State():
 			raise ValueError("Recording period is 5000ns greater than recording exposure - since exposure can't be negative, the total recording period can't be less than 5000.")
 		self.recordingExposureNs = value - 5000
 		
-	currentCameraState = 'normal' #Can also be 'saving' or 'recording'. When saving, the API is unresponsive?
-	currentVideoState = 'viwefinder' #eg, 'viewfinder', 'playback', etc.
+	
+	_currentCameraState = 'pre-recording' #There's going to be some interaction about what's valid when, wrt this variable and API calls.
+	
+	@property
+	def currentCameraState(self):
+		return self._currentCameraState
+	
+	@currentCameraState.setter
+	def currentCameraState(self, value):
+		assert value in {'pre-recording', 'recording', 'playback', 'saving'}
+		self._currentCameraState = value
+	
+	playbackFrame = 0
+	playbackFrameDelta = 0 #Set this to play or rewind the video.
+	totalPlaybackFrames = 70000 #This only changes when we have a full segment recorded. Proposal: It does not change while recording. It changes at maximum rate of 30hz, in case segments are extremely short, in which case it may skip intermediate segments.
+	
 	focusPeakingColor = 0xff0000 #red, green, blue (RGB), like CSS colors.
 	focusPeakingIntensity = 'low' #One of ['off', 'low', 'medium', 'high'].
 	showWhiteClippingZebraStripes = True
@@ -267,7 +285,15 @@ class State():
 		"end": 1000,
 		"hres": 200,
 		"vres": 300,
+		"fps": 12580,
 		"id": "ldPxTT5R",
+	},{
+		"start": 1000,
+		"end": 1250,
+		"hres": 200,
+		"vres": 500,
+		"fps": 900,
+		"id": "KxIjG09V",
 	}]
 	whiteBalance = [1., 1., 1.]
 	triggerDelayNs = int(1e9)
@@ -544,6 +570,16 @@ class ControlAPIMock(QObject):
 		self._timer3.timeout.connect(test3)
 		self._timer3.setSingleShot(True)
 		self._timer3.start(3000) #ms
+		
+		def test4():
+			state.totalPlaybackFrames = 80000
+			self.emitControlSignal('totalPlaybackFrames')
+			
+		self._timer4 = QTimer()
+		self._timer4.setTimerType(Qt.PreciseTimer)
+		self._timer4.timeout.connect(test4)
+		self._timer4.setSingleShot(True)
+		self._timer4.start(1000) #ms
 
 	
 	def emitControlSignal(self, name, value=None):
@@ -695,7 +731,7 @@ class ControlAPIMock(QObject):
 		return None
 	
 	@pyqtSlot(str, int, result='QVariantMap')
-	def waterfallMotionMap(self, segmentId: str, startFrame: int) -> [[int]]:
+	def waterfallMotionMap(self, segmentId: str, startFrame: int) -> dict:
 		"""Get a waterfall-style heatmap of movement in each of the 16 quadrants of the frame.
 			
 			Arguments:
@@ -720,3 +756,20 @@ class ControlAPIMock(QObject):
 			"endFrame": startFrame + len(frameData), #Number of frames of data being returned.
 			"heatmap": QByteArray(bytearray([byte for line in frameData for byte in line])), #The (mock) data being returned. Inefficient, but whatever. Also, what the _heck_, list comprehension syntax.
 		}
+	
+	
+	@pyqtSlot('QVariantList', result='QVariantList')
+	def saveRegions(self, regions: [{"start": int, "end": int, "id": str, "path": str, "format": {'fps': int, 'bpp': int, 'maxBitrate': int}}]) -> [{"success": bool, "msg": str, id: "str"}]:
+		"""Save video clips to disk or network.
+			
+			Accepts a list of regions, returns a list of statuses."""
+		
+		return [{ #Each entry in this list a segment of recorded video. Although currently resolution/framerate is always the same having it in this data will make it easier to fix this in the future if we do.
+			"id": "ldPxTT5R",
+			"success": True,
+			"message": "",
+		},{
+			"id": "KxIjG09V",
+			"success": False,
+			"message": "Network error.",
+		}]
