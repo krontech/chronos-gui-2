@@ -24,8 +24,8 @@ def observe(key: str, callback: Callable[[Optional[str]], None]) -> None:
 	Callbacks must accept zero or one arguments.
 	
 	Example:
-		settings.observe('debugControlsEnabled', lambda debugControlsEnabled=False:
-			print('debug on' if debugControlsEnabled) else 'debug off') )
+		settings.observe('debugControlsEnabled', lambda debugControlsEnabled="False":
+			print('debug on' if debugControlsEnabled != "False" else 'debug off') )
 	"""
 	
 	if _settings.contains(key):
