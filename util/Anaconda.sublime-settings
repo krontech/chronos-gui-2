@@ -3,24 +3,34 @@
 	"pep8_max_line_length": 2000, /*80 characters is too short for my liking. Generally, 120 chars is where it's at, but sometimes a long line is just the clearest way to present something.*/
 	"pep8_ignore": [
 		"E128", /*DDR 2018-08-08: Lines not indented enough. (Related to line breaks in a function call.)*/
-		"E124", /*DDR 2018-08-08: Error shows up in error. Bug at https://github.com/PyCQA/pycodestyle/issues/100. More fundamentally, we can't follow PEP-8 on indentation, because our function calls - being mostly QT - are often horrendously long and would bump their args off-screen if we indented to the opening bracket.*/
+		"E123", /*DDR 2018-11-28: Error shows up in error. Bug at https://github.com/PyCQA/pycodestyle/issues/100. More fundamentally, we can't follow PEP-8 on indentation, because our function calls - being mostly QT - are often horrendously long and would bump their args off-screen if we indented to the opening bracket.*/
+		"E124", /*DDR 2018-08-08: Error shows up in error. Bug at https://github.com/PyCQA/pycodestyle/issues/103.*/
 		"E131", /*DDR 2018-00-00: Continuing lines need specific indentation.*/
+		"E201", /*DDR 2018-11-19: Whitespace after opening bracket. I demand alignment, and this stands in my way.*/
 		"E202", /*DDR 2018-00-00: Whitespace before closing bracket. [)]*/
+		"E222", /*DDR 2018-00-00: Whitespace after equality, I like tables.*/
 		"E226", /*DDR 2018-06-21: Spaces around mathematical operators is a good guideline, but a bad rule.*/
+		"E221", /*DDR 2018-09-28: Allow extra whitespace for "table" layout programming.*/
 		"E231", /*DDR 2018-09-06: I like grouping x y coordinates together, like fn(x,y).*/
+		"E241", /*DDR 2018-09-28: Allow extra whitespace for "table" layout programming.*/
+		"E251", /*DDR 2018-09-28: Allow extra whitespace for "table" layout programming.*/
 		"E261", /*DDR 2018-00-00: At least two spaces before inline comment.*/
 		"E262", /*DDR 2018-06-14: Inline comments should start with '#'.*/
 		"E265", /*DDR 2018-07-05: Block comments should start with '#' too. I like to use a space for textual comments, and no space for commenting out code.*/
+		"E272", /*DDR 2018-11-19: Multiple whitespace before keyword. I demand alignment, and this stands in my way.*/
 		"E302", /*DDR 2018-08-08: I don't care how many blank lines are before a function.*/
 		"E303", /*DDR 2018-00-00: Too many blank lines. I like my whitespace, makes the flow of code easier to read with a good vertical cadence.*/
 		"E305", /*DDR 2018-00-00: Too many or too few blank lines after function definition. I prefer flexible spacing, I feel it's more readable.*/
 		"E309", /*DDR 2018-00-00: From Anaconda base settings.*/
 		"E401", /*DDR 2018-09-10: Multiple imports on one line are fine. 🤷*/
 		"E702", /*DDR 2018-00-00: Multiple statements on one line with semicolon. [;]*/
+		"E711", /*DDR 2018-11-20: No explicit comparisons in if statements sort of breaks when switching on Null, True, and False. It is best to be explicit in that case.*/
+		"E712", /*DDR 2018-11-20: No explicit comparisons in if statements sort of breaks when switching on Null, True, and False. It is best to be explicit in that case.*/
 		"W191", /*DDR 2018-00-00: Spaces, not tabs. I like tabs, less prone to off-by-one errors.*/
 		"W291", /*DDR 2018-00-00: Trailing whitespace. Useful sometimes while manipulating the files, though indeed not something that should be committed.*/
 		"W292", /*DDR 2018-00-00: Trailing newline. Why is this even needed?*/
 		"W293", /*DDR 2018-00-00: Indented blank line. I like my blank lines indented, they're part of the function.*/
+		"W391", /*DDR 2018-11-01: There's no reason to put a blank line at the end of a file that I know of. It's redundant.*/
 		"W503", /*DDR 2018-00-00: I like leading boolean operators after line breaks. The operator is important, and can be hidden off-screen to the right on occasion.*/
 	],
 }
