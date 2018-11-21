@@ -51,6 +51,6 @@ def setValue(key: str, value: str) -> str:
 	_settings.setValue(key, value)
 
 
-def value(key: str, default: str = None) -> None:
+def value(key: str, default: str = '') -> str:
 	"""See http://doc.qt.io/qt-5/qsettings.html#value"""
 	return _settings.value(key, default)
