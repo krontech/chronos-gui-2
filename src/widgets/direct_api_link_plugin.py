@@ -33,11 +33,17 @@ class DirectAPILinkPlugin():
 			if hasattr(self, 'setValue'): #Most inputs.
 				self.valueChanged.connect(
 					lambda val: api.set({
-						self._linkedValueName: self.realValue(val) }) )
-			else: #Checkbox
+						self._linkedValueName: self.realValue() }) )
+			elif hasattr(self, 'setChecked'): #Checkbox
 				self.stateChanged.connect(
 					lambda val: api.set({
 						self._linkedValueName: val != 0 }) )
+			elif hasattr(self, 'setText'): #Line edit
+				self.editingFinished.connect(
+					lambda: api.set({
+						self._linkedValueName: self.text() }) )
+			else:
+				raise ValueError(f'Unknown type of widget to observe. (send on ${self})')
 		
 	
 	@pyqtSlot(int, str)
@@ -46,8 +52,12 @@ class DirectAPILinkPlugin():
 		
 		if hasattr(self, 'setValue'): #Most inputs
 			self.setValue(newValue)
-		else: #Checkbox
+		elif hasattr(self, 'setChecked'): #Checkbox
 			self.setChecked(newValue)
+		elif hasattr(self, 'setText'):
+			self.setText(newValue)
+		else:
+			raise ValueError(f'Unknown type of widget to observe. (receive on ${self})')
 			
 		self.blockSignals(False)
 	
