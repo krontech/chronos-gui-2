@@ -52,11 +52,12 @@ class PrimarySettings(QtWidgets.QDialog):
 		self.timeUpdateTimer.timeout.connect(self.updateDisplayedSystemTime)
 		self.timeUpdateTimer.start(1000)
 		
-		self.uiFileSaving.clicked.connect(lambda: window.show('file_settings'))
-		self.uiUserSettings.clicked.connect(lambda: window.show('user_settings'))
 		self.uiAboutCamera.clicked.connect(lambda: window.show('about_camera'))
-		self.uiUpdateCamera.clicked.connect(lambda: window.show('update_firmware'))
+		self.uiRemoteAccess.clicked.connect(lambda: window.show('remote_access'))
 		self.uiFactoryUtilities.clicked.connect(lambda: window.show('service_screen.locked'))
+		self.uiFileSaving.clicked.connect(lambda: window.show('file_settings'))
+		self.uiUpdateCamera.clicked.connect(lambda: window.show('update_firmware'))
+		self.uiUserSettings.clicked.connect(lambda: window.show('user_settings'))
 		self.uiDone.clicked.connect(window.back)
 		
 	

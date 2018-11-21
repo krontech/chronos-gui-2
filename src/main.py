@@ -80,6 +80,7 @@ class Window(QtCore.QObject):
 		from screens.user_settings import UserSettings
 		from screens.test import Test
 		from screens.service_screen import ServiceScreenLocked, ServiceScreenUnlocked
+		from screens.remote_access import RemoteAccess
 		
 		self._availableScreens = {
 			'main': Main, #load order, load items on main screen first, main screen submenus next, and it doesn't really matter after that. All screens get loaded in less than 10 seconds, so this is only a startup concern.
@@ -98,6 +99,7 @@ class Window(QtCore.QObject):
 			'test': Test,
 			'service_screen.locked': ServiceScreenLocked,
 			'service_screen.unlocked': ServiceScreenUnlocked,
+			'remote_access': RemoteAccess,
 		}
 		
 		self._screens = {}

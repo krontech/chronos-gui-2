@@ -529,6 +529,29 @@ class State():
 			"size": 2930232316000,
 			"free": 1418341032982,
 		}]
+	
+	networkPassword = 'chronos' #Change this to be initally blank in the non-mock API. A blank password *means* no network access at all.
+	localHTTPAccess = True
+	localSSHAccess = True
+	remoteHTTPAccess = True
+	remoteSSHAccess = True
+	HTTPPort = 8080
+	SSHPort = 8022
+	
+	@property
+	def networkInterfaces(self) -> [{str:str}]:
+		"""Roughly; the enumeration of attached, active network devices."""
+		return [{
+			'id': 'enp0s25',
+			'name': 'Ethernet',
+			'localAddress': '192.168.0.1',
+			'remoteAddress': '205.250.126.92',
+		},{
+			'id': 'wlp4s0',
+			'name': 'Mini USB',
+			'localAddress': '192.168.12.1',
+			'remoteAddress': '',
+		}]
 
 
 state = State() #Must be instantiated for QDBusMarshaller. 🙂
