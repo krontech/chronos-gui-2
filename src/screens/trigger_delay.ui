@@ -172,7 +172,7 @@
     <rect>
      <x>20</x>
      <y>225</y>
-     <width>241</width>
+     <width>261</width>
      <height>41</height>
     </rect>
    </property>
@@ -185,7 +185,7 @@
     <rect>
      <x>280</x>
      <y>225</y>
-     <width>241</width>
+     <width>261</width>
      <height>41</height>
     </rect>
    </property>
@@ -198,7 +198,7 @@
     <rect>
      <x>540</x>
      <y>225</y>
-     <width>241</width>
+     <width>261</width>
      <height>41</height>
     </rect>
    </property>
@@ -404,22 +404,6 @@
     </rect>
    </property>
   </widget>
-  <widget class="Button" name="uiRecordingSettings">
-   <property name="geometry">
-    <rect>
-     <x>460</x>
-     <y>400</y>
-     <width>171</width>
-     <height>81</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Rec. Settings</string>
-   </property>
-   <property name="clickMarginRightSetter" stdset="0">
-    <enum>Button::half</enum>
-   </property>
-  </widget>
   <zorder>backdrop</zorder>
   <zorder>headerlabel</zorder>
   <zorder>ui0Pct</zorder>
@@ -448,7 +432,6 @@
   <zorder>uiPostTriggerRecordingSec</zorder>
   <zorder>uiPostTriggerRecordingFrames</zorder>
   <zorder>uiIncomingTrigger</zorder>
-  <zorder>uiRecordingSettings</zorder>
  </widget>
  <customwidgets>
   <customwidget>

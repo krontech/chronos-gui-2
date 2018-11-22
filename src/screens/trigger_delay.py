@@ -16,5 +16,4 @@ class TriggerDelay(QtWidgets.QDialog):
 		self.setAttribute(QtCore.Qt.WA_TranslucentBackground, True)
 		
 		# Button binding.
-		self.uiRecordingSettings.clicked.connect(lambda: window.show('recording_settings'))
 		self.uiDone.clicked.connect(window.back)
