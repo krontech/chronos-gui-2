@@ -769,13 +769,13 @@ Clipping</string>
 				/* Editor style. Use border to show were click margin is, so we don't mess it up during layout. */
 				Button {
 					font-size: 16px;
-					background: white;
+					background: rgba(255,255,255,127); /* The background is drawn under the button borders, so they are opaque if the background is opaque. */
 					
 					/* use borders instead of margins so we can see what we're doing */
-					border-left:   21px solid rgba(20, 5, 231, 53);
-					border-right:  1px solid rgba(20, 5, 231, 53);
-					border-top:    11px solid rgba(20, 5, 231, 53);
-					border-bottom: 1px solid rgba(20, 5, 231, 53);
+					border-left:   21px solid rgba(5, 3, 208, 88);
+					border-right:  1px solid rgba(5, 3, 208, 88);
+					border-top:    11px solid rgba(5, 3, 208, 88);
+					border-bottom: 1px solid rgba(5, 3, 208, 88);
 				}
 			Button { background: #7a70f7 }</string>
     </property>
@@ -1123,8 +1123,8 @@ Calibration</string>
   <tabstop>uiRecord</tabstop>
   <tabstop>uiDebugC</tabstop>
   <tabstop>uiClose</tabstop>
-  <tabstop>uiDebugA</tabstop>
   <tabstop>uiDebugB</tabstop>
+  <tabstop>uiDebugA</tabstop>
   <tabstop>uiExposureSlider</tabstop>
   <tabstop>uiBattery</tabstop>
   <tabstop>uiPrefsAndUtils</tabstop>
