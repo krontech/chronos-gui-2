@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>Chronos D-Bus API Documentation</title>
+		
+		<style>
+			/* Originally from http://bettermotherfuckingwebsite.com */
+			body {
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				margin: 40px 2%;
+				line-height: 1.6;
+				font-size: 18px;
+				color: #444;
+				padding: 0 10px;
+				tab-size: 4;
+			}
+			
+			body > * {
+				width: 650px;
+			}
+			
+			body > table {
+				max-width: 975px;
+			}
+			
+			body > code, .codeblock {
+				white-space: pre;
+				overflow-x: auto;
+				display: block;
+			}
+			
+			code, .codeblock {
+				background: rgba(0,0,0, 0.1);
+				border-radius: 0.2ex;
+				padding: 0 0.4ex;
+			}
+			
+			h1,h2,h3 {
+				line-height: 1.2;
+			}
+			
+			thead, th {
+				position: sticky;
+				top: 0px;
+				background: white;
+				text-align: left;
+			}
+			
+			th, td {
+				padding: 1ex;
+			}
+		</style>
+		
+		<script>
+			//Remove HTML-formatting whitespace from code snippets. (Leading newlines, indentation.)
+			document.addEventListener('DOMContentLoaded', ()=>{
+				document.querySelectorAll('code').forEach(elem => {
+					let lines = elem.innerHTML
+						.split('\n')
+						.filter(line=>line) //Filter to remove non-code lines, mainly the leading newline between <code> and the actual code.
+					
+					minLeadingTabs = lines
+						.filter(line => line.trim())
+						.reduce((minimum, line) => Math.min(line.split(/[^\t]/)[0].length, minimum), Infinity)
+					
+					elem.innerHTML = lines
+						.map(line => line.replace(new RegExp(`^\t{0,${minLeadingTabs}}`), '')) //Remove leading snippet-level indentation, it provides nothing.
+						.join('\n')
+				})
+			})
+		</script>
+	</head>
+	<body>
+		<header>
+			<h1>How To Approach This Codebase</h1>
+			<p style="color:#777; font-style:italic;">A guide to making changes and finding values, from UI to API call.</p>
+		</header>
+		
+		<p>So, you have the sudden need to dive into the Chronos back-of-camera user interface. Perhaps someone hired you, or you're part of a research project, and now you need to change how the camera operates. This document will introduce you to the coding conventions used to write this GUI, and tell you how to find variables and callbacks.</p>
+		
+		<h2>Overview</h2>
+		<p>Program execution starts in <code>src/main.py</code>. <code>src/main.py</code> instantiates all the screens, defined in the <code>src/screens/</code> folder.</p>
+		<p>Each screen consists of <code>.ui</code> for layout and a <code>.py</code> file for logic. To find out what a button does, open the screen <code>.ui</code> file in Qt Designer or Qt Creator. Find the widget name, and search for that name in the corresponding <code>.py</code> file.</p>
+		<p>Callbacks in the <code>.py</code> files use the D-Bus API, mostly via <code>api.set({"key": value})</code> and <code>api.observe("key", callback)</code>, to make things happen.</p>
+		<p>If you need help or would just like some advice, make a posting on <a href="http://forum.krontech.ca/index.php?board=3.0">Krontalk</a>.</p>
+		
+		<h2>The Entry Point</h2>
+		
+		<p>The UI is started as a service, defined in [TODO DDR 2018-11-22: write the service and note it here], or by starting it in developer mode by logging into the camera and running:</p>
+		<code>
+			cd gui
+			util/watch-camera.sh
+		</code>
+		
+		<p>The first file that runs, the program entry point, is <code>~src/main.py</code>. (<code>~</code> indicates project root, here.) Starting from the top of the file, we have a few imports and a bit of setup code. The first class we encounter is the <code>Window</code> class. This class handles the window-level functions of the UI, which is mostly just switching between screens. This class is where you would register a new screen, by importing it and registering it in <code>_availableScreens</code>. The screens are switched by the <code>show()</code> and the <code>back()</code> methods. For example, on the main screen (defined in <code>~src/screens/main.py</code>, as separate from <code>~src/main.py</code>) we have the following code to show the power screen when we click on the power button:</p>
+		<code>
+			self.uiBattery.clicked.connect(lambda: window.show('power'))
+		</code>
+		<p>By default, the <code>'main'</code> screen is loaded when the camera is started.</p>
+		
+		<p>The rest of the code in <code>~src/main.py</code> sets up app input events, and finally starts the app itself running. The QT main loop is the last thing started, by <code>app.exec_()</code>. It takes flow control away from our script. The rest of our code will only be ran when a callback is invoked by the QT framework.</p>
+		
+		<h2>Modifying a Screen</h2>
+		
+		<p>When the <code>Window</code> class loads a screen, its <code>__init__</code> function is called. This function is where UI objects, as defined in the <code>.py</code> file's corresponding <code>.ui</code> file, are linked to the logic in the <code>.py</code> file. So, as an example, let's say we want to add a button to the power screen that takes you to the file save settings screen. Perhaps we want to save our video differently if the battery is getting low. First, we will open the <code>~src/screens/power.py</code> file in our favourite text editor, and open <code>~src/screens/power.ui</code> in Qt Designer or Qt Creator. (We must launch these programs using the scripts in the <code>~util/</code> folder, since some environment variables need to be set for them to work.)</p>
+		
+		<p>In either Designer or Creator, when we open <code>power.ui</code>, we should see something like the following:</p>
+		<img src="how-to-approach/power.ui-1.png">
+		<p>Note that, unlike on the camera, there is a bit of colourful debug information showing the hit margin of the interactive elements. If you don't see this, then the Chronos plugins have not loaded correctly and you will not be able to edit the files successfully.</p>
+		<p>Now, let's add a button beside the Done button. We'll scroll down in the widget box to the left, to Chronos section, and place one of our Buttons. (This is separate from the Push Button under the Buttons section of the widgets box.) We'll drag the button onto the screen, and set the text on it to "File Settings". If we want to set a stylesheet on it, we'll have to scroll down in the property editor to customStyleSheet. The default stylesheet is already in use for the click margins on the button. For example, setting our button's customStyleSheet to <code>Button { background: lightgreen }</code> unsurprisingly results in a light green button.</p>
+		<img src="how-to-approach/power.ui-2.png">
+		<p>To wire our button in, let's look at how the Done button works. Clicking on the button, we see it is named <code>uiDone</code> in the object inspector panel. Following that convention, let's name our Save Setting button uiSaveSettings. We prepend <code>ui</code> to our elements' names because—back in <code>power.py</code>—the elements are loaded directly in to our Power class. We don't want to worry about conflicting with an existing class member when we're editing our .ui files.</p>
+		<p>In <code>power.py</code>, let's see how the Done button changes screens. Searching for <code>uiDone</code>, our Done button's name, we find <code>self.uiDone.clicked.connect(window.back)</code>. This connects the <code>clicked</code> signal to the <code>back</code> function. The <code>clicked</code> signal is provided by Qt, and the <code>back</code> function comes from the Window class defined in <code>~src/main.py</code>.</p>
+		<p>Looking through the window class, either in the code or by using the <code>dbg()</code> call to drop into an interactive debugger, we find a likely-looking function called <code>show()</code>. We'll use this function to show the File Settings window when our new button is clicked. Above the Done button's clicked handler, we'll write the following:</p>
+		<code>
+			self.<strong>uiSaveSettings</strong>.clicked.connect(
+				lambda: window.show(<strong>'file_settings'</strong>) )
+		</code>
+		<p>If we wanted to have a more complex function as a click handler, we'd define a class function in the Battery class. For example, the <code>uiSafelyPowerDown</code> checkbox is bound to <code>self.uiChart.update</code>, so when we check or uncheck it the chart updates with the line showing the power-off threshold.</p>
+		
+		<h2>Making Things Happen</h2>
+		
+		<p>To control the camera, we will use the internal D-Bus API. (Refer to the <a href="D-Bus.html">D-Bus API documentation</a> for details.) Let's look at the charge-remaining dropdown on our power screen, still in <code>~src/screens/power.py</code>. Clicking on the widget in Qt Designer or Qt Creator, we see it's called <code>uiPowerDownThreshold</code>. Searching for that name in the corresponding Python file, we find it's used a couple places. The uses we look at first are in are in the __init__ function, since we need to know which functions are bound to the widget. It looks like the original contents are saved to a list, and then there's a call to <code>api.observe()</code>, and then:</p>
+		
+		<code>
+			self.uiPowerDownThreshold.currentTextChanged.connect(
+				lambda val: api.set({"saveAndPowerDownLowBatteryLevel":
+					pct2dec(val) }) )
+		</code>
+		
+		<p>This function uses the D-Bus API, via <code>api.set()</code>, to actually set the value to whatever the label of the dropdown is. So this is how the power down level is set, but how is it read?</p>
+		
+		<p>Above the currentTextChanged callback, there's a call to <code>api.observe()</code>.</p>
+		
+		<code>
+			api.observe("saveAndPowerDownLowBatteryLevel",
+				self.updatePowerDownThreshold)
+		</code>
+		
+		<p>This will invoke the <code>self.updatePowerDownThreshold</code> method whenever the API setting <code>saveAndPowerDownLowBatteryLevel</code> is changed - and once upon startup, because it changes from an unknown value to a known one. (This is very convenient for initialisation, since our initialisation and update code is often the same.) We could also retrieve the current value of an api setting by using <code>api.get(['saveAndPowerDownLowBatteryLevel'])</code>, but we use <code>api.observe</code> here in case the level is changed later by the HTTP interface or through the mobile app.</p>
+		
+		<p>Let's have a look at the update function, the last part of our puzzle. It has a bunch of stuff around it!</p>
+		<code>
+			@QtCore.pyqtSlot(float, name="updatePowerDownThreshold")
+			@api.silenceCallbacks('uiPowerDownThreshold')
+			def updatePowerDownThreshold(self, threshold: float):
+		</code>
+		<p>This is a rather finicky part of the code, and it gives monumentally bad errors if you mess it up. The first decorator exposes the function to PyQt's D-Bus bindings. It contains the type information of the D-Bus function call. This is important, because D-Bus dispatches to different functions based on the type of the data being passed to them. This needs to be stated in the decorator because the decorator implementation pre-dates Python's built-in type information. The name arg is set to the function name, because the <code>pyqtSlot</code> decorator cannot distinguish between different functions wrapped by the <code>silenceCallbacks</code> decorator. Without a unique name, it will overwrite each previous function with the subsequent function definition. Always set the name to the name of the function being decorated.</p>
+		<p>The next decorator, <code>api.silenceCallbacks</code>, stops the widgets named from firing events. Normally, when a widget is updated, it will update a value in the API. However, since <code>updatePowerDownThreshold</code> is called when a value in the API is updated, it could cause an infinite loop to update the API value here. So we must always silence any widget we modify in this function. Note that, for safety, <code>api.observe</code> will actually check we've at least decorated our callback with <code>api.silenceCallbacks</code>, even if we haven't actually silenced any widgets. Failing to silence a callback is a subtle mode of failure, as QT will not fire an update event if the update is the same as the current state of the widget. Usually, this will stop the infinite update loop. However, if two different updates are being processed by the API at once, they will keep setting the widget to a different value, over and over and over again.</p>
+		<p>Finally, the function itself takes a threshold, in this case between 0 and 1, and converts it into a percentage which is added to the drop-down list.</p>
+		
+		<p></p>
+		
+		<p>← <a href="../readme.html">Return to Overview</a></p>
+	</body>
+</html>
