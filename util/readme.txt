@@ -11,9 +11,11 @@ Note: ~ denotes "in the root folder of" this project. So, this file is ~util/rea
 	
 	- com.krontech.chronos.conf: Configuration file for D-Bus, to allow the service to start. See it for installation instructions.
 	
-	- designer.sh: Launch QT Designer via this script, to set the correct env var so you get the custom widgets the UI uses.
+	- designer.sh: Launch Qt Designer via this script, to set the correct env var so you get the custom widgets the UI uses.
 	
-	- fbdev.py: Example script for accessing the linux framebuffer.
+	- creator.sh: (Backup if Designer doesn't work.) Launch Qt Creator via this script, to set the correct env var so you get the custom widgets the UI uses.
+	
+	- fbdev.py: Example script for accessing the linux framebuffer. (Runs on camera.)
 	
 	- stats*: Collect stats from dev machines. Used primarily to profile performance problems.
 		- stats.node.js: The stats server, collecting data and writing it to stats_reported/. Launch with `node stats.node.js`.
