@@ -132,7 +132,7 @@ class Window(QtCore.QObject):
 		#Cache all screens, cached screens load about 150-200ms faster I think.
 		self._lazyLoadTimer = QtCore.QTimer()
 		self._lazyLoadTimer.timeout.connect(self._loadAScreen)
-		#self._lazyLoadTimer.start(250) #ms
+		self._lazyLoadTimer.start(250) #ms
 		
 	def _ensureInstantiated(self, screenName: str):
 		"""Lazily load screens to shorten initial startup time."""
@@ -201,10 +201,10 @@ class Window(QtCore.QObject):
 
 
 class GlobalFilter(QtCore.QObject):
-	e = QtCore.QEvent #documented at http://doc.qt.io/qt-5/qevent.html
+	e = QtCore.QEvent #documented at https://doc.qt.io/qt-5/qevent.html
 	knownEvents = frozenset([
 		#Frequently-fired events and startup events. Ignored because way too many of them are fired.
-		e.Close, e.Paint, e.UpdateRequest, e.MetaCall, e.PolishRequest, e.LayoutRequest, e.UpdateLater, e.Timer, e.ApplicationStateChange, e.ApplicationActivate, e.ApplicationDeactivate, 20, e.FocusIn, e.WindowActivate, e.ActivationChange, e.Expose, e.DeferredDelete, e.PaletteChange, e.FontChange, e.StyleChange, 15, e.WindowTitleChange, e.ChildAdded, e.ParentChange, e.CursorChange, e.MouseButtonDblClick, e.MouseButtonPress, e.MouseButtonRelease, e.MouseMove, e.MouseTrackingChange, e.Move, 152, e.HideToParent, e.Hide, e.ContentsRectChange, e.Polish, e.ChildPolished, e.DynamicPropertyChange, e.ChildRemoved, e.ZOrderChange, 16, e.ShowToParent, e.ApplicationPaletteChange, e.ThreadChange, e.ToolTip,
+		e.Close, e.Paint, e.UpdateRequest, e.MetaCall, e.PolishRequest, e.LayoutRequest, e.UpdateLater, e.Timer, e.ApplicationStateChange, e.ApplicationActivate, e.ApplicationDeactivate, 20, e.FocusIn, e.WindowActivate, e.ActivationChange, e.Expose, e.DeferredDelete, e.PaletteChange, e.FontChange, e.StyleChange, 15, e.WindowTitleChange, e.ChildAdded, e.ParentChange, e.CursorChange, e.MouseButtonDblClick, e.MouseButtonPress, e.MouseButtonRelease, e.MouseMove, e.MouseTrackingChange, e.Move, 152, e.HideToParent, e.Hide, e.ContentsRectChange, e.Polish, e.ChildPolished, e.DynamicPropertyChange, e.ChildRemoved, e.ZOrderChange, 16, e.ShowToParent, e.ApplicationPaletteChange, e.ThreadChange, e.ToolTip, e.ToolTipChange,
 		
 		#Input events, usually not important, we are after the effects.
 		e.TouchBegin, e.TouchCancel, e.TouchEnd, e.TouchUpdate,
@@ -315,7 +315,7 @@ if __name__ == '__main__':
 	eventFilter = GlobalFilter(app, window)
 	app.installEventFilter(eventFilter)
 	app.setStyleSheet("""
-		/* Remove the little dotted focus ring. It's too hard to see. */
+		/* Remove the little dotted focus ring. It's too hard to see, but still looks messy now that we've got our own. */
 		*:focus {
 			outline: 2px double blue; /*Debugging, show system focus ring.*/
 			outline: none;

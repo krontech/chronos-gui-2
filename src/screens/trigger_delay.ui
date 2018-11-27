@@ -29,49 +29,49 @@
   <widget class="Button" name="ui0Pct">
    <property name="geometry">
     <rect>
-     <x>340</x>
+     <x>350</x>
      <y>0</y>
      <width>101</width>
-     <height>61</height>
+     <height>71</height>
     </rect>
    </property>
    <property name="text">
     <string>0%</string>
    </property>
    <property name="clickMarginBottomSetter" stdset="0">
-    <enum>Button::none</enum>
+    <enum>Button::half</enum>
    </property>
   </widget>
   <widget class="Button" name="ui50Pct">
    <property name="geometry">
     <rect>
-     <x>530</x>
+     <x>520</x>
      <y>0</y>
      <width>101</width>
-     <height>61</height>
+     <height>71</height>
     </rect>
    </property>
    <property name="text">
     <string>50%</string>
    </property>
    <property name="clickMarginBottomSetter" stdset="0">
-    <enum>Button::none</enum>
+    <enum>Button::half</enum>
    </property>
   </widget>
   <widget class="Button" name="ui100Pct">
    <property name="geometry">
     <rect>
-     <x>710</x>
+     <x>690</x>
      <y>0</y>
      <width>101</width>
-     <height>61</height>
+     <height>71</height>
     </rect>
    </property>
    <property name="text">
     <string>100%</string>
    </property>
    <property name="clickMarginBottomSetter" stdset="0">
-    <enum>Button::none</enum>
+    <enum>Button::half</enum>
    </property>
   </widget>
   <widget class="Slider" name="uiTriggerDelaySlider">
@@ -79,7 +79,7 @@
     <rect>
      <x>10</x>
      <y>75</y>
-     <width>761</width>
+     <width>781</width>
      <height>61</height>
     </rect>
    </property>
@@ -135,43 +135,11 @@
     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
    </property>
   </widget>
-  <widget class="Button" name="uiMoreDelay">
-   <property name="geometry">
-    <rect>
-     <x>0</x>
-     <y>140</y>
-     <width>171</width>
-     <height>80</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>More Delay</string>
-   </property>
-   <property name="clickMarginRightSetter" stdset="0">
-    <enum>Button::half</enum>
-   </property>
-  </widget>
-  <widget class="Button" name="uiLessDelay">
-   <property name="geometry">
-    <rect>
-     <x>170</x>
-     <y>140</y>
-     <width>171</width>
-     <height>80</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Less Delay</string>
-   </property>
-   <property name="clickMarginLeftSetter" stdset="0">
-    <enum>Button::half</enum>
-   </property>
-  </widget>
   <widget class="HeaderLabel" name="headerlabel_2">
    <property name="geometry">
     <rect>
      <x>20</x>
-     <y>225</y>
+     <y>170</y>
      <width>261</width>
      <height>41</height>
     </rect>
@@ -184,7 +152,7 @@
    <property name="geometry">
     <rect>
      <x>280</x>
-     <y>225</y>
+     <y>170</y>
      <width>261</width>
      <height>41</height>
     </rect>
@@ -197,7 +165,7 @@
    <property name="geometry">
     <rect>
      <x>540</x>
-     <y>225</y>
+     <y>170</y>
      <width>261</width>
      <height>41</height>
     </rect>
@@ -209,47 +177,47 @@
   <widget class="Label" name="label_4">
    <property name="geometry">
     <rect>
-     <x>200</x>
-     <y>285</y>
+     <x>190</x>
+     <y>230</y>
      <width>71</width>
      <height>31</height>
     </rect>
    </property>
    <property name="text">
-    <string>sec.</string>
+    <string>seconds</string>
    </property>
   </widget>
   <widget class="Label" name="label_5">
    <property name="geometry">
     <rect>
-     <x>460</x>
-     <y>285</y>
+     <x>450</x>
+     <y>230</y>
      <width>71</width>
      <height>31</height>
     </rect>
    </property>
    <property name="text">
-    <string>sec.</string>
+    <string>seconds</string>
    </property>
   </widget>
   <widget class="Label" name="label_6">
    <property name="geometry">
     <rect>
-     <x>720</x>
-     <y>285</y>
+     <x>710</x>
+     <y>230</y>
      <width>71</width>
      <height>31</height>
     </rect>
    </property>
    <property name="text">
-    <string>sec.</string>
+    <string>seconds</string>
    </property>
   </widget>
   <widget class="Label" name="label_7">
    <property name="geometry">
     <rect>
-     <x>200</x>
-     <y>345</y>
+     <x>190</x>
+     <y>290</y>
      <width>71</width>
      <height>31</height>
     </rect>
@@ -261,8 +229,8 @@
   <widget class="Label" name="label_8">
    <property name="geometry">
     <rect>
-     <x>460</x>
-     <y>345</y>
+     <x>450</x>
+     <y>290</y>
      <width>71</width>
      <height>31</height>
     </rect>
@@ -274,8 +242,8 @@
   <widget class="Label" name="label_9">
    <property name="geometry">
     <rect>
-     <x>720</x>
-     <y>345</y>
+     <x>710</x>
+     <y>290</y>
      <width>71</width>
      <height>31</height>
     </rect>
@@ -300,50 +268,56 @@
     <enum>Button::half</enum>
    </property>
   </widget>
-  <widget class="SpinBox" name="uiPreRecordDelaySec">
+  <widget class="DecimalSpinBox" name="uiPreRecordDelaySec">
    <property name="geometry">
     <rect>
      <x>0</x>
-     <y>260</y>
+     <y>205</y>
      <width>201</width>
      <height>71</height>
     </rect>
    </property>
+   <property name="maximum">
+    <double>999999999.000000000000000</double>
+   </property>
    <property name="clickMarginBottomSetter" stdset="0">
-    <enum>SpinBox::half</enum>
+    <enum>DecimalSpinBox::none</enum>
    </property>
   </widget>
   <widget class="SpinBox" name="uiPreRecordDelayFrames">
    <property name="geometry">
     <rect>
      <x>0</x>
-     <y>330</y>
+     <y>275</y>
      <width>201</width>
      <height>71</height>
     </rect>
+   </property>
+   <property name="maximum">
+    <number>999999999</number>
    </property>
    <property name="clickMarginTopSetter" stdset="0">
     <enum>SpinBox::half</enum>
    </property>
   </widget>
-  <widget class="SpinBox" name="uiPreTriggerRecordingSec">
+  <widget class="DecimalSpinBox" name="uiPreTriggerRecordingSec">
    <property name="geometry">
     <rect>
      <x>260</x>
-     <y>260</y>
+     <y>205</y>
      <width>201</width>
      <height>71</height>
     </rect>
    </property>
    <property name="clickMarginBottomSetter" stdset="0">
-    <enum>SpinBox::half</enum>
+    <enum>DecimalSpinBox::none</enum>
    </property>
   </widget>
   <widget class="SpinBox" name="uiPreTriggerRecordingFrames">
    <property name="geometry">
     <rect>
      <x>260</x>
-     <y>330</y>
+     <y>275</y>
      <width>201</width>
      <height>71</height>
     </rect>
@@ -352,24 +326,24 @@
     <enum>SpinBox::half</enum>
    </property>
   </widget>
-  <widget class="SpinBox" name="uiPostTriggerRecordingSec">
+  <widget class="DecimalSpinBox" name="uiPostTriggerRecordingSec">
    <property name="geometry">
     <rect>
      <x>520</x>
-     <y>260</y>
+     <y>205</y>
      <width>201</width>
      <height>71</height>
     </rect>
    </property>
    <property name="clickMarginBottomSetter" stdset="0">
-    <enum>SpinBox::half</enum>
+    <enum>DecimalSpinBox::none</enum>
    </property>
   </widget>
   <widget class="SpinBox" name="uiPostTriggerRecordingFrames">
    <property name="geometry">
     <rect>
      <x>520</x>
-     <y>330</y>
+     <y>275</y>
      <width>201</width>
      <height>71</height>
     </rect>
@@ -382,7 +356,7 @@
    <property name="geometry">
     <rect>
      <x>330</x>
-     <y>65</y>
+     <y>64</y>
      <width>141</width>
      <height>21</height>
     </rect>
@@ -413,8 +387,6 @@
   <zorder>uiPreRecordDelay</zorder>
   <zorder>uiStartRecording</zorder>
   <zorder>uiEndRecording</zorder>
-  <zorder>uiMoreDelay</zorder>
-  <zorder>uiLessDelay</zorder>
   <zorder>headerlabel_2</zorder>
   <zorder>headerlabel_3</zorder>
   <zorder>headerlabel_4</zorder>
@@ -443,6 +415,11 @@
    <class>Button</class>
    <extends>QPushButton</extends>
    <header>button</header>
+  </customwidget>
+  <customwidget>
+   <class>DecimalSpinBox</class>
+   <extends>QDoubleSpinBox</extends>
+   <header>decimal_spin_box</header>
   </customwidget>
   <customwidget>
    <class>HeaderLabel</class>

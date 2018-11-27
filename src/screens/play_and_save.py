@@ -61,7 +61,7 @@ class PlayAndSave(QtWidgets.QDialog):
 				}}
 			""")
 		self.uiSeekSlider.valueChanged.connect(lambda f: api.set({'playbackFrame': f}))
-		api.observe('totalPlaybackFrames', self.onRecordingLengthChange)
+		api.observe('totalRecordedFrames', self.onRecordingLengthChange)
 		api.observe('playbackFrame', self.updateCurrentFrame)
 		
 		self.motionHeatmap = QImage() #Updated by updateMotionHeatmap, used by self.paintMotionHeatmap.

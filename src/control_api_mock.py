@@ -271,9 +271,13 @@ class State():
 		assert value in {'pre-recording', 'recording', 'playback', 'saving'}
 		self._currentCameraState = value
 	
+	totalAvailableFrames = 80000 #This is the number of frames we *can* record. There is some overhead for each frame, so the increase in frames as we decrease resolution is not quite linear.
+	
 	playbackFrame = 0
 	playbackFrameDelta = 0 #Set this to play or rewind the video.
-	totalPlaybackFrames = 70000 #This only changes when we have a full segment recorded. Proposal: It does not change while recording. It changes at maximum rate of 30hz, in case segments are extremely short, in which case it may skip intermediate segments.
+	totalRecordedFrames = 70000 #This only changes when we have a full segment recorded. Proposal: It does not change while recording. It changes at maximum rate of 30hz, in case segments are extremely short, in which case it may skip intermediate segments.
+	
+	triggerDelay = 0 #signed int, between -lots and totalAvailableFrames
 	
 	focusPeakingColor = 0xff0000 #red, green, blue (RGB), like CSS colors.
 	focusPeakingIntensity = 'low' #One of ['off', 'low', 'medium', 'high'].
@@ -595,8 +599,8 @@ class ControlAPIMock(QObject):
 		self._timer3.start(3000) #ms
 		
 		def test4():
-			state.totalPlaybackFrames = 80000
-			self.emitControlSignal('totalPlaybackFrames')
+			state.totalRecordedFrames = 80000
+			self.emitControlSignal('totalRecordedFrames')
 			
 		self._timer4 = QTimer()
 		self._timer4.setTimerType(Qt.PreciseTimer)
