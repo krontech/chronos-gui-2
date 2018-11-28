@@ -853,32 +853,32 @@
   <widget class="Label" name="uiUnsavedChangesWarning">
    <property name="geometry">
     <rect>
-     <x>440</x>
+     <x>480</x>
      <y>397</y>
-     <width>341</width>
+     <width>301</width>
      <height>21</height>
     </rect>
    </property>
    <property name="text">
-    <string>* Press Apply or Done to commit changes.</string>
+    <string>* Press Apply to save changes.</string>
    </property>
    <property name="alignment">
     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
    </property>
   </widget>
-  <widget class="Button" name="uiApply">
+  <widget class="Button" name="uiSave">
    <property name="geometry">
     <rect>
-     <x>460</x>
+     <x>630</x>
      <y>400</y>
      <width>171</width>
      <height>81</height>
     </rect>
    </property>
    <property name="text">
-    <string>Apply</string>
+    <string>Save</string>
    </property>
-   <property name="clickMarginRightSetter" stdset="0">
+   <property name="clickMarginLeftSetter" stdset="0">
     <enum>Button::half</enum>
    </property>
   </widget>
@@ -963,18 +963,35 @@
     <string>Trigger Status</string>
    </property>
   </widget>
+  <widget class="Button" name="uiCancel">
+   <property name="geometry">
+    <rect>
+     <x>460</x>
+     <y>400</y>
+     <width>171</width>
+     <height>81</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Cancel</string>
+   </property>
+   <property name="clickMarginLeftSetter" stdset="0">
+    <enum>Button::full</enum>
+   </property>
+  </widget>
   <zorder>backdrop</zorder>
   <zorder>uiTriggerScreens</zorder>
   <zorder>headerlabel</zorder>
   <zorder>uiActiveTrigger</zorder>
   <zorder>uiUnsavedChangesWarning</zorder>
-  <zorder>uiApply</zorder>
+  <zorder>uiSave</zorder>
   <zorder>uiDone</zorder>
   <zorder>uiTrig1Status</zorder>
   <zorder>uiTrig2Status</zorder>
   <zorder>uiTrig3Status</zorder>
   <zorder>uiMotionTriggerStatus</zorder>
   <zorder>headerlabel_16</zorder>
+  <zorder>uiCancel</zorder>
  </widget>
  <customwidgets>
   <customwidget>
@@ -1034,7 +1051,7 @@
   <tabstop>uiMotionTriggerConfigure</tabstop>
   <tabstop>uiMotionTriggerDebounce</tabstop>
   <tabstop>uiMotionTriggerInvert</tabstop>
-  <tabstop>uiApply</tabstop>
+  <tabstop>uiSave</tabstop>
  </tabstops>
  <resources>
   <include location="../../assets.qrc"/>

@@ -76,11 +76,11 @@ class Triggers(QtWidgets.QDialog):
 			obj = getattr(self, id)
 			changedSignal = getattr(obj, 'currentIndexChanged', getattr(obj, 'valueChanged', getattr(obj, 'stateChanged', None))) #Couldn't just choose one, could we, QT. 😑
 			changedSignal and changedSignal.connect(self.queueVisualizationRepaint)
-			changedSignal and changedSignal.connect(self.uiUnsavedChangesWarning.show)
+			changedSignal and changedSignal.connect(self.markStateDirty)
 		
-		self.uiUnsavedChangesWarning.hide()
-		self.uiApply.clicked.connect(self.uiUnsavedChangesWarning.hide)
-		self.uiDone.clicked.connect(self.uiUnsavedChangesWarning.hide)
+		self.markStateClean() #Initialize. Comes in dirty from Qt Creator.
+		self.uiSave.clicked.connect(self.markStateClean)
+		self.uiCancel.clicked.connect(self.markStateClean)
 		
 		self.trigger3VoltageTextTemplate = self.uiTrigger3ThresholdVoltage.text()
 		self.uiTrig1StatusTextTemplate = self.uiTrig1Status.text()
@@ -111,13 +111,13 @@ class Triggers(QtWidgets.QDialog):
 			self.uiActiveTrigger.removeItem(self.availableTriggerIds.index('motion'))
 		
 		#Set up state init & events.
-		#self.uiApply.clicked.connect(lambda: self and dbg()) #Debug! \o/
-		self.uiApply.clicked.connect(lambda: api.set({
+		#self.uiSave.clicked.connect(lambda: self and dbg()) #Debug! \o/
+		self.uiSave.clicked.connect(lambda: api.set({
 			'triggerConfiguration': self.changedTriggerState()
 		}))
-		self.uiDone.clicked.connect(lambda: (api.set({
-			'triggerConfiguration': self.changedTriggerState()
-		}), window.back()))
+		self.uiDone.clicked.connect(window.back)
+		self.uiCancel.clicked.connect(lambda: 
+			self.updateTriggerConfiguration(self.lastTriggerConfiguration))
 		
 		#OK, so, triggerCapabilities is a constant, that's good. Then
 		#we have triggerConfiguration, which is one variable. We'll
@@ -309,6 +309,18 @@ class Triggers(QtWidgets.QDialog):
 		
 		#Mark visualization panes dirty, so they update appropriately.
 		self.queueVisualizationRepaint()
+	
+	def markStateClean(self):
+		self.uiUnsavedChangesWarning.hide()
+		self.uiSave.hide()
+		self.uiDone.show()
+		self.uiCancel.hide()
+		
+	def markStateDirty(self):
+		self.uiUnsavedChangesWarning.show()
+		self.uiSave.show()
+		self.uiDone.hide()
+		self.uiCancel.show()
 	
 	def queueVisualizationRepaint(self):
 		self.uiTrigger1Visualization.update()

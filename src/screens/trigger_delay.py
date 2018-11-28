@@ -25,6 +25,14 @@ class TriggerDelay(QtWidgets.QDialog):
 		self.setWindowFlags(QtCore.Qt.FramelessWindowHint)
 		self.setAttribute(QtCore.Qt.WA_TranslucentBackground, True)
 		
+		self.uiTriggerDelaySlider.setStyleSheet( #If this turns out to be too expensive to set, just fill in the tip and draw a red rectangle underneath.
+			self.uiTriggerDelaySlider.styleSheet() + '\n' + """
+				Slider::groove {
+					background: qlineargradient( x1:0 y1:0, x2:1 y2:0, stop:0 transparent, stop:0.4999 transparent, stop:0.5001 red, stop:1 red);
+				}
+			"""
+		)
+		
 		# Value init.
 		self.availableDelayMultiplier = 1. #Used for "more" and "less" pre-record delay. Multiplies totalAvailableFrames.
 		
@@ -48,12 +56,29 @@ class TriggerDelay(QtWidgets.QDialog):
 		
 		self.uiTriggerDelaySlider.valueChanged.connect(self.newSliderPosition)
 		
+		
+		self.uiPreRecordDelayFrames.valueChanged.connect(lambda frames:
+			api.set({'triggerDelay': -frames}) )
+		self.uiPreRecordDelaySec.valueChanged.connect(lambda seconds:
+			api.set({'triggerDelay': -self.secondsToFrames(seconds)}) )
+		
+		self.uiPreTriggerRecordingFrames.valueChanged.connect(lambda frames:
+			api.set({'triggerDelay': frames}) )
+		self.uiPreTriggerRecordingSec.valueChanged.connect(lambda seconds:
+			api.set({'triggerDelay': self.secondsToFrames(seconds)}) )
+		
+		self.uiPostTriggerRecordingFrames.valueChanged.connect(lambda frames:
+			api.set({'triggerDelay': self.totalAvailableFrames - frames}) )
+		self.uiPostTriggerRecordingSec.valueChanged.connect(lambda seconds:
+			api.set({'triggerDelay': self.totalAvailableFrames - self.secondsToFrames(seconds)}) )
+		
+		
 		# self.uiDone.clicked.connect(lambda: self and dbg())
 		self.uiDone.clicked.connect(window.back)
 	
 	
 	def secondsToFrames(self, seconds: float) -> int:
-		return round(self.recordingPeriod/1e9 / seconds)
+		return round(seconds / (self.recordingPeriod/1e9))
 	
 	def framesToSeconds(self, frames: int) -> float:
 		return frames * self.recordingPeriod/1e9 #🤞 convert recordingPeriod to seconds, then multiply to get the duration for frames
@@ -155,5 +180,3 @@ class TriggerDelay(QtWidgets.QDialog):
 					sliderPositionX - self.uiIncomingTrigger.width()/2 + handleSize/2 + sliderGeom.x(),
 					sliderGeom.x() ) ),
 			self.uiIncomingTrigger.pos().y() )
-		
-		

@@ -13,6 +13,9 @@
   <property name="windowTitle">
    <string>Trigger Delay</string>
   </property>
+  <property name="styleSheet">
+   <string notr="true"/>
+  </property>
   <widget class="HeaderLabel" name="headerlabel">
    <property name="geometry">
     <rect>
@@ -442,6 +445,19 @@
    <header>spin_box</header>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>uiDone</tabstop>
+  <tabstop>ui0Pct</tabstop>
+  <tabstop>ui50Pct</tabstop>
+  <tabstop>ui100Pct</tabstop>
+  <tabstop>uiTriggerDelaySlider</tabstop>
+  <tabstop>uiPreRecordDelaySec</tabstop>
+  <tabstop>uiPreTriggerRecordingSec</tabstop>
+  <tabstop>uiPostTriggerRecordingSec</tabstop>
+  <tabstop>uiPreRecordDelayFrames</tabstop>
+  <tabstop>uiPreTriggerRecordingFrames</tabstop>
+  <tabstop>uiPostTriggerRecordingFrames</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>
