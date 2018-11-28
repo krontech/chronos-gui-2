@@ -860,7 +860,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>* Press Apply to save changes.</string>
+    <string>* Press Save to apply changes.</string>
    </property>
    <property name="alignment">
     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
