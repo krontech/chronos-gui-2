@@ -21,17 +21,61 @@
 
 import sys
 import random
-from debugger import *; dbg
+from typing import *
 
 from PyQt5.QtCore import pyqtSlot, QObject, QTimer, Qt, QByteArray
 from PyQt5.QtDBus import QDBusConnection, QDBusMessage, QDBusError
 
+from debugger import *; dbg
 
 # Set up d-bus interface. Connect to mock system buses. Check everything's working.
 if not QDBusConnection.systemBus().isConnected():
 	print("Error: Can not connect to D-Bus. Is D-Bus itself running?", file=sys.stderr)
 	sys.exit(-1)
 
+
+def action(actionType: str) -> callable:
+	"""Function decorator to denote what class of action function performs.
+		
+		Available actions are 'get', 'set', and 'pure'.
+			- get: Function returns a value. Even if the same input
+				is given, a different value may be returned.
+			- set: Function primarily updates a value. It may return
+				a status. The setting action is most important.
+			- pure: Function returns a value based solely on it's
+				inputs. Pure functions are cachable, for example.
+		
+		Example:
+			@action('get')
+			@property
+			def availableRecordingAnalogGains(self) -> list: 
+				return [{"multiplier":2**i, "dB":6*i} for i in range(0,5)]
+		
+		This is used by the HTTP API to decide what method, POST or GET, a
+		function is accessed by. Setters are POST, getters GET, and pure
+		functions can be accessd by either POST or GET, since args may need
+		a POST body. (GET functions only have simple type coorecion, while
+		POST has full JSON support.)"""
+	
+	actionTypes = {'get', 'set', 'pure'}
+	if actionType not in actionTypes:
+		raise ValueError(f'Action type "{actionType}" not known. Known action types are: {actionTypes}.')
+	
+	def setAction(fn):
+		setattr(fn, '_action', actionType)
+		return fn
+	
+	return setAction
+
+def stringifyTypeClasses(typeClass: Any) -> str:
+	"""Return a type with all classes subbed out with their names."""
+	if hasattr(typeClass, '__name__'): #Basic types, int, str, etc.
+		return typeClass.__name__
+		
+	if hasattr(typeClass, '_name'): #typing types
+		return typeClass._name or 'Any' #Seems to be Unions mess it up, but I don't know how to break them.
+	
+	raise Exception(f'Unknown typeClass {typeClass}')
 
 
 ########################
@@ -56,7 +100,7 @@ def resolution_is_valid(hOffset: int, vOffset: int, hRes: int, vRes: int):
 	)
 
 
-def framerate_for_resolution(hRes: int, vRes: int):
+def framerate_for_resolution(hRes: int, vRes: int) -> int:
 	if type(hRes) is not int or type(vRes) is not int:
 		return print("D-BUS ERROR", QDBusError.InvalidArgs, f"framerate must be of type <class 'int'>, <class 'int'>. Got type {type(hRes)}, {type(vRes)}.")
 			
@@ -242,7 +286,7 @@ class State():
 	recordingAnalogGainMultiplier = 2 #doesn't rebuild video pipeline, only takes gain multiplier
 	
 	@property
-	def availableRecordingAnalogGains(self): 
+	def availableRecordingAnalogGains(self) -> list: 
 		return [{"multiplier":2**i, "dB":6*i} for i in range(0,5)]
 	
 	
@@ -500,7 +544,7 @@ class State():
 	datetime = "2018-09-20T13:23:23.036586" #iso 8601, YYYY-MM-DDTHH:MM:SS.mmmmmm as detailed at https://docs.python.org/3/library/datetime.html#datetime.datetime.isoformat
 	
 	@property
-	def externalStorage(self) -> [{str:any}]:
+	def externalStorage(self) -> List[Dict[str, Union[str, int]]]:
 		"""External storage device partitions.
 			
 			Returns a list of maps, one map per partition on each
@@ -543,7 +587,7 @@ class State():
 	SSHPort = 8022
 	
 	@property
-	def networkInterfaces(self) -> [{str:str}]:
+	def networkInterfaces(self) -> List[Dict[str,str]]:
 		"""Roughly; the enumeration of attached, active network devices."""
 		return [{
 			'id': 'enp0s25',
@@ -609,42 +653,45 @@ class ControlAPIMock(QObject):
 		self._timer4.start(1000) #ms
 
 	
-	def emitControlSignal(self, name, value=None):
+	def emitControlSignal(self, name: str, value=None) -> None:
 		"""Emit an update signal, usually for indicating a value has changed."""
 		signal = QDBusMessage.createSignal('/com/krontech/chronos/control/mock', 'com.krontech.chronos.control.mock', name)
 		signal << getattr(state, name) if value is None else value
 		QDBusConnection.systemBus().send(signal)
 	
-	def emitError(self, message):
+	def emitError(self, message: str) -> QDBusError:
 		error = QDBusMessage.createError(QDBusError.Other, message)
 		QDBusConnection.systemBus().send(error)
 		return error
 	
 	
-	@pyqtSlot(QDBusMessage, result='QVariantMap')
-	def get(self, msg):
-		keys = msg.arguments()[0]
+	@action('get')
+	@pyqtSlot(list, result='QVariantMap')
+	def get(self, keys: List[str]) -> Union[Dict[str, Any], str]:
 		retval = {}
 		
 		for key in keys:
 			if key[0] is '_' or not hasattr(state, key): # Don't allow querying of private variables.
-				#QDBusMessage.createErrorReply does not exist in PyQt5, and QDBusMessage.errorReply can't be sent.
-				return print("D-BUS ERROR", QDBusError.UnknownProperty, f"The value '{key}' is not known.\nValid keys are: {[i for i in dir(state) if i[0] != '_']}")
+				#QDBusMessage.createErrorReply does not exist in PyQt5, and QDBusMessage.errorReply can't be sent. As far as I can tell, we simply can not emit D-Bus errors.
+				#Can't reply with a single string, either, since QVariantMap MUST be key:value pairs and we don't seem to have unions or anything.
+				#The type overloading, as detailed at http://pyqt.sourceforge.net/Docs/PyQt5/signals_slots.html#the-pyqtslot-decorator, simply does not work in this case. The last pyqtSlot will override the first pyqtSlot with its return type.
+				return {'ERROR': dump(f"The value '{key}' is not a known key to set.\nValid keys are: {[i for i in dir(state) if i[0] != '_']}")}
 			
 			retval[key] = getattr(state, key)
 		
 		return retval
 	
 	
+	@action('set')
 	@pyqtSlot('QVariantMap')
-	def set(self, data):
+	def set(self, data: Dict[str, Any]) -> None:
 		# Check all errors first to avoid partially applying an update.
 		for key, value in data.items():
 			if key[0] is '_' or not hasattr(state, key):  # Don't allow setting of private variables.
 				# return self.sendError('unknownValue', f"The value '{key}' is not known.\nValid keys are: {[i for i in dir(state) if i[0] != '_']}")
-				return print("D-BUS ERROR", QDBusError.UnknownProperty, f"The value '{key}' is not known.\nValid keys are: {[i for i in dir(state) if i[0] != '_']}")
+				return {'ERROR': dump(f"The value '{key}' is not a known key to set.\nValid keys are: {[i for i in dir(state) if i[0] != '_']}")}
 			if not isinstance(value, type(getattr(state, key))):
-				return print("D-BUS ERROR", QDBusError.InvalidSignature, f"Can not set '{key}' to {value}.\n(Previously {getattr(state, key)}.) Expected {type(getattr(state, key))}, got {type(value)}.")
+				return {'ERROR': dump(f"Can not set '{key}', currently {getattr(state, key)}, to {value}.\nExpected {type(getattr(state, key))}, got {type(value)}.")}
 		
 		# Set only changed variables. Changing can be quite involved, such as with recordingHRes.
 		for key, value in data.items():
@@ -660,29 +707,49 @@ class ControlAPIMock(QObject):
 		pendingCallbacks = []
 	
 	
+	@action('set')
 	@pyqtSlot()
-	def power_down(self):
+	def power_down(self) -> None:
 		print('powering down camera…')
 		print('aborted, mock will not shut down machine')
-		
 	
+	
+	@action('get')
 	@pyqtSlot(result=list)
-	def available_keys(self):
-		return [i for i in dir(state) if i[0] != '_']
+	def available_keys(self) -> List[str]:
+		keys = [i for i in dir(state) if i[0] != '_'] #Don't expose private items.
+		return keys
+	
+	
+	@action('get')
+	@pyqtSlot(result=list)
+	def available_calls(self) -> List[Dict[str, str]]:
+		return [{
+			"name": i,
+			"args": { #Return args: type, stripping class down to string name for D-Bus.
+				argName: stringifyTypeClasses(typeClass) 
+				for argName, typeClass in 
+				get_type_hints(getattr(self, i)).items()
+			},
+			"action": getattr(self, i)._action, #Type
+		} for i in self.__class__.__dict__ 
+			if hasattr(getattr(self, i), '_action') ]
 		
 	
+	@action('get')
 	@pyqtSlot(int, int, result=int)
-	def framerate_for_resolution(self, hRes: int, vRes: int):
+	def framerate_for_resolution(self, hRes: int, vRes: int) -> int:
 		return framerate_for_resolution(hRes, vRes)
 	
-	
+	@action('get')
 	@pyqtSlot(result=bool)
-	def resolution_is_valid(self, hOffset: int, vOffset: int, hRes: int, vRes: int): #xywh px
+	def resolution_is_valid(self, hOffset: int, vOffset: int, hRes: int, vRes: int) -> bool: #xywh px
 		return resolution_is_valid(hOffset, vOffset, hRes, vRes)
 	
 	
+	@action('set')
 	@pyqtSlot(str)
-	def autoFactoryCal(self, safeword: str):
+	def autoFactoryCal(self, safeword: str) -> None:
 		if(safeword != 'tempest shadow'): #The safeword (which is not a password, and confers no security) is a safty precaution to prevent the API call from being placed inadvertently during normal scripting. It can be quite hard to undo the effects these factory functions.
 			print('incorrect safeword specified')
 			return
@@ -690,8 +757,9 @@ class ControlAPIMock(QObject):
 		print('MOCK: perform auto factory calibration')
 	
 	
+	@action('set')
 	@pyqtSlot(str)
-	def adcOffsetCal(self, safeword: str):
+	def adcOffsetCal(self, safeword: str) -> None:
 		if(safeword != 'tempest shadow'): 
 			print('incorrect safeword specified')
 			return
@@ -699,8 +767,9 @@ class ControlAPIMock(QObject):
 		print('MOCK: perform adc offset calibration')
 	
 	
+	@action('set')
 	@pyqtSlot(str)
-	def columnGainCal(self, safeword: str):
+	def columnGainCal(self, safeword: str) -> None:
 		if(safeword != 'tempest shadow'): 
 			print('incorrect safeword specified')
 			return
@@ -708,8 +777,9 @@ class ControlAPIMock(QObject):
 		print('MOCK: perform column gain calibration')
 	
 	
+	@action('set')
 	@pyqtSlot(str)
-	def blackCalAllStandard(self, safeword: str):
+	def blackCalAllStandard(self, safeword: str) -> None:
 		if(safeword != 'tempest shadow'):
 			print('incorrect safeword specified')
 			return
@@ -717,8 +787,9 @@ class ControlAPIMock(QObject):
 		print('MOCK: perform black calibration, all standard resolutions')
 	
 	
+	@action('set')
 	@pyqtSlot(str)
-	def whiteRefCal(self, safeword: str):
+	def whiteRefCal(self, safeword: str) -> None:
 		if(safeword != 'tempest shadow'): 
 			print('incorrect safeword specified')
 			return
@@ -726,39 +797,46 @@ class ControlAPIMock(QObject):
 		print('MOCK: perform white reference calibration')
 	
 	
+	@action('set')
 	@pyqtSlot()
-	def takeStillReferenceForMotionTriggering(self):
+	def takeStillReferenceForMotionTriggering(self) -> None:
 		print('MOCK: train stillness for motion triggering')
 	
 	
+	@action('set')
 	@pyqtSlot()
-	def setWhiteBalance(self):
+	def setWhiteBalance(self) -> None:
 		print('MOCK: set white balance')
 	
 	
+	@action('set')
 	@pyqtSlot()
-	def doBlackCalibration(self):
+	def doBlackCalibration(self) -> None:
 		print('MOCK: do black calibration')
 	
 	
+	@action('set')
 	@pyqtSlot(str, result='QVariantMap')
-	def saveCalibrationData(self, toFolder: str):
+	def saveCalibrationData(self, toFolder: str) -> Union[Dict[str, str], None]:
 		#return self.emitError('A fire! Oh no!') #Doesn't work.
 		print(f'MOCK: Save calibration data to {toFolder}.')
 		return {"message": "Out of space."} if 'sda' in toFolder else None
 	
+	@action('set')
 	@pyqtSlot(str, result='QVariantMap')
 	def loadCalibrationData(self, fromFolder: str):
 		print(f'MOCK: Load calibration data.')
 		return None
 	
+	@action('set')
 	@pyqtSlot(str)
 	def applySoftwareUpdate(self, fromFolder: str):
 		print(f'MOCK: Apply software update.')
 		return None
 	
+	@action('get')
 	@pyqtSlot(str, int, result='QVariantMap')
-	def waterfallMotionMap(self, segmentId: str, startFrame: int) -> dict:
+	def waterfallMotionMap(self, segmentId: str, startFrame: int) -> Dict[str, Union[str, bytearray]]:
 		"""Get a waterfall-style heatmap of movement in each of the 16 quadrants of the frame.
 			
 			Arguments:
@@ -794,11 +872,20 @@ class ControlAPIMock(QObject):
 		}
 	
 	
+	@action('set')
 	@pyqtSlot('QVariantList', result='QVariantList')
-	def saveRegions(self, regions: [{"start": int, "end": int, "id": str, "path": str, "format": {'fps': int, 'bpp': int, 'maxBitrate': int}}]) -> [{"success": bool, "msg": str, id: "str"}]:
+	def saveRegions(self, regions: List[Dict[str, Union[int, str, Dict[str, int]]]]) -> List[Dict[str, Union[bool, str]]]:
 		"""Save video clips to disk or network.
 			
 			Accepts a list of regions, returns a list of statuses."""
+		
+		#Regions: [{
+		#	"start": int, 
+		#	"end": int, 
+		#	"id": str,
+		#	"path": str,
+		#	"format": {'fps': int, 'bpp': int, 'maxBitrate': int},
+		#}]
 		
 		return [{ #Each entry in this list a segment of recorded video. Although currently resolution/framerate is always the same having it in this data will make it easier to fix this in the future if we do.
 			"id": "ldPxTT5R",
