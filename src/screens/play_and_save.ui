@@ -266,9 +266,9 @@ Settings</string>
   <widget class="QWidget" name="uiTimelineVisualization" native="true">
    <property name="geometry">
     <rect>
-     <x>0</x>
+     <x>78</x>
      <y>421</y>
-     <width>800</width>
+     <width>644</width>
      <height>59</height>
     </rect>
    </property>
