@@ -124,9 +124,11 @@ def control(*args, **kwargs):
 def get(keyOrKeys):
 	"""Call the camera control DBus get method.
 		
-		Accepts str or [str].
+		Accepts key or [key, …], where keys are strings.
 		
-		Returns value or [value], relatively.
+		Returns value or {key:value, …}, respectively.
+		
+		See control's `available_keys` for a list of valid inputs.
 	"""
 	
 	keyList = [keyOrKeys] if isinstance(keyOrKeys, str) else keyOrKeys

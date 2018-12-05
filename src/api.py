@@ -115,12 +115,19 @@ def control(*args, **kwargs):
 	return msg.value()
 
 
+_camState = control('get', control('available_keys'))
+if(not _camState):
+	raise Exception("Cache failed to populate. This indicates the get call is not working.")
+
+
 def get(keyOrKeys):
 	"""Call the camera control DBus get method.
 		
-		Accepts str or [str].
+		Accepts key or [key, …], where keys are strings.
 		
-		Returns value or [value], relatively.
+		Returns value or {key:value, …}, respectively.
+		
+		See control's `available_keys` for a list of valid inputs.
 	"""
 	
 	keyList = [keyOrKeys] if isinstance(keyOrKeys, str) else keyOrKeys
@@ -141,16 +148,9 @@ def set(values):
 
 
 
-
-
 # State cache for observe(), so it doesn't have to query the status of a variable on each subscription.
-_camState = control('get', control('available_keys'))
-if(not _camState):
-	raise Exception("Cache failed to populate. This indicates the get call is not working.")
 
 # Keep observe()'s state up-to-date.
-# TODO DDR 2018-06-22: This is broken currently, as connect() never returns here.
-# We're going to ignore the fact that this doesn't work for now, as it will only matter if we reinitialize something in the camApp from this cache. 😒
 __wrappers = [] #Keep a reference to the wrapper objects around. Might be needed so they don't get GC'd.
 for key in _camState.keys():
 	class Wrapper(QObject):
