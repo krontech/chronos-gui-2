@@ -328,6 +328,8 @@ class State():
 	showWhiteClippingZebraStripes = True
 	showBlackClippingZebraStripes = True
 	disableOverwritingRingBuffer = False #In segmented mode, disable overwriting earlier recorded ring buffer segments. DDR 2018-06-19: Loial figures this was fixed, but neither of us know why it's hidden in the old UI.
+	
+	nanosegmentLengthPct = 50e9 #0 = no segmentation, which actually = all available frames. Multiply by 1e9 to get the percentage of the available record time that a segment takes. eg, 100e-9 is 100% of the buffer, or one segment. 50e9 grants two segments. 40e9 grants two full-length segments… and half-length one?
 	recordedSegments = [{ #Each entry in this list a segment of recorded video. Although currently resolution/framerate is always the same having it in this data will make it easier to fix this in the future if we do.
 		"start": 0,
 		"end": 1000,
@@ -839,9 +841,13 @@ class ControlAPIMock(QObject):
 	def waterfallMotionMap(self, segmentId: str, startFrame: int) -> Dict[str, Union[str, bytearray]]:
 		"""Get a waterfall-style heatmap of movement in each of the 16 quadrants of the frame.
 			
-			Arguments:
-				segmentId: As returned in from recordedSegments. If no segment exists, an empty
-					array will be returned.
+			Arguments (should be):
+				startFrame: frame to start from, as in recordedSegments, or 0.
+				endFrame: frame to end at, as in recordedSegments or totalRecordedFrames.
+			
+			Note that both startFrame and endFrame are clamped to valid numbers, so
+			providing 0 will *always* result in the first frame, and INT_MAX will always
+			result in the last frame.
 			"""
 		startFrame = startFrame % 1024 #Cycle period of data below.
 		

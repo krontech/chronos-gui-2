@@ -36,7 +36,7 @@
     <number>2</number>
    </property>
    <widget class="QWidget" name="uiRegularPane">
-    <widget class="Label" name="label_3">
+    <widget class="Label" name="uiRegularLengthInSeconds">
      <property name="geometry">
       <rect>
        <x>20</x>
@@ -46,10 +46,10 @@
       </rect>
      </property>
      <property name="text">
-      <string>1000 seconds</string>
+      <string>%d seconds</string>
      </property>
     </widget>
-    <widget class="Label" name="label_4">
+    <widget class="Label" name="uiRegularLengthInFrames">
      <property name="geometry">
       <rect>
        <x>20</x>
@@ -59,7 +59,7 @@
       </rect>
      </property>
      <property name="text">
-      <string>133213 frames</string>
+      <string>%d frames</string>
      </property>
     </widget>
     <widget class="HeaderLabel" name="headerlabel_4">
@@ -101,7 +101,7 @@
       <string>Number of Segments</string>
      </property>
     </widget>
-    <widget class="Label" name="label_5">
+    <widget class="Label" name="uiRegularLengthNumSegments">
      <property name="geometry">
       <rect>
        <x>310</x>
@@ -142,7 +142,7 @@
       <string>Number of Segments</string>
      </property>
     </widget>
-    <widget class="SpinBox" name="spinbox">
+    <widget class="SpinBox" name="uiSegmentLengthInFrames">
      <property name="geometry">
       <rect>
        <x>0</x>
@@ -155,7 +155,7 @@
       <enum>SpinBox::half</enum>
      </property>
     </widget>
-    <widget class="DecimalSpinBox" name="decimalspinbox">
+    <widget class="DecimalSpinBox" name="uiSegmentLengthInSeconds">
      <property name="geometry">
       <rect>
        <x>0</x>
@@ -168,7 +168,7 @@
       <enum>DecimalSpinBox::half</enum>
      </property>
     </widget>
-    <widget class="SpinBox" name="spinbox_2">
+    <widget class="SpinBox" name="uiSegmentLengthNumSegments">
      <property name="geometry">
       <rect>
        <x>290</x>
@@ -219,7 +219,7 @@
     </widget>
    </widget>
    <widget class="QWidget" name="uiRunAndGunPane">
-    <widget class="Label" name="label_6">
+    <widget class="Label" name="uiRunNGunTimeInFrames">
      <property name="geometry">
       <rect>
        <x>20</x>
@@ -258,7 +258,7 @@
       <string>Record Length</string>
      </property>
     </widget>
-    <widget class="Label" name="label_7">
+    <widget class="Label" name="uiRunNGunTimeInSeconds">
      <property name="geometry">
       <rect>
        <x>20</x>
@@ -271,7 +271,7 @@
       <string>1000 seconds in total</string>
      </property>
     </widget>
-    <widget class="Label" name="label_8">
+    <widget class="Label" name="uiRunNGunNumSegments">
      <property name="geometry">
       <rect>
        <x>310</x>
@@ -388,6 +388,13 @@
    <header>spin_box</header>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>uiDone</tabstop>
+  <tabstop>uiRecordMode</tabstop>
+  <tabstop>uiSegmentLengthInSeconds</tabstop>
+  <tabstop>uiSegmentLengthNumSegments</tabstop>
+  <tabstop>uiSegmentLengthInFrames</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>
