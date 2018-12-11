@@ -56,6 +56,7 @@ class PrimarySettings(QtWidgets.QDialog):
 		self.uiRemoteAccess.clicked.connect(lambda: window.show('remote_access'))
 		self.uiFactoryUtilities.clicked.connect(lambda: window.show('service_screen.locked'))
 		self.uiFileSaving.clicked.connect(lambda: window.show('file_settings'))
+		self.uiStorage.clicked.connect(lambda: window.show('storage'))
 		self.uiUpdateCamera.clicked.connect(lambda: window.show('update_firmware'))
 		self.uiUserSettings.clicked.connect(lambda: window.show('user_settings'))
 		self.uiDone.clicked.connect(window.back)

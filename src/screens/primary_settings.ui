@@ -141,7 +141,7 @@ Unsaved Video in RAM</string>
    <property name="geometry">
     <rect>
      <x>570</x>
-     <y>210</y>
+     <y>180</y>
      <width>211</width>
      <height>41</height>
     </rect>
@@ -160,7 +160,7 @@ Unsaved Video in RAM</string>
    <property name="geometry">
     <rect>
      <x>570</x>
-     <y>310</y>
+     <y>300</y>
      <width>211</width>
      <height>61</height>
     </rect>
@@ -214,7 +214,7 @@ Unsaved Video in RAM</string>
    <property name="geometry">
     <rect>
      <x>570</x>
-     <y>160</y>
+     <y>140</y>
      <width>211</width>
      <height>41</height>
     </rect>
@@ -343,7 +343,7 @@ Unsaved Video in RAM</string>
    <property name="geometry">
     <rect>
      <x>570</x>
-     <y>110</y>
+     <y>100</y>
      <width>211</width>
      <height>41</height>
     </rect>
@@ -358,6 +358,61 @@ Unsaved Video in RAM</string>
     <enum>Button::none</enum>
    </property>
   </widget>
+  <widget class="FeedbackLabel" name="uiSystemClockFeedback">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>460</y>
+     <width>531</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Date not formatted correctly; format is YYYY-MM-DD HH:MM:SS AM or PM.</string>
+   </property>
+  </widget>
+  <widget class="Button" name="uiStorage">
+   <property name="geometry">
+    <rect>
+     <x>570</x>
+     <y>220</y>
+     <width>211</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Storage</string>
+   </property>
+   <property name="clickMarginTopSetter" stdset="0">
+    <enum>Button::none</enum>
+   </property>
+   <property name="clickMarginBottomSetter" stdset="0">
+    <enum>Button::none</enum>
+   </property>
+  </widget>
+  <zorder>backdrop</zorder>
+  <zorder>headerlabel</zorder>
+  <zorder>label</zorder>
+  <zorder>label_2</zorder>
+  <zorder>label_3</zorder>
+  <zorder>label_4</zorder>
+  <zorder>label_5</zorder>
+  <zorder>label_6</zorder>
+  <zorder>headerlabel_2</zorder>
+  <zorder>uiFileSaving</zorder>
+  <zorder>uiUserSettings</zorder>
+  <zorder>uiAboutCamera</zorder>
+  <zorder>uiUpdateCamera</zorder>
+  <zorder>uiFactoryUtilities</zorder>
+  <zorder>uiDone</zorder>
+  <zorder>uiAskBeforeDiscarding</zorder>
+  <zorder>uiInterfaceRotated</zorder>
+  <zorder>uiInterfaceSide</zorder>
+  <zorder>uiLayoutPreview</zorder>
+  <zorder>uiRemoteAccess</zorder>
+  <zorder>uiSystemClockFeedback</zorder>
+  <zorder>uiSystemTime</zorder>
+  <zorder>uiStorage</zorder>
  </widget>
  <customwidgets>
   <customwidget>
@@ -376,6 +431,11 @@ Unsaved Video in RAM</string>
    <header>combo_box</header>
   </customwidget>
   <customwidget>
+   <class>FeedbackLabel</class>
+   <extends>QLabel</extends>
+   <header>feedback_label</header>
+  </customwidget>
+  <customwidget>
    <class>HeaderLabel</class>
    <extends>QLabel</extends>
    <header>header_label</header>
@@ -391,6 +451,20 @@ Unsaved Video in RAM</string>
    <header>line_edit</header>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>uiDone</tabstop>
+  <tabstop>uiInterfaceSide</tabstop>
+  <tabstop>uiInterfaceRotated</tabstop>
+  <tabstop>uiAskBeforeDiscarding</tabstop>
+  <tabstop>uiSystemTime</tabstop>
+  <tabstop>uiAboutCamera</tabstop>
+  <tabstop>uiRemoteAccess</tabstop>
+  <tabstop>uiFactoryUtilities</tabstop>
+  <tabstop>uiFileSaving</tabstop>
+  <tabstop>uiStorage</tabstop>
+  <tabstop>uiUpdateCamera</tabstop>
+  <tabstop>uiUserSettings</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>
