@@ -92,10 +92,11 @@ class PrimarySettings(QtWidgets.QDialog):
 	def sysTimeFocusOut(self, evt):
 		try:
 			newTime = datetime.strptime(self.uiSystemTime.text(), "%Y-%m-%d %I:%M:%S %p")
-			api.set({'datetime': newTime.isoformat()}) #This causes stopEditingDate to be called, when datetime is updated.
 		except ValueError: #Probably means we couldn't parse the date.
-			#TODO DDR 2018-09-20: Actually, you know, indicate this visually somehow.
-			print("Couldn't parse date. 😭")
+			return self.uiSystemClockFeedback.showError("Date not formatted correctly; format is YYYY-MM-DD HH:MM:SS AM or PM.")
+		
+		api.set({'datetime': newTime.isoformat()}) #This causes stopEditingDate to be called, when datetime is updated.
+		self.uiSystemClockFeedback.showMessage("System date updated.")
 		
 	def sysTimeBeingEdited(self):
 		return self.editingSystemTime #self.uiSystemTime.hasFocus() doesn't work if invalid
