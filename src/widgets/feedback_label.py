@@ -22,13 +22,19 @@ class FeedbackLabel(QLabel):
 		if not showHitRects:
 			self.hide()
 			
-
-
+		self._hideMessageTimer = QtCore.QTimer()
+		self._hideMessageTimer.timeout.connect(self.hide)
+	
+	
 	def sizeHint(self):
 		return QSize(141, 21)
 	
-	def showError(self, message: str) -> None:
-		"""Show an error message. Use .hide() when the condition has passed."""
+	
+	def showError(self, message: str='', *, timeout: int=0) -> None:
+		"""Show a highlighted error message.
+			
+			Use .hide() when the condition has passed, or specify a
+			timeout=x in seconds if the error is transient."""
 		
 		self.setStyleSheet(f"""
 			font-size: 14px;
@@ -36,11 +42,17 @@ class FeedbackLabel(QLabel):
 			color: #c80000;
 		""")
 		
-		self.setText(message)
+		message and self.setText(message)
 		self.show()
+		timeout and self._hideMessageTimer.start(timeout*1000)
 	
-	def showMessage(self, message: str) -> None:
-		"""Show a feedback message. Use .hide() when the condition has passed."""
+	
+	def showMessage(self, message: str='', *, timeout: int=30) -> None:
+		"""Show a non-highlighted feedback message.
+			
+			Hides itself after 30 seconds. Can be overridden by
+			setting timeout = x seconds. If x is 0 (or None), don't
+			auto-hide."""
 		
 		self.setStyleSheet(f"""
 			font-size: 14px;
@@ -48,6 +60,6 @@ class FeedbackLabel(QLabel):
 			color: #000000;
 		""")
 		
-		self.setText(message)
+		message and self.setText(message)
 		self.show()
-	
+		timeout and self._hideMessageTimer.start(timeout*1000)
