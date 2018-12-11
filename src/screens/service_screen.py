@@ -49,11 +49,11 @@ class ServiceScreenUnlocked(QtWidgets.QDialog):
 		self.setAttribute(QtCore.Qt.WA_TranslucentBackground, True)
 		
 		# Button binding.
-		self.uiAutoCal.clicked.connect(lambda: api.control('autoFactoryCal', 'tempest shadow'))
-		self.uiAdcOffset.clicked.connect(lambda: api.control('adcOffsetCal', 'tempest shadow'))
-		self.uiColumnGain.clicked.connect(lambda: api.control('columnGainCal', 'tempest shadow'))
-		self.uiBlackCalAll.clicked.connect(lambda: api.control('blackCalAllStandard', 'tempest shadow'))
-		self.uiWhiteRef.clicked.connect(lambda: api.control('whiteRefCal', 'tempest shadow'))
+		self.uiAutoCal.clicked.connect(lambda: api.control('autoFactoryCal', 'correct horse battery staple'))
+		self.uiAdcOffset.clicked.connect(lambda: api.control('adcOffsetCal', 'correct horse battery staple'))
+		self.uiColumnGain.clicked.connect(lambda: api.control('columnGainCal', 'correct horse battery staple'))
+		self.uiBlackCalAll.clicked.connect(lambda: api.control('blackCalAllStandard', 'correct horse battery staple'))
+		self.uiWhiteRef.clicked.connect(lambda: api.control('whiteRefCal', 'correct horse battery staple'))
 		self.uiCloseApp.clicked.connect(QtWidgets.QApplication.closeAllWindows)
 		
 		settings.observe('debug controls enabled', lambda x='False':

@@ -749,9 +749,9 @@ class ControlAPIMock(QObject):
 	
 	@action('set')
 	@pyqtSlot(str)
-	def autoFactoryCal(self, safeword: str) -> None:
-		if(safeword != 'tempest shadow'): #The safeword (which is not a password, and confers no security) is a safty precaution to prevent the API call from being placed inadvertently during normal scripting. It can be quite hard to undo the effects these factory functions.
-			print('incorrect safeword specified')
+	def autoFactoryCal(self, passphrase: str) -> None:
+		if(passphrase != 'correct horse battery staple'): #The passphrase (which is not a password, and confers no security) is a safty precaution to prevent the API call from being placed inadvertently during normal scripting. It can be quite hard to undo the effects these factory functions.
+			print('incorrect passphrase specified')
 			return
 		
 		print('MOCK: perform auto factory calibration')
@@ -759,9 +759,9 @@ class ControlAPIMock(QObject):
 	
 	@action('set')
 	@pyqtSlot(str)
-	def adcOffsetCal(self, safeword: str) -> None:
-		if(safeword != 'tempest shadow'): 
-			print('incorrect safeword specified')
+	def adcOffsetCal(self, passphrase: str) -> None:
+		if(passphrase != 'correct horse battery staple'): 
+			print('incorrect passphrase specified')
 			return
 		
 		print('MOCK: perform adc offset calibration')
@@ -769,9 +769,9 @@ class ControlAPIMock(QObject):
 	
 	@action('set')
 	@pyqtSlot(str)
-	def columnGainCal(self, safeword: str) -> None:
-		if(safeword != 'tempest shadow'): 
-			print('incorrect safeword specified')
+	def columnGainCal(self, passphrase: str) -> None:
+		if(passphrase != 'correct horse battery staple'): 
+			print('incorrect passphrase specified')
 			return
 		
 		print('MOCK: perform column gain calibration')
@@ -779,9 +779,9 @@ class ControlAPIMock(QObject):
 	
 	@action('set')
 	@pyqtSlot(str)
-	def blackCalAllStandard(self, safeword: str) -> None:
-		if(safeword != 'tempest shadow'):
-			print('incorrect safeword specified')
+	def blackCalAllStandard(self, passphrase: str) -> None:
+		if(passphrase != 'correct horse battery staple'):
+			print('incorrect passphrase specified')
 			return
 		
 		print('MOCK: perform black calibration, all standard resolutions')
@@ -789,9 +789,9 @@ class ControlAPIMock(QObject):
 	
 	@action('set')
 	@pyqtSlot(str)
-	def whiteRefCal(self, safeword: str) -> None:
-		if(safeword != 'tempest shadow'): 
-			print('incorrect safeword specified')
+	def whiteRefCal(self, passphrase: str) -> None:
+		if(passphrase != 'correct horse battery staple'): 
+			print('incorrect passphrase specified')
 			return
 		
 		print('MOCK: perform white reference calibration')
