@@ -9,6 +9,11 @@ IFS=$'\n'
 trap "{ stty sane; echo; kill 0; }" EXIT #Kill all children when we die. (This cleans up any windows lying around.) Also restore the console (keyboard stops being echoed after ctrl-c'ing out of pdb) and advance to a new line before printing the prompt again. When python is in pdb() on the camera, it will not respond to anything other than -9 unfortunately.
 
 bash <<< "#sh doesn't do the equality test for 143, must use bash
+	QSG_RENDER_LOOP=basic
+	QT_QUICK_BACKEND=software
+	QT_QPA_PLATFORM=linuxfb:fb=/dev/fb1 #Tell qt to use use framebuffer vs X. (Video is displayed to fb0.)
+	XDG_RUNTIME_DIR=/tmp/runtime-root #quiet a qt warning
+	
 	while true; do
 		sleep 2 &
 		python3 src/main.py < `readlink -f /dev/stdin` 2> `readlink -f /dev/stderr`
