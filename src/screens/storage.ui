@@ -36,63 +36,6 @@
     <string>Storage</string>
    </property>
   </widget>
-  <widget class="Label" name="label">
-   <property name="geometry">
-    <rect>
-     <x>20</x>
-     <y>300</y>
-     <width>181</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="font">
-    <font>
-     <weight>75</weight>
-     <bold>true</bold>
-    </font>
-   </property>
-   <property name="text">
-    <string>Mounted Devices</string>
-   </property>
-  </widget>
-  <widget class="Label" name="label_2">
-   <property name="geometry">
-    <rect>
-     <x>20</x>
-     <y>100</y>
-     <width>181</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="font">
-    <font>
-     <weight>75</weight>
-     <bold>true</bold>
-    </font>
-   </property>
-   <property name="text">
-    <string>USB/SATA Storage</string>
-   </property>
-  </widget>
-  <widget class="Label" name="label_3">
-   <property name="geometry">
-    <rect>
-     <x>20</x>
-     <y>200</y>
-     <width>200</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="font">
-    <font>
-     <weight>75</weight>
-     <bold>true</bold>
-    </font>
-   </property>
-   <property name="text">
-    <string>SD Card Storage</string>
-   </property>
-  </widget>
   <widget class="Button" name="uiDone">
    <property name="geometry">
     <rect>
@@ -161,26 +104,6 @@
     </property>
     <property name="clickMarginTopSetter" stdset="0">
      <enum>LineEdit::none</enum>
-    </property>
-   </widget>
-   <widget class="Label" name="label_4">
-    <property name="geometry">
-     <rect>
-      <x>20</x>
-      <y>20</y>
-      <width>161</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <pointsize>-1</pointsize>
-      <weight>75</weight>
-      <bold>true</bold>
-     </font>
-    </property>
-    <property name="text">
-     <string>Network Storage</string>
     </property>
    </widget>
    <widget class="Label" name="label_6">
@@ -263,8 +186,20 @@
      <enum>Button::half</enum>
     </property>
    </widget>
+   <widget class="Subheader" name="subheader_3">
+    <property name="geometry">
+     <rect>
+      <x>130</x>
+      <y>20</y>
+      <width>241</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Network Storage:</string>
+    </property>
+   </widget>
    <zorder>label_8</zorder>
-   <zorder>label_4</zorder>
    <zorder>label_6</zorder>
    <zorder>label_7</zorder>
    <zorder>label_5</zorder>
@@ -272,6 +207,7 @@
    <zorder>uiNetworkStoragePassoword</zorder>
    <zorder>uiNetworkStorageAddress</zorder>
    <zorder>uiNetworkStorageTestConnection</zorder>
+   <zorder>subheader_3</zorder>
   </widget>
   <widget class="Label" name="uiMountedDeviceList">
    <property name="geometry">
@@ -281,6 +217,19 @@
      <width>591</width>
      <height>151</height>
     </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Monospace</family>
+     <pointsize>-1</pointsize>
+    </font>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">
+			font-size: 16px;
+			background: transparent;
+			font-family: Monospace;
+		</string>
    </property>
    <property name="text">
     <string>NAME        MAJ:MIN RM   SIZE RO TYPE MOUNTPOINT
@@ -366,7 +315,7 @@ mmcblk0     179:0    0   7.4G  0 disk
     </rect>
    </property>
    <property name="text">
-    <string>Configure where files can be saved to.</string>
+    <string>Configure places files can be saved to.</string>
    </property>
   </widget>
   <widget class="Button" name="uiFileSaving">
@@ -385,6 +334,58 @@ mmcblk0     179:0    0   7.4G  0 disk
     <enum>Button::half</enum>
    </property>
   </widget>
+  <widget class="Comment" name="comment">
+   <property name="geometry">
+    <rect>
+     <x>58</x>
+     <y>404</y>
+     <width>231</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>⭎ Make sure this is Monospace font! Designer tends to forget if it's not set in the CSS.</string>
+   </property>
+  </widget>
+  <widget class="Subheader" name="subheader">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>100</y>
+     <width>241</width>
+     <height>24</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>USB/SATA Storage:</string>
+   </property>
+  </widget>
+  <widget class="Subheader" name="subheader_2">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>200</y>
+     <width>241</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>SD Card Storage:</string>
+   </property>
+  </widget>
+  <widget class="Subheader" name="subheader_4">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>300</y>
+     <width>241</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Mounted Devices:</string>
+   </property>
+  </widget>
  </widget>
  <customwidgets>
   <customwidget>
@@ -396,6 +397,11 @@ mmcblk0     179:0    0   7.4G  0 disk
    <class>Button</class>
    <extends>QPushButton</extends>
    <header>button</header>
+  </customwidget>
+  <customwidget>
+   <class>Comment</class>
+   <extends>QLabel</extends>
+   <header>comment</header>
   </customwidget>
   <customwidget>
    <class>HeaderLabel</class>
@@ -411,6 +417,11 @@ mmcblk0     179:0    0   7.4G  0 disk
    <class>LineEdit</class>
    <extends>QLineEdit</extends>
    <header>line_edit</header>
+  </customwidget>
+  <customwidget>
+   <class>Subheader</class>
+   <extends>QLabel</extends>
+   <header>subheader</header>
   </customwidget>
  </customwidgets>
  <tabstops>
