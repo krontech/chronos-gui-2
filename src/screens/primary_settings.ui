@@ -134,20 +134,20 @@ Unsaved Video in RAM</string>
     </rect>
    </property>
    <property name="text">
-    <string>Utilities &amp; Options</string>
+    <string>Other</string>
    </property>
   </widget>
   <widget class="Button" name="uiFileSaving">
    <property name="geometry">
     <rect>
      <x>570</x>
-     <y>180</y>
+     <y>260</y>
      <width>211</width>
      <height>41</height>
     </rect>
    </property>
    <property name="text">
-    <string>File Saving</string>
+    <string>Video Saving</string>
    </property>
    <property name="clickMarginTopSetter" stdset="0">
     <enum>Button::none</enum>
@@ -195,7 +195,7 @@ Unsaved Video in RAM</string>
    <property name="geometry">
     <rect>
      <x>570</x>
-     <y>260</y>
+     <y>220</y>
      <width>211</width>
      <height>41</height>
     </rect>
@@ -214,7 +214,7 @@ Unsaved Video in RAM</string>
    <property name="geometry">
     <rect>
      <x>570</x>
-     <y>140</y>
+     <y>180</y>
      <width>211</width>
      <height>41</height>
     </rect>
@@ -375,13 +375,13 @@ Unsaved Video in RAM</string>
    <property name="geometry">
     <rect>
      <x>570</x>
-     <y>220</y>
+     <y>140</y>
      <width>211</width>
      <height>41</height>
     </rect>
    </property>
    <property name="text">
-    <string>Storage</string>
+    <string>Configure Storage</string>
    </property>
    <property name="clickMarginTopSetter" stdset="0">
     <enum>Button::none</enum>
@@ -459,10 +459,10 @@ Unsaved Video in RAM</string>
   <tabstop>uiSystemTime</tabstop>
   <tabstop>uiAboutCamera</tabstop>
   <tabstop>uiRemoteAccess</tabstop>
-  <tabstop>uiFactoryUtilities</tabstop>
-  <tabstop>uiFileSaving</tabstop>
   <tabstop>uiStorage</tabstop>
+  <tabstop>uiFactoryUtilities</tabstop>
   <tabstop>uiUpdateCamera</tabstop>
+  <tabstop>uiFileSaving</tabstop>
   <tabstop>uiUserSettings</tabstop>
  </tabstops>
  <resources/>
