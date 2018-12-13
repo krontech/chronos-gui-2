@@ -28,5 +28,3 @@ class Comment(QLabel):
 
 	def sizeHint(self):
 		return QSize(241, 51)
-		
-		

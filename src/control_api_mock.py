@@ -22,6 +22,7 @@
 import sys
 import random
 from typing import *
+from time import sleep
 
 from PyQt5.QtCore import pyqtSlot, QObject, QTimer, Qt, QByteArray
 from PyQt5.QtDBus import QDBusConnection, QDBusMessage, QDBusError
@@ -76,6 +77,10 @@ def stringifyTypeClasses(typeClass: Any) -> str:
 		return typeClass._name or 'Any' #Seems to be Unions mess it up, but I don't know how to break them.
 	
 	raise Exception(f'Unknown typeClass {typeClass}')
+
+def removeWhitespace(text:str):
+	"""Remove all leading and trailing whitespace from each line of a string."""
+	return '\n'.join(filter(lambda x:x, map(str.strip, text.split('\n'))))
 
 
 ########################
@@ -555,8 +560,8 @@ class State():
 			
 			Maps contain the following keys:
 				name: The given name of the partition.
-				device: The name of the device the partition is on. If
-					a device has more than one partition, each
+				device: The name of the device the partition is on.
+					If a device has more than one partition, each
 					partition will have the same device name.
 				path: Where in the [camera] filesystem the device is
 					mounted to. Unlike name, guaranteed to be unique.
@@ -564,6 +569,8 @@ class State():
 				free: The amount of available space on the partition,
 					in bytes. Note that size and free may not fit in
 					a 32-bit integer.
+				interface: Either a "usb" drive, an "sd" card port,
+					or a "network" mount.
 			"""
 		
 		return [{
@@ -572,21 +579,35 @@ class State():
 			"path": "/dev/sda",
 			"size": 1294839100, #bytes, 64-bit positive integer
 			"free": 4591,
+			"interface": "usb", #"usb" or "sd"
 		},{
 			"name": "Toastdesk",
 			"device": "sdc1",
 			"path": "/dev/sdc1",
 			"size": 2930232316000,
 			"free": 1418341032982,
+			"interface": "usb", 
 		}]
 	
 	networkPassword = 'chronos' #Change this to be initally blank in the non-mock API. A blank password *means* no network access at all.
-	localHTTPAccess = True
+	localHTTPAccess = True #If this changes, something must shut down or start the web server. The only thing the server will do is start up on the right HTTP port; it will even need to be restarted if that changes. (However, the server does not need to be restarted for changes to the password. The hash is re-updated as it changes.)
 	localSSHAccess = True
 	remoteHTTPAccess = True
 	remoteSSHAccess = True
-	HTTPPort = 8080
-	SSHPort = 8022
+	HTTPPort = 80
+	SSHPort = 22
+	
+	networkStorageAddress = "smb://192.168.1.201/Something"
+	networkStorageUsername = "ns username"
+	_networkStoragePassword = "ns password" #This can't be a secure storage method, but I don't know how else to do it. Perhaps there is no way? Do we have a keychain on the OS we can use that would help, given we don't have password-authenticated logins?
+	
+	@property
+	def networkStoragePassword(self):
+		return "•••••••" if self._networkStoragePassword else "" #Don't make reading out the password easy, at least. This interface should support write-only passwords in the future, too.
+	
+	@networkStoragePassword.setter
+	def networkStoragePassword(self, value):
+		self._networkStoragePassword = value
 	
 	@property
 	def networkInterfaces(self) -> List[Dict[str,str]]:
@@ -902,3 +923,59 @@ class ControlAPIMock(QObject):
 			"success": False,
 			"message": "Network error.",
 		}]
+	
+	@action('set')
+	@pyqtSlot(str)
+	def formatStorage(self, device):
+		"""Reformat the block device for video saving.
+			
+			See the gettable "externalStorage" property for a list of
+			mounted external storage partitions. Each partition has a
+			device associated with it. Formatting the device will
+			coalesce and erase all existing partitions and files."""
+		
+		print(f"MOCK: Formatting device {device}…", end='', flush=True)
+		sleep(2)
+		print(" done.")
+	
+	@action('set')
+	@pyqtSlot(str)
+	def unmount(self, path):
+		"""Unmount the partition mounted at path.
+			
+			See the gettable "externalStorage" property for a list of
+			mounted external storage partitions. To remount a device,
+			either reinsert it or SSH into the camera and use the
+			mount command. (See "man mount" for more details.)"""
+		
+		print(f"MOCK: Unmounting {path}.")
+	
+	@action('get')
+	@pyqtSlot(result=str)
+	def df(self, ):
+		"""Run the df linux command, and return the output.
+			
+			Basically, returns a string with information about each partition.
+			Forms a nice little table if printed with a fixed-width font. See
+			"man df" for more details."""
+		
+		return removeWhitespace("""
+			NAME        MAJ:MIN RM   SIZE RO TYPE MOUNTPOINT
+			mmcblk0     179:0    0   7.4G  0 disk
+			|-mmcblk0p1 179:1    0  39.2M  0 part /boot
+			`-mmcblk0p2 179:2    0   7.4G  0 part /
+		""")
+	
+	
+	@action('set')
+	@pyqtSlot(result=str)
+	def testNetworkStorageCredentials(self):
+		"""Check the remote file share works.
+			
+			Returns an error message upon failure, or an empty string
+			on success."""
+		
+		print("MOCK: Checking network storage…", end='', flush=True)
+		sleep(3)
+		print(" ok.")
+		return ""

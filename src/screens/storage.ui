@@ -58,22 +58,9 @@
      <x>350</x>
      <y>10</y>
      <width>461</width>
-     <height>301</height>
+     <height>411</height>
     </rect>
    </property>
-   <widget class="Label" name="label_8">
-    <property name="geometry">
-     <rect>
-      <x>130</x>
-      <y>270</y>
-      <width>271</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>IP address, netmask, and status?</string>
-    </property>
-   </widget>
    <widget class="LineEdit" name="uiNetworkStorageUsername">
     <property name="geometry">
      <rect>
@@ -88,6 +75,9 @@
     </property>
     <property name="clickMarginBottomSetter" stdset="0">
      <enum>LineEdit::half</enum>
+    </property>
+    <property name="linkedValueName" stdset="0">
+     <string>networkStorageUsername</string>
     </property>
    </widget>
    <widget class="LineEdit" name="uiNetworkStoragePassoword">
@@ -104,6 +94,9 @@
     </property>
     <property name="clickMarginTopSetter" stdset="0">
      <enum>LineEdit::none</enum>
+    </property>
+    <property name="linkedValueName" stdset="0">
+     <string>networkStoragePassword</string>
     </property>
    </widget>
    <widget class="Label" name="label_6">
@@ -153,6 +146,9 @@
     <property name="clickMarginBottomSetter" stdset="0">
      <enum>LineEdit::none</enum>
     </property>
+    <property name="linkedValueName" stdset="0">
+     <string>networkStorageAddress</string>
+    </property>
    </widget>
    <widget class="Label" name="label_5">
     <property name="geometry">
@@ -170,7 +166,7 @@
      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
     </property>
    </widget>
-   <widget class="Button" name="uiNetworkStorageTestConnection">
+   <widget class="Button" name="uiTestNetworkStorage">
     <property name="geometry">
      <rect>
       <x>110</x>
@@ -199,15 +195,31 @@
      <string>Network Storage:</string>
     </property>
    </widget>
-   <zorder>label_8</zorder>
+   <widget class="FeedbackLabel" name="uiTestNetworkStorageFeedback">
+    <property name="geometry">
+     <rect>
+      <x>130</x>
+      <y>250</y>
+      <width>251</width>
+      <height>151</height>
+     </rect>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+    </property>
+    <property name="customStyleSheet" stdset="0">
+     <string>background: white; /*Cover up Mounted Devices if needed.*/</string>
+    </property>
+   </widget>
    <zorder>label_6</zorder>
    <zorder>label_7</zorder>
    <zorder>label_5</zorder>
    <zorder>uiNetworkStorageUsername</zorder>
    <zorder>uiNetworkStoragePassoword</zorder>
    <zorder>uiNetworkStorageAddress</zorder>
-   <zorder>uiNetworkStorageTestConnection</zorder>
    <zorder>subheader_3</zorder>
+   <zorder>uiTestNetworkStorageFeedback</zorder>
+   <zorder>uiTestNetworkStorage</zorder>
   </widget>
   <widget class="Label" name="uiMountedDeviceList">
    <property name="geometry">
@@ -218,12 +230,6 @@
      <height>151</height>
     </rect>
    </property>
-   <property name="font">
-    <font>
-     <family>Monospace</family>
-     <pointsize>-1</pointsize>
-    </font>
-   </property>
    <property name="styleSheet">
     <string notr="true">
 			font-size: 16px;
@@ -232,10 +238,13 @@
 		</string>
    </property>
    <property name="text">
-    <string>NAME        MAJ:MIN RM   SIZE RO TYPE MOUNTPOINT
+    <string>NAME        MAJ:MIN RM   SIZE RO TYPE MOUNTPOINT TEST
 mmcblk0     179:0    0   7.4G  0 disk
 |-mmcblk0p1 179:1    0  39.2M  0 part /boot
 `-mmcblk0p2 179:2    0   7.4G  0 part /</string>
+   </property>
+   <property name="textFormat">
+    <enum>Qt::PlainText</enum>
    </property>
    <property name="alignment">
     <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
@@ -309,7 +318,7 @@ mmcblk0     179:0    0   7.4G  0 disk
    <property name="geometry">
     <rect>
      <x>20</x>
-     <y>50</y>
+     <y>57</y>
      <width>361</width>
      <height>21</height>
     </rect>
@@ -340,11 +349,11 @@ mmcblk0     179:0    0   7.4G  0 disk
      <x>58</x>
      <y>404</y>
      <width>231</width>
-     <height>41</height>
+     <height>71</height>
     </rect>
    </property>
    <property name="text">
-    <string>⭎ Make sure this is Monospace font! Designer tends to forget if it's not set in the CSS.</string>
+    <string>⭎ Make sure this is Monospace font! Designer tends to forget if it's not set in the CSS. Also, it prints QFont::setPointSize errors. 😒</string>
    </property>
   </widget>
   <widget class="Subheader" name="subheader">
@@ -386,6 +395,82 @@ mmcblk0     179:0    0   7.4G  0 disk
     <string>Mounted Devices:</string>
    </property>
   </widget>
+  <widget class="Comment" name="comment_2">
+   <property name="geometry">
+    <rect>
+     <x>190</x>
+     <y>90</y>
+     <width>151</width>
+     <height>51</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Pop up a choose dialog if more than one drive plugged in?</string>
+   </property>
+  </widget>
+  <widget class="FeedbackLabel" name="uiUSBStorageFeedback">
+   <property name="geometry">
+    <rect>
+     <x>30</x>
+     <y>170</y>
+     <width>241</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Multiple USB drives available.
+Disconnect all but one.</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+   </property>
+  </widget>
+  <widget class="FeedbackLabel" name="uiSDStorageFeedback">
+   <property name="geometry">
+    <rect>
+     <x>30</x>
+     <y>270</y>
+     <width>241</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>«error message
+will go here»</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+   </property>
+  </widget>
+  <widget class="Backdrop" name="uiButtonWhiteBorder">
+   <property name="geometry">
+    <rect>
+     <x>470</x>
+     <y>410</y>
+     <width>331</width>
+     <height>71</height>
+    </rect>
+   </property>
+  </widget>
+  <zorder>backdrop</zorder>
+  <zorder>headerlabel</zorder>
+  <zorder>uiMountedDeviceList</zorder>
+  <zorder>uiFormatUSB</zorder>
+  <zorder>uiEjectUSB</zorder>
+  <zorder>uiEjectSD</zorder>
+  <zorder>uiFormatSD</zorder>
+  <zorder>label_10</zorder>
+  <zorder>comment</zorder>
+  <zorder>subheader</zorder>
+  <zorder>subheader_2</zorder>
+  <zorder>subheader_4</zorder>
+  <zorder>comment_2</zorder>
+  <zorder>uiUSBStorageFeedback</zorder>
+  <zorder>uiSDStorageFeedback</zorder>
+  <zorder>widget</zorder>
+  <zorder>uiButtonWhiteBorder</zorder>
+  <zorder>uiFileSaving</zorder>
+  <zorder>uiDone</zorder>
  </widget>
  <customwidgets>
   <customwidget>
@@ -402,6 +487,11 @@ mmcblk0     179:0    0   7.4G  0 disk
    <class>Comment</class>
    <extends>QLabel</extends>
    <header>comment</header>
+  </customwidget>
+  <customwidget>
+   <class>FeedbackLabel</class>
+   <extends>QLabel</extends>
+   <header>feedback_label</header>
   </customwidget>
   <customwidget>
    <class>HeaderLabel</class>
@@ -433,7 +523,7 @@ mmcblk0     179:0    0   7.4G  0 disk
   <tabstop>uiNetworkStorageAddress</tabstop>
   <tabstop>uiNetworkStorageUsername</tabstop>
   <tabstop>uiNetworkStoragePassoword</tabstop>
-  <tabstop>uiNetworkStorageTestConnection</tabstop>
+  <tabstop>uiTestNetworkStorage</tabstop>
  </tabstops>
  <resources/>
  <connections/>
