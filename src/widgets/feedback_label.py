@@ -1,5 +1,5 @@
 from PyQt5.QtWidgets import QLabel
-from PyQt5.QtCore import QSize
+from PyQt5.QtCore import QSize, pyqtProperty
 
 from debugger import *; dbg
 
@@ -14,6 +14,8 @@ class FeedbackLabel(QLabel):
 	
 	def __init__(self, parent=None, showHitRects=False):
 		super().__init__(parent)
+		
+		self._customStyleSheet = ''
 		
 		# Set some default text, so we can see the widget.
 		if not self.text():
@@ -30,6 +32,14 @@ class FeedbackLabel(QLabel):
 		return QSize(141, 21)
 	
 	
+	def refreshStyle(self):
+		self.setStyleSheet(f"""
+			font-size: 14px;
+			background: transparent;
+			color: #c80000;
+		""" + self._customStyleSheet)
+	
+	
 	def showError(self, message: str='', *, timeout: int=0) -> None:
 		"""Show a highlighted error message.
 			
@@ -40,7 +50,7 @@ class FeedbackLabel(QLabel):
 			font-size: 14px;
 			background: transparent;
 			color: #c80000;
-		""")
+		""" + self._customStyleSheet)
 		
 		message and self.setText(message)
 		self.show()
@@ -58,8 +68,18 @@ class FeedbackLabel(QLabel):
 			font-size: 14px;
 			background: transparent;
 			color: #000000;
-		""")
+		""" + self._customStyleSheet)
 		
 		message and self.setText(message)
 		self.show()
 		timeout and self._hideMessageTimer.start(timeout*1000)
+	
+	
+	@pyqtProperty(str)
+	def customStyleSheet(self):
+		return self._customStyleSheet
+	
+	@customStyleSheet.setter
+	def customStyleSheet(self, styleSheet):
+		self._customStyleSheet = styleSheet
+		self.refreshStyle()
