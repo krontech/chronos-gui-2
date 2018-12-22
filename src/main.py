@@ -16,6 +16,10 @@ import settings
 from hardware import Hardware
 from widgets.focus_ring import FocusRing
 
+#Our settings
+PRECACHE_ALL_SCREENS = False
+
+#Script setup
 perf_start_time = time.perf_counter()
 
 sys.path.append('src/widgets') #Add the components' path to import, because — since pyQt5 calculates the import path outside of our control — we can't import them from a subfolder like with the screens.
@@ -50,7 +54,7 @@ class Window(QtCore.QObject):
 		more transparency to the UI.
 		
 			As to why each screen is a QDialog? All our dialogs were ported
-		forwardfrom before I got here, so it's just historic cruft at this
+		forward from before I got here, so it's just historic cruft at this
 		point. I can't figure out what would be better to port them to anyway,
 		since we can't seem to use a QMainWindow with a QStackedLayout unless
 		we combine everything into one .ui file.
@@ -64,6 +68,7 @@ class Window(QtCore.QObject):
 	def __init__(self, app):
 		super().__init__()
 		self.app = app
+		
 		
 		from screens.about_camera import AboutCamera
 		from screens.file_settings import FileSettings
@@ -134,7 +139,8 @@ class Window(QtCore.QObject):
 		#Cache all screens, cached screens load about 150-200ms faster I think.
 		self._lazyLoadTimer = QtCore.QTimer()
 		self._lazyLoadTimer.timeout.connect(self._loadAScreen)
-		self._lazyLoadTimer.start(250) #ms
+		PRECACHE_ALL_SCREENS and self._lazyLoadTimer.start(250) #ms
+		
 		
 		from input_panels.keyboard_numeric import KeyboardNumericWithUnits, KeyboardNumericWithoutUnits
 		from input_panels.keyboard_alphanumeric import KeyboardAlphanumeric
@@ -209,7 +215,36 @@ class Window(QtCore.QObject):
 			self.show(self._screenStack[-2])
 		else:
 			print('Error: No more back to navigate to.')
+	
+	
+	
+	
+	
+	
+	def showInput(self, name, *, hints=[]):
+		"""Display a soft keyboard on-screen.
+			
+			name: Identifier string in self._keyboards.
+			hints: Keyword, takes ['list', 'of', 'words'] to show as
+				soft buttons at the top of the keyboard. Only
+				applies to the alphanumeric keyboard."""
+		
+		panel = self._keyboards[name]
+		panel.setParent(self._screens[self.currentScreen])
+		panel.onShow.emit()
+		panel.show(hints) if hints else panel.show()
 
+	
+	def hideInput(self, name=''):
+		"""Hide the keyboard given by name, or the most recent keyboard."""
+		
+		name = name or self._activeKeyboard
+		if panelName:
+			panel = self._keyboards[name]
+			panel.hide()
+			panel.onHide.emit()
+			
+		self._activeKeyboard = ''
 
 
 class GlobalFilter(QtCore.QObject):

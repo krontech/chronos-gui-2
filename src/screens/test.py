@@ -9,7 +9,7 @@ from debugger import *; dbg
 class Test(QtWidgets.QWidget):
 	def __init__(self, window):
 		super().__init__()
-		uic.loadUi("src/screens/test.spin_box.ui", self)
+		uic.loadUi("src/screens/test.widget.ui", self)
 		
 		# Panel init.
 		self.move(0, 0)

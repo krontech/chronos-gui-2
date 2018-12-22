@@ -25,7 +25,10 @@ class LineEdit(QLineEdit, TouchMarginPlugin, DirectAPILinkPlugin, FocusablePlugi
 		
 		self.jogWheelLowResolutionRotation.connect(lambda delta, pressed: 
 			not pressed and self.selectWidget(delta) )
-		self.jogWheelClick.connect(lambda: self.injectKeystrokes(Qt.Key_Space))
+		self.jogWheelClick.connect(lambda: 
+			self.window().focusRing.focusOut()
+			if self.window().focusRing.isFocussedIn else
+			self.window().focusRing.focusIn() )
 	
 	def sizeHint(self):
 		return QSize(361, 81)

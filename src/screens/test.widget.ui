@@ -535,50 +535,6 @@
     <enum>Button::half</enum>
    </property>
   </widget>
-  <widget class="Button" name="button_3">
-   <property name="geometry">
-    <rect>
-     <x>370</x>
-     <y>130</y>
-     <width>161</width>
-     <height>61</height>
-    </rect>
-   </property>
-   <property name="clickMarginLeftSetter" stdset="0">
-    <enum>Button::half</enum>
-   </property>
-   <property name="clickMarginRightSetter" stdset="0">
-    <enum>Button::half</enum>
-   </property>
-   <property name="clickMarginTopSetter" stdset="0">
-    <enum>Button::half</enum>
-   </property>
-   <property name="clickMarginBottomSetter" stdset="0">
-    <enum>Button::half</enum>
-   </property>
-  </widget>
-  <widget class="Button" name="button_5">
-   <property name="geometry">
-    <rect>
-     <x>530</x>
-     <y>130</y>
-     <width>121</width>
-     <height>61</height>
-    </rect>
-   </property>
-   <property name="clickMarginLeftSetter" stdset="0">
-    <enum>Button::half</enum>
-   </property>
-   <property name="clickMarginRightSetter" stdset="0">
-    <enum>Button::half</enum>
-   </property>
-   <property name="clickMarginTopSetter" stdset="0">
-    <enum>Button::half</enum>
-   </property>
-   <property name="clickMarginBottomSetter" stdset="0">
-    <enum>Button::half</enum>
-   </property>
-  </widget>
   <widget class="ComboBox" name="combobox_4">
    <property name="geometry">
     <rect>
@@ -993,6 +949,19 @@
     <number>9999</number>
    </property>
   </widget>
+  <widget class="LineEdit" name="lineedit">
+   <property name="geometry">
+    <rect>
+     <x>360</x>
+     <y>140</y>
+     <width>331</width>
+     <height>81</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>type here</string>
+   </property>
+  </widget>
   <zorder>widget</zorder>
   <zorder>white_4</zorder>
   <zorder>combobox_4</zorder>
@@ -1006,8 +975,6 @@
   <zorder>label_2</zorder>
   <zorder>label_4</zorder>
   <zorder>uiAnimateTriangle</zorder>
-  <zorder>button_3</zorder>
-  <zorder>button_5</zorder>
   <zorder>slider</zorder>
   <zorder>uiBack</zorder>
   <zorder>uiDebug</zorder>
@@ -1017,6 +984,7 @@
   <zorder>combobox</zorder>
   <zorder>radiobutton</zorder>
   <zorder>spinbox_2</zorder>
+  <zorder>lineedit</zorder>
  </widget>
  <customwidgets>
   <customwidget>
@@ -1055,6 +1023,11 @@
    <header>label</header>
   </customwidget>
   <customwidget>
+   <class>LineEdit</class>
+   <extends>QLineEdit</extends>
+   <header>line_edit</header>
+  </customwidget>
+  <customwidget>
    <class>RadioButton</class>
    <extends>QRadioButton</extends>
    <header>radio_button</header>
@@ -1078,8 +1051,7 @@
   <tabstop>combobox_4</tabstop>
   <tabstop>decimalspinbox</tabstop>
   <tabstop>spinbox</tabstop>
-  <tabstop>button_3</tabstop>
-  <tabstop>button_5</tabstop>
+  <tabstop>lineedit</tabstop>
   <tabstop>slider</tabstop>
   <tabstop>decimalspinbox_2</tabstop>
   <tabstop>spinbox_2</tabstop>

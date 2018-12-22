@@ -87,6 +87,8 @@ class FocusablePlugin():
 		#wheel to navigate widgets. We don't yet know which widget will be
 		#focused next, that will dealt with by a refocus callback on the app.
 		self.window().focusRing.show()
+		self.window().focusRing.focusOut(immediate=True)
+		
 		
 	
 	def changeJogWheelCharacterSelection(self, delta: int):
@@ -257,3 +259,8 @@ class FocusablePlugin():
 			if hasattr(self, 'units') else 
 			self.value() 
 		)
+	
+	
+	#Install event filter here to detect touch events and set
+	#self.editMode appropriately. If the jog wheel is being used
+	#to select, set self.editMode to 'jogwheel' instead in selectWidget.
