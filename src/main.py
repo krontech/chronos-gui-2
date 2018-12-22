@@ -136,6 +136,16 @@ class Window(QtCore.QObject):
 		self._lazyLoadTimer.timeout.connect(self._loadAScreen)
 		self._lazyLoadTimer.start(250) #ms
 		
+		from input_panels.keyboard_numeric import KeyboardNumericWithUnits, KeyboardNumericWithoutUnits
+		from input_panels.keyboard_alphanumeric import KeyboardAlphanumeric
+		self._keyboards = {
+			"numeric_with_units": KeyboardNumericWithUnits(self),
+			"numeric_without_units": KeyboardNumericWithoutUnits(self),
+			"alphanumeric": KeyboardAlphanumeric(self),
+		}
+		
+		self._activeKeyboard = ''
+		
 	def _ensureInstantiated(self, screenName: str):
 		"""Lazily load screens to shorten initial startup time."""
 		
