@@ -2,11 +2,10 @@ from PyQt5 import uic, QtWidgets, QtCore
 from PyQt5.QtCore import pyqtSlot
 
 from debugger import *; dbg
+import settings
 import api_mock as api
 from api_mock import silenceCallbacks
 
-
-settings = QtCore.QSettings('Krontech', 'back-of-camera interface')
 
 
 class RecordMode(QtWidgets.QDialog):
@@ -18,11 +17,17 @@ class RecordMode(QtWidgets.QDialog):
 		super().__init__()
 		uic.loadUi('src/screens/record_mode.ui', self)
 		
+		
 		# Panel init.
 		self.move(0, 0)
 		self.setWindowFlags(QtCore.Qt.FramelessWindowHint)
 		self.setAttribute(QtCore.Qt.WA_TranslucentBackground, True)
 		
+		# Secret high-percision backing value.
+		self.nanosegmentLengthPct = 0
+		api.observe('nanosegmentLengthPct', self.updateSegmentLength)
+		api.observe('totalAvailableFrames', )
+		api.observe('recordingExposureNs', )
 		
 		# Set up panel switching.
 		#DDR 2018-07-24 It's impossible to associate an identifier with anything in QT Designer. Painfully load the identifiers here. Also check everything because I will mess this up next time I add a trigger.
@@ -48,5 +53,16 @@ class RecordMode(QtWidgets.QDialog):
 		self.uiRecordMode.currentIndexChanged.connect(self.changeShownTrigger)
 		
 	def changeShownTrigger(self, index):
+		lastModeId = self.availableRecordModeIds[self.uiRecordModePanes.index]
 		self.uiRecordModePanes.setCurrentIndex(index)
-		settings.setValue('active record mode', self.availableRecordModeIds[index])
+		recordModeID = self.availableRecordModeIds[index]
+		settings.setValue('active record mode', recordModeID)
+		
+		if lastModeId == 'segmented':
+			settings.setValue('segmented mode segment duration', )
+	
+	@pyqtSlot(int, name="updateSegmentLength")
+	@silenceCallbacks('uiExposureSlider')
+	def updateSegmentLength(self, nanosegmentLengthPct: int):
+		lengthPct = nanosegmentLengthPct*1e9
+		self.uiSegmentLengthInSeconds.setValue()
