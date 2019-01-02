@@ -28,6 +28,11 @@ class CheckBox(QCheckBox, TouchMarginPlugin, DirectAPILinkPlugin, FocusablePlugi
 		self.jogWheelLowResolutionRotation.connect(lambda delta, pressed: 
 			not pressed and self.selectWidget(delta) )
 		self.jogWheelClick.connect(lambda: self.injectKeystrokes(Qt.Key_Space))
+		
+		# Focus ring effect.
+		self.jogWheelDown.connect(lambda: self.window().focusRing.focusIn(amount=.25)) #Small click effect.
+		self.jogWheelUp.connect(lambda: self.window().focusRing.focusOut())
+		self.jogWheelLongPress.connect(lambda: self.window().focusRing.focusOut(speed=.04))
 	
 	
 	def mousePressEvent(self, ev):

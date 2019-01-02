@@ -25,6 +25,17 @@ class Button(QPushButton, TouchMarginPlugin, FocusablePlugin):
 		self.jogWheelLowResolutionRotation.connect(lambda delta, pressed: 
 			not pressed and self.selectWidget(delta) )
 		self.jogWheelClick.connect(lambda: self.injectKeystrokes(Qt.Key_Space))
+		
+		# Focus ring effect.
+		self.jogWheelDown.connect(lambda: self.window().focusRing.focusIn(amount=.25)) #Small click effect.
+		self.jogWheelUp.connect(lambda: self.window().focusRing.focusOut())
+		self.jogWheelLongPress.connect(lambda: self.window().focusRing.focusOut(speed=.04))
+		
+		# Jog wheel highlight button on click effect.
+		self.jogWheelDown.connect(lambda: (self.__setattr__('keepActiveLook', True), self.refreshStyle()))
+		self.jogWheelUp.connect(lambda: (self.__setattr__('keepActiveLook', False), self.refreshStyle()))
+		self.jogWheelLongPress.connect(lambda: (self.__setattr__('keepActiveLook', False), self.refreshStyle()))
+		
 	
 	def sizeHint(self):
 		return QSize(181, 81)
