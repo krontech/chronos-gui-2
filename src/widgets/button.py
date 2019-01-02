@@ -10,6 +10,7 @@ from focusable_plugin import FocusablePlugin
 
 class Button(QPushButton, TouchMarginPlugin, FocusablePlugin):
 	Q_ENUMS(MarginWidth) #This is needed here. I don't know why the definition in the TouchMarginPlugin doesn't work.
+	jogWheelRotationCancelsClick = False #Widget doesn't use rotation. Ignore it.
 	
 	def __init__(self, parent=None, showHitRects=False):
 		self.keepActiveLook = False
@@ -39,7 +40,8 @@ class Button(QPushButton, TouchMarginPlugin, FocusablePlugin):
 	
 	def sizeHint(self):
 		return QSize(181, 81)
-		
+	
+	
 	def refreshStyle(self):
 		if self.showHitRects:
 			self.setStyleSheet(f"""

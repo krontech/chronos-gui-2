@@ -11,10 +11,7 @@ from focusable_plugin import FocusablePlugin
 
 class CheckBox(QCheckBox, TouchMarginPlugin, DirectAPILinkPlugin, FocusablePlugin):
 	Q_ENUMS(MarginWidth) #This is needed here. I don't know why the definition in the TouchMarginPlugin doesn't work.
-	
-	def sizeHint(self):
-		return QSize(181, 81)
-	
+	jogWheelRotationCancelsClick = False #Widget doesn't use rotation. Ignore it.
 	
 	def __init__(self, parent=None, showHitRects=False):
 		super().__init__(parent, showHitRects=showHitRects)
@@ -33,6 +30,10 @@ class CheckBox(QCheckBox, TouchMarginPlugin, DirectAPILinkPlugin, FocusablePlugi
 		self.jogWheelDown.connect(lambda: self.window().focusRing.focusIn(amount=.25)) #Small click effect.
 		self.jogWheelUp.connect(lambda: self.window().focusRing.focusOut())
 		self.jogWheelLongPress.connect(lambda: self.window().focusRing.focusOut(speed=.04))
+	
+	
+	def sizeHint(self):
+		return QSize(181, 81)
 	
 	
 	def mousePressEvent(self, ev):
