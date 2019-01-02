@@ -22,12 +22,14 @@ class FocusRing(QLabel):
 		
 		self._paddingMultiplier = 1
 		self._paddingMultiplierDelta = .1 #Set later.
+		self._paddingMinMultiplier = 0.
+		self._paddingMaxMultiplier = 1.
 		self._currentPadding = self.unfocussedPadding
 		self.isFocussedIn = False
 		self._focussedOn = None
 		
 		self.focusInOutTimer = QtCore.QTimer()
-		self.focusInOutTimer.timeout.connect(self.updateFocusRingPadding)
+		self.focusInOutTimer.timeout.connect(self._updateFocusRingPadding)
 		self.focusInOutTimer.setInterval(16)
 		
 		self.refreshStyleSheet(self._currentPadding)
@@ -61,16 +63,16 @@ class FocusRing(QLabel):
 		self.window().focusRing.setGeometry(QRect(xy, wh))
 	
 	
-	def updateFocusRingPadding(self):
+	def _updateFocusRingPadding(self):
 		# This construct, with associated timers and class state variables, reimplements an
 		#	`animate(self._currentPadding, [unfocussedPadding, focussedPadding], frames(5))` function.
 		
 		self._paddingMultiplier += self._paddingMultiplierDelta
-		if self._paddingMultiplier < 0:
-			self._paddingMultiplier = 0
+		if self._paddingMultiplier < self._paddingMinMultiplier:
+			self._paddingMultiplier = self._paddingMinMultiplier
 			self.focusInOutTimer.stop()
-		elif self._paddingMultiplier > 1:
-			self._paddingMultiplier = 1
+		elif self._paddingMultiplier > self._paddingMaxMultiplier:
+			self._paddingMultiplier = self._paddingMaxMultiplier
 			self.focusInOutTimer.stop()
 		
 		totalPaddingDifference = self.unfocussedPadding - self.focussedPadding
@@ -88,16 +90,59 @@ class FocusRing(QLabel):
 		self._focussedOn and self.focusOn(self._focussedOn)
 	
 	
-	def focusIn(self, *, immediate=False):
-		"""Move focus to a widget."""
-		self._paddingMultiplierDelta = -1. if immediate else -.75
-		self.updateFocusRingPadding()
+	def focusIn(self, *, immediate: bool = False, speed: float = .75, amount: float = 1.):
+		"""Tighten focus on the selected widget.
+			
+			------------------------------------------------------------
+			To focus on a widget, use focusOn(widget). This function,
+			focusIn, makes the focus ring smaller around the widget to
+			indicate it's "got input". For example, when you focus in on
+			a slider, the focus ring tightens around the handle and
+			moving the jog wheel moves the handle instead of the focus
+			ring. To indicate release focus, use focusOut.
+			
+			Note that the widget currently focussed is entirely
+			responsible for choosing what happens when input is given.
+			Calling focusIn or focusOut doesn't affect the actual logic.
+			
+			Keywords:
+				immediate: if True, do not animate change. Equivalent
+					to speed=1.0.
+				speed: How fast to animate. Animation is 1 unit long,
+					and speed is the delta each frame. Speed need not
+					divide evenly into the animation length.
+				amount: How much of the animation to play. 1.0 plays all
+					the animation, and 0.0 plays none of the animation.
+					So, setting amount to 0.25, we play 1/4th of the
+					full animation and then stop."""
+		
+		self._paddingMultiplierDelta = -1. if immediate else -speed
+		self._paddingMinMultiplier = 1.0 - amount
+		self._updateFocusRingPadding()
 		immediate or self.focusInOutTimer.isActive() or self.focusInOutTimer.start()
 		self.isFocussedIn = True
 	
-	def focusOut(self, *, immediate=False):
-		"""Move focus to a widget."""
-		self._paddingMultiplierDelta = 1. if immediate else .75
-		self.updateFocusRingPadding()
+	def focusOut(self, *, immediate: bool = False, speed: float = .75, amount: float = 1.):
+		"""Loosen focus on the selected widget.
+			
+			------------------------------------------------------------
+			To focus on a widget, use focusOn(widget). This function,
+			focusOut, is the opposite of focusIn. It indicates release
+			of focus. See focusIn for more details!
+			
+			Keywords:
+				immediate: if True, do not animate change. Equivalent
+					to speed=1.0.
+				speed: How fast to animate. Animation is 1 unit long,
+					and speed is the delta each frame. Speed need not
+					divide evenly into the animation length.
+				amount: How much of the animation to play. 1.0 plays all
+					the animation, and 0.0 plays none of the animation.
+					So, setting amount to 0.25, we play 1/4th of the
+					full animation and then stop."""
+		
+		self._paddingMultiplierDelta = 1. if immediate else speed
+		self._paddingMaxMultiplier = amount
+		self._updateFocusRingPadding()
 		immediate or self.focusInOutTimer.isActive() or self.focusInOutTimer.start()
 		self.isFocussedIn = False
