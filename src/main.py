@@ -339,14 +339,20 @@ def connectHardwareEvents(app, hardware):
 			app.focusWidget() and app.focusWidget().jogWheelClick.emit()
 			jogWheelLongClickTimer.stop() #Suppress jog wheel long press.
 	
+	def cancelPress(_):
+		#Cancel a click or long-press when the wheel is rotated.
+		if jogWheelLongClickTimer.isActive():
+			if app.focusWidget() and app.focusWidget().jogWheelRotationCancelsClick:
+				app.focusWidget() and app.focusWidget().jogWheelCancel.emit()
+				jogWheelLongClickTimer.stop()
+	
 	hardware.subscribe('jogWheelDown', jogWheelLongClickTimer.start)
 	hardware.subscribe('jogWheelDown', lambda: app.focusWidget().jogWheelDown.emit())
 	hardware.subscribe('jogWheelUp', lambda: app.focusWidget().jogWheelUp.emit())
 	hardware.subscribe('jogWheelUp', endPress) #Must be after jogWheelUp event.
 	hardware.subscribe('jogWheelHighResolutionRotation', lambda direction:
 		app.focusWidget() and app.focusWidget().jogWheelHighResolutionRotation.emit(direction, hardware.jogWheelPressed) )
-	hardware.subscribe('jogWheelLowResolutionRotation', lambda _:
-		jogWheelLongClickTimer.stop() ) #High resolution rotation to cancel a click or long press is too finicky.
+	hardware.subscribe('jogWheelLowResolutionRotation', cancelPress ) #High resolution rotation to cancel a click or long press is too finicky.
 	hardware.subscribe('jogWheelLowResolutionRotation', lambda direction:
 		app.focusWidget() and app.focusWidget().jogWheelLowResolutionRotation.emit(direction, hardware.jogWheelPressed) )
 	

@@ -13,12 +13,14 @@ class FocusablePlugin():
 	"""
 	
 	#Subscribe to these signals in the parent class.
+	jogWheelRotationCancelsClick = True
 	jogWheelDown = pyqtSignal()
 	jogWheelUp = pyqtSignal() #fired before click
 	jogWheelLowResolutionRotation = pyqtSignal(int, bool) #direction, -1 or +1; jog wheel is depressed
 	jogWheelHighResolutionRotation = pyqtSignal(int, bool) #direction, -1 or +1; jog wheel is depressed
 	jogWheelClick = pyqtSignal() #a tap on the jog wheel, cancelled by rotation or long press
 	jogWheelLongPress = pyqtSignal() #long press of jog wheel, cancelled by rotation or click
+	jogWheelCancel = pyqtSignal() #click/long-press is aborted by jog wheel rotation
 	
 	#Specify the widget property "units", on numeric inputs, to provide a list of units to choose from. It is recommended to stick to 4, since that's how many unit buttons are on the numeric keyboard. Units can be scrolled with the jog wheel.
 	unitList = ['y', 'z', 'a', 'f', 'p', 'n', 'µ', 'm', '', 'k', 'M', 'G', 'T', 'P', 'E', 'Z', 'Y']
