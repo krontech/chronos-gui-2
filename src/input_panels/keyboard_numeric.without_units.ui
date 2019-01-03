@@ -330,7 +330,7 @@
     <string>Button { font-size: 22px; }</string>
    </property>
   </widget>
-  <widget class="Button" name="uiLeft">
+  <widget class="Button" name="uiRight">
    <property name="geometry">
     <rect>
      <x>110</x>
@@ -371,7 +371,7 @@
     <string>Button { font-size: 22px; }</string>
    </property>
   </widget>
-  <widget class="Button" name="ui0_2">
+  <widget class="Button" name="uiLeft">
    <property name="geometry">
     <rect>
      <x>10</x>
@@ -403,6 +403,23 @@
    <header>button</header>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>ui7</tabstop>
+  <tabstop>ui8</tabstop>
+  <tabstop>ui9</tabstop>
+  <tabstop>ui4</tabstop>
+  <tabstop>ui5</tabstop>
+  <tabstop>ui6</tabstop>
+  <tabstop>ui1</tabstop>
+  <tabstop>ui2</tabstop>
+  <tabstop>ui3</tabstop>
+  <tabstop>ui0</tabstop>
+  <tabstop>uiDot</tabstop>
+  <tabstop>uiBackspace</tabstop>
+  <tabstop>uiLeft</tabstop>
+  <tabstop>uiRight</tabstop>
+  <tabstop>uiClose</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

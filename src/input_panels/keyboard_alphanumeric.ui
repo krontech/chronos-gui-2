@@ -1261,6 +1261,51 @@
    <header>button</header>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>uiQ</tabstop>
+  <tabstop>uiW</tabstop>
+  <tabstop>uiE</tabstop>
+  <tabstop>uiR</tabstop>
+  <tabstop>uiT</tabstop>
+  <tabstop>uiY</tabstop>
+  <tabstop>uiU</tabstop>
+  <tabstop>uiI</tabstop>
+  <tabstop>uiO</tabstop>
+  <tabstop>uiP</tabstop>
+  <tabstop>ui7</tabstop>
+  <tabstop>ui8</tabstop>
+  <tabstop>ui9</tabstop>
+  <tabstop>uiA</tabstop>
+  <tabstop>uiS</tabstop>
+  <tabstop>uiD</tabstop>
+  <tabstop>uiF</tabstop>
+  <tabstop>uiG</tabstop>
+  <tabstop>uiH</tabstop>
+  <tabstop>uiJ</tabstop>
+  <tabstop>uiK</tabstop>
+  <tabstop>uiL</tabstop>
+  <tabstop>ui4</tabstop>
+  <tabstop>ui5</tabstop>
+  <tabstop>ui6</tabstop>
+  <tabstop>uiShift</tabstop>
+  <tabstop>uiZ</tabstop>
+  <tabstop>uiX</tabstop>
+  <tabstop>uiC</tabstop>
+  <tabstop>uiV</tabstop>
+  <tabstop>uiB</tabstop>
+  <tabstop>uiN</tabstop>
+  <tabstop>uiM</tabstop>
+  <tabstop>uiDot</tabstop>
+  <tabstop>ui1</tabstop>
+  <tabstop>ui2</tabstop>
+  <tabstop>ui3</tabstop>
+  <tabstop>uiBackspace</tabstop>
+  <tabstop>uiSpace</tabstop>
+  <tabstop>uiLeft</tabstop>
+  <tabstop>uiRight</tabstop>
+  <tabstop>ui0</tabstop>
+  <tabstop>uiClose</tabstop>
+ </tabstops>
  <resources/>
  <connections>
   <connection>
