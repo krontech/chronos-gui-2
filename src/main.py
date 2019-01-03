@@ -68,7 +68,7 @@ class Window(QtCore.QObject):
 	def __init__(self, app):
 		super().__init__()
 		self.app = app
-		
+		app.window = self #Yuck. Couldn't find a decent way to plumb self.showInput through to the widgets otherwise.
 		
 		from screens.about_camera import AboutCamera
 		from screens.file_settings import FileSettings
@@ -217,10 +217,6 @@ class Window(QtCore.QObject):
 			print('Error: No more back to navigate to.')
 	
 	
-	
-	
-	
-	
 	def showInput(self, name, *, hints=[]):
 		"""Display a soft keyboard on-screen.
 			
@@ -229,22 +225,21 @@ class Window(QtCore.QObject):
 				soft buttons at the top of the keyboard. Only
 				applies to the alphanumeric keyboard."""
 		
-		panel = self._keyboards[name]
+		self._activeKeyboard = name
+		panel = self._keyboards[self._activeKeyboard]
 		panel.setParent(self._screens[self.currentScreen])
-		panel.onShow.emit()
-		panel.show(hints) if hints else panel.show()
+		panel.onShow.emit(hints)
+		panel.show()
 
 	
-	def hideInput(self, name=''):
+	def hideInput(self):
 		"""Hide the keyboard given by name, or the most recent keyboard."""
 		
-		name = name or self._activeKeyboard
-		if panelName:
-			panel = self._keyboards[name]
-			panel.hide()
-			panel.onHide.emit()
-			
+		panel = self._keyboards[self._activeKeyboard]
+		panel.hide()
+		panel.onHide.emit()
 		self._activeKeyboard = ''
+			
 
 
 class GlobalFilter(QtCore.QObject):
@@ -334,19 +329,32 @@ def connectHardwareEvents(app, hardware):
 	jogWheelLongClickTimer.timeout.connect(lambda: app.focusWidget().jogWheelLongPress.emit())
 	jogWheelLongClickTimer.setSingleShot(True)
 	
+	pressTarget = None
+	
+	def startPress():
+		nonlocal pressTarget
+		jogWheelLongClickTimer.start()
+		pressTarget = app.focusWidget()
+	
 	def endPress():
+		nonlocal pressTarget
+		
 		if jogWheelLongClickTimer.isActive(): #Long-press timer hasn't expired, just a click.
+			pressTarget = None
 			app.focusWidget() and app.focusWidget().jogWheelClick.emit()
 			jogWheelLongClickTimer.stop() #Suppress jog wheel long press.
 	
 	def cancelPress(_):
+		nonlocal pressTarget
+		
 		#Cancel a click or long-press when the wheel is rotated.
-		if jogWheelLongClickTimer.isActive():
-			if app.focusWidget() and app.focusWidget().jogWheelRotationCancelsClick:
-				app.focusWidget() and app.focusWidget().jogWheelCancel.emit()
+		if app.focusWidget() and app.focusWidget().jogWheelRotationCancelsClick:
+			pressTarget = None
+			app.focusWidget() and app.focusWidget().jogWheelCancel.emit()
+			if jogWheelLongClickTimer.isActive():
 				jogWheelLongClickTimer.stop()
 	
-	hardware.subscribe('jogWheelDown', jogWheelLongClickTimer.start)
+	hardware.subscribe('jogWheelDown', startPress)
 	hardware.subscribe('jogWheelDown', lambda: app.focusWidget().jogWheelDown.emit())
 	hardware.subscribe('jogWheelUp', lambda: app.focusWidget().jogWheelUp.emit())
 	hardware.subscribe('jogWheelUp', endPress) #Must be after jogWheelUp event.
@@ -356,6 +364,14 @@ def connectHardwareEvents(app, hardware):
 	hardware.subscribe('jogWheelLowResolutionRotation', lambda direction:
 		app.focusWidget() and app.focusWidget().jogWheelLowResolutionRotation.emit(direction, hardware.jogWheelPressed) )
 	
+	def focusChanged(old, new):
+		nonlocal pressTarget
+		
+		pressTarget and pressTarget.jogWheelCancel.emit()
+		pressTarget = None
+		jogWheelLongClickTimer.stop()
+		
+	app.focusChanged.connect(focusChanged)
 
 
 
@@ -376,10 +392,16 @@ if __name__ == '__main__':
 			/*outline-radius: 5px;*/
 		}
 	""")
-	app.focusChanged.connect(lambda old, new: 
-		window._screens[window.currentScreen].focusRing.focusOn(new)
-		if new else #hide on screen transition?
-		window._screens[window.currentScreen].focusRing.hide() )
+	
+	def focusChanged(old, new):
+		if new:
+			window._screens[window.currentScreen].focusRing.focusOn(new)
+			window._screens[window.currentScreen].focusRing.focusOut(immediate=True)
+		else:
+			#hide on screen transition
+			window._screens[window.currentScreen].focusRing.hide()
+	app.focusChanged.connect(focusChanged)
+
 	
 	forceHardwareInstantiation = True #This should be an env var.
 	if forceHardwareInstantiation:

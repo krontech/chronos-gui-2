@@ -3,6 +3,7 @@ from PyQt5.QtCore import pyqtSignal
 
 from debugger import *; dbg
 
+
 class KeyboardAlphanumeric(QtWidgets.QWidget):
 	onShow = pyqtSignal(list)
 	onHide = pyqtSignal()

@@ -36,6 +36,7 @@ class Button(QPushButton, TouchMarginPlugin, FocusablePlugin):
 		self.jogWheelDown.connect(lambda: (self.__setattr__('keepActiveLook', True), self.refreshStyle()))
 		self.jogWheelUp.connect(lambda: (self.__setattr__('keepActiveLook', False), self.refreshStyle()))
 		self.jogWheelLongPress.connect(lambda: (self.__setattr__('keepActiveLook', False), self.refreshStyle()))
+		self.jogWheelCancel.connect(lambda: (self.__setattr__('keepActiveLook', False), self.refreshStyle()))
 		
 	
 	def sizeHint(self):

@@ -59,8 +59,8 @@ class FocusRing(QLabel):
 				margins["left"] + margins["right"], 
 				margins["bottom"] + margins["top"],
 			) - QSize(self._currentPadding, self._currentPadding)*2
-			
-		self.window().focusRing.setGeometry(QRect(xy, wh))
+		
+		self.setGeometry(QRect(xy, wh))
 	
 	
 	def _updateFocusRingPadding(self):

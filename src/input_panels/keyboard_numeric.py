@@ -5,7 +5,7 @@ from debugger import *; dbg
 
 
 class KeyboardNumeric(QtWidgets.QWidget):
-	onShow = pyqtSignal()
+	onShow = pyqtSignal(list)
 	onHide = pyqtSignal()
 	
 	def __init__(self, window, uiFilePath):
