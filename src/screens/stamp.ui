@@ -227,18 +227,19 @@
     <rect>
      <x>0</x>
      <y>400</y>
-     <width>131</width>
+     <width>141</width>
      <height>81</height>
     </rect>
    </property>
    <property name="text">
-    <string>Time</string>
+    <string>Time From
+Trigger</string>
    </property>
   </widget>
   <widget class="CheckBox" name="checkbox_2">
    <property name="geometry">
     <rect>
-     <x>130</x>
+     <x>140</x>
      <y>400</y>
      <width>131</width>
      <height>81</height>
@@ -251,9 +252,9 @@
   <widget class="CheckBox" name="checkbox_3">
    <property name="geometry">
     <rect>
-     <x>260</x>
+     <x>270</x>
      <y>400</y>
-     <width>151</width>
+     <width>141</width>
      <height>81</height>
     </rect>
    </property>
