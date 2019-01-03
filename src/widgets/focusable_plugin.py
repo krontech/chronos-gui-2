@@ -12,8 +12,15 @@ class FocusablePlugin():
 		desired input type.
 	"""
 	
-	#Subscribe to these signals in the parent class.
+	# Normally, rotating the encoder knob cancels a click event. This is so
+	# that pressing and rotating, which fires
+	# jogWheel(?:Low|High)ResolutionRotation events, doesn't trigger the click
+	# handlers when you just wanted rotation events. Generally, you would only
+	# set this to False for a class of widget which doesn't respond to jog
+	# wheel rotation events.
 	jogWheelRotationCancelsClick = True
+	
+	#Subscribe to these signals in the parent class.
 	jogWheelDown = pyqtSignal()
 	jogWheelUp = pyqtSignal() #fired before click
 	jogWheelLowResolutionRotation = pyqtSignal(int, bool) #direction, -1 or +1; jog wheel is depressed
