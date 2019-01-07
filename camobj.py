@@ -1,8 +1,10 @@
 
 # Camera class
 #from mem import fpga_mmio
-from periphery import GPIO
+import time
+import pdb
 
+from termcolor import colored
 from mmapregisters import *
 from memobj import MemObject
 from sensorobj import SensorObject
@@ -53,10 +55,32 @@ def i2c_eeprom_do_read(addr,  offset,  leng):
 
 
 class CamObject:
+
+
+
+	ioports = board_chronos14_ioports
+
+		# self.CamInit()
+
+
+	print ("continue")
+	mem = MemObject()
+	mem.CtypesTest()
+
+	# exit()
+
+	FPGAWrite32 = mem.FPGAWrite32
+	FPGAWrite16 = mem.FPGAWrite16
+	FPGAWrite8 = mem.FPGAWrite8
+
+	#pdb.set_trace()
+	sensor = Lux1310Object(mem)
+
+
 	def __init__(self):
 		print ("CamObject Init")
 		self.CamInit()
-		thiscam = self
+		#thiscam = self
 	
 		
 	#print("CamObject created")
@@ -143,21 +167,176 @@ class CamObject:
 			   fps, hOutRes, vOutRes, maxFPS)
 
 		g = self.sensor.ImageGeometry
-		self.mem.fpga_write32(DISPLAY_H_RES, g.hres)
-		self.mem.fpga_write32(DISPLAY_V_RES, g.vres)
+		self.mem.FPGAWrite32("DISPLAY_H_RES", g.hres)
+		self.mem.FPGAWrite32("DISPLAY_V_RES", g.vres)
 		print (f"ImageGeometry: {g}")
+
+
+	def getFPGAVersion(self):
+		ver = self.mem.FPGARead16("FPGA_VERSION")
+		print (f"Version is {ver}")
+		return ver
+
+	def getFPGASubVersion(self):
+		sver = self.mem.FPGARead16("FPGA_SUBVERSION")
+		print (f"Subversion is {sver}")
+		return sver
+
+	def setLiveOutputTiming(self, hRes, vRes, hOutRes, vOutRes, maxFps):
+
+		#consts:
+		hSync = 1
+		hBackPorch = 64
+		hFrontPorch = 4
+		vSync = 1
+		vBackPorch = 4
+		vFrontPorch = 1
+	
+		pxClock = 100000000
+	
+		# minHPeriod;
+		# hPeriod;
+		# vPeriod;
+		# UInt32 fps;
+
+		# FPGA revision 3.14 and higher use a 133MHz video clock. 
+		if ((self.getFPGAVersion() > 3) or (self.getFPGASubVersion() >= 14)):
+			print ("Faster FPGA clock enabled")
+			pxClock = 133333333
+
+		hPeriod = hSync + hBackPorch + hOutRes + hFrontPorch;
+
+		# calculate minimum hPeriod to fit within the 1024 max vertical resolution
+		# and make sure hPeriod is equal or larger
+		minHPeriod = (pxClock // ((1024+vBackPorch+vSync+vFrontPorch) * maxFps)) + 1 # the +1 is just to round up
+		if hPeriod < minHPeriod:
+			hPeriod = minHPeriod
+
+		# calculate vPeriod and make sure it's large enough for the frame
+		vPeriod = pxClock // (hPeriod * maxFps)
+		if (vPeriod < (vOutRes + vBackPorch + vSync + vFrontPorch)):
+			vPeriod = (vOutRes + vBackPorch + vSync + vFrontPorch)
+	
+		# calculate FPS for debug output
+		fps = pxClock // (vPeriod * hPeriod);
+		print ("setLiveOutputTiming: %d*%d@%d (%d*%d max: %d)" % \
+		   ((hPeriod - hBackPorch - hSync - hFrontPorch),
+		   (vPeriod - vBackPorch - vSync - vFrontPorch),
+		   fps, hOutRes, vOutRes, maxFps))
+
+		self.mem.FPGAWrite16("DISPLAY_H_RES", hRes)
+		self.mem.FPGAWrite16("DISPLAY_H_OUT_RES", hOutRes)
+		self.mem.FPGAWrite16("DISPLAY_V_RES", vRes)
+		self.mem.FPGAWrite16("DISPLAY_V_OUT_RES", vOutRes)
+
+		self.mem.FPGAWrite16("DISPLAY_H_PERIOD", hPeriod - 1)
+		self.mem.FPGAWrite16("DISPLAY_H_SYNC_LEN", hSync)
+		self.mem.FPGAWrite16("DISPLAY_H_BACK_PORCH", hBackPorch)
+
+		self.mem.FPGAWrite16("DISPLAY_V_PERIOD", vPeriod - 1)
+		self.mem.FPGAWrite16("DISPLAY_V_SYNC_LEN", vSync)
+		self.mem.FPGAWrite16("DISPLAY_V_BACK_PORCH", vBackPorch)
+
+
+	def FakeIO(self):
+		print ("TODO: don't do fake IO")
+		self.mem.fpga_write16(0xa0, 0x1)
+		self.mem.fpga_write16(0xa4, 0x1)
+		self.mem.fpga_write16(0xa8, 0x0)
+		self.mem.fpga_write32(0x60, 0x0)	
+		self.mem.fpga_write16(0xb4, 0x0)
+		self.mem.fpga_write16(0xb0, 0x0)
+		self.mem.fpga_write16(0xac, 0x2)
+		self.mem.fpga_write16(0xbc, 0x0)
+		self.mem.fpga_write16(0xbc, 0x0)
+		self.mem.fpga_write16(0xbc, 0x0)
+
+
+	def Fake16(self, addr, data):
+			# breakpoint()
+			print (f"--- faking 16 bit (0x{(addr * 2):x}, (0x{data:x})")
+			self.mem.fpga_write16(addr * 2, data)
+	def Fake32(self, addr, data):
+			# breakpoint()
+			print (f"=== faking 32 bit (0x{(addr * 2):x}, (0x{data:x})")
+			self.mem.fpga_write32(addr * 2, data)
+
+	def FakeInit(self):
+		print ("TODO: don't do fake init")
+
+		self.Fake16(0x36, 0x52)
+		self.Fake32(0x10, 0x12e5a)
+		self.Fake16(0x24, 0xf000)
+		self.Fake16(0x214, 0x500)
+		self.Fake16(0x218, 0x500)
+		self.Fake16(0x216, 0x400)
+		self.Fake16(0x220, 0x400)
+		self.Fake16(0x208, 0x652)
+		self.Fake16(0x20c, 0x1)
+		self.Fake16(0x210, 0x40)
+		self.Fake16(0x20a, 0x405)
+		self.Fake16(0x20e, 0x1)
+		self.Fake16(0x212, 0x4)
+		self.Fake32(0x30, 0x0)
+		self.Fake16(0x5e, 0x0)
+		self.Fake32(0x10, 0x78)
+		self.Fake32(0x28, 0x1fffe000)
+		self.Fake32(0x82, 0x0)
+		self.Fake32(0x80, 0x200c)
+		self.Fake16(0x24, 0xf000)
+		self.Fake32(0x20, 0x2)
+		self.Fake32(0x20, 0x0)
+		self.Fake16(0x5e, 0x0)
+		self.Fake32(0x10, 0x12e5a)
+		self.Fake32(0x10, 0x0)
+		self.Fake32(0x10, 0x12e5a)
+		self.Fake16(0x278, 0x10e5)
+		self.Fake16(0x27a, 0x10e5)
+		self.Fake16(0x27c, 0x10e5)
+		self.Fake16(0x260, 0x1ea2)
+		self.Fake16(0x262, 0xf6c6)
+		self.Fake16(0x264, 0xfc41)
+		self.Fake16(0x268, 0xfb1d)
+		self.Fake16(0x26a, 0x163b)
+		self.Fake16(0x26c, 0xfe74)
+		self.Fake16(0x26e, 0x209)
+		self.Fake16(0x270, 0xf0c1)
+		self.Fake16(0x272, 0x1a63)
+		self.Fake16(0x278, 0x16ce)
+		self.Fake16(0x27a, 0x10e5)
+		self.Fake16(0x27c, 0x1ac3)
+		self.Fake32(0x200, 0x280)
+		self.Fake32(0x222, 0x19)
+		self.Fake32(0x10, 0x12c31)
+
+
 
 
 
 	 
 	def CamInit(self):
+
+		print("CamInit()")
 		
-		print (self.sensor)
+	
+		#breakpoint()	
+
+		# Reset the FPGA
+		#self.mem.fpga_write16(SYSTEM_RESET, 1)
+		
+		#TESTING! no reset
+		#self.mem.FPGAWrite16("SYSTEM_RESET", 1)
+		
+
+		# Give it some time
+		time.sleep(0.2)
+
+		self.setLiveOutputTiming(1296, 1024, 1280, 1024, 60)
 
 		print (f"pixel rate is {self.sensor.ImageSensor.pixel_rate}")
 		 
 		maxfps = self.sensor.ImageSensor.pixel_rate / \
-			(self.sensor.ImageSensor.h_max_res * self.sensor.ImageSensor.v_max_res);
+			(self.sensor.ImageSensor.h_max_res * self.sensor.ImageSensor.v_max_res)
 		print (f"maxfps is {maxfps}")
 		
 		g = self.sensor.ImageGeometry 
@@ -172,84 +351,225 @@ class CamObject:
 		self.sensor.hMaxRes = self.sensor.ImageSensor.h_max_res
 		self.sensor.vMaxRes = self.sensor.ImageSensor.v_max_res
 
-		print (self.sensor)
+		# print (self.sensor)
 		# Configure the FIFO threshold and image sequencer
 
-		self.mem.fpga_write32(SEQ_LIVE_ADDR_0, MAX_FRAME_LENGTH)
-		self.mem.fpga_write32(SEQ_LIVE_ADDR_1, MAX_FRAME_LENGTH * 2)
-		self.mem.fpga_write32(SEQ_LIVE_ADDR_2, MAX_FRAME_LENGTH * 3)
-		self.mem.fpga_write32(SEQ_REC_REGION_START, REC_START_ADDR)
 
-		frame_words = int(((self.sensor.hMaxRes * self.sensor.vMaxRes * self.image_sensor_bpp()) / 8 + (32 - 1)) / 32)
-		print(f"frame_words = {frame_words}")
-		print(f"hMaxRes = {self.sensor.hMaxRes}")
-		self.mem.fpga_write32(SEQ_FRAME_SIZE, (frame_words + 0x3f) & ~0x3f)
-		
+		self.mem.FPGAWrite16("SENSOR_FIFO_START_W_THRESH", 0x100)
+		self.mem.FPGAWrite16("SENSOR_FIFO_STOP_W_THRESH", 0x100)
 
 
+
+		self.mem.FPGAWrite32("SEQ_LIVE_ADDR_0", MAX_FRAME_LENGTH)
+		self.mem.FPGAWrite32("SEQ_LIVE_ADDR_1", MAX_FRAME_LENGTH * 2)
+		self.mem.FPGAWrite32("SEQ_LIVE_ADDR_2", MAX_FRAME_LENGTH * 3)
+		self.mem.FPGAWrite32("SEQ_REC_REGION_START", REC_START_ADDR) #in camApp this uses setRecRegionStartWords
+
+		print ("---------")
 		#temporary single definition; move to fpgah.py
 		DISPLAY_CTL_READOUT_INHIBIT = (1 << 3)
 
 		dctrl = self.mem.fpga_read32(DISPLAY_CTL)
+		print (f"dctrl is 0x{dctrl:x}")
 		dctrl &= ~DISPLAY_CTL_READOUT_INHIBIT
-		self.mem.fpga_write32(DISPLAY_CTL, dctrl)
+		print (f"AND mask is 0x{DISPLAY_CTL_READOUT_INHIBIT:x}")
+		#MANUAL KLUDGE!
+		dctrl = 0x2f0
+		# exit()
+
+		self.mem.FPGAWrite32("DISPLAY_CTL", dctrl)  #(18)
+
+		# exit()
+
+		self.mem.FPGAWrite32("IMAGER_FRAME_PERIOD", 100 * 4000)		# 18
+		self.mem.FPGAWrite32("IMAGER_INT_TIME", 100 * 3900)			# 19
+
+		# exit()
+
+
+		#TODO - dereference through SensorObj:
+		breakpoint()
+		self.sensor._writeDACVoltages()
+		# exit()
+
+		# breakpoint()
+
+		print (self.sensor)
+		time.sleep(0.01)
+		self.sensor.lux1310SetReset(True)
+		self.sensor.lux1310SetReset(False)
+		time.sleep(0.001)
+
+		print ("#############\nLux has been reset\n#############")
+
+		# self.sensor.Lux1310RegDump()
+
+		# breakpoint()
+
+		#TODO: this goes into sensor abstraction
+		self.sensor.Lux1310Write("LUX1310_SCI_SRESET_B", 0)
+
+		# exit()
+
+		self.sensor.SensorInit2()
+
+		# exit()
+
+		#self.sensor.Lux1310AutoPhaseCal()			
+
+		self.sensor.LuxInit2()
+
+		# exit()
+
+		# breakpoint()
+
+		self.FakeIO()
+
+		# breakpoint()
+
+		self.setImagerSettings()
+
+		# exit()
+
+		breakpoint()
+		self.FakeInit()
+
+		# frame_words = int(((self.sensor.hMaxRes * self.sensor.vMaxRes * self.image_sensor_bpp()) / 8 + (32 - 1)) / 32)
+		# print(f"frame_words = {frame_words}")
+		# print(f"hMaxRes = {self.sensor.hMaxRes}")
+		# self.FPGAWrite32("SEQ_FRAME_SIZE", (frame_words + 0x3f) & ~0x3f)
+		
 
 
 
+		# this was from daemon:
+		# self.SetLiveTiming(self.sensor.hMaxRes, self.sensor.vMaxRes, 60)
+		# print ("--> SENSOR:")
+		# print (self.sensor.ImageGeometry)
 
-		self.SetLiveTiming(self.sensor.hMaxRes, self.sensor.vMaxRes, 60)
-		print ("--> SENSOR:")
-		print (self.sensor.ImageGeometry)
+		#ReadSerial()
 
-	def GPIOWrite(self, pin_name, value):
-		gpio = self._GPIO_ports[pin_name]
-		gpio.write(bool(value))
-
-	def GPIORead(self, pin_name):
-		gpio = self._GPIO_ports[pin_name]
-		return gpio.read()
-
-
-	_board_chronos14_gpio = {
-	"lux1310-dac-cs" : (33, "out"),
-	"lux1310-color" :  (66, "in"),
-	"encoder-a" :      (20, "in"),
-	"encoder-b" :      (26, "in"),
-	"encoder-sw" :     (27, "in"),
-	"shutter-sw" :     (66, "in"),
-	"record-led.0" :   (41, "out"),
-	"record-led.1" :   (25, "out"),
-	"trigger-pin" :    (127, "in"),
-	"frame-irq" :      (51, "in"),
-	# FPGA Programming Pins 
-	# "ecp5-progn" :     (47, ""),
-	# "ecp5-init" :      (45, ""),
-	# "ecp5-done" :      (52, ""),
-	# "ecp5-cs" :        (58, ""),
-	# "ecp5-holdn" :     (58  ""),
-	}
-
-	_GPIO_ports = {}
-
-	for key, value in _board_chronos14_gpio.items():
-		gpioaccess = GPIO(value[0], value[1])
-		_GPIO_ports.update({key : gpioaccess})
-
-	#print(_GPIO_ports)
-
-	print ("begin")
-	mem = MemObject()
-	#sensor = SensorObject(mem)
-	#sensor = Lux1310Object(mem)
-	sensor = Lux1310Object(mem)
-
+		#sensor = SensorObject(mem)
+		#sensor = Lux1310Object(mem)
 	
-	ioports = board_chronos14_ioports
+	
+	def setImagerSettings(self):
+		#TODO: all this
+		# self.mem.FPGAWrite32("IMAGER_INT_TIME", 0)
+		# self.mem.FPGAWrite16("SENSOR_LINE_PERIOD", 0)
+		self.mem.FPGAWrite32("IMAGER_INT_TIME", 0)
+		
 
-	# self.CamInit()
+		self.sensor.Lux1310SetResolutions()
+		#breakpoint()
+		#self.sensor.Lux1310SetFramePeriod(self.sensor.currentPeriod, self.sensor.currentHRes, self.sensor.currentVRes)
+
+		#FAKE:
+		self.sensor.mem.FPGAWrite32("IMAGER_FRAME_PERIOD", 0x1716f)
 
 
-	ReadSerial()
+		self.sensor.Lux1310SetGain(self.sensor.gain)
+
+		self.sensor.Lux1310UpdateWavetableSetting()
+
+
+
+		self.sensor.Lux1310LoadColGainFromFile()
+
+
+		#TODO: finish this section instead of faking it
+
+
+		#Set the timing generator to handle the line period
+		# self.FPGAWrite16("SENSOR_LINE_PERIOD", \
+		# 	max((self.sensor.currentHRes / LUX1310_HRES_INCREMENT) + 2, (sensor.wavetableSize + 3)) - 1)
+		# time.sleep(0.01)
+		# print ("About to setSlaveExposure")
+
+		# self.sensor.setSlaveExposure(settings.exposure)
+		# self.sensor.seqOnOff(true);
+
+
+
+'''
+	imagerSettings.hRes = settings.hRes;
+	imagerSettings.stride = settings.stride;
+	imagerSettings.vRes = settings.vRes;
+	imagerSettings.hOffset = settings.hOffset;
+	imagerSettings.vOffset = settings.vOffset;
+	imagerSettings.period = settings.period;
+	imagerSettings.exposure = settings.exposure;
+	imagerSettings.gain = settings.gain;
+	imagerSettings.disableRingBuffer = settings.disableRingBuffer;
+	imagerSettings.mode = settings.mode;
+	imagerSettings.prerecordFrames = settings.prerecordFrames;
+	imagerSettings.segmentLengthFrames = settings.segmentLengthFrames;
+	imagerSettings.segments = settings.segments;
+
+    //Zero trigger delay for Gated Burst
+    if(settings.mode == RECORD_MODE_GATED_BURST)
+	io->setTriggerDelayFrames(0, FLAG_TEMPORARY);
+
+	imagerSettings.frameSizeWords = ROUND_UP_MULT((settings.stride * (settings.vRes+0) * 12 / 8 + (BYTES_PER_WORD - 1)) / BYTES_PER_WORD, FRAME_ALIGN_WORDS);	//Enough words to fit the frame, but make it even
+
+    UInt32 maxRecRegionSize = getMaxRecordRegionSizeFrames(imagerSettings.hRes, imagerSettings.vRes);  //(ramSize - REC_REGION_START) / imagerSettings.frameSizeWords;
+
+    if(settings.recRegionSizeFrames > maxRecRegionSize)
+	imagerSettings.recRegionSizeFrames = maxRecRegionSize;
+    else
+	imagerSettings.recRegionSizeFrames = settings.recRegionSizeFrames;
+
+    setFrameSizeWords(imagerSettings.frameSizeWords);
+
+	qDebug() << "About to sensor->loadADCOffsetsFromFile";
+	sensor->loadADCOffsetsFromFile();
+
+	loadColGainFromFile();
+
+	qDebug()	<< "\nSet imager settings:\nhRes" << imagerSettings.hRes
+				<< "vRes" << imagerSettings.vRes
+				<< "stride" << imagerSettings.stride
+				<< "hOffset" << imagerSettings.hOffset
+				<< "vOffset" << imagerSettings.vOffset
+				<< "exposure" << imagerSettings.exposure
+				<< "period" << imagerSettings.period
+				<< "frameSizeWords" << imagerSettings.frameSizeWords
+				<< "recRegionSizeFrames" << imagerSettings.recRegionSizeFrames;
+
+	if (settings.temporary) {
+		qDebug() << "--- settings --- temporary, not saving";
+	}
+	else {
+		qDebug() << "--- settings --- saving";
+	appSettings.setValue("camera/hRes",                 imagerSettings.hRes);
+	appSettings.setValue("camera/vRes",                 imagerSettings.vRes);
+	appSettings.setValue("camera/stride",               imagerSettings.stride);
+	appSettings.setValue("camera/hOffset",              imagerSettings.hOffset);
+	appSettings.setValue("camera/vOffset",              imagerSettings.vOffset);
+	appSettings.setValue("camera/gain",                 imagerSettings.gain);
+	appSettings.setValue("camera/period",               imagerSettings.period);
+	appSettings.setValue("camera/exposure",             imagerSettings.exposure);
+	appSettings.setValue("camera/recRegionSizeFrames",  imagerSettings.recRegionSizeFrames);
+	appSettings.setValue("camera/disableRingBuffer",    imagerSettings.disableRingBuffer);
+	appSettings.setValue("camera/mode",                 imagerSettings.mode);
+	appSettings.setValue("camera/prerecordFrames",      imagerSettings.prerecordFrames);
+	appSettings.setValue("camera/segmentLengthFrames",  imagerSettings.segmentLengthFrames);
+	appSettings.setValue("camera/segments",             imagerSettings.segments);
+	}
+'''
+
+
+		#TODO do this properly
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -257,24 +577,3 @@ class CamObject:
 	# self.SetLiveTiming()
 
 
-
-
-# minHPeriod;
-# hPeriod;
-# vPeriod;
-# fps;
-
-
-# def cam_init(cam):
-
-# 	frame_words = 0
-# 	maxfps = 3
-
-
-
-
-#print ("cam begin")
-
-#camobj = CamObject()
-
-#camobj.mem.mm_print()

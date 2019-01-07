@@ -1,0 +1,119 @@
+
+
+SCI Writes:
+
+Camera::Init
+  Lux1310::Init
+    Lux1310::InitSensor
+      1 - 39
+  Camera::setImagerSettings
+    Lux1310::setResolution
+      40 - 43
+    Lux1310::setGain
+      44 - 46
+    Lux1310::updateWavetableSetting
+      Lux1310::setWavetable
+      47 - 50  
+
+
+FPGA Writes:
+
+Camera::Init
+  1
+  Camera::setLiveOutputTiming
+    2 - 11
+  12 - 16
+  Camera::setRecRegionStartWords
+    17
+  18
+  Lux1310::Init
+    Lux1310::InitSensor
+      19 - 20
+      Lux1310::setReset
+        21 - 22
+      Lux1310::autoPhaseCal
+        Lux1310::setClkPhase
+          23 - 25
+      26 - 27
+      Lux1310::setFramePeriod
+        Lux1310::setSlavePeriod
+          28 
+      Lux1310::setIntegrationTime
+        Lux1310::setSlaveExposure
+          29
+  IO::init
+    IO::setTriggerEnable
+      30
+    IO::setTriggerInvert
+      31
+    IO::setTriggerDebounceEn
+      32
+    IO::[misc]
+      33 - 39
+  Camera::setImagerSettings
+    40
+    Lux1310::setFramePeriod
+      Lux1310::setSlavePeriod
+        41 
+    Lux1310::updateWavetableSetting
+      Lux1310::setWavetable
+        Lux1310::setABNDelayClocks
+          42
+    43
+    Lux1310::setSlaveExposure
+      44
+  Camera::setFrameSizeWords
+      45
+    Camera::setDisplaySettings
+      Camera::setLiveOutputTiming
+        46 - 55
+  IO::setTriggerDelayFrames
+    56
+  Camera::autoFPNCorrection
+    IO::setShutterGatingEnable
+      57
+    Camera::setIntegrationTime
+      Camera::setSlaveExposure
+        58
+    Camera::setRecSequencerModeSingleBlock
+      Camera::setRecRegionEndWords
+        59
+      Camera::writeSeqPgmMemory
+        60 - 61
+      Camera::setFrameSizeWords
+        62
+    Camera::startRecording
+      Camera::startSequencer
+        63 - 64
+      Camera::setShutterGatingEnable
+       65
+    Camera::setIntegrationTime
+      Lux1310:::setIntegrationTime
+        Lux1310::setSlaveExposure
+          66
+    Camera::computeFPNCorrection2
+      Lux1310::seqOnOff
+        67
+      Lux1310::setIntegrationTime
+        Lux1310:::setIntegrationTime
+          Lux1310::setSlaveExposure
+            68
+       Lux1310::setWhiteBalance
+         69 - 71
+  Camera::setCCMatrix
+    72 - 80
+  Camera::setWhiteBalance
+    81 - 83
+  Camera::setFocusPeakColorLL
+    84 
+  Camera::setFocusPeakThresholdLL
+    85      
+
+
+<on_expSliderValueChanged>
+  Camera::setIntegrationTime
+    Lux1310::setIntegrationTime
+      Lux1310::setSlaveExposure
+        86
+
+

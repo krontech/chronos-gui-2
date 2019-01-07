@@ -1,0 +1,247 @@
+setLiveOutputTiming: 1550*1024@59 (1280*1024 max: 60)
+   (1)--- FPGAWrite16("DISPLAY_H_RES":0x428, 0x510)
+   (2)--- FPGAWrite16("DISPLAY_H_OUT_RES":0x430, 0x500)
+   (3)--- FPGAWrite16("DISPLAY_V_RES":0x42c, 0x400)
+   (4)--- FPGAWrite16("DISPLAY_V_OUT_RES":0x440, 0x400)
+   (5)--- FPGAWrite16("DISPLAY_H_PERIOD":0x410, 0x652)
+   (6)--- FPGAWrite16("DISPLAY_H_SYNC_LEN":0x418, 0x1)
+   (7)--- FPGAWrite16("DISPLAY_H_BACK_PORCH":0x420, 0x40)
+   (8)--- FPGAWrite16("DISPLAY_V_PERIOD":0x414, 0x405)
+   (9)--- FPGAWrite16("DISPLAY_V_SYNC_LEN":0x41c, 0x1)
+   (10)--- FPGAWrite16("DISPLAY_V_BACK_PORCH":0x424, 0x4)
+pixel rate is 1385431040
+maxfps is 1057.0
+h_max_res = 1280
+   (11)--- FPGAWrite16("SENSOR_FIFO_START_W_THRESH":0x10, 0x100)
+   (12)--- FPGAWrite16("SENSOR_FIFO_STOP_W_THRESH":0x14, 0x100)
+   (13)--- FPGAWrite32("SEQ_LIVE_ADDR_0":0x54, 0xf000)
+   (14)--- FPGAWrite32("SEQ_LIVE_ADDR_1":0x58, 0x1e000)
+   (15)--- FPGAWrite32("SEQ_LIVE_ADDR_2":0x5c, 0x2d000)
+   (16)--- FPGAWrite32("SEQ_REC_REGION_START":0x4c, 0x3c000)
+---------
+dctrl is 0x280
+AND mask is 0x8
+   (17)--- FPGAWrite32("DISPLAY_CTL":0x400, 0x2f0)
+   (18)--- FPGAWrite32("IMAGER_FRAME_PERIOD":0x1c, 0x61a80)
+   (19)--- FPGAWrite32("IMAGER_INT_TIME":0x20, 0x5f370)
+> /root/lowpy/camobj.py(392)CamInit()
+-> self.sensor._writeDACVoltages()
+(Pdb) c
+> /root/lowpy/lux1310.py(813)_writeDACVoltages()
+-> print("_writeDACVoltages")
+(Pdb) c
+_writeDACVoltages
+_writeDACVoltage: 1, 0.3V
+   writeDAC 1: 0x4d3
+      writeDACSPI 0x14d3
+_writeDACVoltage: 4, 2.7V
+   writeDAC 4: 0xd16
+      writeDACSPI 0x4d16
+_writeDACVoltage: 7, 3.3V
+   writeDAC 7: 0xd53
+      writeDACSPI 0x7d53
+_writeDACVoltage: 6, 0.7V
+   writeDAC 6: 0xb43
+      writeDACSPI 0x6b43
+_writeDACVoltage: 5, 3.6V
+   writeDAC 5: 0xe89
+      writeDACSPI 0x5e89
+_writeDACVoltage: 2, 2.5V
+   writeDAC 2: 0xc1e
+      writeDACSPI 0x2c1e
+_writeDACVoltage: 3, 2V
+   writeDAC 3: 0x9b1
+      writeDACSPI 0x39b1
+_writeDACVoltage: 0, 1.5V
+   writeDAC 0: 0x745
+      writeDACSPI 0x745
+<lux1310.Lux1310Object object at 0x40127690>
+   (20)--- fpga_write16(0x0, 0x5)
+   (21)--- fpga_write16(0x0, 0x4)
+#############
+Lux has been reset
+#############
+  <1>$$$ Lux1310Write("LUX1310_SCI_SRESET_B", 0x0) - 0x7e, 0x0
+  <2>$$$ Lux1310Write("LUX1310_SCI_CUST_PAT", 0xfc0) - 0x57, 0xfc0
+  <3>$$$ Lux1310Write("LUX1310_SCI_TST_PAT", 0x2) - 0x56, 0x2
+  <4>$$$ Lux1310Write("LUX1310_SCI_PCLK_VBLANK", 0xfc0) - 0x4c, 0xfc0
+  <5>$$$ Lux1310Write("LUX1310_SCI_DAC_ILV", 0xe1) - 0x5a, 0xe1
+   (22)--- fpga_write16(0x4, 0x0)
+   (23)--- fpga_write16(0x4, 0x1)
+   (24)--- fpga_write16(0x4, 0x0)
+
+lux1310_data_correct: 0
+  <6>$$$ Lux1310Write("LUX1310_SCI_PCLK_VBLANK", 0xf00) - 0x4c, 0xf00
+  <7>$$$ Lux1310Write("LUX1310_SCI_TST_PAT", 0x2202) - 0x56, 0x2
+  <8>$$$ Lux1310Write("LUX1310_SCI_RDOUT_DLY", 0x50) - 0x37, 0x50
+  <9>$$$ Lux1310Write("LUX1310_SCI_WAVETAB_SIZE", 0x50) - 0x7a, 0x50
+  <10>$$$ Lux1310Write("LUX1310_SCI_LINE_VALID_DLY", 0x7) - 0x71, 0x7
+  <11>$$$ Lux1310Write("LUX1310_SCI_STATE_IDLE_CTRL0", 0xe08e) - 0x2d, 0xe08e
+  <12>$$$ Lux1310Write("LUX1310_SCI_STATE_IDLE_CTRL1", 0xfc1f) - 0x2e, 0xfc1f
+  <13>$$$ Lux1310Write("LUX1310_SCI_STATE_IDLE_CTRL2", 0x3) - 0x2f, 0x3
+  <14>$$$ Lux1310Write("LUX1310_SCI_ADC_CLOCK_CTRL", 0x2202) - 0x5c, 0x2202
+  <15>$$$ Lux1310Write("LUX1310_SCI_SEL_VCM", 0x4b76) - 0x62, 0x4b76
+  <16>$$$ Lux1310Write("LUX1310_SCI_INT_CLK_TIMING", 0x41f) - 0x74, 0x41f
+LuxInit2
+configuring for LUX1310 silicon rev 2
+  <17>$$$ Lux1310Write("LUX1310_SCI_TERMB_RXCLK", 0x307f) - 0x5b, 0x307f
+< undocumented 0x7b Lux write >
+  <19>$$$ Lux1310Write(0x3a07ff, 0x0)
+  <20>$$$ Lux1310Write(0x3b07ff, 0x0)
+  <21>$$$ Lux1310Write(0x3c07ff, 0x0)
+  <22>$$$ Lux1310Write(0x3d07ff, 0x0)
+  <23>$$$ Lux1310Write(0x3e07ff, 0x0)
+  <24>$$$ Lux1310Write(0x3f07ff, 0x0)
+  <25>$$$ Lux1310Write(0x4007ff, 0x0)
+  <26>$$$ Lux1310Write(0x4107ff, 0x0)
+  <27>$$$ Lux1310Write(0x4207ff, 0x0)
+  <28>$$$ Lux1310Write(0x4307ff, 0x0)
+  <29>$$$ Lux1310Write(0x4407ff, 0x0)
+  <30>$$$ Lux1310Write(0x4507ff, 0x0)
+  <31>$$$ Lux1310Write(0x4607ff, 0x0)
+  <32>$$$ Lux1310Write(0x4707ff, 0x0)
+  <33>$$$ Lux1310Write(0x4807ff, 0x0)
+  <34>$$$ Lux1310Write(0x4907ff, 0x0)
+  <35>$$$ Lux1310Write("LUX1310_SCI_ADC_CAL_EN", 0x1) - 0x39, 0x1
+  <36>$$$ Lux1310Write("LUX1310_SCI_GAIN_SEL_SAMP", 0x7f) - 0x51, 0x7f
+  <37>$$$ Lux1310Write("LUX1310_SCI_GAIN_SEL_FB", 0x7f) - 0x52, 0x7f
+  <38>$$$ Lux1310Write("LUX1310_SCI_GAIN_BIT", 0x3) - 0x53, 0x3
+$$$ Lux1310SCIWriteBuf to 0x7f: 427 entries
+  <39>$$$ Lux1310Write("LUX1310_SCI_TIMING_EN", 0x1) - 0x1, 0x1
+   (25)--- FPGAWrite32("IMAGER_FRAME_PERIOD":0x1c, 0x61a80)
+   (26)--- FPGAWrite32("IMAGER_INT_TIME":0x20, 0x5f370)
+getMinFramePeriod: 0.0009457444444444445
+Requested period 0.00094575
+getMinFramePeriod: 0.0009457444444444445
+   (27)--- FPGAWrite32("IMAGER_FRAME_PERIOD":0x1c, 0x1716f)
+   (28)--- FPGAWrite32("IMAGER_INT_TIME":0x20, 0x16f8e)
+done LuxInit2
+TODO: don't do fake IO
+   (29)--- fpga_write16(0xa0, 0x1)
+   (30)--- fpga_write16(0xa4, 0x1)
+   (31)--- fpga_write16(0xa8, 0x0)
+   (32)--- fpga_write32(0x60, 0x0)
+   (33)--- fpga_write16(0xb4, 0x0)
+   (34)--- fpga_write16(0xb0, 0x0)
+   (35)--- fpga_write16(0xac, 0x2)
+   (36)--- fpga_write16(0xbc, 0x0)
+   (37)--- fpga_write16(0xbc, 0x0)
+   (38)--- fpga_write16(0xbc, 0x0)
+   (39)--- FPGAWrite32("IMAGER_INT_TIME":0x20, 0x0)
+### Lux1310SetResolutions
+ImageGeometryData(hres=1280, vres=1024, hoffset=0, voffset=0)
+0
+80
+  <40>$$$ Lux1310Write("LUX1310_SCI_X_START", 0x20) - 0x5, 0x20
+  <41>$$$ Lux1310Write("LUX1310_SCI_X_END", 0x51f) - 0x6, 0x51f
+  <42>$$$ Lux1310Write("LUX1310_SCI_Y_START", 0x0) - 0x7, 0x0
+  <43>$$$ Lux1310Write("LUX1310_SCI_Y_END", 0x3ff) - 0x8, 0x3ff
+   (40)--- FPGAWrite32("IMAGER_FRAME_PERIOD":0x1c, 0x1716f)
+> /root/lowpy/lux1310.py(504)Lux1310SetGain()
+-> if NODAC:
+(Pdb) c
+Lux1310SetGain: 0
+  <44>$$$ Lux1310Write("LUX1310_SCI_GAIN_SEL_SAMP", 0x7f) - 0x51, 0x7f
+  <45>$$$ Lux1310Write("LUX1310_SCI_GAIN_SEL_FB", 0x7f) - 0x52, 0x7f
+  <46>$$$ Lux1310Write("LUX1310_SCI_GAIN_BIT", 0x3) - 0x53, 0x3
+  <47>$$$ Lux1310Write("LUX1310_SCI_TIMING_EN", 0x8000) - 0x1, 0x0
+  <48>$$$ Lux1310Write("LUX1310_SCI_RDOUT_DLY", 0x50) - 0x37, 0x50
+  <49>$$$ Lux1310Write("LUX1310_SCI_WAVETAB_SIZE", 0x50) - 0x7a, 0x50
+$$$ Lux1310SCIWriteBuf to 0x7f: 427 entries
+  <50>$$$ Lux1310Write("LUX1310_SCI_TIMING_EN", 0x1) - 0x1, 0x1
+   (41)--- FPGAWrite16("SENSOR_MAGIC_START_DELAY":0x68, 0x50)
+Wavetable size set to 80
+Resetting cal gain to 1.0
+> /root/lowpy/camobj.py(435)CamInit()
+-> self.FakeInit()
+(Pdb) c
+TODO: don't do fake init
+--- faking 16 bit (0x6c, (0x52)
+   (42)--- fpga_write16(0x6c, 0x52)
+=== faking 32 bit (0x20, (0x12e5a)
+   (43)--- fpga_write32(0x20, 0x12e5a)
+--- faking 16 bit (0x48, (0xf000)
+   (44)--- fpga_write16(0x48, 0xf000)
+--- faking 16 bit (0x428, (0x500)
+   (45)--- fpga_write16(0x428, 0x500)
+--- faking 16 bit (0x430, (0x500)
+   (46)--- fpga_write16(0x430, 0x500)
+--- faking 16 bit (0x42c, (0x400)
+   (47)--- fpga_write16(0x42c, 0x400)
+--- faking 16 bit (0x440, (0x400)
+   (48)--- fpga_write16(0x440, 0x400)
+--- faking 16 bit (0x410, (0x652)
+   (49)--- fpga_write16(0x410, 0x652)
+--- faking 16 bit (0x418, (0x1)
+   (50)--- fpga_write16(0x418, 0x1)
+--- faking 16 bit (0x420, (0x40)
+   (51)--- fpga_write16(0x420, 0x40)
+--- faking 16 bit (0x414, (0x405)
+   (52)--- fpga_write16(0x414, 0x405)
+--- faking 16 bit (0x41c, (0x1)
+   (53)--- fpga_write16(0x41c, 0x1)
+--- faking 16 bit (0x424, (0x4)
+   (54)--- fpga_write16(0x424, 0x4)
+=== faking 32 bit (0x60, (0x0)
+   (55)--- fpga_write32(0x60, 0x0)
+--- faking 16 bit (0xbc, (0x0)
+   (56)--- fpga_write16(0xbc, 0x0)
+=== faking 32 bit (0x20, (0x78)
+   (57)--- fpga_write32(0x20, 0x78)
+=== faking 32 bit (0x50, (0x1fffe000)
+   (58)--- fpga_write32(0x50, 0x1fffe000)
+=== faking 32 bit (0x104, (0x0)
+   (59)--- fpga_write32(0x104, 0x0)
+=== faking 32 bit (0x100, (0x200c)
+   (60)--- fpga_write32(0x100, 0x200c)
+--- faking 16 bit (0x48, (0xf000)
+   (61)--- fpga_write16(0x48, 0xf000)
+=== faking 32 bit (0x40, (0x2)
+   (62)--- fpga_write32(0x40, 0x2)
+=== faking 32 bit (0x40, (0x0)
+   (63)--- fpga_write32(0x40, 0x0)
+--- faking 16 bit (0xbc, (0x0)
+   (64)--- fpga_write16(0xbc, 0x0)
+=== faking 32 bit (0x20, (0x12e5a)
+   (65)--- fpga_write32(0x20, 0x12e5a)
+=== faking 32 bit (0x20, (0x0)
+   (66)--- fpga_write32(0x20, 0x0)
+=== faking 32 bit (0x20, (0x12e5a)
+   (67)--- fpga_write32(0x20, 0x12e5a)
+--- faking 16 bit (0x4f0, (0x10e5)
+   (68)--- fpga_write16(0x4f0, 0x10e5)
+--- faking 16 bit (0x4f4, (0x10e5)
+   (69)--- fpga_write16(0x4f4, 0x10e5)
+--- faking 16 bit (0x4f8, (0x10e5)
+   (70)--- fpga_write16(0x4f8, 0x10e5)
+--- faking 16 bit (0x4c0, (0x1ea2)
+   (71)--- fpga_write16(0x4c0, 0x1ea2)
+--- faking 16 bit (0x4c4, (0xf6c6)
+   (72)--- fpga_write16(0x4c4, 0xf6c6)
+--- faking 16 bit (0x4c8, (0xfc41)
+   (73)--- fpga_write16(0x4c8, 0xfc41)
+--- faking 16 bit (0x4d0, (0xfb1d)
+   (74)--- fpga_write16(0x4d0, 0xfb1d)
+--- faking 16 bit (0x4d4, (0x163b)
+   (75)--- fpga_write16(0x4d4, 0x163b)
+--- faking 16 bit (0x4d8, (0xfe74)
+   (76)--- fpga_write16(0x4d8, 0xfe74)
+--- faking 16 bit (0x4dc, (0x209)
+   (77)--- fpga_write16(0x4dc, 0x209)
+--- faking 16 bit (0x4e0, (0xf0c1)
+   (78)--- fpga_write16(0x4e0, 0xf0c1)
+--- faking 16 bit (0x4e4, (0x1a63)
+   (79)--- fpga_write16(0x4e4, 0x1a63)
+--- faking 16 bit (0x4f0, (0x16ce)
+   (80)--- fpga_write16(0x4f0, 0x16ce)
+--- faking 16 bit (0x4f4, (0x10e5)
+   (81)--- fpga_write16(0x4f4, 0x10e5)
+--- faking 16 bit (0x4f8, (0x1ac3)
+   (82)--- fpga_write16(0x4f8, 0x1ac3)
+=== faking 32 bit (0x400, (0x280)
+   (83)--- fpga_write32(0x400, 0x280)
+=== faking 32 bit (0x444, (0x19)
+   (84)--- fpga_write32(0x444, 0x19)
+=== faking 32 bit (0x20, (0x12c31)
+   (85)--- fpga_write32(0x20, 0x12c31)
+LIVE FPGA registers

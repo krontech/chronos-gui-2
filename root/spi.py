@@ -9,7 +9,7 @@ SPI_SPEED = 1000000
 SPI_BITORDER = "msb"
 SPI_BITS = 16
 
-#spi = 0
+spi = 0
 
 def spi_open():
 	global spi
@@ -21,4 +21,4 @@ def spi_transfer(data):
 	spilist = [data >> 8, data & 255]
 	#print (spilist)
 	spi.transfer(spilist)
-	
+

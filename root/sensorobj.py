@@ -31,63 +31,6 @@ class ImageConstraintsData:
 	f_quantization: int = 0
 
 
-@dataclass
-class ImageSensorData:
-	#struct fpga *fpga;
-	#const struct image_sensor_ops *ops;
-
-	# Image Sensor descriptions. 
-	name: str = " "
-	mfr: str = " "
-	iformat: int = 0
-	
-	# Image Sensor Limits
-	h_max_res: int = 0
-	v_max_res: int = 0
-	h_min_res: int = 0
-	v_min_res: int = 0
-	h_increment: int = 0
-	v_increment: int = 0
-	pixel_rate: int = 0
-	adc_count: int = 0
-
-	# Black Pixel Regions. 
-	blk_top: int = 0
-	blk_bottom: int = 0
-	blk_left: int = 0
-	blk_right: int = 0
-
-
-
-
-# @dataclass
-# class ImageSensorData:
-# 	#struct fpga *fpga;
-# 	#const struct image_sensor_ops *ops;
-
-# 	# Image Sensor descriptions. 
-# 	name: str = " "
-# 	mfr: str = " "
-# 	iformat: int = 0
-	
-# 	# Image Sensor Limits
-# 	h_max_res: int = 0
-# 	v_max_res: int = 0
-# 	h_min_res: int = 0
-# 	v_min_res: int = 0
-# 	h_increment: int = 0
-# 	v_increment: int = 0
-# 	pixel_rate: int = 0
-# 	adc_count: int = 0
-
-# 	# Black Pixel Regions. 
-# 	blk_top: int = 0
-# 	blk_bottom: int = 0
-# 	blk_left: int = 0
-# 	blk_right: int = 0
-
-
-
 
 
 '''
@@ -104,24 +47,17 @@ class image_sensor_ops {
 };
 '''
 
+def luxnum(self):
+	return 5
 
 class SensorObject():
-	# def __init__(self, mem):
 	def __init__(self, mem):
-		print ("SensorObject Init")
 		self.mem = mem
-		#print (mem)
-		self.SensorInit()
 
 	# print ("class SensorObject")
 	# print (mem)
 	
 	ImageGeometry = ImageGeometryData()
-	ImageConstraints = ImageConstraintsData()
-	ImageSensor = ImageSensorData()
-	OpsDict = {}
-	# ImageGeometry.hres = 500000001
-	# ImageSensor = ImageSensorData
-	
-	hMaxRes = 0;
-	vMaxRes = 0;
+	ImageGeometry.hres = 500000001
+	numfunc = luxnum
+

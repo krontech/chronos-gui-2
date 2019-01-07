@@ -1,61 +1,76 @@
 
+# import pdb; pdb.set_trace()
+
+print("Live Video Testing")
+
+# breakpoint()
+
 import time
 from camobj import CamObject
-#import camobj
+from termcolor import colored
+# import camobj
 
-print ("Live Video Testing")
+# breakpoint()
 
-
-
-
-
+# exit()
 # main part
 
 cam = CamObject()
 
+# exit()
 
 def nicehex(n):
 	return "0x" + ("0000000" + hex(n)[2:])[-4:]
+
+
 def nicehex4(n):
 	return "0x" + ("0000000" + hex(n)[2:])[-8:]
 
-print ("LIVE FPGA registers")
 
-#print (cam)
+print("LIVE FPGA registers")
+
+# print (cam)
 
 for i in range(0, 10, 4):
 	mm = cam.mem.fpga_mmio.read32(i)
-	print (nicehex(i), " - ", nicehex4(mm))
+	print(nicehex(i), " - ", nicehex4(mm))
 
-print ("LIVE!")
+print("LIVE!")
 
-print (cam.sensor.ImageGeometry.hres)
-print (cam.sensor.numfunc())
+# print (cam.sensor.ImageGeometry.hres)
+# print (cam.sensor.numfunc())
 
 
-sw = cam.GPIORead("encoder-sw")
+sw = cam.mem.GPIORead("encoder-sw")
 print(f"Encoder switch is {sw}")
 
+print ("----")
 for x in range(10):
-	cam.GPIOWrite("record-led.0", x & 1)
-	cam.GPIOWrite("record-led.1", not (x & 1))
+	cam.mem.GPIOWrite("record-led.0", x & 1)
+	print("-")
+	cam.mem.GPIOWrite("record-led.1", not (x & 1))
 	time.sleep(0.08)
-cam.GPIOWrite("record-led.0", 0)
-cam.GPIOWrite("record-led.1", 0)
+	print(x)
+cam.mem.GPIOWrite("record-led.0", 0)
+cam.mem.GPIOWrite("record-led.1", 0)
+
+exit()
 
 while 0:
-	a = cam.GPIORead("encoder-a")
-	b = cam.GPIORead("encoder-b")
-	#b = cam.GPIORead("encoder-sw")
-	#a = not cam.GPIORead("shutter-sw")
-	cam.GPIOWrite("record-led.0", a)
-	cam.GPIOWrite("record-led.1", b)
+	a = cam.mem.GPIORead("encoder-a")
+	b = cam.mem.GPIORead("encoder-b")
+	# b = cam.GPIORead("encoder-sw")
+	# a = not cam.GPIORead("shutter-sw")
+	cam.mem.GPIOWrite("record-led.0", a)
+	cam.mem.GPIOWrite("record-led.1", b)
 
+# cam.sensor.Lux1310RegDump()
+print("........")
 
+cam.sensor.Lux1310ShowTestPattern()
 
-
-cam.TestLive()
+# cam.TestLive()
 
 # print (cam.sensor.ImageConstraints)
 # print (cam.sensor.ImageGeometry)
-print (cam.sensor.ImageSensor)
+# print (cam.sensor.ImageSensor)
