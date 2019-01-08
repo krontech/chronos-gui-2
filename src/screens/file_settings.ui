@@ -39,7 +39,7 @@
     <string>File Size</string>
    </property>
   </widget>
-  <widget class="ComboBox" name="combobox">
+  <widget class="ComboBox" name="uiSavedVideoLocation">
    <property name="geometry">
     <rect>
      <x>0</x>
@@ -52,7 +52,7 @@
     <enum>ComboBox::half</enum>
    </property>
   </widget>
-  <widget class="Button" name="button">
+  <widget class="Button" name="uiSafelyRemove">
    <property name="geometry">
     <rect>
      <x>330</x>
@@ -78,7 +78,7 @@
     <string notr="true">background: teal</string>
    </property>
   </widget>
-  <widget class="Label" name="label">
+  <widget class="Label" name="uiDiskSpaceUsed">
    <property name="geometry">
     <rect>
      <x>560</x>
@@ -91,7 +91,7 @@
     <string>%s used</string>
    </property>
   </widget>
-  <widget class="Label" name="label_2">
+  <widget class="Label" name="uiDiskSpaceFree">
    <property name="geometry">
     <rect>
      <x>700</x>
@@ -104,7 +104,7 @@
     <string>%s free</string>
    </property>
   </widget>
-  <widget class="Label" name="label_3">
+  <widget class="Label" name="uiDiskSpaceRequired">
    <property name="geometry">
     <rect>
      <x>560</x>
@@ -187,7 +187,7 @@
     <string>Saved Video Name</string>
    </property>
   </widget>
-  <widget class="LineEdit" name="lineedit">
+  <widget class="LineEdit" name="uiSavedVideoName">
    <property name="geometry">
     <rect>
      <x>0</x>
@@ -200,7 +200,7 @@
     <string>Vid_%date%_%time%_%mark%</string>
    </property>
   </widget>
-  <widget class="ComboBox" name="combobox_2">
+  <widget class="ComboBox" name="uiSavedVideoFileExtention">
    <property name="geometry">
     <rect>
      <x>350</x>
@@ -291,7 +291,7 @@
     <string>Bits Per Pixel</string>
    </property>
   </widget>
-  <widget class="SpinBox" name="spinbox">
+  <widget class="SpinBox" name="uiSavedFileFramerate">
    <property name="geometry">
     <rect>
      <x>0</x>
@@ -314,7 +314,7 @@
     <string>fps</string>
    </property>
   </widget>
-  <widget class="SpinBox" name="spinbox_2">
+  <widget class="SpinBox" name="uiSavedFileBPP">
    <property name="geometry">
     <rect>
      <x>240</x>
@@ -337,7 +337,7 @@
     <string>After Recording</string>
    </property>
   </widget>
-  <widget class="CheckBox" name="checkbox">
+  <widget class="CheckBox" name="uiAutoSaveVideo">
    <property name="geometry">
     <rect>
      <x>0</x>
@@ -350,7 +350,7 @@
     <string>Auto-Save Video</string>
    </property>
   </widget>
-  <widget class="CheckBox" name="checkbox_2">
+  <widget class="CheckBox" name="uiResumeRecordingAfterSave">
    <property name="geometry">
     <rect>
      <x>200</x>
@@ -422,7 +422,7 @@ After Save Complete</string>
     <string>Mbps</string>
    </property>
   </widget>
-  <widget class="SpinBox" name="spinbox_3">
+  <widget class="SpinBox" name="uiSavedFileMaxBitrate">
    <property name="geometry">
     <rect>
      <x>470</x>
@@ -449,31 +449,31 @@ After Save Complete</string>
   <zorder>widget_2</zorder>
   <zorder>headerlabel</zorder>
   <zorder>headerlabel_2</zorder>
-  <zorder>button</zorder>
-  <zorder>combobox</zorder>
+  <zorder>uiSafelyRemove</zorder>
+  <zorder>uiSavedVideoLocation</zorder>
   <zorder>uiDiskSpaceVisualization</zorder>
-  <zorder>label</zorder>
-  <zorder>label_2</zorder>
-  <zorder>label_3</zorder>
+  <zorder>uiDiskSpaceUsed</zorder>
+  <zorder>uiDiskSpaceFree</zorder>
+  <zorder>uiDiskSpaceRequired</zorder>
   <zorder>frame</zorder>
   <zorder>frame_2</zorder>
   <zorder>frame_3</zorder>
   <zorder>headerlabel_3</zorder>
-  <zorder>lineedit</zorder>
-  <zorder>combobox_2</zorder>
+  <zorder>uiSavedVideoName</zorder>
+  <zorder>uiSavedVideoFileExtention</zorder>
   <zorder>headerlabel_4</zorder>
   <zorder>label_6</zorder>
   <zorder>label_7</zorder>
-  <zorder>spinbox</zorder>
-  <zorder>spinbox_2</zorder>
+  <zorder>uiSavedFileFramerate</zorder>
+  <zorder>uiSavedFileBPP</zorder>
   <zorder>headerlabel_5</zorder>
-  <zorder>checkbox</zorder>
-  <zorder>checkbox_2</zorder>
+  <zorder>uiAutoSaveVideo</zorder>
+  <zorder>uiResumeRecordingAfterSave</zorder>
   <zorder>uiStampData</zorder>
   <zorder>uiDone</zorder>
   <zorder>label_9</zorder>
   <zorder>label_10</zorder>
-  <zorder>spinbox_3</zorder>
+  <zorder>uiSavedFileMaxBitrate</zorder>
  </widget>
  <customwidgets>
   <customwidget>
