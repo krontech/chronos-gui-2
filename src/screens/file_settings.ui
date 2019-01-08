@@ -517,6 +517,19 @@ After Save Complete</string>
    <header>spin_box</header>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>uiSavedVideoLocation</tabstop>
+  <tabstop>uiSafelyRemove</tabstop>
+  <tabstop>uiSavedVideoName</tabstop>
+  <tabstop>uiSavedVideoFileExtention</tabstop>
+  <tabstop>uiSavedFileFramerate</tabstop>
+  <tabstop>uiSavedFileBPP</tabstop>
+  <tabstop>uiSavedFileMaxBitrate</tabstop>
+  <tabstop>uiAutoSaveVideo</tabstop>
+  <tabstop>uiResumeRecordingAfterSave</tabstop>
+  <tabstop>uiStampData</tabstop>
+  <tabstop>uiDone</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>
