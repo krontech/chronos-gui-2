@@ -525,22 +525,4 @@
   <tabstop>uiClose</tabstop>
  </tabstops>
  <resources/>
- <connections>
-  <connection>
-   <sender>uiClose</sender>
-   <signal>clicked()</signal>
-   <receiver>uiKeyboardNumericWithUnits</receiver>
-   <slot>hide()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>346</x>
-     <y>424</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>395</x>
-     <y>310</y>
-    </hint>
-   </hints>
-  </connection>
- </connections>
 </ui>

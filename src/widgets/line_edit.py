@@ -1,6 +1,6 @@
 from random import randint
 
-from PyQt5.QtCore import Q_ENUMS, QSize, Qt
+from PyQt5.QtCore import Q_ENUMS, QSize, Qt, QEvent
 from PyQt5.QtWidgets import QLineEdit
 
 from debugger import *; dbg
@@ -14,21 +14,32 @@ class LineEdit(QLineEdit, TouchMarginPlugin, DirectAPILinkPlugin, FocusablePlugi
 	
 	def __init__(self, parent=None, showHitRects=False):
 		self.keepActiveLook = False
-		
+
 		super().__init__(parent, showHitRects=showHitRects)
 		
 		# Set some default text, so we can see the widget.
 		if not self.text():
 			self.setText('')
+		
+		self.setCursorMoveStyle(Qt.LogicalMoveStyle) #Left moves left, right moves right. Defaults is right arrow key moves left under rtl writing systems.
 			
 		self.clickMarginColor = f"rgba({randint(128, 255)}, {randint(64, 128)}, {randint(0, 32)}, {randint(32,96)})"
 		
+		self.inputMode = '' #Set to empty, 'jogWheel', or 'touch'. Used for defocus event handling behaviour.
+		
 		self.jogWheelLowResolutionRotation.connect(lambda delta, pressed: 
 			not pressed and self.selectWidget(delta) )
-		self.jogWheelClick.connect(lambda: 
-			self.window().focusRing.focusOut()
-			if self.window().focusRing.isFocussedIn else
-			self.window().focusRing.focusIn() )
+		self.jogWheelClick.connect(self.jogWheelClicked)
+		
+		self.touchStart.connect(self.editTapped)
+		
+		self.doneEditing.connect(self.doneEditingCallback)
+		
+		###
+		### TODO: Add an event filter to get clicked events. (We can't 
+		###       use focus events because the jog wheel does that when
+		###       it rolls over an input.) Bring up the input panel.
+		###
 	
 	def sizeHint(self):
 		return QSize(361, 81)
@@ -65,3 +76,21 @@ class LineEdit(QLineEdit, TouchMarginPlugin, DirectAPILinkPlugin, FocusablePlugi
 					margin-bottom: {self.clickMarginBottom*10}px;
 				}}
 			""" + self.originalStyleSheet())
+	
+	def jogWheelClicked(self):
+		if self.window().focusRing.isFocussedIn:
+			self.window().focusRing.focusOut()
+			self.doneEditing.emit()
+		else:
+			self.window().focusRing.focusIn()
+			self.inputMode = 'jogWheel'
+			self.window().app.window.showInput('alphanumeric', focus=True)
+	
+	def editTapped(self):
+		self.inputMode = 'touch'
+		self.window().app.window.showInput('alphanumeric', focus=False)
+	
+	def doneEditingCallback(self):
+		self.inputMode = ''
+		self.window().app.window.hideInput()
+		

@@ -962,6 +962,32 @@
     <string>type here</string>
    </property>
   </widget>
+  <widget class="LineEdit" name="lineedit_2">
+   <property name="geometry">
+    <rect>
+     <x>160</x>
+     <y>0</y>
+     <width>331</width>
+     <height>81</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>type here</string>
+   </property>
+  </widget>
+  <widget class="LineEdit" name="lineedit_3">
+   <property name="geometry">
+    <rect>
+     <x>290</x>
+     <y>400</y>
+     <width>331</width>
+     <height>81</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>type here</string>
+   </property>
+  </widget>
   <zorder>widget</zorder>
   <zorder>white_4</zorder>
   <zorder>combobox_4</zorder>
@@ -985,6 +1011,8 @@
   <zorder>radiobutton</zorder>
   <zorder>spinbox_2</zorder>
   <zorder>lineedit</zorder>
+  <zorder>lineedit_2</zorder>
+  <zorder>lineedit_3</zorder>
  </widget>
  <customwidgets>
   <customwidget>

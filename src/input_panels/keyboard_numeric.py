@@ -5,7 +5,7 @@ from debugger import *; dbg
 
 
 class KeyboardNumeric(QtWidgets.QWidget):
-	onShow = pyqtSignal(list)
+	onShow = pyqtSignal('QVariantMap')
 	onHide = pyqtSignal()
 	
 	def __init__(self, window, uiFilePath):
@@ -16,7 +16,13 @@ class KeyboardNumeric(QtWidgets.QWidget):
 		self.move(800-self.width(), 0)
 		self.setWindowFlags(QtCore.Qt.FramelessWindowHint)
 		self.setAttribute(QtCore.Qt.WA_TranslucentBackground, True)
-
+		
+		self.onShow.connect(self.handleShown)
+		self.onHide.connect(lambda o: print('hide', o))
+	
+	def handleShown(self, options):
+		#eg, {'focus': False, 'hints': [], 'opener': <line_edit.LineEdit object at 0x46155cb0>}
+		pass
 
 class KeyboardNumericWithUnits(KeyboardNumeric):
 	def __init__(self, window):

@@ -61,7 +61,7 @@ class FocusRing(QLabel):
 			) - QSize(self._currentPadding, self._currentPadding)*2
 		
 		self.setGeometry(QRect(xy, wh))
-		self.raise_()
+		self.raise_() #Make focus ring appear above keyboard.
 	
 	
 	def _updateFocusRingPadding(self):

@@ -29,12 +29,13 @@ QtWidgets.QApplication.setAttribute(QtCore.Qt.AA_EnableHighDpiScaling, True)
 
 
 class Window(QtCore.QObject):
-	"""Metacontrols (screen switching) for the back of camera interface.
+	"""Meta-controls (screen switching & keyboards) for the app.
 	
-		This class provides a high-level API to control the running application.
-		Currently, that means controlling which screen is currently displayed. It
-		also provides some convenience for developing the application by restoring
-		the last displayed screen.
+			This class provides a high-level API to control the running
+		application. Currently, that means controlling which screen is
+		currently displayed and providing calls to enable an on-screen
+		keyboard. It also provides some convenience for developing the
+		application by restoring the last displayed screen.
 		
 		History:
 			The current method of screen switching is pretty dumb, as it does
@@ -58,17 +59,19 @@ class Window(QtCore.QObject):
 		point. I can't figure out what would be better to port them to anyway,
 		since we can't seem to use a QMainWindow with a QStackedLayout unless
 		we combine everything into one .ui file.
-		
-		Methods:
-			show(string id): Switch the currently open screen. Similar to
-				QStackedLayout, but provides a string-indexed interface versus an
-				int-indexed interface.
 	"""
 	
 	def __init__(self, app):
 		super().__init__()
+		
 		self.app = app
 		app.window = self #Yuck. Couldn't find a decent way to plumb self.showInput through to the widgets otherwise.
+		
+		
+		
+		################################
+		# Screen-loading functionality #
+		################################
 		
 		from screens.about_camera import AboutCamera
 		from screens.file_settings import FileSettings
@@ -163,6 +166,25 @@ class Window(QtCore.QObject):
 		
 		screen = self._screens[screenName] = self._availableScreens[screenName](self)
 		screen.app = self.app
+		
+		# So, we want alpha blending, so we can have a drop-shadow for our
+		# keyboard. Great. Since we're not using a compositing window manager,
+		# we don't get that between windows. So we don't want put the keyboard
+		# in it's own window. (We could hack something together where the
+		# shadow is in one window, and the keyboard in the other. This seems
+		# rather confusing to me.) So, what we're going to do is to move all
+		# the children of the loaded screen into a widget the size of the
+		# screen, and the keyboard into another. This gives us -conceptually-
+		# the same setup as in the old camApp, where keyboards were in a
+		# separate container.
+		
+		children = screen.children()
+		screenContents = QtWidgets.QWidget(screen)
+		for child in children:
+			child.setParent(screenContents)
+		screen.screenContents = screenContents
+		
+		# Finally, add the screen's focus ring.
 		screen.focusRing = FocusRing(self._screens[screenName])
 		
 	def _uninstantiatedScreens(self):
@@ -217,28 +239,57 @@ class Window(QtCore.QObject):
 			print('Error: No more back to navigate to.')
 	
 	
-	def showInput(self, name, *, hints=[]):
+	
+	#############################
+	# Input panel functionality #
+	#############################
+	
+	def showInput(self, name: str, *, hints: list = [], focus: bool):
 		"""Display a soft keyboard on-screen.
 			
 			name: Identifier string in self._keyboards.
 			hints: Keyword, takes ['list', 'of', 'words'] to show as
 				soft buttons at the top of the keyboard. Only
-				applies to the alphanumeric keyboard."""
+				applies to the alphanumeric keyboard.
+			focus: Determines if the keyboard takes focus or not.
+				Behaves like a modal dialog if it does focus."""
+		
+		if self.activeInputName() == name:
+			return
+		
+		if self.activeInput():
+			self.hideInput()
 		
 		self._activeKeyboard = name
 		panel = self._keyboards[self._activeKeyboard]
 		panel.setParent(self._screens[self.currentScreen])
-		panel.onShow.emit(hints)
-		panel.show()
+		panel.onShow.emit({
+			"opener": app.focusWidget(),
+			"hints": hints,
+			"focus": focus,
+		})
 
 	
 	def hideInput(self):
 		"""Hide the keyboard given by name, or the most recent keyboard."""
 		
 		panel = self._keyboards[self._activeKeyboard]
-		panel.hide()
 		panel.onHide.emit()
 		self._activeKeyboard = ''
+	
+	
+	def activeInput(self):
+		if self._activeKeyboard and self._keyboards[self._activeKeyboard].isVisible():
+			return self._keyboards[self._activeKeyboard]
+		else:
+			return None
+		
+	
+	def activeInputName(self):
+		if self._activeKeyboard and self._keyboards[self._activeKeyboard].isVisible():
+			return self._activeKeyboard
+		else:
+			return None
 			
 
 

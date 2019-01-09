@@ -37,13 +37,13 @@
    <property name="geometry">
     <rect>
      <x>0</x>
-     <y>5</y>
-     <width>801</width>
-     <height>301</height>
+     <y>10</y>
+     <width>800</width>
+     <height>300</height>
     </rect>
    </property>
   </widget>
-  <widget class="QWidget" name="horizontalLayoutWidget">
+  <widget class="QWidget" name="uiSuggestionBar">
    <property name="geometry">
     <rect>
      <x>0</x>
@@ -52,15 +52,15 @@
      <height>45</height>
     </rect>
    </property>
-   <layout class="QHBoxLayout" name="uiSuggestionBar"/>
+   <layout class="QHBoxLayout" name="uiSuggestionBarLayout"/>
   </widget>
-  <widget class="QWidget" name="widget" native="true">
+  <widget class="QWidget" name="uiKeyPanel" native="true">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>45</y>
-     <width>801</width>
-     <height>261</height>
+     <width>800</width>
+     <height>260</height>
     </rect>
    </property>
    <widget class="Button" name="ui9">
@@ -1244,10 +1244,10 @@
     </property>
    </widget>
   </widget>
+  <zorder>uiSuggestionBar</zorder>
   <zorder>backdrop</zorder>
-  <zorder>widget</zorder>
+  <zorder>uiKeyPanel</zorder>
   <zorder>uiDropshadow</zorder>
-  <zorder>horizontalLayoutWidget</zorder>
  </widget>
  <customwidgets>
   <customwidget>
@@ -1307,22 +1307,4 @@
   <tabstop>uiClose</tabstop>
  </tabstops>
  <resources/>
- <connections>
-  <connection>
-   <sender>uiClose</sender>
-   <signal>clicked()</signal>
-   <receiver>uiKeyboardNumericWithUnits</receiver>
-   <slot>hide()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>744</x>
-     <y>275</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>-2</x>
-     <y>24</y>
-    </hint>
-   </hints>
-  </connection>
- </connections>
 </ui>

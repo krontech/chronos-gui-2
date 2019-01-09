@@ -184,7 +184,17 @@ EOL
     #   EOQ
     
     #Faster SSH:
-    #If present, remove /etc/profile.d/horse.sh. It takes a moment to run. 😭
+    #If present, edit /etc/profile.d/horse.sh to use /usr/games/cowsay instead
+    #   of ponysay. Ponysay takes a moment to run. 😭 (`apt-get install cowsay`)
     #Go to the SSH *client*, edit /etc/nsswitch.conf, and change a line
     #FROM: hosts:          files mdns4_minimal [NOTFOUND=return] dns
     #TO:   hosts:          files dns
+    
+    #Static IP
+    #Edit the eth0 section in /etc/network/interfaces on the camera like:
+    #   auto eth0
+    #   iface eth0 inet static
+    #           address 192.168.1.214
+    #           netmask 255.255.255.0
+    #           gateway 192.168.1.1
+    #Where "214" is your static IP address choice.
