@@ -273,6 +273,9 @@ class Window(QtCore.QObject):
 	def hideInput(self):
 		"""Hide the keyboard given by name, or the most recent keyboard."""
 		
+		if not self._activeKeyboard:
+			return #Well, that was easy. *causes horrendous problems down the road*
+		
 		panel = self._keyboards[self._activeKeyboard]
 		panel.onHide.emit()
 		self._activeKeyboard = ''

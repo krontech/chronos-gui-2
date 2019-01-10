@@ -28,6 +28,12 @@ class KeyboardAlphanumeric(QtWidgets.QWidget):
 		#We bounce the "done editing" idea through whatever opened us, so if whatever opened us is invalid it has the option of not closing us if it wants to. Is… is this spaghetti logic? I'm so sorry.
 		self.uiClose.clicked.connect(lambda: 
 			self.opener and self.opener.doneEditing.emit() )
+		
+		#Wrap "Close" around to "q", so we don't select off the end of the keyboard and close it.
+		self.uiClose.jogWheelLowResolutionRotation.disconnect()
+		self.uiClose.jogWheelLowResolutionRotation.connect(self.wrapFocusRingSelectionForClose)
+		self.uiQ.jogWheelLowResolutionRotation.disconnect()
+		self.uiQ.jogWheelLowResolutionRotation.connect(self.wrapFocusRingSelectionForQ)
 	
 	def __handleShown(self, options):
 		#eg, {'focus': False, 'hints': [], 'opener': <line_edit.LineEdit object at 0x46155cb0>}
@@ -49,6 +55,7 @@ class KeyboardAlphanumeric(QtWidgets.QWidget):
 			self.uiKeyPanel.setGeometry(inputGeometry)
 			inputGeometry.setHeight(inputGeometry.height() + self.uiSuggestionBar.height() + padding)
 			self.setGeometry(inputGeometry)
+			print('SUGGESTION BAR NOT IMPLEMENTED (check it works correctly with tap VS jog wheel focus modes)')
 		
 		self.setGeometry(0, self.parentWidget().height() - self.height(), self.width(), self.height())
 		
@@ -84,6 +91,28 @@ class KeyboardAlphanumeric(QtWidgets.QWidget):
 		###
 		###
 		
+		
+		#Set button focus policy.
+		
+		for pane in self.children():
+			for widget in pane.children():
+				if type(widget) is QtWidgets.QHBoxLayout:
+					for widget in widget.children():
+						widget.setFocusPolicy(
+							QtCore.Qt.StrongFocus 
+							if options["focus"] 
+							else QtCore.Qt.NoFocus
+						)
+				else:
+					widget.setFocusPolicy(
+						QtCore.Qt.StrongFocus 
+						if options["focus"] 
+						else QtCore.Qt.NoFocus
+					)
+		
+		options["focus"] and self.uiClose.setFocus()
+		self.window().focusRing.focusOut(immediate=True)
+		
 		self.parent().app.focusChanged.connect(self.__handleFocusChange)
 	
 	def __handleHide(self):
@@ -113,3 +142,16 @@ class KeyboardAlphanumeric(QtWidgets.QWidget):
 		focussedOnInputOrKeyboard = new == self.opener or True in [new in child.children() for child in self.children()]
 		if not focussedOnInputOrKeyboard:
 			self.opener.doneEditing.emit()
+	
+	
+	def wrapFocusRingSelectionForClose(self, delta, pressed):
+		if delta < 0:
+			return not pressed and self.uiClose.selectWidget(delta)
+		else:
+			self.uiQ.setFocus()
+	
+	def wrapFocusRingSelectionForQ(self, delta, pressed):
+		if delta > 0:
+			return not pressed and self.uiQ.selectWidget(delta)
+		else:
+			self.uiClose.setFocus()
