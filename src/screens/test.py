@@ -1,4 +1,4 @@
-from PyQt5 import uic, QtWidgets, QtCore
+from PyQt5 import uic, QtWidgets, QtCore, QtGui
 # from PyQt5.QtCore import pyqtSlot
 from PyQt5.QtSvg import QSvgWidget
 

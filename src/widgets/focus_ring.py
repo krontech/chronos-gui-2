@@ -90,6 +90,9 @@ class FocusRing(QLabel):
 		
 		self._focussedOn and self.focusOn(self._focussedOn)
 	
+	def refocus(self):
+		self._focussedOn and self.focusOn(self._focussedOn)
+	
 	
 	def focusIn(self, *, immediate: bool = False, speed: float = .75, amount: float = 1.):
 		"""Tighten focus on the selected widget.

@@ -1,4 +1,6 @@
-from PyQt5 import uic, QtWidgets, QtCore
+from string import ascii_uppercase, digits
+
+from PyQt5 import uic, QtWidgets, QtCore, QtGui
 from PyQt5.QtCore import pyqtSignal
 
 from debugger import *; dbg
@@ -34,6 +36,31 @@ class KeyboardAlphanumeric(QtWidgets.QWidget):
 		self.uiClose.jogWheelLowResolutionRotation.connect(self.wrapFocusRingSelectionForClose)
 		self.uiQ.jogWheelLowResolutionRotation.disconnect()
 		self.uiQ.jogWheelLowResolutionRotation.connect(self.wrapFocusRingSelectionForQ)
+		
+		self.refocusFocusRingTimer = QtCore.QTimer()
+		self.refocusFocusRingTimer.timeout.connect(lambda: 
+			self.window().focusRing.refocus() )
+		self.refocusFocusRingTimer.setSingleShot(True)
+		
+		self.uiShift.pressed.connect(self.toggleCaps)
+		
+		#Assign keystrokes for each alphanumeric key.
+		for key in [getattr(self, f'ui{letter}') for letter in f"{ascii_uppercase}{digits}"]:
+			key.pressed.connect((lambda key: #The spare lambda closure captures the key variable, which otherwise is updated in the for loop.
+				lambda: self.sendKeystroke(
+					getattr(QtCore.Qt, f"Key_{key.text().upper()}") )
+			)(key))
+		
+		#Assign keystrokes for the rest of the keys.
+		self.uiDot.pressed.connect(lambda: 
+			self.sendKeystroke(QtCore.Qt.Key_Period) )
+		self.uiBackspace.pressed.connect(lambda: 
+			self.sendKeystroke(QtCore.Qt.Key_Backspace) )
+		self.uiSpace.pressed.connect(lambda: 
+			self.sendKeystroke(QtCore.Qt.Key_Space) )
+		
+		self.uiLeft.pressed.connect(lambda: self.adjustCarat(-1))
+		self.uiRight.pressed.connect(lambda: self.adjustCarat(1))
 	
 	def __handleShown(self, options):
 		#eg, {'focus': False, 'hints': [], 'opener': <line_edit.LineEdit object at 0x46155cb0>}
@@ -85,9 +112,7 @@ class KeyboardAlphanumeric(QtWidgets.QWidget):
 		
 		###
 		###
-		### TODO: make button focus policy correct, 
-		### also tweak first/last button for focus wrapping.
-		### See how animation looks.
+		### TODO: See how animation looks.
 		###
 		###
 		
@@ -110,8 +135,11 @@ class KeyboardAlphanumeric(QtWidgets.QWidget):
 						else QtCore.Qt.NoFocus
 					)
 		
-		options["focus"] and self.uiClose.setFocus()
-		self.window().focusRing.focusOut(immediate=True)
+		if options["focus"]:
+			self.uiClose.setFocus()
+			self.window().focusRing.focusOut(immediate=True)
+		else:
+			self.window().focusRing.refocus()
 		
 		self.parent().app.focusChanged.connect(self.__handleFocusChange)
 	
@@ -136,6 +164,10 @@ class KeyboardAlphanumeric(QtWidgets.QWidget):
 		except TypeError:
 			print('Warning: __handleFocusChange for alphanumeric keyboard not connected.')
 			pass
+		
+		#Refresh focus ring position or focus on the thing that opened us, since the previously focussed button just disappeared.
+		self.opener.setFocus()
+		self.refocusFocusRingTimer.start(16) #Position of opener changes asynchronously.
 			
 	
 	def __handleFocusChange(self, old, new):
@@ -155,3 +187,56 @@ class KeyboardAlphanumeric(QtWidgets.QWidget):
 			return not pressed and self.uiQ.selectWidget(delta)
 		else:
 			self.uiClose.setFocus()
+	
+	def toggleCaps(self):
+		self.uiShift.keepActiveLook = not self.uiShift.keepActiveLook
+		self.uiShift.refreshStyle()
+		
+		for keycap in [getattr(self, f'ui{letter}') for letter in ascii_uppercase]:
+			keycap.setText(getattr(keycap.text(), 
+				'upper' if self.uiShift.keepActiveLook else 'lower')())
+	
+	def sendKeystroke(self, code):
+		print(f'emitting key #{code}')
+		
+		#The QLineEdit backing widget for text input relies on the text value of the key event, so we need to synthesize a text for the event to take effect.
+		try:
+			eventText = chr(code)
+		except ValueError:
+			eventText = ''
+		
+		#Incoming codes are always upper-case.
+		if not self.uiShift.keepActiveLook:
+			eventText = eventText.lower()
+			
+		
+		#If we're typing a capital, unshift after typing it.
+		if self.uiShift.keepActiveLook and code >= QtCore.Qt.Key_A and code <= QtCore.Qt.Key_Z:
+			self.toggleCaps()
+		
+		self.parent().app.sendEvent(
+			self.opener,
+			QtGui.QKeyEvent(
+				QtGui.QKeyEvent.KeyPress,
+				code,
+				QtCore.Qt.ShiftModifier if self.uiShift.keepActiveLook else QtCore.Qt.NoModifier,
+				eventText #This is the magic to actually get the event to take effect for non-backspace keys.
+			)
+		)
+		self.parent().app.sendEvent(
+			self.opener,
+			QtGui.QKeyEvent(
+				QtGui.QKeyEvent.KeyRelease,
+				code,
+				QtCore.Qt.ShiftModifier if self.uiShift.keepActiveLook else QtCore.Qt.NoModifier,
+				eventText
+			)
+		)
+	
+	def adjustCarat(self, direction):
+		self.opener.cursorForward(False, direction)
+		
+		#Reset cursor flash time, so it's always visible when we're moving it.
+		cursorFlashTime = self.window().app.cursorFlashTime()
+		self.window().app.setCursorFlashTime(-1)
+		self.window().app.setCursorFlashTime(cursorFlashTime)

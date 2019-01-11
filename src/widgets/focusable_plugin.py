@@ -30,6 +30,7 @@ class FocusablePlugin():
 	jogWheelCancel = pyqtSignal() #click/long-press is aborted by jog wheel rotation
 	
 	touchStart = pyqtSignal() #fired when you click or touch the input
+	touchEnd = pyqtSignal()
 	
 	doneEditing = pyqtSignal() #Fired when the keyboard input should close.
 	
@@ -294,6 +295,16 @@ class FocusablePlugin():
 		if event.type() == QEvent.TouchBegin:
 			self.touchStart.emit()
 			return False #Don't swallow this event. You can filter it later in eventFilter2 and do so if needed.
+		
+		#This never fires. 🤷
+		if event.type() == QEvent.TouchEnd:
+			self.touchEnd.emit()
+			return False
+		
+		#Work around the previous event not working. Brings up keyboard with mouse input, which normally shouldn't happen - the assumption is that if mouse is plugged in, a keyboard and mouse are plugged in, so the on-screen keyboard should not pop up.
+		if event.type() == QEvent.MouseButtonRelease:
+			self.touchEnd.emit()
+			return False
 		
 		return bool(self.eventFilter2(obj, event))
 	

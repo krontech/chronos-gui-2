@@ -30,7 +30,7 @@ class LineEdit(QLineEdit, TouchMarginPlugin, DirectAPILinkPlugin, FocusablePlugi
 		self.jogWheelLowResolutionRotation.connect(self.handleJogWheelRotation)
 		self.jogWheelClick.connect(self.jogWheelClicked)
 		
-		self.touchStart.connect(self.editTapped)
+		self.touchEnd.connect(self.editTapped)
 		
 		self.doneEditing.connect(self.doneEditingCallback)
 		
