@@ -25,9 +25,9 @@ class RecordMode(QtWidgets.QDialog):
 		
 		# Secret high-percision backing value.
 		self.nanosegmentLengthPct = 0
-		api.observe('nanosegmentLengthPct', self.updateSegmentLength)
-		api.observe('totalAvailableFrames', )
-		api.observe('recordingExposureNs', )
+		# api.observe('nanosegmentLengthPct', self.updateSegmentLength)
+		# api.observe('totalAvailableFrames', )
+		# api.observe('recordingExposureNs', )
 		
 		# Set up panel switching.
 		#DDR 2018-07-24 It's impossible to associate an identifier with anything in QT Designer. Painfully load the identifiers here. Also check everything because I will mess this up next time I add a trigger.
@@ -53,7 +53,7 @@ class RecordMode(QtWidgets.QDialog):
 		self.uiRecordMode.currentIndexChanged.connect(self.changeShownTrigger)
 		
 	def changeShownTrigger(self, index):
-		lastModeId = self.availableRecordModeIds[self.uiRecordModePanes.index]
+		lastModeId = self.availableRecordModeIds[self.uiRecordModePanes.currentIndex()]
 		self.uiRecordModePanes.setCurrentIndex(index)
 		recordModeID = self.availableRecordModeIds[index]
 		settings.setValue('active record mode', recordModeID)
@@ -61,8 +61,8 @@ class RecordMode(QtWidgets.QDialog):
 		if lastModeId == 'segmented':
 			settings.setValue('segmented mode segment duration', )
 	
-	@pyqtSlot(int, name="updateSegmentLength")
-	@silenceCallbacks('uiExposureSlider')
-	def updateSegmentLength(self, nanosegmentLengthPct: int):
-		lengthPct = nanosegmentLengthPct*1e9
-		self.uiSegmentLengthInSeconds.setValue()
+	# @pyqtSlot(int, name="updateSegmentLength")
+	# @silenceCallbacks('uiExposureSlider')
+	# def updateSegmentLength(self, nanosegmentLengthPct: int):
+	# 	lengthPct = nanosegmentLengthPct*1e9
+	# 	self.uiSegmentLengthInSeconds.setValue()
