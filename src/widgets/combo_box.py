@@ -2,7 +2,6 @@ from random import randint
 
 from PyQt5.QtCore import Q_ENUMS, QSize, Qt
 from PyQt5.QtWidgets import QComboBox, QListView, QScroller
-from PyQt5.QtGui import QKeyEvent
 
 from debugger import *; dbg
 from touch_margin_plugin import TouchMarginPlugin, MarginWidth
@@ -197,6 +196,7 @@ class ComboBoxDropdown(QListView, FocusablePlugin):
 		self.setUniformItemSizes(True) #This enables the view to do some optimizations for performance purposes.
 		self.setHorizontalScrollMode(self.ScrollPerPixel) #Make grab gesture work, otherwise moves dropdown 1 entry per pixel dragged.
 		self.setVerticalScrollMode(self.ScrollPerPixel)
+		self.setAttribute(Qt.WA_AcceptTouchEvents, True) #Enable touch gestures according to http://doc.qt.io/qt-5/qtouchevent.html#enabling-touch-events, which appears to be lieing.
 		
 		self.jogWheelLowResolutionRotation.connect(lambda delta:
 			self.injectKeystrokes(
@@ -204,11 +204,11 @@ class ComboBoxDropdown(QListView, FocusablePlugin):
 		
 		self.jogWheelClick.connect(lambda: self.injectKeystrokes(Qt.Key_Enter))
 		
-		#QScroller::grabGesture(ui->combo->view()->viewport(),QScroller::LeftMouseButtonGesture);
-		QScroller.grabGesture(self.viewport(), QScroller.LeftMouseButtonGesture)
+		#Add drag-to-scroll to dropdown menus.
+		QScroller.grabGesture(self.viewport(), QScroller.LeftMouseButtonGesture) #DDR 2019-01-15: Defaults to TouchGesture - which should work, according to WA_AcceptTouchEvents, but doesn't.
 		scroller = QScroller.scroller(self.viewport())
 		properties = scroller.scrollerProperties()
-		properties.setScrollMetric(properties.DragStartDistance, 0.003) #default: 0.005
+		properties.setScrollMetric(properties.DragStartDistance, 0.003) #default: 0.005 - tweaked for "feel", the platform defaults are overly dramatic.
 		properties.setScrollMetric(properties.OvershootDragDistanceFactor, 0.3) #default: 1
 		properties.setScrollMetric(properties.OvershootScrollDistanceFactor, 0.3) #default: 1
 		properties.setScrollMetric(properties.OvershootScrollTime, 0.5) #default: 0.7
