@@ -39,7 +39,13 @@ class FocusRing(QLabel):
 	def focusOn(self, widget):
 		"""Move focus to a widget."""
 		
+		
 		self._focussedOn = widget
+		
+		#Allow combobox dropdown menus to not be ringed, since they have the highlight which fulfills the purpose.
+		if getattr(widget, 'hideFocusRingFocus', False):
+			self.setGeometry(-9999,-9999,10,10) #Just move the focus ring off-screen if it's supposed to be hidden. That way, it doesn't mess with hidden/shown status.
+			return
 		
 		xy = widget.parentWidget().mapToGlobal(widget.pos())
 		wh = widget.size()

@@ -1,5 +1,6 @@
 from PyQt5.QtCore import Qt, pyqtSignal, QObject, QEvent
 from PyQt5.QtGui import QKeyEvent
+from PyQt5.QtWidgets import QApplication
 
 from debugger import *; dbg
 
@@ -65,14 +66,14 @@ class FocusablePlugin():
 	#TODO: write useful common functions here, such as "select next".
 	#Can maybe use self.parent.window.app.postEvent(…) here, like in main.py?
 	
-	def injectKeystrokes(self, key, count=1, modifier=Qt.NoModifier):
+	def injectKeystrokes(self, key, *, count=1, modifier=Qt.NoModifier):
 		"""Inject n keystrokes into the app, to the focused widget."""
 		for _ in range(count):
-			self.window().app.postEvent(
-				self.window().app.focusWidget(), #window._screens[window.currentScreen],
+			QApplication.instance().postEvent(
+				QApplication.instance().focusWidget(), #window._screens[window.currentScreen],
 				QKeyEvent(QKeyEvent.KeyPress, key, modifier) )
-			self.window().app.postEvent(
-				self.window().app.focusWidget(),
+			QApplication.instance().postEvent(
+				QApplication.instance().focusWidget(),
 				QKeyEvent(QKeyEvent.KeyRelease, key, modifier) )
 		
 		

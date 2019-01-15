@@ -988,6 +988,309 @@
     <string>type here</string>
    </property>
   </widget>
+  <widget class="ComboBox" name="combobox_2">
+   <property name="geometry">
+    <rect>
+     <x>470</x>
+     <y>320</y>
+     <width>181</width>
+     <height>61</height>
+    </rect>
+   </property>
+   <property name="clickMarginTopSetter" stdset="0">
+    <enum>ComboBox::none</enum>
+   </property>
+   <item>
+    <property name="text">
+     <string extracomment="comment 1">test 1</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>test 2</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>test 3</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>test 444</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>test 5</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>test 6</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>test 7</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>test 8</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>test 9</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>test 10</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>test 7</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>test 8</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>test 9</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>test 10</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>test 7</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>test 8</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>test 9</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>test 10</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>test 7</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>test 8</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>test 9</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>test 10</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>test 7</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>test 8</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>test 9</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>test 10</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>test 7</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>test 8</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>test 9</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>test 10</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>test 7</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>test 8</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>test 9</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>test 10</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>test 7</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>test 8</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>test 9</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>test 10</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>test 7</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>test 8</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>test 9</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>test 10</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>test 7</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>test 8</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>test 9</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>test 10</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>test 7</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>test 8</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>test 9</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>test 10</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>test 7</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>test 8</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>test 9</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>test 10</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>test 7</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>test 8</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>test 9</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>test 10</string>
+    </property>
+   </item>
+  </widget>
   <zorder>widget</zorder>
   <zorder>white_4</zorder>
   <zorder>combobox_4</zorder>
@@ -1013,6 +1316,7 @@
   <zorder>lineedit</zorder>
   <zorder>lineedit_2</zorder>
   <zorder>lineedit_3</zorder>
+  <zorder>combobox_2</zorder>
  </widget>
  <customwidgets>
   <customwidget>
