@@ -208,6 +208,7 @@ class ComboBoxDropdown(QListView, FocusablePlugin):
 		QScroller.grabGesture(self.viewport(), QScroller.LeftMouseButtonGesture) #DDR 2019-01-15: Defaults to TouchGesture - which should work, according to WA_AcceptTouchEvents, but doesn't.
 		scroller = QScroller.scroller(self.viewport())
 		properties = scroller.scrollerProperties()
+		properties.setScrollMetric(properties.AxisLockThreshold, 0.0)
 		properties.setScrollMetric(properties.DragStartDistance, 0.003) #default: 0.005 - tweaked for "feel", the platform defaults are overly dramatic.
 		properties.setScrollMetric(properties.OvershootDragDistanceFactor, 0.3) #default: 1
 		properties.setScrollMetric(properties.OvershootScrollDistanceFactor, 0.3) #default: 1
