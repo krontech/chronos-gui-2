@@ -28,6 +28,8 @@ print (f"EEPROM: {hex(v)}")
 
 from ioports import board_chronos14_ioports
 
+import pychronos
+
 MAX_FRAME_LENGTH = 0xf000
 REC_START_ADDR = MAX_FRAME_LENGTH * 4
 
@@ -57,7 +59,6 @@ def i2c_eeprom_do_read(addr,  offset,  leng):
 class CamObject:
 
 
-
 	ioports = board_chronos14_ioports
 
 		# self.CamInit()
@@ -65,7 +66,10 @@ class CamObject:
 
 	print ("continue")
 	mem = MemObject()
-	mem.CtypesTest()
+	# mem.CtypesTest()
+	mem.MemTest()
+
+	# breakpoint()
 
 	# exit()
 
@@ -240,26 +244,26 @@ class CamObject:
 
 	def FakeIO(self):
 		print ("TODO: don't do fake IO")
-		self.mem.fpga_write16(0xa0, 0x1)
-		self.mem.fpga_write16(0xa4, 0x1)
-		self.mem.fpga_write16(0xa8, 0x0)
-		self.mem.fpga_write32(0x60, 0x0)	
-		self.mem.fpga_write16(0xb4, 0x0)
-		self.mem.fpga_write16(0xb0, 0x0)
-		self.mem.fpga_write16(0xac, 0x2)
-		self.mem.fpga_write16(0xbc, 0x0)
-		self.mem.fpga_write16(0xbc, 0x0)
-		self.mem.fpga_write16(0xbc, 0x0)
+		self.mem.FPGAWrite16(0xa0, 0x1)
+		self.mem.FPGAWrite16(0xa4, 0x1)
+		self.mem.FPGAWrite16(0xa8, 0x0)
+		self.mem.FPGAWrite32(0x60, 0x0)	
+		self.mem.FPGAWrite16(0xb4, 0x0)
+		self.mem.FPGAWrite16(0xb0, 0x0)
+		self.mem.FPGAWrite16(0xac, 0x2)
+		self.mem.FPGAWrite16(0xbc, 0x0)
+		self.mem.FPGAWrite16(0xbc, 0x0)
+		self.mem.FPGAWrite16(0xbc, 0x0)
 
 
 	def Fake16(self, addr, data):
 			# breakpoint()
 			print (f"--- faking 16 bit (0x{(addr * 2):x}, (0x{data:x})")
-			self.mem.fpga_write16(addr * 2, data)
+			self.mem.FPGAWrite16(addr * 2, data)
 	def Fake32(self, addr, data):
 			# breakpoint()
 			print (f"=== faking 32 bit (0x{(addr * 2):x}, (0x{data:x})")
-			self.mem.fpga_write32(addr * 2, data)
+			self.mem.FPGAWrite32(addr * 2, data)
 
 	def FakeInit(self):
 		print ("TODO: don't do fake init")
@@ -388,7 +392,7 @@ class CamObject:
 
 
 		#TODO - dereference through SensorObj:
-		breakpoint()
+		# breakpoint()
 		self.sensor._writeDACVoltages()
 		# exit()
 
@@ -431,7 +435,7 @@ class CamObject:
 
 		# exit()
 
-		breakpoint()
+			# breakpoint()
 		self.FakeInit()
 
 		# frame_words = int(((self.sensor.hMaxRes * self.sensor.vMaxRes * self.image_sensor_bpp()) / 8 + (32 - 1)) / 32)

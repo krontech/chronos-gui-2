@@ -1,7 +1,7 @@
 
 # import pdb; pdb.set_trace()
 
-print("Live Video Testing")
+print("\n\nLive Video Testing")
 
 # breakpoint()
 
@@ -14,6 +14,8 @@ from termcolor import colored
 
 # exit()
 # main part
+
+globvar = 123
 
 cam = CamObject()
 
@@ -54,7 +56,7 @@ for x in range(10):
 cam.mem.GPIOWrite("record-led.0", 0)
 cam.mem.GPIOWrite("record-led.1", 0)
 
-exit()
+# exit()
 
 while 0:
 	a = cam.mem.GPIORead("encoder-a")
@@ -67,7 +69,8 @@ while 0:
 # cam.sensor.Lux1310RegDump()
 print("........")
 
-cam.sensor.Lux1310ShowTestPattern()
+# breakpoint()
+# cam.sensor.Lux1310ShowTestPattern()
 
 # cam.TestLive()
 

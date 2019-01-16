@@ -14,8 +14,11 @@ import struct
 from lux1310waves import *
 from lux1310sensor import *
 
+
+
+
 NODAC = False
-# NODAC = True
+NODAC = True
 
 
 '''
@@ -83,6 +86,9 @@ class Lux1310Object(SensorObject):
 
 	breakSCI = False
 	# breakSCI = True
+
+	noSCI = True
+	noSCI = False
 
 	# we'll keep a copy of the wavetable delay
 	keepdelay = 0
@@ -179,13 +185,15 @@ class Lux1310Object(SensorObject):
 		#print (repr(self))
 		readdata = self.mem.fpga_read16(addr)
 		readdata &= mask
-		self.mem.fpga_write16s(addr, readdata)
+		self.mem.FPGAWrite16s(addr, readdata)
+		cprint (f"FPGAndBits: FPGAwrite16 - 0x{addr:x}: 0x{readdata:x}", "white", "on_blue")
 
 	def FPGAOrBits(self, addr, mask):
 		#print (f"  $$$ FPGAOrBits(0x{addr:x}, 0x{mask:x})")
 		readdata = self.mem.fpga_read16(addr)
 		readdata |= mask
-		self.mem.fpga_write16s(addr, readdata)
+		self.mem.FPGAWrite16s(addr, readdata)
+		cprint (f"FPGAOrBits: FPGAwrite16 - 0x{addr:x}: 0x{readdata:x}", "white", "on_blue")
 
 	#raise Exception("\n\nSCI writing doesn't work!")
 
@@ -198,6 +206,7 @@ class Lux1310Object(SensorObject):
 		# pprint(vars(self))
 
 		# NOTE: this uses the write + "s" methods, that do not print debug info
+		if self.noSCI: return
 		self.mem.fpga_write16s(SENSOR_SCI_CONTROL, 0x8000)
 
 		self.FPGAAndBits(SENSOR_SCI_CONTROL, 0xffff - SENSOR_SCI_CONTROL_RW_MASK)
@@ -220,6 +229,7 @@ class Lux1310Object(SensorObject):
 		# Clear RW, and setup the transfer and fill the FIFO
 		# print (f"\n\n SELF = {self}")
 		# pprint(vars(self))
+		if self.noSCI: return
 
 		self.mem.fpga_write16(SENSOR_SCI_CONTROL, 0x8000)
 		self.mem.fpga_write16(SENSOR_SCI_CONTROL, 0)
@@ -243,6 +253,7 @@ class Lux1310Object(SensorObject):
 		# self.Lux1310SCIWritePure(addr, value)
 		# print (f" ({self.SCIc})$$$ Lux1310SCIWrite(0x{addr:x}, 0x{value:x})")
 
+		if self.noSCI: return
 		if self.breakSCI: breakpoint()
 		self.Lux1310SCIWriteWithMask(addr, value)
 
@@ -250,19 +261,38 @@ class Lux1310Object(SensorObject):
 	def Lux1310SCIWriteBuf(self, addr, values):
 		'''Perform a series of 8 bit register writes'''
 		# Clear RW, and setup the transfer and fill the FIFO
+
+		debugWB = True
+		cprint (f"### WriteBuf ###", "white", "on_blue")
+
+		if self.noSCI: return
 		print (f"$$$ Lux1310SCIWriteBuf to 0x{addr:x}: {len(values)} entries")
-		self.mem.fpga_write16s(SENSOR_SCI_CONTROL, 0x8000)
-		
-		self.FPGAAndBits(SENSOR_SCI_CONTROL, 0xffff - SENSOR_SCI_CONTROL_RW_MASK)
-		self.mem.fpga_write16s(SENSOR_SCI_ADDRESS, addr)
-		self.mem.fpga_write16s(SENSOR_SCI_DATALEN, len(values))
+		rw = self.mem.fpga_read16(SENSOR_SCI_CONTROL) & (0xffff - SENSOR_SCI_CONTROL_RW_MASK)
+		self.mem.FPGAWrite16(SENSOR_SCI_CONTROL, 0x8000 | rw)
+		if debugWB:
+			cprint (f"WB: fpga_write16s - 0x{SENSOR_SCI_CONTROL:x}: 0x{(0x8000 | rw):x}", "white", "on_blue")
+
+		# self.FPGAAndBits(SENSOR_SCI_CONTROL, (0xffff - SENSOR_SCI_CONTROL_RW_MASK))
+		self.mem.FPGAWrite16(SENSOR_SCI_ADDRESS, addr)
+		if debugWB:
+			cprint (f"WB: fpga_write16s - 0x{SENSOR_SCI_ADDRESS:x}: 0x{addr:x}", "white", "on_blue")
+		self.mem.FPGAWrite16(SENSOR_SCI_DATALEN, len(values))
+		if debugWB:
+			cprint (f"WB: fpga_write16s - 0x{SENSOR_SCI_DATALEN:x}: 0x{len(values):x}", "white", "on_blue")
 		for b in values:
-			self.mem.fpga_write16s(SENSOR_SCI_FIFO_WR_ADDR, b)
+			self.mem.FPGAWrite16s(SENSOR_SCI_FIFO_WR_ADDR, b)
+			if debugWB:
+				# cprint (f"WB: fpga_write16s - 0x{SENSOR_SCI_FIFO_WR_ADDR:x}: 0x{b:x}", "white", "on_blue")
+				print (b)
 			# print (f"  - 0x{b:x}")
 
 		# Start the transfer and then wait for completion.
 		self.FPGAOrBits(SENSOR_SCI_CONTROL, SENSOR_SCI_CONTROL_RUN_MASK)
+		f = self.mem.fpga_read16(SENSOR_SCI_CONTROL)
+		f = f & SENSOR_SCI_CONTROL_RUN_MASK
+		print (f"f is {f}")
 		while self.mem.fpga_read16(SENSOR_SCI_CONTROL) & SENSOR_SCI_CONTROL_RUN_MASK:
+			# print (".")
 			pass
 
 	def Lux1310SCIRead(self, addr):
@@ -295,35 +325,40 @@ class Lux1310Object(SensorObject):
 		#debug testing: sleep some
 		time.sleep(0.01)
 		# breakpoint()
+		if self.noSCI: return
 
-		self.SCIc = self.SCIc + 1
+		self.mem.writesCount += 1
 		if type(reg) is str:
 			lreg = Lux1310_dict[reg]
 			sciaddr = lreg >> self.SCI.LUX1310_SCI_REG_ADDR
 			scidata = setbits(val, lreg & self.SCI.LUX1310_SCI_REG_MASK)
-			cprint(f'  <{self.SCIc}>$$$ Lux1310Write("{reg}", 0x{val:x}) - 0x{sciaddr:x}, 0x{scidata:x}', "yellow")
+			cprint(f'  [{self.mem.writesCount}]$$$ Lux1310Write("{reg}", 0x{val:x}) - 0x{sciaddr:x}, 0x{scidata:x}', "yellow")
 			self.Lux1310SCIWrite(sciaddr, scidata)
+			cprint(f"  SCI WRITE: 0x{sciaddr:x}: 0x{scidata:x}", "blue", "on_yellow")
 		else:
-			cprint(f"  <{self.SCIc}>$$$ Lux1310Write(0x{reg:x}, 0x{val:x})", "red")
+			cprint(f"  [{self.mem.writesCount}]$$$ Lux1310Write(0x{reg:x}, 0x{val:x})", "red")
 		
 			sciaddr = reg >> self.SCI.LUX1310_SCI_REG_ADDR
 			scidata = setbits(val, reg & self.SCI.LUX1310_SCI_REG_MASK)
 			self.Lux1310SCIWrite(sciaddr, scidata)
+			cprint(f"  SCI WRITE: 0x{sciaddr:x}: 0x{scidata:x}", "blue", "on_yellow")
 
 
 	def Lux1310WriteWord(self, reg, val):
 		'''Perform a full register write, without considering bit-field definitions
 		NEW: pass a string instead
 		'''
-		self.SCIc = self.SCIc + 1
+		if self.noSCI: return
+
+		self.mem.writesCount += 1
 		if type(reg) is str:
 			lreg = Lux1310_dict[reg]
 			sciaddr = lreg >> self.SCI.LUX1310_SCI_REG_ADDR
 			scidata = val
-			cprint(f'  <{self.SCIc}>$$$ Lux1310Write("{reg}", 0x{val:x}) - 0x{sciaddr:x}, 0x{scidata:x}', "yellow")
+			cprint(f'  [{self.mem.writesCount}]$$$ Lux1310WriteWord("{reg}", 0x{val:x}) - 0x{sciaddr:x}, 0x{scidata:x}', "yellow")
 			self.Lux1310SCIWrite(sciaddr, scidata)
 		else:
-			cprint(f"  <{self.SCIc}>$$$ Lux1310Write(0x{reg:x}, 0x{val:x})", "red")
+			cprint(f'  [{self.mem.writesCount}]$$$ Lux1310WriteWord("{reg}", 0x{val:x}) - 0x{sciaddr:x}, 0x{scidata:x}', "yellow")
 			sciaddr = reg >> self.SCI.LUX1310_SCI_REG_ADDR
 			scidata = val
 			self.Lux1310SCIWrite(sciaddr, scidata)
@@ -500,7 +535,7 @@ class Lux1310Object(SensorObject):
 		return 0;
 
 	def Lux1310SetGain(self, gain):
-		breakpoint()
+		# breakpoint()
 		if NODAC:
 			return
 		print (f"Lux1310SetGain: {gain}")
@@ -662,6 +697,9 @@ class Lux1310Object(SensorObject):
 	def __init__(self, mem):
 		print (colored("### lux1310 __init__", "red"))
 		cprint ("### lux1310 __init__", "red", "on_white")
+
+		print (f"mem is {mem}")
+
 		SensorObject.__init__(self, mem)
 
 		
@@ -716,7 +754,10 @@ class Lux1310Object(SensorObject):
 		#lux1310_write_wavetab(data, &lux1310_wt_sram80);
 		# TODO: don't just assume the first wavetable is delay of 80!
 	
+		# while True:
 		self.Lux1310SCIWriteBuf(0x7F, Lux1310Wave80Data);
+			# time.sleep(0.1)
+		# self.Lux1310SCIWriteBuf(0x7F, Lux1310Wave80Data);
 		
 		self.Lux1310Write("LUX1310_SCI_TIMING_EN", 1);
 		
@@ -809,7 +850,7 @@ class Lux1310Object(SensorObject):
 		
 
 	def _writeDACVoltages(self):
-		breakpoint()
+		# breakpoint()
 		print("_writeDACVoltages")
 		self._initDAC();
 		self._writeDACVoltage(VABL_VOLTAGE, 0.3);
@@ -863,8 +904,8 @@ class Lux1310Object(SensorObject):
 		time.sleep(0.01)
 
 
-		self.lux1310SetReset(True)
-		self.lux1310SetReset(False)
+		# self.lux1310SetReset(True)
+		# self.lux1310SetReset(False)
 
 		time.sleep(0.001)
 
@@ -874,9 +915,9 @@ class Lux1310Object(SensorObject):
 	def lux1310SetReset(self, value):
 		readvalue = self.mem.fpga_mmio.read16(IMAGE_SENSOR_CONTROL)
 		if value:
-			self.mem.fpga_write16(IMAGE_SENSOR_CONTROL, readvalue | IMAGE_SENSOR_RESET_MASK)
+			self.mem.FPGAWrite16(IMAGE_SENSOR_CONTROL, readvalue | IMAGE_SENSOR_RESET_MASK)
 		else:
-			self.mem.fpga_write16(IMAGE_SENSOR_CONTROL, readvalue & 0xffff - IMAGE_SENSOR_RESET_MASK)
+			self.mem.FPGAWrite16(IMAGE_SENSOR_CONTROL, readvalue & 0xffff - IMAGE_SENSOR_RESET_MASK)
 
 	def SensorInit(self):
 		#self.ImageSensor = ImageSensorData()
@@ -949,15 +990,15 @@ class Lux1310Object(SensorObject):
 		self.Lux1310AutoPhaseCal()
 		
 		# Toggle the clock phase and wait for the FPGA to lock. 
-		self.mem.fpga_write16(SENSOR_CLK_PHASE, 0)
-		self.mem.fpga_write16(SENSOR_CLK_PHASE, 1)
-		self.mem.fpga_write16(SENSOR_CLK_PHASE, 0)
+		self.mem.FPGAWrite16(SENSOR_CLK_PHASE, 0)
+		self.mem.FPGAWrite16(SENSOR_CLK_PHASE, 1)
+		self.mem.FPGAWrite16(SENSOR_CLK_PHASE, 0)
 		#/ TODO: Shouldn't there be a while loop here? */
 		data_correct = self.Lux1310GetDataCorrect()
 		print(f"\nlux1310_data_correct: {data_correct}")
 
 		self.Lux1310Write("LUX1310_SCI_PCLK_VBLANK", 0xf00)
-		self.Lux1310Write("LUX1310_SCI_TST_PAT", 0x2202)  # ADC clock control
+		self.Lux1310Write("LUX1310_SCI_TST_PAT", 0x0)  # ADC clock control
 
 
 #to here
@@ -1053,8 +1094,8 @@ class Lux1310Object(SensorObject):
 
 		print ("Setting display addresses")
 		cr = self.mem.FPGARead16("DISPLAY_CTL") | 1	
-		self.mem.FPGAWrite16("DISPLAY_CTL", cr) #Set to display from display frame address register
-		self.mem.FPGAWrite32("DISPLAY_FRAME_ADDRESS", 0x40000)	# Set display address
+		self.mem.FPGAWrite16nb("DISPLAY_CTL", cr) #Set to display from display frame address register
+		self.mem.FPGAWrite32nb("DISPLAY_FRAME_ADDRESS", 0x40000)	# Set display address
 
 
 		print ("Testing RAM R/W")
@@ -1078,8 +1119,9 @@ class Lux1310Object(SensorObject):
 		
 		print ("Zero image area")
 		#Zero image area
-		self.mem.FPGAWrite32("GPMC_PAGE_OFFSET", 0x40000) #Set GPMC offset
+		self.mem.FPGAWrite32nb("GPMC_PAGE_OFFSET", 0x40000) #Set GPMC offset
 		for i in range(0, FRAME_SIZE, 2):
+			# self.mem.RAMWrite16(i, (i >> 8) & 0xff80)
 			self.mem.RAMWrite16(i, (i >> 8) & 0xff80)
 
 		print ("Draw a rectangular box with diagonal")
@@ -1092,7 +1134,14 @@ class Lux1310Object(SensorObject):
 		for y in range(80): 
 			for x in range(128):	
 			
-				#self.writePixel12(x+y*1280, 0x2000000, 2048) #;//(x == 0 || y == 0 || x == 1279 || y == 1023 || x == y) ? 0xFFF : 0);
+				# self.writePixel12(x+y*1280, 0x2000000, 2048) #(x == 0 || y == 0 || x == 1279 || y == 1023 || x == y) ? 0xFFF : 0);
+				d =  ((x == 0) or (y == 0) or (x == 1279) or (y == 1023) or (x == y)) 
+				if d:
+					self.writePixel12(x+y*1280, 0x0000000, 0xFFF )
+				else:
+					self.writePixel12(x+y*1280, 0x0000000, 0)
+				# self.writePixel12(x+y*1280, 0x2000000, ((x == 0) || (y == 0) || (x == 1279) || (y == 1023) || (x == y)) ? 0xFFF : 0);
+				# self.writePixel12(x+y*1280, 0x2000000,  (x == y) ? 0xFFF : 0);
 				#print(".")
 				#qDebug() << "line" << y;
 				pass
@@ -1117,4 +1166,3 @@ class Lux1310Object(SensorObject):
 		dataH |= (value >> (8 - shift))
 		self.mem.RAMWrite8(address, dataL)
 		self.mem.RAMWrite8(address+1, dataH)
-
