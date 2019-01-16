@@ -23,12 +23,12 @@
     </rect>
    </property>
   </widget>
-  <widget class="HeaderLabel" name="headerlabel">
+  <widget class="Subheader" name="headerlabel">
    <property name="geometry">
     <rect>
      <x>20</x>
-     <y>20</y>
-     <width>131</width>
+     <y>60</y>
+     <width>111</width>
      <height>41</height>
     </rect>
    </property>
@@ -39,8 +39,8 @@
   <widget class="ComboBox" name="uiPresets">
    <property name="geometry">
     <rect>
-     <x>140</x>
-     <y>0</y>
+     <x>120</x>
+     <y>40</y>
      <width>381</width>
      <height>81</height>
     </rect>
@@ -54,8 +54,8 @@
   <widget class="SpinBox" name="uiHRes">
    <property name="geometry">
     <rect>
-     <x>140</x>
-     <y>70</y>
+     <x>120</x>
+     <y>120</y>
      <width>191</width>
      <height>51</height>
     </rect>
@@ -70,8 +70,8 @@
   <widget class="SpinBox" name="uiVRes">
    <property name="geometry">
     <rect>
-     <x>330</x>
-     <y>70</y>
+     <x>310</x>
+     <y>120</y>
      <width>191</width>
      <height>51</height>
     </rect>
@@ -86,8 +86,8 @@
   <widget class="SpinBox" name="uiHOffset">
    <property name="geometry">
     <rect>
-     <x>140</x>
-     <y>120</y>
+     <x>120</x>
+     <y>170</y>
      <width>191</width>
      <height>61</height>
     </rect>
@@ -102,8 +102,8 @@
   <widget class="SpinBox" name="uiVOffset">
    <property name="geometry">
     <rect>
-     <x>330</x>
-     <y>120</y>
+     <x>310</x>
+     <y>170</y>
      <width>191</width>
      <height>61</height>
     </rect>
@@ -118,8 +118,8 @@
   <widget class="Button" name="uiMaximizeFramerate">
    <property name="geometry">
     <rect>
-     <x>400</x>
-     <y>180</y>
+     <x>380</x>
+     <y>230</y>
      <width>121</width>
      <height>71</height>
     </rect>
@@ -134,8 +134,8 @@
   <widget class="Label" name="label">
    <property name="geometry">
     <rect>
-     <x>375</x>
-     <y>200</y>
+     <x>355</x>
+     <y>250</y>
      <width>30</width>
      <height>21</height>
     </rect>
@@ -147,8 +147,8 @@
   <widget class="Label" name="label_2">
    <property name="geometry">
     <rect>
-     <x>375</x>
-     <y>250</y>
+     <x>355</x>
+     <y>300</y>
      <width>140</width>
      <height>21</height>
     </rect>
@@ -160,8 +160,8 @@
   <widget class="QWidget" name="widget" native="true">
    <property name="geometry">
     <rect>
-     <x>360</x>
-     <y>210</y>
+     <x>340</x>
+     <y>260</y>
      <width>10</width>
      <height>51</height>
     </rect>
@@ -173,8 +173,8 @@
   <widget class="SpinBox" name="uiExposure">
    <property name="geometry">
     <rect>
-     <x>140</x>
-     <y>290</y>
+     <x>120</x>
+     <y>340</y>
      <width>231</width>
      <height>61</height>
     </rect>
@@ -189,8 +189,8 @@
   <widget class="Button" name="uiMaximizeExposure">
    <property name="geometry">
     <rect>
-     <x>360</x>
-     <y>280</y>
+     <x>340</x>
+     <y>330</y>
      <width>111</width>
      <height>81</height>
     </rect>
@@ -202,52 +202,52 @@
     <enum>Button::half</enum>
    </property>
   </widget>
-  <widget class="HeaderLabel" name="headerlabel_2">
+  <widget class="Subheader" name="headerlabel_2">
    <property name="geometry">
     <rect>
      <x>20</x>
-     <y>130</y>
-     <width>131</width>
-     <height>31</height>
+     <y>180</y>
+     <width>111</width>
+     <height>41</height>
     </rect>
    </property>
    <property name="text">
     <string>Offset</string>
    </property>
   </widget>
-  <widget class="HeaderLabel" name="headerlabel_3">
+  <widget class="Subheader" name="headerlabel_3">
    <property name="geometry">
     <rect>
      <x>20</x>
-     <y>190</y>
-     <width>131</width>
-     <height>31</height>
+     <y>240</y>
+     <width>111</width>
+     <height>41</height>
     </rect>
    </property>
    <property name="text">
     <string>Frame Rate</string>
    </property>
   </widget>
-  <widget class="HeaderLabel" name="headerlabel_4">
+  <widget class="Subheader" name="headerlabel_4">
    <property name="geometry">
     <rect>
      <x>20</x>
-     <y>300</y>
-     <width>131</width>
-     <height>31</height>
+     <y>350</y>
+     <width>111</width>
+     <height>41</height>
     </rect>
    </property>
    <property name="text">
     <string>Exposure</string>
    </property>
   </widget>
-  <widget class="HeaderLabel" name="headerlabel_5">
+  <widget class="Subheader" name="headerlabel_5">
    <property name="geometry">
     <rect>
      <x>20</x>
-     <y>360</y>
-     <width>131</width>
-     <height>31</height>
+     <y>410</y>
+     <width>111</width>
+     <height>41</height>
     </rect>
    </property>
    <property name="text">
@@ -290,7 +290,7 @@
    <property name="geometry">
     <rect>
      <x>620</x>
-     <y>200</y>
+     <y>250</y>
      <width>181</width>
      <height>81</height>
     </rect>
@@ -303,9 +303,9 @@
    <property name="geometry">
     <rect>
      <x>550</x>
-     <y>200</y>
+     <y>250</y>
      <width>251</width>
-     <height>281</height>
+     <height>231</height>
     </rect>
    </property>
   </widget>
@@ -315,7 +315,7 @@
      <x>550</x>
      <y>0</y>
      <width>251</width>
-     <height>21</height>
+     <height>71</height>
     </rect>
    </property>
   </widget>
@@ -325,7 +325,7 @@
      <x>781</x>
      <y>20</y>
      <width>20</width>
-     <height>181</height>
+     <height>231</height>
     </rect>
    </property>
   </widget>
@@ -333,7 +333,7 @@
    <property name="geometry">
     <rect>
      <x>550</x>
-     <y>20</y>
+     <y>70</y>
      <width>231</width>
      <height>181</height>
     </rect>
@@ -412,8 +412,8 @@
   <widget class="Label" name="label_3">
    <property name="geometry">
     <rect>
-     <x>310</x>
-     <y>80</y>
+     <x>290</x>
+     <y>130</y>
      <width>41</width>
      <height>21</height>
     </rect>
@@ -428,8 +428,8 @@
   <widget class="Label" name="label_4">
    <property name="geometry">
     <rect>
-     <x>310</x>
-     <y>140</y>
+     <x>290</x>
+     <y>190</y>
      <width>41</width>
      <height>21</height>
     </rect>
@@ -441,12 +441,12 @@
     <set>Qt::AlignCenter</set>
    </property>
   </widget>
-  <widget class="HeaderLabel" name="headerlabel_6">
+  <widget class="Subheader" name="headerlabel_6">
    <property name="geometry">
     <rect>
      <x>20</x>
-     <y>70</y>
-     <width>131</width>
+     <y>120</y>
+     <width>111</width>
      <height>41</height>
     </rect>
    </property>
@@ -457,8 +457,8 @@
   <widget class="DecimalSpinBox" name="uiFrameDuration">
    <property name="geometry">
     <rect>
-     <x>140</x>
-     <y>240</y>
+     <x>120</x>
+     <y>290</y>
      <width>231</width>
      <height>51</height>
     </rect>
@@ -482,8 +482,8 @@
   <widget class="DecimalSpinBox" name="uiFps">
    <property name="geometry">
     <rect>
-     <x>140</x>
-     <y>180</y>
+     <x>120</x>
+     <y>230</y>
      <width>231</width>
      <height>61</height>
     </rect>
@@ -498,8 +498,8 @@
   <widget class="ComboBox" name="uiAnalogGain">
    <property name="geometry">
     <rect>
-     <x>140</x>
-     <y>350</y>
+     <x>120</x>
+     <y>400</y>
      <width>221</width>
      <height>71</height>
     </rect>
@@ -527,6 +527,19 @@
    </property>
    <property name="alignment">
     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+   </property>
+  </widget>
+  <widget class="HeaderLabel" name="headerlabel_7">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>10</y>
+     <width>241</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Recording Settings</string>
    </property>
   </widget>
   <zorder>backdrop</zorder>
@@ -560,6 +573,7 @@
   <zorder>uiUnsavedChangesWarning</zorder>
   <zorder>uiDone</zorder>
   <zorder>uiSavePreset</zorder>
+  <zorder>headerlabel_7</zorder>
  </widget>
  <customwidgets>
   <customwidget>
@@ -596,6 +610,11 @@
    <class>SpinBox</class>
    <extends>QSpinBox</extends>
    <header>spin_box</header>
+  </customwidget>
+  <customwidget>
+   <class>Subheader</class>
+   <extends>QLabel</extends>
+   <header>subheader</header>
   </customwidget>
  </customwidgets>
  <tabstops>
