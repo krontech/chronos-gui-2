@@ -53,7 +53,7 @@ class MemObject:
 
 	noFPGA = True
 	noFPGA = False
-	noGPIO = True
+	noGPIO = False
 
 	FPGActypes = True
 	# FPGActypes = False

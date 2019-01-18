@@ -18,7 +18,7 @@ from lux1310sensor import *
 
 
 NODAC = False
-NODAC = True
+# NODAC = True
 
 
 '''
@@ -112,6 +112,8 @@ class Lux1310Object(SensorObject):
 	# get SCI constants
 	SCI = SCIObject()
 
+	thisSPIobj = spi.SPIobj()
+
 	# SPI_DEV = "/dev/spidev3.0"
 	# SPI_MODE = 1
 	# SPI_SPEED = 1000000
@@ -183,12 +185,14 @@ class Lux1310Object(SensorObject):
 		#pprint(vars(self))
 		#help(self)
 		#print (repr(self))
+
 		readdata = self.mem.fpga_read16(addr)
 		readdata &= mask
 		self.mem.FPGAWrite16s(addr, readdata)
 		cprint (f"FPGAndBits: FPGAwrite16 - 0x{addr:x}: 0x{readdata:x}", "white", "on_blue")
 
 	def FPGAOrBits(self, addr, mask):
+
 		#print (f"  $$$ FPGAOrBits(0x{addr:x}, 0x{mask:x})")
 		readdata = self.mem.fpga_read16(addr)
 		readdata |= mask
@@ -207,6 +211,8 @@ class Lux1310Object(SensorObject):
 
 		# NOTE: this uses the write + "s" methods, that do not print debug info
 		if self.noSCI: return
+		if self.breakSCI: breakpoint()
+
 		self.mem.fpga_write16s(SENSOR_SCI_CONTROL, 0x8000)
 
 		self.FPGAAndBits(SENSOR_SCI_CONTROL, 0xffff - SENSOR_SCI_CONTROL_RW_MASK)
@@ -230,6 +236,8 @@ class Lux1310Object(SensorObject):
 		# print (f"\n\n SELF = {self}")
 		# pprint(vars(self))
 		if self.noSCI: return
+		if self.breakSCI: breakpoint()
+
 
 		self.mem.fpga_write16(SENSOR_SCI_CONTROL, 0x8000)
 		self.mem.fpga_write16(SENSOR_SCI_CONTROL, 0)
@@ -262,10 +270,12 @@ class Lux1310Object(SensorObject):
 		'''Perform a series of 8 bit register writes'''
 		# Clear RW, and setup the transfer and fill the FIFO
 
-		debugWB = True
+		debugWB = False
 		cprint (f"### WriteBuf ###", "white", "on_blue")
 
 		if self.noSCI: return
+		if self.breakSCI: breakpoint()
+
 		print (f"$$$ Lux1310SCIWriteBuf to 0x{addr:x}: {len(values)} entries")
 		rw = self.mem.fpga_read16(SENSOR_SCI_CONTROL) & (0xffff - SENSOR_SCI_CONTROL_RW_MASK)
 		self.mem.FPGAWrite16(SENSOR_SCI_CONTROL, 0x8000 | rw)
@@ -326,6 +336,8 @@ class Lux1310Object(SensorObject):
 		time.sleep(0.01)
 		# breakpoint()
 		if self.noSCI: return
+		if self.breakSCI: breakpoint()
+
 
 		self.mem.writesCount += 1
 		if type(reg) is str:
@@ -349,6 +361,7 @@ class Lux1310Object(SensorObject):
 		NEW: pass a string instead
 		'''
 		if self.noSCI: return
+		if self.breakSCI: breakpoint()
 
 		self.mem.writesCount += 1
 		if type(reg) is str:
@@ -796,8 +809,8 @@ class Lux1310Object(SensorObject):
 		self.mem.GPIOWrite("lux1310-dac-cs", 0)
 		#spilist = [reg >> 8, reg & 255]
 		#print (spilist)
-		spi.spi_transfer(reg)
-
+		# SPITransfer16(reg)
+		self.thisSPIobj.spi_transfer3(reg)
 		self.mem.GPIOWrite("lux1310-dac-cs", 1)
 
 			
@@ -806,6 +819,7 @@ class Lux1310Object(SensorObject):
 	# gpio_write(data->daccs, 1);
 
 	def _writeDACVoltage(self, chan, voltage):
+		# breakpoint()
 		cprint(f"_writeDACVoltage: {chan}, {voltage}V", "blue", "on_white")
 		if chan == VDR3_VOLTAGE:
 			self.writeDAC(voltage * VDR3_SCALE, VDR3_VOLTAGE)
@@ -835,24 +849,77 @@ class Lux1310Object(SensorObject):
 
 	def writeDACSPI(self, data):
 		cprint(f"      writeDACSPI 0x{data:x}", "blue", "on_white")
-		self.mem.GPIOWrite("lux1310-dac-cs", 0)
-		spi.spi_transfer(data)
+		self.mem.GPIOWrite("lux1310-dac-cs", 0)	
+		self.thisSPIobj.spi_transfer3(data)
 		self.mem.GPIOWrite("lux1310-dac-cs", 1)
 		
 
 
 	def _initDAC(self):
-		spi.spi_open()
-		# exit()
-		self.mem.GPIOWrite("lux1310-dac-cs", 0)
-		spi.spi_transfer(0x9000)
-		self.mem.GPIOWrite("lux1310-dac-cs", 0)
-		
+		# spi.spi_open()
+		self.thisSPIobj.spi_open3()
 
-	def _writeDACVoltages(self):
+		cprint(f" initDAC:     writeDACSPI 0x{0x9000:x}", "blue", "on_white")
+		self.mem.GPIOWrite("lux1310-dac-cs", 0)
+		# self.SPITransfer16(0x9000)
+		self.thisSPIobj.spi_transfer3(0x9000)	
+		self.mem.GPIOWrite("lux1310-dac-cs", 1)
+		
+	def _blinkCS(self):
+		while True:
+			print ("Blinking DAC CS")
+			self.mem.GPIOWrite("record-led.0", 0)
+			self.mem.GPIOWrite("record-led.1", 0)
+			self.mem.GPIOWrite("lux1310-dac-cs", 0)
+			time.sleep(1)
+			print ("...")
+			self.mem.GPIOWrite("record-led.0", 1)
+			self.mem.GPIOWrite("record-led.1", 1)
+			self.mem.GPIOWrite("lux1310-dac-cs", 1)
+			time.sleep(1)
+		
+	def SPITransfer16(self, data):
+		print (f"SPITransfer16: 0x{data:x}")
+		tup = [(data >> 8) & 0xff, data & 0xff]
+		spiobj.transfer(tup)
+
+	def testSPI(self):
+		# breakpoint()
+		# spi.spi_open()	
+
+		# thisSPIobj = spi.SPIobj()
+		# self.thisSPIobj = spi.SPIobj()
+
+
+		# print (self.thisSPIobj)
+
+		self.thisSPIobj.spi_open3()
+		# print (spiobj)
+		n = 0
+		while True:
+			cprint(f" SPI TEST{n}", "blue", "on_white")
+			self.mem.GPIOWrite("lux1310-dac-cs", 0)
+			# self.SPITransfer16(0x9123)	
+			# spi.spi_transfer(0x9123)	
+			# spi.spi_transfer([0x91, 0x23])
+			# thisSPIobj.spi_obj.transfer([0x91, 0x23])
+			
+
+			self.thisSPIobj.spi_transfer3(0x9123)	
+
+			self.mem.GPIOWrite("lux1310-dac-cs", 1)
+			# time.sleep(0.1)
+			n += 1
+
+
+
+	def _writeDACVoltages(self):	
 		# breakpoint()
 		print("_writeDACVoltages")
-		self._initDAC();
+		# spi.spi_open2()
+		# self.testSPI()
+		self._initDAC()
+		# self._blinkCS()
 		self._writeDACVoltage(VABL_VOLTAGE, 0.3);
 		self._writeDACVoltage(VRSTB_VOLTAGE, 2.7);
 		self._writeDACVoltage(VRST_VOLTAGE, 3.3);
