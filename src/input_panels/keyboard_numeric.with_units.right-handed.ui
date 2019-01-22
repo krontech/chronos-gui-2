@@ -392,7 +392,7 @@
     <string>Button { font-size: 22px; }</string>
    </property>
   </widget>
-  <widget class="Button" name="uiLeft_2">
+  <widget class="Button" name="uiLeft">
    <property name="geometry">
     <rect>
      <x>10</x>
@@ -518,39 +518,26 @@
    <header>button</header>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>uiMega</tabstop>
+  <tabstop>ui7</tabstop>
+  <tabstop>ui8</tabstop>
+  <tabstop>ui9</tabstop>
+  <tabstop>uiKilo</tabstop>
+  <tabstop>ui4</tabstop>
+  <tabstop>ui5</tabstop>
+  <tabstop>ui6</tabstop>
+  <tabstop>uiMilli</tabstop>
+  <tabstop>ui1</tabstop>
+  <tabstop>ui2</tabstop>
+  <tabstop>ui3</tabstop>
+  <tabstop>uiMicro</tabstop>
+  <tabstop>ui0</tabstop>
+  <tabstop>uiDot</tabstop>
+  <tabstop>uiBackspace</tabstop>
+  <tabstop>uiLeft</tabstop>
+  <tabstop>uiRight</tabstop>
+  <tabstop>uiClose</tabstop>
+ </tabstops>
  <resources/>
- <connections>
-  <connection>
-   <sender>uiClose</sender>
-   <signal>clicked()</signal>
-   <receiver>uiKeyboardNumericWithUnits</receiver>
-   <slot>close()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>333</x>
-     <y>395</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>-3</x>
-     <y>426</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>uiClose</sender>
-   <signal>clicked()</signal>
-   <receiver>uiKeyboardNumericWithUnits</receiver>
-   <slot>hide()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>328</x>
-     <y>443</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>-1</x>
-     <y>414</y>
-    </hint>
-   </hints>
-  </connection>
- </connections>
 </ui>

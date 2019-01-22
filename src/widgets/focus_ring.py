@@ -39,7 +39,13 @@ class FocusRing(QLabel):
 	def focusOn(self, widget):
 		"""Move focus to a widget."""
 		
+		
 		self._focussedOn = widget
+		
+		#Allow combobox dropdown menus to not be ringed, since they have the highlight which fulfills the purpose.
+		if getattr(widget, 'hideFocusRingFocus', False):
+			self.setGeometry(-9999,-9999,10,10) #Just move the focus ring off-screen if it's supposed to be hidden. That way, it doesn't mess with hidden/shown status.
+			return
 		
 		xy = widget.parentWidget().mapToGlobal(widget.pos())
 		wh = widget.size()
@@ -61,6 +67,7 @@ class FocusRing(QLabel):
 			) - QSize(self._currentPadding, self._currentPadding)*2
 		
 		self.setGeometry(QRect(xy, wh))
+		self.raise_() #Make focus ring appear above keyboard.
 	
 	
 	def _updateFocusRingPadding(self):
@@ -87,6 +94,9 @@ class FocusRing(QLabel):
 			widget-animation-duration: 1000;
 		""")
 		
+		self._focussedOn and self.focusOn(self._focussedOn)
+	
+	def refocus(self):
 		self._focussedOn and self.focusOn(self._focussedOn)
 	
 	

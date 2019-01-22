@@ -37,13 +37,13 @@
    <property name="geometry">
     <rect>
      <x>0</x>
-     <y>5</y>
-     <width>801</width>
-     <height>301</height>
+     <y>10</y>
+     <width>800</width>
+     <height>300</height>
     </rect>
    </property>
   </widget>
-  <widget class="QWidget" name="horizontalLayoutWidget">
+  <widget class="QWidget" name="uiSuggestionBar">
    <property name="geometry">
     <rect>
      <x>0</x>
@@ -52,15 +52,15 @@
      <height>45</height>
     </rect>
    </property>
-   <layout class="QHBoxLayout" name="uiSuggestionBar"/>
+   <layout class="QHBoxLayout" name="uiSuggestionBarLayout"/>
   </widget>
-  <widget class="QWidget" name="widget" native="true">
+  <widget class="QWidget" name="uiKeyPanel" native="true">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>45</y>
-     <width>801</width>
-     <height>261</height>
+     <width>800</width>
+     <height>260</height>
     </rect>
    </property>
    <widget class="Button" name="ui9">
@@ -74,6 +74,15 @@
     </property>
     <property name="text">
      <string>9</string>
+    </property>
+    <property name="autoRepeat">
+     <bool>true</bool>
+    </property>
+    <property name="autoRepeatDelay">
+     <number>500</number>
+    </property>
+    <property name="autoRepeatInterval">
+     <number>200</number>
     </property>
     <property name="clickMarginLeftSetter" stdset="0">
      <enum>Button::none</enum>
@@ -131,6 +140,15 @@
     <property name="text">
      <string>.</string>
     </property>
+    <property name="autoRepeat">
+     <bool>true</bool>
+    </property>
+    <property name="autoRepeatDelay">
+     <number>500</number>
+    </property>
+    <property name="autoRepeatInterval">
+     <number>200</number>
+    </property>
     <property name="clickMarginLeftSetter" stdset="0">
      <enum>Button::none</enum>
     </property>
@@ -155,6 +173,15 @@
     </property>
     <property name="text">
      <string>x</string>
+    </property>
+    <property name="autoRepeat">
+     <bool>true</bool>
+    </property>
+    <property name="autoRepeatDelay">
+     <number>500</number>
+    </property>
+    <property name="autoRepeatInterval">
+     <number>200</number>
     </property>
     <property name="clickMarginLeftSetter" stdset="0">
      <enum>Button::none</enum>
@@ -184,6 +211,15 @@
     <property name="text">
      <string>t</string>
     </property>
+    <property name="autoRepeat">
+     <bool>true</bool>
+    </property>
+    <property name="autoRepeatDelay">
+     <number>500</number>
+    </property>
+    <property name="autoRepeatInterval">
+     <number>200</number>
+    </property>
     <property name="clickMarginLeftSetter" stdset="0">
      <enum>Button::none</enum>
     </property>
@@ -211,6 +247,15 @@
     </property>
     <property name="text">
      <string>Space</string>
+    </property>
+    <property name="autoRepeat">
+     <bool>true</bool>
+    </property>
+    <property name="autoRepeatDelay">
+     <number>500</number>
+    </property>
+    <property name="autoRepeatInterval">
+     <number>200</number>
     </property>
     <property name="clickMarginLeftSetter" stdset="0">
      <enum>Button::none</enum>
@@ -240,6 +285,9 @@
     <property name="text">
      <string>▶</string>
     </property>
+    <property name="autoRepeat">
+     <bool>true</bool>
+    </property>
     <property name="clickMarginLeftSetter" stdset="0">
      <enum>Button::none</enum>
     </property>
@@ -264,6 +312,15 @@
     </property>
     <property name="text">
      <string>f</string>
+    </property>
+    <property name="autoRepeat">
+     <bool>true</bool>
+    </property>
+    <property name="autoRepeatDelay">
+     <number>500</number>
+    </property>
+    <property name="autoRepeatInterval">
+     <number>200</number>
     </property>
     <property name="clickMarginLeftSetter" stdset="0">
      <enum>Button::none</enum>
@@ -293,6 +350,15 @@
     <property name="text">
      <string>w</string>
     </property>
+    <property name="autoRepeat">
+     <bool>true</bool>
+    </property>
+    <property name="autoRepeatDelay">
+     <number>500</number>
+    </property>
+    <property name="autoRepeatInterval">
+     <number>200</number>
+    </property>
     <property name="clickMarginLeftSetter" stdset="0">
      <enum>Button::none</enum>
     </property>
@@ -320,6 +386,15 @@
     </property>
     <property name="text">
      <string>6</string>
+    </property>
+    <property name="autoRepeat">
+     <bool>true</bool>
+    </property>
+    <property name="autoRepeatDelay">
+     <number>500</number>
+    </property>
+    <property name="autoRepeatInterval">
+     <number>200</number>
     </property>
     <property name="clickMarginLeftSetter" stdset="0">
      <enum>Button::none</enum>
@@ -349,6 +424,15 @@
     <property name="text">
      <string>q</string>
     </property>
+    <property name="autoRepeat">
+     <bool>true</bool>
+    </property>
+    <property name="autoRepeatDelay">
+     <number>500</number>
+    </property>
+    <property name="autoRepeatInterval">
+     <number>200</number>
+    </property>
     <property name="clickMarginLeftSetter" stdset="0">
      <enum>Button::half</enum>
     </property>
@@ -376,6 +460,15 @@
     </property>
     <property name="text">
      <string>m</string>
+    </property>
+    <property name="autoRepeat">
+     <bool>true</bool>
+    </property>
+    <property name="autoRepeatDelay">
+     <number>500</number>
+    </property>
+    <property name="autoRepeatInterval">
+     <number>200</number>
     </property>
     <property name="clickMarginLeftSetter" stdset="0">
      <enum>Button::none</enum>
@@ -405,6 +498,15 @@
     <property name="text">
      <string>u</string>
     </property>
+    <property name="autoRepeat">
+     <bool>true</bool>
+    </property>
+    <property name="autoRepeatDelay">
+     <number>500</number>
+    </property>
+    <property name="autoRepeatInterval">
+     <number>200</number>
+    </property>
     <property name="clickMarginLeftSetter" stdset="0">
      <enum>Button::none</enum>
     </property>
@@ -432,6 +534,15 @@
     </property>
     <property name="text">
      <string>p</string>
+    </property>
+    <property name="autoRepeat">
+     <bool>true</bool>
+    </property>
+    <property name="autoRepeatDelay">
+     <number>500</number>
+    </property>
+    <property name="autoRepeatInterval">
+     <number>200</number>
     </property>
     <property name="clickMarginLeftSetter" stdset="0">
      <enum>Button::none</enum>
@@ -461,6 +572,15 @@
     <property name="text">
      <string>5</string>
     </property>
+    <property name="autoRepeat">
+     <bool>true</bool>
+    </property>
+    <property name="autoRepeatDelay">
+     <number>500</number>
+    </property>
+    <property name="autoRepeatInterval">
+     <number>200</number>
+    </property>
     <property name="clickMarginLeftSetter" stdset="0">
      <enum>Button::none</enum>
     </property>
@@ -489,6 +609,9 @@
     <property name="text">
      <string>⌫</string>
     </property>
+    <property name="autoRepeat">
+     <bool>true</bool>
+    </property>
     <property name="clickMarginRightSetter" stdset="0">
      <enum>Button::none</enum>
     </property>
@@ -513,6 +636,15 @@
     </property>
     <property name="text">
      <string>r</string>
+    </property>
+    <property name="autoRepeat">
+     <bool>true</bool>
+    </property>
+    <property name="autoRepeatDelay">
+     <number>500</number>
+    </property>
+    <property name="autoRepeatInterval">
+     <number>200</number>
     </property>
     <property name="clickMarginLeftSetter" stdset="0">
      <enum>Button::none</enum>
@@ -570,6 +702,9 @@
     <property name="text">
      <string>◀</string>
     </property>
+    <property name="autoRepeat">
+     <bool>true</bool>
+    </property>
     <property name="clickMarginLeftSetter" stdset="0">
      <enum>Button::none</enum>
     </property>
@@ -597,6 +732,15 @@
     </property>
     <property name="text">
      <string>e</string>
+    </property>
+    <property name="autoRepeat">
+     <bool>true</bool>
+    </property>
+    <property name="autoRepeatDelay">
+     <number>500</number>
+    </property>
+    <property name="autoRepeatInterval">
+     <number>200</number>
     </property>
     <property name="clickMarginLeftSetter" stdset="0">
      <enum>Button::none</enum>
@@ -626,6 +770,15 @@
     <property name="text">
      <string>b</string>
     </property>
+    <property name="autoRepeat">
+     <bool>true</bool>
+    </property>
+    <property name="autoRepeatDelay">
+     <number>500</number>
+    </property>
+    <property name="autoRepeatInterval">
+     <number>200</number>
+    </property>
     <property name="clickMarginLeftSetter" stdset="0">
      <enum>Button::none</enum>
     </property>
@@ -653,6 +806,15 @@
     </property>
     <property name="text">
      <string>7</string>
+    </property>
+    <property name="autoRepeat">
+     <bool>true</bool>
+    </property>
+    <property name="autoRepeatDelay">
+     <number>500</number>
+    </property>
+    <property name="autoRepeatInterval">
+     <number>200</number>
     </property>
     <property name="clickMarginLeftSetter" stdset="0">
      <enum>Button::none</enum>
@@ -682,6 +844,15 @@
     <property name="text">
      <string>2</string>
     </property>
+    <property name="autoRepeat">
+     <bool>true</bool>
+    </property>
+    <property name="autoRepeatDelay">
+     <number>500</number>
+    </property>
+    <property name="autoRepeatInterval">
+     <number>200</number>
+    </property>
     <property name="clickMarginLeftSetter" stdset="0">
      <enum>Button::none</enum>
     </property>
@@ -710,6 +881,15 @@
     <property name="text">
      <string>1</string>
     </property>
+    <property name="autoRepeat">
+     <bool>true</bool>
+    </property>
+    <property name="autoRepeatDelay">
+     <number>500</number>
+    </property>
+    <property name="autoRepeatInterval">
+     <number>200</number>
+    </property>
     <property name="clickMarginRightSetter" stdset="0">
      <enum>Button::none</enum>
     </property>
@@ -734,6 +914,15 @@
     </property>
     <property name="text">
      <string>z</string>
+    </property>
+    <property name="autoRepeat">
+     <bool>true</bool>
+    </property>
+    <property name="autoRepeatDelay">
+     <number>500</number>
+    </property>
+    <property name="autoRepeatInterval">
+     <number>200</number>
     </property>
     <property name="clickMarginLeftSetter" stdset="0">
      <enum>Button::none</enum>
@@ -763,6 +952,15 @@
     <property name="text">
      <string>g</string>
     </property>
+    <property name="autoRepeat">
+     <bool>true</bool>
+    </property>
+    <property name="autoRepeatDelay">
+     <number>500</number>
+    </property>
+    <property name="autoRepeatInterval">
+     <number>200</number>
+    </property>
     <property name="clickMarginLeftSetter" stdset="0">
      <enum>Button::none</enum>
     </property>
@@ -790,6 +988,15 @@
     </property>
     <property name="text">
      <string>3</string>
+    </property>
+    <property name="autoRepeat">
+     <bool>true</bool>
+    </property>
+    <property name="autoRepeatDelay">
+     <number>500</number>
+    </property>
+    <property name="autoRepeatInterval">
+     <number>200</number>
     </property>
     <property name="clickMarginLeftSetter" stdset="0">
      <enum>Button::none</enum>
@@ -819,6 +1026,15 @@
     <property name="text">
      <string>h</string>
     </property>
+    <property name="autoRepeat">
+     <bool>true</bool>
+    </property>
+    <property name="autoRepeatDelay">
+     <number>500</number>
+    </property>
+    <property name="autoRepeatInterval">
+     <number>200</number>
+    </property>
     <property name="clickMarginLeftSetter" stdset="0">
      <enum>Button::none</enum>
     </property>
@@ -847,6 +1063,15 @@
     <property name="text">
      <string>a</string>
     </property>
+    <property name="autoRepeat">
+     <bool>true</bool>
+    </property>
+    <property name="autoRepeatDelay">
+     <number>500</number>
+    </property>
+    <property name="autoRepeatInterval">
+     <number>200</number>
+    </property>
     <property name="clickMarginRightSetter" stdset="0">
      <enum>Button::none</enum>
     </property>
@@ -871,6 +1096,15 @@
     </property>
     <property name="text">
      <string>k</string>
+    </property>
+    <property name="autoRepeat">
+     <bool>true</bool>
+    </property>
+    <property name="autoRepeatDelay">
+     <number>500</number>
+    </property>
+    <property name="autoRepeatInterval">
+     <number>200</number>
     </property>
     <property name="clickMarginLeftSetter" stdset="0">
      <enum>Button::none</enum>
@@ -900,6 +1134,15 @@
     <property name="text">
      <string>d</string>
     </property>
+    <property name="autoRepeat">
+     <bool>true</bool>
+    </property>
+    <property name="autoRepeatDelay">
+     <number>500</number>
+    </property>
+    <property name="autoRepeatInterval">
+     <number>200</number>
+    </property>
     <property name="clickMarginLeftSetter" stdset="0">
      <enum>Button::none</enum>
     </property>
@@ -927,6 +1170,15 @@
     </property>
     <property name="text">
      <string>c</string>
+    </property>
+    <property name="autoRepeat">
+     <bool>true</bool>
+    </property>
+    <property name="autoRepeatDelay">
+     <number>500</number>
+    </property>
+    <property name="autoRepeatInterval">
+     <number>200</number>
     </property>
     <property name="clickMarginLeftSetter" stdset="0">
      <enum>Button::none</enum>
@@ -956,6 +1208,15 @@
     <property name="text">
      <string>o</string>
     </property>
+    <property name="autoRepeat">
+     <bool>true</bool>
+    </property>
+    <property name="autoRepeatDelay">
+     <number>500</number>
+    </property>
+    <property name="autoRepeatInterval">
+     <number>200</number>
+    </property>
     <property name="clickMarginLeftSetter" stdset="0">
      <enum>Button::none</enum>
     </property>
@@ -983,6 +1244,15 @@
     </property>
     <property name="text">
      <string>s</string>
+    </property>
+    <property name="autoRepeat">
+     <bool>true</bool>
+    </property>
+    <property name="autoRepeatDelay">
+     <number>500</number>
+    </property>
+    <property name="autoRepeatInterval">
+     <number>200</number>
     </property>
     <property name="clickMarginLeftSetter" stdset="0">
      <enum>Button::none</enum>
@@ -1012,6 +1282,15 @@
     <property name="text">
      <string>y</string>
     </property>
+    <property name="autoRepeat">
+     <bool>true</bool>
+    </property>
+    <property name="autoRepeatDelay">
+     <number>500</number>
+    </property>
+    <property name="autoRepeatInterval">
+     <number>200</number>
+    </property>
     <property name="clickMarginLeftSetter" stdset="0">
      <enum>Button::none</enum>
     </property>
@@ -1040,6 +1319,15 @@
     <property name="text">
      <string>0</string>
     </property>
+    <property name="autoRepeat">
+     <bool>true</bool>
+    </property>
+    <property name="autoRepeatDelay">
+     <number>500</number>
+    </property>
+    <property name="autoRepeatInterval">
+     <number>200</number>
+    </property>
     <property name="clickMarginRightSetter" stdset="0">
      <enum>Button::none</enum>
     </property>
@@ -1065,6 +1353,15 @@
     <property name="text">
      <string>4</string>
     </property>
+    <property name="autoRepeat">
+     <bool>true</bool>
+    </property>
+    <property name="autoRepeatDelay">
+     <number>500</number>
+    </property>
+    <property name="autoRepeatInterval">
+     <number>200</number>
+    </property>
     <property name="clickMarginRightSetter" stdset="0">
      <enum>Button::none</enum>
     </property>
@@ -1089,6 +1386,15 @@
     </property>
     <property name="text">
      <string>v</string>
+    </property>
+    <property name="autoRepeat">
+     <bool>true</bool>
+    </property>
+    <property name="autoRepeatDelay">
+     <number>500</number>
+    </property>
+    <property name="autoRepeatInterval">
+     <number>200</number>
     </property>
     <property name="clickMarginLeftSetter" stdset="0">
      <enum>Button::none</enum>
@@ -1118,6 +1424,15 @@
     <property name="text">
      <string>n</string>
     </property>
+    <property name="autoRepeat">
+     <bool>true</bool>
+    </property>
+    <property name="autoRepeatDelay">
+     <number>500</number>
+    </property>
+    <property name="autoRepeatInterval">
+     <number>200</number>
+    </property>
     <property name="clickMarginLeftSetter" stdset="0">
      <enum>Button::none</enum>
     </property>
@@ -1146,6 +1461,15 @@
     <property name="text">
      <string>l</string>
     </property>
+    <property name="autoRepeat">
+     <bool>true</bool>
+    </property>
+    <property name="autoRepeatDelay">
+     <number>500</number>
+    </property>
+    <property name="autoRepeatInterval">
+     <number>200</number>
+    </property>
     <property name="clickMarginLeftSetter" stdset="0">
      <enum>Button::none</enum>
     </property>
@@ -1170,6 +1494,15 @@
     </property>
     <property name="text">
      <string>j</string>
+    </property>
+    <property name="autoRepeat">
+     <bool>true</bool>
+    </property>
+    <property name="autoRepeatDelay">
+     <number>500</number>
+    </property>
+    <property name="autoRepeatInterval">
+     <number>200</number>
     </property>
     <property name="clickMarginLeftSetter" stdset="0">
      <enum>Button::none</enum>
@@ -1199,6 +1532,15 @@
     <property name="text">
      <string>i</string>
     </property>
+    <property name="autoRepeat">
+     <bool>true</bool>
+    </property>
+    <property name="autoRepeatDelay">
+     <number>500</number>
+    </property>
+    <property name="autoRepeatInterval">
+     <number>200</number>
+    </property>
     <property name="clickMarginLeftSetter" stdset="0">
      <enum>Button::none</enum>
     </property>
@@ -1227,6 +1569,15 @@
     <property name="text">
      <string>8</string>
     </property>
+    <property name="autoRepeat">
+     <bool>true</bool>
+    </property>
+    <property name="autoRepeatDelay">
+     <number>500</number>
+    </property>
+    <property name="autoRepeatInterval">
+     <number>200</number>
+    </property>
     <property name="clickMarginLeftSetter" stdset="0">
      <enum>Button::none</enum>
     </property>
@@ -1244,10 +1595,10 @@
     </property>
    </widget>
   </widget>
+  <zorder>uiSuggestionBar</zorder>
   <zorder>backdrop</zorder>
-  <zorder>widget</zorder>
+  <zorder>uiKeyPanel</zorder>
   <zorder>uiDropshadow</zorder>
-  <zorder>horizontalLayoutWidget</zorder>
  </widget>
  <customwidgets>
   <customwidget>
@@ -1261,23 +1612,51 @@
    <header>button</header>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>uiQ</tabstop>
+  <tabstop>uiW</tabstop>
+  <tabstop>uiE</tabstop>
+  <tabstop>uiR</tabstop>
+  <tabstop>uiT</tabstop>
+  <tabstop>uiY</tabstop>
+  <tabstop>uiU</tabstop>
+  <tabstop>uiI</tabstop>
+  <tabstop>uiO</tabstop>
+  <tabstop>uiP</tabstop>
+  <tabstop>ui7</tabstop>
+  <tabstop>ui8</tabstop>
+  <tabstop>ui9</tabstop>
+  <tabstop>uiA</tabstop>
+  <tabstop>uiS</tabstop>
+  <tabstop>uiD</tabstop>
+  <tabstop>uiF</tabstop>
+  <tabstop>uiG</tabstop>
+  <tabstop>uiH</tabstop>
+  <tabstop>uiJ</tabstop>
+  <tabstop>uiK</tabstop>
+  <tabstop>uiL</tabstop>
+  <tabstop>ui4</tabstop>
+  <tabstop>ui5</tabstop>
+  <tabstop>ui6</tabstop>
+  <tabstop>uiShift</tabstop>
+  <tabstop>uiZ</tabstop>
+  <tabstop>uiX</tabstop>
+  <tabstop>uiC</tabstop>
+  <tabstop>uiV</tabstop>
+  <tabstop>uiB</tabstop>
+  <tabstop>uiN</tabstop>
+  <tabstop>uiM</tabstop>
+  <tabstop>uiDot</tabstop>
+  <tabstop>ui1</tabstop>
+  <tabstop>ui2</tabstop>
+  <tabstop>ui3</tabstop>
+  <tabstop>uiBackspace</tabstop>
+  <tabstop>uiSpace</tabstop>
+  <tabstop>uiLeft</tabstop>
+  <tabstop>uiRight</tabstop>
+  <tabstop>ui0</tabstop>
+  <tabstop>uiClose</tabstop>
+ </tabstops>
  <resources/>
- <connections>
-  <connection>
-   <sender>uiClose</sender>
-   <signal>clicked()</signal>
-   <receiver>uiKeyboardNumericWithUnits</receiver>
-   <slot>hide()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>744</x>
-     <y>275</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>-2</x>
-     <y>24</y>
-    </hint>
-   </hints>
-  </connection>
- </connections>
+ <connections/>
 </ui>

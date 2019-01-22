@@ -1,6 +1,6 @@
 from random import randint
 
-from PyQt5.QtCore import Q_ENUMS, QSize, Qt
+from PyQt5.QtCore import Q_ENUMS, QSize, Qt, QEvent
 from PyQt5.QtWidgets import QLineEdit
 
 from debugger import *; dbg
@@ -14,21 +14,39 @@ class LineEdit(QLineEdit, TouchMarginPlugin, DirectAPILinkPlugin, FocusablePlugi
 	
 	def __init__(self, parent=None, showHitRects=False):
 		self.keepActiveLook = False
-		
+
 		super().__init__(parent, showHitRects=showHitRects)
 		
 		# Set some default text, so we can see the widget.
 		if not self.text():
 			self.setText('')
+		
+		self.setCursorMoveStyle(Qt.LogicalMoveStyle) #Left moves left, right moves right. Defaults is right arrow key moves left under rtl writing systems.
 			
 		self.clickMarginColor = f"rgba({randint(128, 255)}, {randint(64, 128)}, {randint(0, 32)}, {randint(32,96)})"
 		
-		self.jogWheelLowResolutionRotation.connect(lambda delta, pressed: 
-			not pressed and self.selectWidget(delta) )
-		self.jogWheelClick.connect(lambda: 
-			self.window().focusRing.focusOut()
-			if self.window().focusRing.isFocussedIn else
-			self.window().focusRing.focusIn() )
+		self.inputMode = '' #Set to empty, 'jogWheel', or 'touch'. Used for defocus event handling behaviour.
+		
+		self.jogWheelLowResolutionRotation.connect(self.handleJogWheelRotation)
+		self.jogWheelClick.connect(self.jogWheelClicked)
+		
+		self.touchEnd.connect(self.editTapped)
+		
+		self.doneEditing.connect(self.doneEditingCallback)
+		
+		###
+		### TODO: Add an event filter to get clicked events. (We can't 
+		###       use focus events because the jog wheel does that when
+		###       it rolls over an input.) Bring up the input panel.
+		###
+		
+		#When we tap an input, we deselect selected text. But we want to
+		#select all text. So, select it again after we've tapped it. Note:
+		#This only applies if the keyboard hasn't bumped the text out of the
+		#way first.
+		self.selectAllTimer = QtCore.QTimer()
+		self.selectAllTimer.timeout.connect(self.selectAll)
+		self.selectAllTimer.setSingleShot(True)
 	
 	def sizeHint(self):
 		return QSize(361, 81)
@@ -65,3 +83,43 @@ class LineEdit(QLineEdit, TouchMarginPlugin, DirectAPILinkPlugin, FocusablePlugi
 					margin-bottom: {self.clickMarginBottom*10}px;
 				}}
 			""" + self.originalStyleSheet())
+	
+	def jogWheelClicked(self):
+		if self.window().focusRing.isFocussedIn:
+			self.window().focusRing.focusOut()
+			self.doneEditing.emit()
+		else:
+			self.inputMode = 'jogWheel'
+			self.window().app.window.showInput('alphanumeric', focus=True)
+		
+		self.selectAll()
+		self.selectAllTimer.start(16)
+	
+	def editTapped(self):
+		if self.inputMode == 'touch':
+			return
+		
+		self.inputMode = 'touch'
+		self.window().app.window.showInput('alphanumeric', focus=False)
+		self.window().focusRing.focusIn()
+		
+		self.selectAll()
+		self.selectAllTimer.start(16)
+	
+	def doneEditingCallback(self):
+		self.inputMode = ''
+		self.window().app.window.hideInput()
+	
+	def handleJogWheelRotation(self, delta, pressed):
+		if self.inputMode:
+			if pressed:
+				self.cursorWordForward(False) if delta > 0 else self.cursorWordBackward(False)
+			else:
+				self.cursorForward(False, delta)
+			
+			#An important detail - reset the cursor flash so it's always visible while moving, so we can see where we have moved it to.
+			cursorFlashTime = self.window().app.cursorFlashTime()
+			self.window().app.setCursorFlashTime(-1)
+			self.window().app.setCursorFlashTime(cursorFlashTime)
+		else:
+			self.selectWidget(delta)

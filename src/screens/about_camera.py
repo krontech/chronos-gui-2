@@ -1,4 +1,5 @@
 from PyQt5 import uic, QtWidgets, QtCore
+from PyQt5.QtWidgets import QScroller
 # from PyQt5.QtCore import pyqtSlot
 
 from debugger import *; dbg
@@ -30,15 +31,31 @@ class AboutCamera(QtWidgets.QDialog):
 		self.uiScroll.setMaximum( 
 			self.uiText.height() - self.uiScrollArea.height() )
 		
-		self.uiScrollArea.setAttribute(QtCore.Qt.WA_TransparentForMouseEvents)
+		#Add drag-to-scroll to text content.
 		self.uiScrollArea.setFocusPolicy(QtCore.Qt.NoFocus)
+		QScroller.grabGesture(self.uiScrollArea.viewport(), QScroller.LeftMouseButtonGesture) #DDR 2019-01-15: Defaults to TouchGesture - which should work, according to WA_AcceptTouchEvents, but doesn't.
+		scroller = QScroller.scroller(self.uiScrollArea.viewport())
+		properties = scroller.scrollerProperties()
+		properties.setScrollMetric(properties.AxisLockThreshold, 0.0)
+		properties.setScrollMetric(properties.MousePressEventDelay, 0.0)
+		properties.setScrollMetric(properties.DragStartDistance, 0.0) #default: 0.005 - tweaked for "feel", the platform defaults are overly dramatic.
+		properties.setScrollMetric(properties.OvershootDragDistanceFactor, 0.3) #default: 1
+		properties.setScrollMetric(properties.OvershootScrollDistanceFactor, 0.3) #default: 1
+		properties.setScrollMetric(properties.OvershootScrollTime, 0.5) #default: 0.7
+		scroller.setScrollerProperties(properties)
 		
 		# Button binding.
 		self.uiScroll.valueChanged.connect(self.scrollPane)
+		self.uiScrollArea.verticalScrollBar().valueChanged.connect(self.scrollKnob)
 		
 		self.uiDone.clicked.connect(window.back)
-		
+	
+	@api.silenceCallbacks('uiScrollArea')
 	def scrollPane(self, pos):
-		"""Update the text position when scrollbar changes."""
-		
+		"""Update the text position when the slider position changes."""
 		self.uiScrollArea.verticalScrollBar().setValue(pos)
+	
+	@api.silenceCallbacks('uiScroll')
+	def scrollKnob(self, pos):
+		"""Update the slider position when the text position changes."""
+		self.uiScroll.setValue(pos)

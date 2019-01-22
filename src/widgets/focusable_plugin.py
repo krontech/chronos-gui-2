@@ -1,5 +1,6 @@
-from PyQt5.QtCore import Qt, pyqtSignal
+from PyQt5.QtCore import Qt, pyqtSignal, QObject, QEvent
 from PyQt5.QtGui import QKeyEvent
+from PyQt5.QtWidgets import QApplication
 
 from debugger import *; dbg
 
@@ -29,6 +30,11 @@ class FocusablePlugin():
 	jogWheelLongPress = pyqtSignal() #long press of jog wheel, cancelled by rotation or click
 	jogWheelCancel = pyqtSignal() #click/long-press is aborted by jog wheel rotation
 	
+	touchStart = pyqtSignal() #fired when you click or touch the input
+	touchEnd = pyqtSignal()
+	
+	doneEditing = pyqtSignal() #Fired when the keyboard input should close.
+	
 	#Specify the widget property "units", on numeric inputs, to provide a list of units to choose from. It is recommended to stick to 4, since that's how many unit buttons are on the numeric keyboard. Units can be scrolled with the jog wheel.
 	unitList = ['y', 'z', 'a', 'f', 'p', 'n', 'µ', 'm', '', 'k', 'M', 'G', 'T', 'P', 'E', 'Z', 'Y']
 	knownUnits = { #Map of units to their multipliers. eg, k = kilo = ×1000. Or µs = microseconds = ×0.000001. Usually queried with unit[:1], because something like mV or ms both have the same common numerical multiplier. [0] is not used because it fails on "".
@@ -54,18 +60,20 @@ class FocusablePlugin():
 			self.originalPrefix = self.prefix()
 			self.originalSuffix = self.suffix()
 			assert self.suffix()[:1] in self.availableUnits(), f'{self.window().objectName()}.{self.objectName()}: Suffix "{self.suffix()}" unit "{self.suffix()[:1]}" not found in {self.availableUnits()}. (List via "units" widget property set to "{self.units}.")' #Test slice, might not have first character if unit is "".
+		
+		self.installEventFilter(self)
 	
 	#TODO: write useful common functions here, such as "select next".
 	#Can maybe use self.parent.window.app.postEvent(…) here, like in main.py?
 	
-	def injectKeystrokes(self, key, count=1, modifier=Qt.NoModifier):
+	def injectKeystrokes(self, key, *, count=1, modifier=Qt.NoModifier):
 		"""Inject n keystrokes into the app, to the focused widget."""
 		for _ in range(count):
-			self.window().app.postEvent(
-				self.window().app.focusWidget(), #window._screens[window.currentScreen],
+			QApplication.instance().postEvent(
+				QApplication.instance().focusWidget(), #window._screens[window.currentScreen],
 				QKeyEvent(QKeyEvent.KeyPress, key, modifier) )
-			self.window().app.postEvent(
-				self.window().app.focusWidget(),
+			QApplication.instance().postEvent(
+				QApplication.instance().focusWidget(),
 				QKeyEvent(QKeyEvent.KeyRelease, key, modifier) )
 		
 		
@@ -273,3 +281,43 @@ class FocusablePlugin():
 	#Install event filter here to detect touch events and set
 	#self.editMode appropriately. If the jog wheel is being used
 	#to select, set self.editMode to 'jogwheel' instead in selectWidget.
+	
+	def eventFilter(self, obj, event):
+		"""Event filter that provides touch signal events.
+			
+			Please override eventFilter2 in sub-classes."""
+		
+		if event.type() == QEvent.KeyPress:
+			#This esc-key test is never even hit, I think it's caught by the global filter first.
+			if event.key() == Qt.Key_Escape:
+				event.ignore()
+				return True
+		
+		if event.type() == QEvent.TouchBegin:
+			self.touchStart.emit()
+			return False #Don't swallow this event. You can filter it later in eventFilter2 and do so if needed.
+		
+		#This never fires. 🤷
+		if event.type() == QEvent.TouchEnd:
+			self.touchEnd.emit()
+			return False
+		
+		#Work around the previous event not working. Brings up keyboard with mouse input, which normally shouldn't happen - the assumption is that if mouse is plugged in, a keyboard and mouse are plugged in, so the on-screen keyboard should not pop up.
+		if event.type() == QEvent.MouseButtonRelease:
+			self.touchEnd.emit()
+			return False
+		
+		return bool(self.eventFilter2(obj, event))
+	
+	def eventFilter2(self, obj, event):
+		"""Override this instead of eventFilter."""
+
+
+
+class __FocusablePluginEventFilter(QObject):
+	def eventFilter(self, obj, event):
+		"""This doesn't work. 
+			
+			eventFilter seems to need to be a function in the class
+			installing it on itself."""
+		pass

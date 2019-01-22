@@ -155,11 +155,6 @@
    </item>
    <item>
     <property name="text">
-     <string>20%</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
      <string>15%</string>
     </property>
    </item>
