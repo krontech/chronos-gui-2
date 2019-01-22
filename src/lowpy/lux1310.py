@@ -548,7 +548,8 @@ class Lux1310Object(SensorObject):
 		return 0;
 
 	def Lux1310SetGain(self, gain):
-		# breakpoint()
+		# return
+		breakpoint()
 		if NODAC:
 			return
 		print (f"Lux1310SetGain: {gain}")
@@ -718,15 +719,16 @@ class Lux1310Object(SensorObject):
 		
 
 	def Lux1310RegDump(self):
+		cprint ("Lux1310 Register Dump", "blue")
 		for reg, val in Lux1310_dict.items():
 			cont = self.Lux1310SCIRead(val >> 16)
-			print (f"--> {reg:<35} (0x{val >> 16:x}) : 0x{(cont):x}")
+			cprint (f"--> {reg:<35} (0x{val >> 16:x}) : 0x{(cont):x}", "blue")
 
 
 	def LuxInit2(self):
 		'''these things are moved to later'''
 
-		# self.Lux1310RegDump()
+		self.Lux1310RegDump()
 
 		print ("LuxInit2")
 		# Grab the sensor revision for further tuning.
@@ -1135,6 +1137,7 @@ class Lux1310Object(SensorObject):
 
 		#TODO: actual file reading
 		# right now this sets gain of 1.0
+		# breakpoint()
 		if(True):
 			print("Resetting cal gain to 1.0")
 			for i in range(16):
@@ -1146,9 +1149,28 @@ class Lux1310Object(SensorObject):
 		DCGstart = 0x1000
 		for i in range(LUX1310_MAX_H_RES):
 			gain = 1.0
-			self.mem.fpga_write16s(DCGstart + 2 * (i % 16), int(gain * 4096.0))
+			self.mem.fpga_write16s(DCGstart + 2 * (i ), int(gain * 4096.0))
 			#self.Lux1310WriteDGCMem(gainCorrection[i % 16], i);
 
+	def Lux1310ZeroFPNArea(self):
+		FRAME_SIZE = 1280 * 1024 * 12 // 8
+
+		print ( "Zero FPN area")
+		# breakpoint()
+		self.mem.FPGAWrite32("GPMC_PAGE_OFFSET", 0)	# Set GPMC offset
+		for i in range(0, FRAME_SIZE, 2):
+			self.mem.RAMWrite16(i, 0)
+			if not (i & 0x3ff): print (f"0x{i:x}")
+
+	def Lux1310PrintFPNArea(self):
+		FRAME_SIZE = 1280 * 1024 * 12 // 8
+
+		print ( "Contents of FPN area")
+		# breakpoint()
+		self.mem.FPGAWrite32("GPMC_PAGE_OFFSET", 0)	# Set GPMC offset
+		for i in range(0, FRAME_SIZE, 2):
+			self.mem.ReadWrite16(i, 0)
+			if not (i & 0xff): print (f"0x{i:x}")
 
 
 
@@ -1179,9 +1201,10 @@ class Lux1310Object(SensorObject):
 		print ( "Zero FPN area")
 		# breakpoint()
 		self.mem.FPGAWrite32("GPMC_PAGE_OFFSET", 0)	# Set GPMC offset
-		for i in range(0, FRAME_SIZE, 202):
+		for i in range(0, FRAME_SIZE, 2):
 			self.mem.RAMWrite16(i, 0)
-			if not (i & 0x3fff): print (f"0x{i:x}")
+			if not (i & 0xff): print (f"0x{i:x}")
+
 
 		
 		print ("Zero image area")

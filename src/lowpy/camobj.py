@@ -27,7 +27,7 @@ print (f"EEPROM: {hex(v)}")
 '''
 
 from ioports import board_chronos14_ioports
-
+		
 import pychronos
 
 MAX_FRAME_LENGTH = 0xf000
@@ -228,6 +228,8 @@ class CamObject:
 		   (vPeriod - vBackPorch - vSync - vFrontPorch),
 		   fps, hOutRes, vOutRes, maxFps))
 
+		print (f"pxClock is 0x{pxClock:x}, hPeriod is 0x{hPeriod:x}, vPeriod is 0x{vPeriod:x}")
+
 		self.mem.FPGAWrite16("DISPLAY_H_RES", hRes)
 		self.mem.FPGAWrite16("DISPLAY_H_OUT_RES", hOutRes)
 		self.mem.FPGAWrite16("DISPLAY_V_RES", vRes)
@@ -260,6 +262,10 @@ class CamObject:
 			# breakpoint()
 			print (f"--- faking 16 bit (0x{(addr * 2):x}, (0x{data:x})")
 			self.mem.FPGAWrite16(addr * 2, data)
+	def Fake16b(self, addr, data):
+			# breakpoint()
+			print (f"--- faking 16 bit (0x{(addr * 2):x}, (0x{data:x})")
+			self.mem.FPGAWrite16(addr, data)
 	def Fake32(self, addr, data):
 			# breakpoint()
 			print (f"=== faking 32 bit (0x{(addr * 2):x}, (0x{data:x})")
@@ -268,50 +274,76 @@ class CamObject:
 	def FakeInit(self):
 		print ("TODO: don't do fake init")
 
-		self.Fake16(0x36, 0x52)
-		self.Fake32(0x10, 0x12e5a)
-		self.Fake16(0x24, 0xf000)
-		self.Fake16(0x214, 0x500)
-		self.Fake16(0x218, 0x500)
-		self.Fake16(0x216, 0x400)
-		self.Fake16(0x220, 0x400)
-		self.Fake16(0x208, 0x652)
-		self.Fake16(0x20c, 0x1)
-		self.Fake16(0x210, 0x40)
-		self.Fake16(0x20a, 0x405)
-		self.Fake16(0x20e, 0x1)
-		self.Fake16(0x212, 0x4)
-		self.Fake32(0x30, 0x0)
-		self.Fake16(0x5e, 0x0)
-		self.Fake32(0x10, 0x78)
-		self.Fake32(0x28, 0x1fffe000)
-		self.Fake32(0x82, 0x0)
-		self.Fake32(0x80, 0x200c)
-		self.Fake16(0x24, 0xf000)
-		self.Fake32(0x20, 0x2)
-		self.Fake32(0x20, 0x0)
-		self.Fake16(0x5e, 0x0)
-		self.Fake32(0x10, 0x12e5a)
-		self.Fake32(0x10, 0x0)
-		self.Fake32(0x10, 0x12e5a)
-		self.Fake16(0x278, 0x10e5)
-		self.Fake16(0x27a, 0x10e5)
-		self.Fake16(0x27c, 0x10e5)
-		self.Fake16(0x260, 0x1ea2)
-		self.Fake16(0x262, 0xf6c6)
-		self.Fake16(0x264, 0xfc41)
-		self.Fake16(0x268, 0xfb1d)
-		self.Fake16(0x26a, 0x163b)
-		self.Fake16(0x26c, 0xfe74)
-		self.Fake16(0x26e, 0x209)
-		self.Fake16(0x270, 0xf0c1)
-		self.Fake16(0x272, 0x1a63)
-		self.Fake16(0x278, 0x16ce)
-		self.Fake16(0x27a, 0x10e5)
-		self.Fake16(0x27c, 0x1ac3)
-		self.Fake32(0x200, 0x280)
-		self.Fake32(0x222, 0x19)
-		self.Fake32(0x10, 0x12c31)
+		self.Fake16(0x36, 0x52)		# SENSOR_LINE_PERIOD
+		self.Fake32(0x10, 0x12e5a)	# IMAGER_INT_TIME
+		self.Fake16(0x24, 0xf000)	# SEQ_FRAME_SIZE
+		
+		self.Fake16(0x214, 0x500)	# DISPLAY_H_RES
+		self.Fake16(0x218, 0x500)	# DISPLAY_H_OUT_RES
+		self.Fake16(0x216, 0x400)	# DISPLAY_V_RES
+		self.Fake16(0x220, 0x400)	# DISPLAY_V_OUT_RES
+		# self.Fake16(0x208, 0x652)	# DISPLAY_H_PERIOD
+		self.Fake16(0x20c, 0x1)		# DISPLAY_H_SYNC_LEN
+		self.Fake16(0x210, 0x40)	# DISPLAY_H_BACK_PORCH
+		self.Fake16(0x20a, 0x405)	# DISPLAY_V_PERIOD
+		self.Fake16(0x20e, 0x1)		# DISPLAY_V_SYNC_LEN
+		self.Fake16(0x212, 0x4)		# DISPLAY_V_BACK_PORCH
+		
+		self.Fake32(0x30, 0x0)		# SEQ_TRIG_DELAY
+		self.Fake16(0x5e, 0x0)		# EXT_SHUTTER_CTL
+		self.Fake32(0x10, 0x78)		# IMAGER_INT_TIME
+		self.Fake32(0x28, 0x1fffe000)	# SEQ_REGION_END
+		self.Fake32(0x82, 0x0)		# ????
+		self.Fake32(0x80, 0x200c)	# SEQ_PGM_MEM_START
+		self.Fake16(0x24, 0xf000)	# SEQ_FRAME_SIZE
+		self.Fake32(0x20, 0x2)		# SEQ_CTL
+		self.Fake32(0x20, 0x0)		# SEQ_CTL
+		self.Fake16(0x5e, 0x0)		# EXT_SHUTTER_CTL
+		self.Fake32(0x10, 0x12e5a)	# IMAGER_INT_TIME
+		self.Fake32(0x10, 0x0)		# IMAGER_INT_TIME
+		self.Fake32(0x10, 0x12e5a)	# IMAGER_INT_TIME
+		self.Fake16(0x278, 0x10e5)	# WL_DYNDLY_2
+		self.Fake16(0x27a, 0x10e5)	# WL_DYNDLY_3
+		self.Fake16(0x27c, 0x10e5)	# ???
+		self.Fake16(0x260, 0x1ea2)	# \
+		self.Fake16(0x262, 0xf6c6)	# |
+		self.Fake16(0x264, 0xfc41)	# |
+		self.Fake16(0x268, 0xfb1d)	# |
+		self.Fake16(0x26a, 0x163b)	# |
+		self.Fake16(0x26c, 0xfe74)	# CCM
+		self.Fake16(0x26e, 0x209)	# |
+		self.Fake16(0x270, 0xf0c1)	# |
+		self.Fake16(0x272, 0x1a63)	# /
+		self.Fake16(0x278, 0x16ce)	# WL_DYNDLY_2
+		self.Fake16(0x27a, 0x10e5)	# WL_DYNDLY_3
+		self.Fake16(0x27c, 0x1ac3)	# ???
+		self.Fake32(0x200, 0x280)	# DISPLAY_CTL
+		self.Fake32(0x222, 0x19)	# DISPLAY_PEAKING_THRESH
+		self.Fake32(0x10, 0x12c31)	# IMAGER_INT_TIME
+
+	#latest fakery:
+		self.Fake16b(0x20, 0x15b9)	# 
+		self.Fake16b(0x4f0, 0x10cc)	# 
+		self.Fake16b(0x4f4, 0x10cc)	# 
+		self.Fake16b(0x4f8, 0x10cc)	# 
+		
+		self.Fake16b(0x4c0, 0x1ea2)	# CCM
+		self.Fake16b(0x4c4, 0xf6c6)	# CCM
+		self.Fake16b(0x4c8, 0xfc41)	# CCM
+		self.Fake16b(0x4d0, 0xfb1d)	# CCM
+		self.Fake16b(0x4d4, 0x163b)	# CCM
+		self.Fake16b(0x4d8, 0xfe74)	# CCM
+		self.Fake16b(0x4dc, 0x209)	# CCM
+		self.Fake16b(0x4e0, 0xf0c1)	# CCM_
+		self.Fake16b(0x4e4, 0x1a63)	# CCM_
+		self.Fake16b(0x4f0, 0x16ae)	# WL_DYNDLY_
+		self.Fake16b(0x4f4, 0x10cc)	# WL_DYNDLY_3
+		self.Fake16b(0x4f8, 0x1a9c)	# ???
+		self.Fake16b(0x400, 0x290)	# DISPLAY_CTL
+		self.Fake16b(0x444, 0x19)	# DISPLAY_PEAKING_THRESH
+		self.Fake16b(0x20, 0x15b9)	# IMAGER_INT_TIME
+
+
 
 
 
@@ -329,7 +361,7 @@ class CamObject:
 		#self.mem.fpga_write16(SYSTEM_RESET, 1)
 		
 		#TESTING! no reset
-		#self.mem.FPGAWrite16("SYSTEM_RESET", 1)
+		# self.mem.FPGAWrite16("SYSTEM_RESET", 1)
 		
 
 		# Give it some time
@@ -472,12 +504,12 @@ class CamObject:
 		self.sensor.mem.FPGAWrite32("IMAGER_FRAME_PERIOD", 0x1716f)
 
 
-		self.sensor.Lux1310SetGain(self.sensor.gain)
+		# self.sensor.Lux1310SetGain(self.sensor.gain)
 
 		self.sensor.Lux1310UpdateWavetableSetting()
 
 
-
+		# breakpoint()
 		self.sensor.Lux1310LoadColGainFromFile()
 
 

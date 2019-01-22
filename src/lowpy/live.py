@@ -69,6 +69,9 @@ while 0:
 # cam.sensor.Lux1310RegDump()
 print("........")
 
+breakpoint()
+cam.sensor.Lux1310ZeroFPNArea()
+
 # breakpoint()
 # cam.sensor.Lux1310ShowTestPattern()
 

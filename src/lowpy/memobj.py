@@ -54,6 +54,7 @@ class MemObject:
 	noFPGA = True
 	noFPGA = False
 	noGPIO = False
+	# noGPIO = True
 
 	FPGActypes = True
 	# FPGActypes = False
@@ -142,6 +143,9 @@ class MemObject:
 	# 	self.fpga_mmio.write32(addr, data)
 
 
+	def writeDGCMem(self, gain, column):
+		pass
+		# FPGAWrite16(DCG_MEM_START)
 
 	def FPGAmasked(self, addr):
 		ret = False
@@ -468,6 +472,7 @@ class MemObject:
 
 
 	def GPIOWrite(self, pin_name, value):
+		cprint(f'######## GPIO "{pin_name}": {value}', "white", "on_cyan")
 		if self.noGPIO: return
 		gpio = self._GPIO_ports[pin_name]
 		gpio.write(bool(value))
