@@ -20,7 +20,7 @@ def spi_open2():
 
 def spi_transfer(data):
 	breakpoint()
-	print (f"spi_transfer 0x{data:x}")
+	# print (f"spi_transfer 0x{data:x}")
 	global spiobj
 	spilist = [(data >> 8) & 0xff, data & 0xff]
 	#print (spilist)
@@ -39,7 +39,7 @@ class SPIobj:
 		#print (spi)
 
 	def spi_transfer3(self, data):
-		print (f"-->spi_transfer 0x{data:x}")
+		# print (f"-->spi_transfer 0x{data:x}")
 		# global spiobj
 		# spilist = [(data >> 8) & 0xff, data & 0xff]
 		spilist = [data & 0xff, (data >> 8) & 0xff]

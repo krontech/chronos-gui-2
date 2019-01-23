@@ -91,18 +91,6 @@ class MemObject:
 	# print (f"globvar is {globvar}")
 
 	def CtypesTest(self):
-		# ptr = self.fpga_mmio.pointer
-		# print(f"ptr is {ptr}")
-		# print(f"base is {self.fpga_mmio.base}")
-
-		# lptr = cast(ptr, POINTER(c_ulong))
-		# wptr = cast(ptr, POINTER(c_ushort))
-		# bptr = cast(ptr, POINTER(c_ubyte))
-		
-		# lptr[2] = 0x0fc1
-		# bptr[0] = 5
-		# self.FPGAlptr[0x428//4] = 0x510
-		# self.FPGAlptr[0] = 0x123
 		print(f"\n0x0: 0x{self.FPGAlptr[0x0]:x}")
 
 
@@ -120,28 +108,6 @@ class MemObject:
 
 	def __init__(self):
 		pass
-		# breakpoint()
-	
-
-		# print ("Testing RAM R/W")
-		# x = self.RAM_mmio.read8(0)
-		# print (f" - reading {x}")
-		# print (" - writing...")
-		# self.mem.RAMWrite8(0, 123)
-		# x = self.RAM_mmio.read8(0)
-		# print (f" - reading {x}")
-
-	
-
-
-	
-	# don't use these ones
-	# def mm_write16(self, addr, data):
-	# 	self.fpga_mmio.write16(addr, data)
-
-	# def mm_write32(self, addr, data):
-	# 	self.fpga_mmio.write32(addr, data)
-
 
 	def writeDGCMem(self, gain, column):
 		pass
@@ -161,8 +127,6 @@ class MemObject:
 		return ret
 
 
-
-
 	#NEW: use Python dictionary to do FPGA writes
 
 	def FPGAWrite8(self, addr, data):
@@ -173,14 +137,15 @@ class MemObject:
 			FPGAreg = FPGA_dict[addr]
 		else:
 			FPGAreg = addr
-		cprint (f'   [{self.writesCount}]- - - FPGAWrite8("{addr}":0x{FPGAreg:x}, 0x{data:x})', self.FPGAcol)
+		# cprint (f'   [{self.writesCount}]- - - FPGAWrite8("{addr}":0x{FPGAreg:x}, 0x{data:x})', self.FPGAcol)
 		if self.breakFPGA: breakpoint()
 		if self.usePC:
 			old = self.fpga.mem8[FPGAreg]
 			self.fpga.mem8[FPGAreg] = data & 0xff
 			new = self.fpga.mem8[FPGAreg]
 			if old != new:
-				cprint(f"0x{FPGAreg:x}: was 0x{old:x}, is 0x{new:x}", "white", "on_blue" )
+				# cprint(f"0x{FPGAreg:x}: was 0x{old:x}, is 0x{new:x}", "white", "on_blue" )
+				pass
 			return
 		if self.FPGActypes:
 			self.FPGAbptr[FPGAreg] = data & 0xff
@@ -195,14 +160,15 @@ class MemObject:
 			FPGAreg = FPGA_dict[addr]
 		else:
 			FPGAreg = addr
-		cprint (f'   [{self.writesCount}]----- FPGAWrite16("{addr}":0x{FPGAreg:x}, 0x{data:x})', self.FPGAcol)
+		# cprint (f'   [{self.writesCount}]----- FPGAWrite16("{addr}":0x{FPGAreg:x}, 0x{data:x})', self.FPGAcol)
 		if self.breakFPGA: breakpoint()
 		if self.usePC:
 			old = self.fpga.mem16[FPGAreg // 2]
 			self.fpga.mem16[FPGAreg // 2] = data & 0xffff
 			new = self.fpga.mem16[FPGAreg // 2]
 			if old != new:
-				cprint(f"0x{FPGAreg:x}: was 0x{old:x}, is 0x{new:x}", "white", "on_blue" )
+				# cprint(f"0x{FPGAreg:x}: was 0x{old:x}, is 0x{new:x}", "white", "on_blue" )
+				pass
 			return
 		if self.FPGActypes:
 			self.FPGAwptr[FPGAreg // 2] = data & 0xffff
@@ -217,14 +183,15 @@ class MemObject:
 			FPGAreg = FPGA_dict[addr]
 		else:
 			FPGAreg = addr
-		cprint (f'   [{self.writesCount}]===== FPGAWrite32("{addr}":0x{FPGAreg:x}, 0x{data:x})', self.FPGAcol)
+		# cprint (f'   [{self.writesCount}]===== FPGAWrite32("{addr}":0x{FPGAreg:x}, 0x{data:x})', self.FPGAcol)
 		if self.breakFPGA: breakpoint()
 		if self.usePC:
 			old = self.fpga.mem32[FPGAreg // 4]
 			self.fpga.mem32[FPGAreg // 4] = data
 			new = self.fpga.mem32[FPGAreg // 4]
 			if old != new:
-				cprint(f"0x{FPGAreg:x}: was 0x{old:x}, is 0x{new:x}", "white", "on_blue" )
+				# cprint(f"0x{FPGAreg:x}: was 0x{old:x}, is 0x{new:x}", "white", "on_blue" )
+				pass
 			return
 		if self.FPGActypes:
 			self.FPGAlptr[FPGAreg // 4] = data
@@ -472,7 +439,7 @@ class MemObject:
 
 
 	def GPIOWrite(self, pin_name, value):
-		cprint(f'######## GPIO "{pin_name}": {value}', "white", "on_cyan")
+		# cprint(f'######## GPIO "{pin_name}": {value}', "white", "on_cyan")
 		if self.noGPIO: return
 		gpio = self._GPIO_ports[pin_name]
 		gpio.write(bool(value))

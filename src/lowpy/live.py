@@ -29,13 +29,13 @@ def nicehex4(n):
 	return "0x" + ("0000000" + hex(n)[2:])[-8:]
 
 
-print("LIVE FPGA registers")
+# print("LIVE FPGA registers")
 
 # print (cam)
 
-for i in range(0, 10, 4):
-	mm = cam.mem.fpga_mmio.read32(i)
-	print(nicehex(i), " - ", nicehex4(mm))
+# for i in range(0, 10, 4):
+# 	mm = cam.mem.fpga_mmio.read32(i)
+# 	print(nicehex(i), " - ", nicehex4(mm))
 
 print("LIVE!")
 
@@ -44,15 +44,15 @@ print("LIVE!")
 
 
 sw = cam.mem.GPIORead("encoder-sw")
-print(f"Encoder switch is {sw}")
+# print(f"Encoder switch is {sw}")
 
 print ("----")
 for x in range(10):
 	cam.mem.GPIOWrite("record-led.0", x & 1)
-	print("-")
+	# print("-")
 	cam.mem.GPIOWrite("record-led.1", not (x & 1))
 	time.sleep(0.08)
-	print(x)
+	# print(x)
 cam.mem.GPIOWrite("record-led.0", 0)
 cam.mem.GPIOWrite("record-led.1", 0)
 

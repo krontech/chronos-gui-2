@@ -260,15 +260,15 @@ class CamObject:
 
 	def Fake16(self, addr, data):
 			# breakpoint()
-			print (f"--- faking 16 bit (0x{(addr * 2):x}, (0x{data:x})")
+			# print (f"--- faking 16 bit (0x{(addr * 2):x}, (0x{data:x})")
 			self.mem.FPGAWrite16(addr * 2, data)
 	def Fake16b(self, addr, data):
 			# breakpoint()
-			print (f"--- faking 16 bit (0x{(addr * 2):x}, (0x{data:x})")
+			# print (f"--- faking 16 bit (0x{(addr * 2):x}, (0x{data:x})")
 			self.mem.FPGAWrite16(addr, data)
 	def Fake32(self, addr, data):
 			# breakpoint()
-			print (f"=== faking 32 bit (0x{(addr * 2):x}, (0x{data:x})")
+			# print (f"=== faking 32 bit (0x{(addr * 2):x}, (0x{data:x})")
 			self.mem.FPGAWrite32(addr * 2, data)
 
 	def FakeInit(self):
