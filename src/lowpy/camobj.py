@@ -1,15 +1,17 @@
-
+# -*- coding: future_fstrings -*-
 # Camera class
 #from mem import fpga_mmio
 import time
 import pdb
+
+# import numpy as np
 
 from termcolor import colored
 from mmapregisters import *
 from memobj import MemObject
 from sensorobj import SensorObject
 from lux1310 import Lux1310Object
-import fpgah
+# import fpgah
 #import sys, smbus
 #import pyi2cflash-0.1.1
 
@@ -598,18 +600,12 @@ class CamObject:
 		#TODO do this properly
 
 
-
-
-
-
-
-
-
-
-
-
-
-
 	# self.SetLiveTiming()
+
+
+
+
+# NumPy stuff
+
 
 

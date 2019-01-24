@@ -1,7 +1,10 @@
+# -*- coding: future_fstrings -*-
+
 from pprint import pprint
 from termcolor import colored, cprint
 import pdb
 import math
+import numpy as np
 
 from periphery import GPIO
 from sensorobj import SensorObject
@@ -9,7 +12,7 @@ import spi
 from lux1310h import *
 from mmapregisters import *
 import time
-from dataclasses import dataclass
+# from dataclasses import dataclass
 import struct
 from lux1310waves import *
 from lux1310sensor import *
@@ -1020,7 +1023,6 @@ class Lux1310Object(SensorObject):
 
 		print ( "Zero FPN area")
 
-		return
 		self.mem.FPGAWrite32("GPMC_PAGE_OFFSET", 0)	# Set GPMC offset
 		for i in range(0, FRAME_SIZE, 2):
 			self.mem.RAMWrite16(i, 0)

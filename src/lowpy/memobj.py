@@ -1,3 +1,4 @@
+# -*- coding: future_fstrings -*-
 
 import time
 import pdb
@@ -10,7 +11,7 @@ from periphery import GPIO
 #from periphery import SPI
 from mmapregisters import *
 from spi import *
-from lux import *
+# from lux import *
 from ctypes import *
 
 import pychronos
