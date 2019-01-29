@@ -2,11 +2,17 @@
 # Camera class
 #from mem import fpga_mmio
 import time
+from datetime import datetime
 import pdb
 
-# import numpy as np
+from blackCal0 import *
+
+
+import numpy
 
 from termcolor import colored
+# from ppretty import ppretty
+
 from mmapregisters import *
 from memobj import MemObject
 from sensorobj import SensorObject
@@ -20,6 +26,8 @@ from lux1310 import Lux1310Object
 from smbus2 import SMBusWrapper
 from smbus2 import SMBus
 
+# import blackCal
+
 '''    
 bus = SMBus()
 bus.open(1)
@@ -29,17 +37,137 @@ print (f"EEPROM: {hex(v)}")
 '''
 
 from ioports import board_chronos14_ioports
-		
+
+# import errorcodes		
 import pychronos
 
 MAX_FRAME_LENGTH = 0xf000
 REC_START_ADDR = MAX_FRAME_LENGTH * 4
-
-CAMERA_SERIAL_I2CADDR =	0x54
-CAMERA_SERIAL_LENGTH =	32
-CAMERA_SERIAL_OFFSET =	0
+REC_REGION_START = MAX_FRAME_LENGTH * 4
 
 
+CAMERA_SERIAL_I2CADDR =		0x54
+CAMERA_SERIAL_LENGTH =		32
+CAMERA_SERIAL_OFFSET =		0
+
+RECORD_MODE_NORMAL =		0
+RECORD_MODE_SEGMENTED =		1
+RECORD_MODE_GATED_BURST =	2
+RECORD_MODE_FPN =			3
+
+#error codes:
+
+SUCCESS                                   =   0
+
+
+CAMERA_SUCCESS                            =   0  # try to use SUCCESS instead 
+CAMERA_THREAD_ERROR                       =   1
+CAMERA_ALREADY_RECORDING                  =   2
+CAMERA_NOT_RECORDING                      =   3
+CAMERA_NO_RECORDING_PRESENT               =   4
+CAMERA_IN_PLAYBACK_MODE                   =   5
+CAMERA_ERROR_SENSOR                       =   6
+CAMERA_INVALID_IMAGER_SETTINGS            =   7
+CAMERA_FILE_NOT_FOUND                     =   8
+CAMERA_FILE_ERROR                         =   9
+CAMERA_ERROR_IO                           =  10
+CAMERA_INVALID_SETTINGS                   =  11
+CAMERA_FPN_CORRECTION_ERROR               =  12
+CAMERA_CLIPPED_ERROR                      =  13
+CAMERA_LOW_SIGNAL_ERROR                   =  14
+CAMERA_RECORD_FRAME_ERROR                 =  15
+CAMERA_ITERATION_LIMIT_EXCEEDED           =  16
+CAMERA_GAIN_CORRECTION_ERROR              =  17
+CAMERA_MEM_ERROR                          =  18
+CAMERA_WRONG_FPGA_VERSION                 =  19
+CAMERA_DEAD_PIXEL_RECORD_ERROR            =  20
+CAMERA_DEAD_PIXEL_FAILED                  =  21
+
+
+ECP5_ALREAY_OPEN                          = 101
+ECP5_NOT_OPEN                             = 102
+ECP5_GPIO_ERROR                           = 103
+ECP5_SPI_OPEN_FAIL                        = 104
+ECP5_IOCTL_FAIL                           = 105
+ECP5_FILE_IO_ERROR                        = 106
+ECP5_MEMORY_ERROR                         = 107
+ECP5_WRONG_DEVICE_ID                      = 108
+ECP5_DONE_NOT_ASSERTED                    = 109
+
+
+GPMCERR_FOPEN                             = 201
+GPMCERR_MAP                               = 202
+
+
+IO_ERROR_OPEN                             = 301
+IO_FILE_ERROR                             = 302
+
+
+LUPA1300_SPI_OPEN_FAIL                    = 401
+LUPA1300_NO_DATA_VALID_WINDOW             = 402
+LUPA1300_INSUFFICIENT_DATA_VALID_WINDOW   = 403
+LUX1310_FILE_ERROR                        = 404
+
+
+SPI_NOT_OPEN                              = 501
+SPI_ALREAY_OPEN                           = 502
+SPI_OPEN_FAIL                             = 503
+SPI_IOCTL_FAIL                            = 504
+
+
+UI_FILE_ERROR                             = 601
+UI_THREAD_ERROR                           = 602
+
+
+VIDEO_NOT_RUNNING                         = 701
+VIDEO_RESOLUTION_ERROR                    = 702
+VIDEO_OMX_ERROR                           = 703
+VIDEO_FILE_ERROR                          = 704
+VIDEO_THREAD_ERROR                        = 705
+
+
+RECORD_THREAD_ERROR                       = 801
+RECORD_NOT_RUNNING                        = 802
+RECORD_ALREADY_RUNNING                    = 803
+RECORD_NO_DIRECTORY_SET                   = 804
+RECORD_FILE_EXISTS                        = 805
+RECORD_DIRECTORY_NOT_WRITABLE             = 806
+RECORD_ERROR                              = 807
+RECORD_INSUFFICIENT_SPACE                 = 808
+
+
+SETTINGS_LOAD_ERROR                       = 901
+SETTINGS_SAVE_ERROR                       = 902	
+
+
+
+
+
+columnOffsetMemory    = pychronos.fpgamap(0x5000//2, 0x1000)
+columnGainMemory      = pychronos.fpgamap(0x1000//2, 0x1000)
+columnLinearityMemory = pychronos.fpgamap(0xD000//2, 0x1000)
+seq = pychronos.sequencer()
+display = pychronos.display()
+rawRegisters = pychronos.fpgamap(0x0000, 0x1000)
+
+
+
+
+
+
+
+class SeqPgmMem:
+	termRecTrig = 0
+	termRecMem = 0 
+	termRecBlkEnd = 0
+	termBlkFull = 0
+	termBlkLow = 0
+	termBlkHigh = 0
+	termBlkFalling = 0
+	termBlkRising = 0
+	nextBlk = 0
+	blkSize = 0
+	
 
 def i2c_eeprom_do_read(addr,  offset,  leng):
 	bus = SMBus(1)
@@ -56,15 +184,45 @@ def i2c_eeprom_do_read(addr,  offset,  leng):
 		# Returned value is a list of 16 bytes
 		print(block)
 
+class imgSetObj():
+	hRes = 0                # pixels
+	vRes = 0                # pixels
+	stride = 0              # Number of pixels per line (allows for dark pixels in the last column)
+	hRes = 1280
+	vRes = 1024
+	hOffset = 0             # active area offset from left
+	vOffset = 0             # Active area offset from top
+	exposure = 79441            # 10ns increments
+	period = 94575              # Frame period in 10ns increments
+	gain = 0
+	frameSizeWords = 61440  # Number of words a frame takes up
+	recRegionSizeFrames = 8734 # Number of frames in the entire record region
+	mode = 0 				# Recording mode
+	segments = 0            # Number of segments in segmented mode
+	segmentLengthFrames = 8734 # Length of segment in segmented mode
+	prerecordFrames = 0     # Number of frames to record before each burst in Gated Burst mode
+	disableRingBuffer = 0
+
+class recordingDataObj:
+	valid = False
+	hasBeenSaved = False
+	imgset = 0
+
+
 
 
 class CamObject:
 
+	recording = False
+	playbackMode = False
+	videoHasBeenReviewed = False
 
 	ioports = board_chronos14_ioports
 
 		# self.CamInit()
 
+	imagerSettings = imgSetObj()
+	recordingData = recordingDataObj()
 
 	print ("continue")
 	mem = MemObject()
@@ -115,7 +273,7 @@ class CamObject:
 
 
 	def i2c_eeprom_read16(fd, addr, offset, leng):
-		return i2c_eeprom_do_read(fd, addr, offset, leng, 2);
+		return i2c_eeprom_do_read(fd, addr, offset, leng, 2)
 		pass
 		#print ("EEPROM")
 		#print (pyi2cflash.read(addr, offset, leng))
@@ -124,7 +282,7 @@ class CamObject:
 	def ReadSerial():
 		#iofile = ioports["eeprom-i2c"]
 		#fd = open(iofile, O_RDWR)
-		#return i2c_eeprom_read16(fd, CAMERA_SERIAL_I2CADDR, CAMERA_SERIAL_OFFSET, CAMERA_SERIAL_LENGTH);
+		#return i2c_eeprom_read16(fd, CAMERA_SERIAL_I2CADDR, CAMERA_SERIAL_OFFSET, CAMERA_SERIAL_LENGTH)
 		i2c_eeprom_do_read(CAMERA_SERIAL_I2CADDR, CAMERA_SERIAL_OFFSET, CAMERA_SERIAL_LENGTH)
 
 	def TestLive(self):
@@ -156,7 +314,7 @@ class CamObject:
 		# Calculate minimum hPeriod to fit within the max vertical
 		# resolution and make sure hPeriod is equal to or larger
 	 
-		minHPeriod = (pxClock / ((self.sensor.vMaxRes + vPorch + vSync + vSync) * maxFPS)) + 1; # the +1 is just to round up
+		minHPeriod = (pxClock / ((self.sensor.vMaxRes + vPorch + vSync + vSync) * maxFPS)) + 1 # the +1 is just to round up
 		if hPeriod < minHPeriod: 
 			hPeriod = minHPeriod
 
@@ -210,7 +368,7 @@ class CamObject:
 			print ("Faster FPGA clock enabled")
 			pxClock = 133333333
 
-		hPeriod = hSync + hBackPorch + hOutRes + hFrontPorch;
+		hPeriod = hSync + hBackPorch + hOutRes + hFrontPorch
 
 		# calculate minimum hPeriod to fit within the 1024 max vertical resolution
 		# and make sure hPeriod is equal or larger
@@ -224,7 +382,7 @@ class CamObject:
 			vPeriod = (vOutRes + vBackPorch + vSync + vFrontPorch)
 	
 		# calculate FPS for debug output
-		fps = pxClock // (vPeriod * hPeriod);
+		fps = pxClock // (vPeriod * hPeriod)
 		print ("setLiveOutputTiming: %d*%d@%d (%d*%d max: %d)" % \
 		   ((hPeriod - hBackPorch - hSync - hFrontPorch),
 		   (vPeriod - vBackPorch - vSync - vFrontPorch),
@@ -514,6 +672,275 @@ class CamObject:
 		# breakpoint()
 		self.sensor.Lux1310LoadColGainFromFile()
 
+	def testor(self):
+		pass
+
+
+# Sequencer stuff
+
+	def startRecording(self):
+		if self.recording:
+			return CAMERA_ALREADY_RECORDING
+		if self.playbackMode:
+			return CAMERA_IN_PLAYBACK_MODE
+
+		print ("startRecording")
+		print (f"mode is {self.imagerSettings.mode}")
+		if self.imagerSettings.mode == RECORD_MODE_NORMAL:
+			self.setRecSequencerModeNormal()
+
+		elif self.imagerSettings.mode == RECORD_MODE_SEGMENTED:
+			self.setRecSequencerModeNormal()
+
+		elif self.imagerSettings.mode == RECORD_MODE_GATED_BURST:
+			self.setRecSequencerModeGatedBurst(self.imagerSettings.prerecordFrames)
+
+		elif self.imagerSettings.mode == RECORD_MODE_FPN:
+			#this part is uncommented in the camApp code
+			print ("RECORD_MODE_FPN")
+			# self.setRecSequencerModeSingleBlock(16, 0) 
+			pass
+
+
+		self.recordingData.valid = False
+		self.recordingData.hasBeenSaved = False
+		# vinst->flushRegions()
+		self.startSequencer()
+		self.mem.GPIOWrite("record-led.0", 1)
+		self.mem.GPIOWrite("record-led.1", 1)
+		self.recording = True
+		self.videoHasBeenReviewed = False
+
+		# while (True):
+		# 	print(self.recording)
+
+
+
+		return SUCCESS
+		
+
+	def setRecSequencerModeNormal(self):
+
+		seqPgm = SeqPgmMem
+
+		if self.recording:
+			return CAMERA_ALREADY_RECORDING
+		if self.playbackMode:
+			return CAMERA_IN_PLAYBACK_MODE
+
+		# Set to one plus the last valid address in the record region
+		self.setRecRegionEndWords(REC_REGION_START + self.imagerSettings.recRegionSizeFrames * self.imagerSettings.frameSizeWords)
+
+		seqPgm.termRecTrig = 0
+		seqPgm.termRecMem = 1 if self.imagerSettings.disableRingBuffer else 0     # This currently doesn't work, bug in record sequencer hardware
+		seqPgm.termRecBlkEnd = 0 if ((RECORD_MODE_SEGMENTED == self.imagerSettings.mode) and (self.imagerSettings.segments > 1)) else 1
+		seqPgm.termBlkFull = 0
+		seqPgm.termBlkLow = 0
+		seqPgm.termBlkHigh = 0
+		seqPgm.termBlkFalling = 0
+		seqPgm.termBlkRising = 1
+		seqPgm.nextBlk = 0
+		seqPgm.blkSize = (self.imagerSettings.recRegionSizeFrames if (self.imagerSettings.mode == RECORD_MODE_NORMAL) \
+			else self.imagerSettings.recRegionSizeFrames // self.imagerSettings.segments) - 1 # Set to number of frames desired minus one
+		
+		smode = "normal" if self.imagerSettings.mode == RECORD_MODE_NORMAL else "segmented"
+		print (f"Setting record sequencer mode to {smode}, disableRingBuffer = {self.imagerSettings.disableRingBuffer}, end = '')")
+		print (f", segments = {self.imagerSettings.segments}, blkSize = {seqPgm.blkSize}")
+		self.writeSeqPgmMem(seqPgm, 0)
+
+		self.setFrameSizeWords(self.imagerSettings.frameSizeWords)
+
+		return SUCCESS
+
+	def setRecSequencerModeGatedBurst(self, prerecord):
+
+		seqPgm = SeqPgmMem
+
+		if self.recording:
+			return CAMERA_ALREADY_RECORDING
+		if self.playbackMode:
+			return CAMERA_IN_PLAYBACK_MODE
+
+		# Set to one plus the last valid address in the record region
+		self.setRecRegionEndWords(REC_REGION_START + self.imagerSettings.recRegionSizeFrames * self.imagerSettings.frameSizeWords)
+		
+		# Two instruction program
+		# Instruction 0 records to a single frame while trigger is inactive
+		# Instruction 1 records as normal while trigger is active
+
+		# When trigger is inactive, we sit in this 1-frame block, continuously overwriting that frame
+		seqPgm.termRecTrig = 0
+		seqPgm.termRecMem = 0
+		seqPgm.termRecBlkEnd = 0
+		seqPgm.termBlkFull = 0
+		seqPgm.termBlkLow = 0
+		seqPgm.termBlkHigh = 1	# Terminate when trigger becomes active
+		seqPgm.termBlkFalling = 0
+		seqPgm.termBlkRising = 1
+		seqPgm.nextBlk = 1					# Go to next block when this one terminates
+		seqPgm.blkSize = prerecord - 1		# Set to number of frames desired minus one
+
+		self.writeSeqPgmMem(seqPgm, 0)
+
+		seqPgm.termRecTrig = 0
+		seqPgm.termRecMem = 1 if self.imagerSettings.disableRingBuffer else 0
+		seqPgm.termRecBlkEnd = 0
+		seqPgm.termBlkFull = 0
+		seqPgm.termBlkLow = 1   # Terminate when trigger becomes inactive
+		seqPgm.termBlkHigh = 0
+		seqPgm.termBlkFalling = 0
+		seqPgm.termBlkRising = 1
+		seqPgm.nextBlk = 0		# Go back to block 0
+		seqPgm.blkSize = self.imagerSettings.recRegionSizeFrames - 3		# Set to number of frames desired minus one BUG? minus three?
+
+		print (f"---- Sequencer ---- Set to Gated burst mode, second block size: {seqPgm.blkSize+1}")
+
+		self.writeSeqPgmMem(seqPgm, 0)
+
+		self.setFrameSizeWords(self.imagerSettings.frameSizeWords)
+
+		return SUCCESS
+
+
+	def setRecSequencerModeSingleBlock(self, blockLength, frameOffset):
+		seqPgm = SeqPgmMem
+
+		if self.recording:
+			return CAMERA_ALREADY_RECORDING
+		if self.playbackMode:
+			return CAMERA_IN_PLAYBACK_MODE
+
+		# Set to one plus the last valid address in the record region
+		self.setRecRegionEndWords(REC_REGION_START + (self.imagerSettings.recRegionSizeFrames+frameOffset) * self.imagerSettings.frameSizeWords)
+
+		seqPgm.termRecTrig = 0
+		seqPgm.termRecMem = 0
+		seqPgm.termRecBlkEnd = 1
+		seqPgm.termBlkFull = 1
+		seqPgm.termBlkLow = 0
+		seqPgm.termBlkHigh = 0	# Terminate when trigger becomes active
+		seqPgm.termBlkFalling = 0
+		seqPgm.termBlkRising = 0
+		seqPgm.nextBlk = 0				# Go to next block when this one terminates
+		seqPgm.blkSize = blockLength - 1		# Set to number of frames desired minus one
+
+		# breakpoint()
+		self.writeSeqPgmMem(seqPgm, 0)
+
+		self.setFrameSizeWords(self.imagerSettings.frameSizeWords)
+
+		return SUCCESS
+
+
+	def stopRecording(self):
+		if (not self.recording):
+			return CAMERA_NOT_RECORDING
+		self.terminateRecord()
+
+		self.recordingData.valid = False
+		self.recordingData.hasBeenSaved = False
+		# vinst->flushRegions()
+		self.mem.GPIOWrite("record-led.0", 0)
+		self.mem.GPIOWrite("record-led.1", 0)
+		# self.recording = True
+		# self.videoHasBeenReviewed = False
+
+		print (f"stopRecording: recording is {self.recording}")
+
+		return SUCCESS
+
+
+# Find the earliest fully valid block
+
+	def endOfRec():
+		print ("EndOfRec")
+
+		print (f"--- Sequencer --- Total record region size: {self.imagerSettings.recRegionSizeFrames}")
+
+		 # TODO: Need to check with the video pipeline if there were actually frames captured, but there is
+		 # a possible race condition since both the UI and the pipeline are just polling the sequencer.
+		
+		 # For now, just assume that we always captured something.
+
+		# this was commented out in camApp    
+		# if(0 == recDataLength)
+		# {
+		# 	recordingData.valid = false;
+		# 	recordingData.hasBeenSaved = true;		//We didn't record anything so there's nothing to lose by overwriting
+		# }
+
+		self.recordingData.imgset = self.imagerSettings
+		self.recordingData.valid = true
+		self.recordingData.hasBeenSaved = false
+		self.mem.GPIOWrite("record-led.0", 0)
+		self.mem.GPIOWrite("record-led.1", 0)
+		self.recording = false
+
+
+
+	def writeSeqPgmMem(self, seqPgm, address):
+		# breakpoint()
+		print ("WSPM")
+		# print (ppretty(seqPgm))
+		datalow = seqPgm.termRecTrig
+		datalow += seqPgm.termRecMem << 1
+		datalow += seqPgm.termRecBlkEnd << 2
+		datalow += seqPgm.termBlkFull << 3
+		datalow += seqPgm.termBlkLow << 4
+		datalow += seqPgm.termBlkHigh << 5
+		datalow += seqPgm.termBlkFalling << 6
+		datalow += seqPgm.termBlkRising << 7
+		datalow += seqPgm.nextBlk << 8   # 4 bit field
+		datalow += (seqPgm.blkSize & 0xfffff) << 12  # 4 bit field here
+
+		print (f"blkSize = {seqPgm.blkSize}")
+		datahigh = seqPgm.blkSize >> 20	# the other 28 bits go here
+
+		print (f"datahigh = {datahigh}, datalow = {datalow}")
+		self.mem.FPGAWrite32((SEQ_PGM_MEM_START + address * 16) + 4, datahigh)
+		self.mem.FPGAWrite32((SEQ_PGM_MEM_START + address * 16), datalow)
+
+	def setFrameSizeWords(self, frameSize):
+		self.mem.FPGAWrite32("SEQ_FRAME_SIZE", frameSize)
+
+
+	def getRecording(self):
+		return self.mem.FPGARead32("SEQ_STATUS") and SEQ_STATUS_RECORDING_MASK
+
+
+	def startSequencer(self):
+		reg = self.mem.FPGARead32("SEQ_CTL")
+		self.mem.FPGAWrite32("SEQ_CTL", reg or SEQ_CTL_START_REC_MASK)
+		self.mem.FPGAWrite32("SEQ_CTL", reg and (0xffffffff - SEQ_CTL_START_REC_MASK))
+
+
+	def terminateRecord(self):
+		reg = self.mem.FPGARead32("SEQ_CTL")
+		self.mem.FPGAWrite32("SEQ_CTL", reg or SEQ_CTL_STOP_REC_MASK)
+		self.mem.FPGAWrite32("SEQ_CTL", reg and (0xffffffff - SEQ_CTL_STOP_REC_MASK))
+
+	def setRecRegionStartWords(self, start):
+		self.mem.FPGAWrite32("SEQ_REC_REGION_START", start)
+
+
+	def setRecRegionEndWords(self, end):
+		self.mem.FPGAWrite32("SEQ_REC_REGION_END", end)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 		#TODO: finish this section instead of faking it
 
@@ -525,74 +952,356 @@ class CamObject:
 		# print ("About to setSlaveExposure")
 
 		# self.sensor.setSlaveExposure(settings.exposure)
-		# self.sensor.seqOnOff(true);
+		# self.sensor.seqOnOff(true)
 
 
 
-'''
-	imagerSettings.hRes = settings.hRes;
-	imagerSettings.stride = settings.stride;
-	imagerSettings.vRes = settings.vRes;
-	imagerSettings.hOffset = settings.hOffset;
-	imagerSettings.vOffset = settings.vOffset;
-	imagerSettings.period = settings.period;
-	imagerSettings.exposure = settings.exposure;
-	imagerSettings.gain = settings.gain;
-	imagerSettings.disableRingBuffer = settings.disableRingBuffer;
-	imagerSettings.mode = settings.mode;
-	imagerSettings.prerecordFrames = settings.prerecordFrames;
-	imagerSettings.segmentLengthFrames = settings.segmentLengthFrames;
-	imagerSettings.segments = settings.segments;
 
-    //Zero trigger delay for Gated Burst
-    if(settings.mode == RECORD_MODE_GATED_BURST)
-	io->setTriggerDelayFrames(0, FLAG_TEMPORARY);
 
-	imagerSettings.frameSizeWords = ROUND_UP_MULT((settings.stride * (settings.vRes+0) * 12 / 8 + (BYTES_PER_WORD - 1)) / BYTES_PER_WORD, FRAME_ALIGN_WORDS);	//Enough words to fit the frame, but make it even
 
-    UInt32 maxRecRegionSize = getMaxRecordRegionSizeFrames(imagerSettings.hRes, imagerSettings.vRes);  //(ramSize - REC_REGION_START) / imagerSettings.frameSizeWords;
 
-    if(settings.recRegionSizeFrames > maxRecRegionSize)
-	imagerSettings.recRegionSizeFrames = maxRecRegionSize;
-    else
-	imagerSettings.recRegionSizeFrames = settings.recRegionSizeFrames;
 
-    setFrameSizeWords(imagerSettings.frameSizeWords);
+	def setSettings(self):
 
-	qDebug() << "About to sensor->loadADCOffsetsFromFile";
-	sensor->loadADCOffsetsFromFile();
 
-	loadColGainFromFile();
 
-	qDebug()	<< "\nSet imager settings:\nhRes" << imagerSettings.hRes
-				<< "vRes" << imagerSettings.vRes
-				<< "stride" << imagerSettings.stride
-				<< "hOffset" << imagerSettings.hOffset
-				<< "vOffset" << imagerSettings.vOffset
-				<< "exposure" << imagerSettings.exposure
-				<< "period" << imagerSettings.period
-				<< "frameSizeWords" << imagerSettings.frameSizeWords
-				<< "recRegionSizeFrames" << imagerSettings.recRegionSizeFrames;
+		self.imagerSettings.hRes = settings.hRes
+		self.imagerSettings.stride = settings.stride
+		self.imagerSettings.vRes = settings.vRes
+		self.imagerSettings.hOffset = settings.hOffset
+		self.imagerSettings.vOffset = settings.vOffset
+		self.imagerSettings.period = settings.period
+		self.imagerSettings.exposure = settings.exposure
+		self.imagerSettings.gain = settings.gain
+		self.imagerSettings.disableRingBuffer = settings.disableRingBuffer
+		self.imagerSettings.mode = settings.mode
+		self.imagerSettings.prerecordFrames = settings.prerecordFrames
+		self.imagerSettings.segmentLengthFrames = settings.segmentLengthFrames
+		self.imagerSettings.segments = settings.segments
+
+		return
+
+
+
+
+
+	def doBlackCalSequenced(self):
+
+		# print (f"doBlackCal({xres}, {yres})")
+
+		#this part is from startRecording()
+		self.setRecSequencerModeSingleBlock(16, 0)
+		self.recordingData.valid = False
+		self.recordingData.hasBeenSaved = False
+		# vinst->flushRegions()
+		self.startSequencer()
+		self.mem.GPIOWrite("record-led.0", 1)
+		self.mem.GPIOWrite("record-led.1", 1)
+		self.recording = True
+		self.videoHasBeenReviewed = False
+
+		self.doBlackCal(f)
+
+		self.stopRecording()
+
+
+	def recordFrames(self, numframes):
+		print (f"Starting record of {numframes} frames")
+
+		self.stopRecording()
+
+
+		oldMode = self.imagerSettings.mode
+		self.imagerSettings.mode = RECORD_MODE_FPN
+
+		rec  = self.mem.FPGARead32("SEQ_STATUS") and SEQ_STATUS_RECORDING_MASK
+		print (f"rec is {rec}")
+
+
+		retVal = self.setRecSequencerModeSingleBlock(numframes + 1, 0)
+		if SUCCESS != retVal:
+			return retVal
+
+		rec  = self.mem.FPGARead32("SEQ_STATUS") and SEQ_STATUS_RECORDING_MASK
+		print (f"rec is {rec}")
+
+
+		retVal = self.startRecording()
+		if SUCCESS != retVal:
+			return retVal
+
+		rec  = self.mem.FPGARead32("SEQ_STATUS") and SEQ_STATUS_RECORDING_MASK
+		print (f"rec is {rec}")
+
+
+		usStart = datetime.now().microsecond
+		print (f"now is {usStart} us")
+		looping = True
+		while looping:
+			rec  = self.mem.FPGARead32("SEQ_STATUS") and SEQ_STATUS_RECORDING_MASK
+			print (rec)
+			time.sleep(0.001)
+			looping = rec
+		
+		dsEnd = datetime.now().microsecond
+		print (f"now is {dsEnd} us")
+
+		elapsed = dsEnd - usStart
+		if elapsed < 0:
+			elapsed += 1000000
+
+		print (f"elapsed time = {elapsed} us")			
+			
+		retVal = self.stopRecording()			
+
+
+		if False:	#If after the timeout recording hasn't finished
+			print("Error: Record failed to stop within timeout period.")
+
+			retVal = self.stopRecording()
+			if SUCCESS != retVal:
+				print("Error: Stop Record failed")
+			return CAMERA_RECORD_FRAME_ERROR
+
+		print("Record done")
+
+		self.imagerSettings.mode = oldMode
+		return SUCCESS
+	
+
+
+	def doBlackCal(self, useLiveBuffer=False):
+
+		
+		# get the resolution from the display properties
+		xres = display.hRes
+		yres = display.vRes
+		
+		#-----------------------------------------------------------------------
+		# this needs to be switched to using the record sequencer
+		if (useLiveBuffer):
+			origAddress = [seq.liveAddr[0], seq.liveAddr[1], seq.liveAddr[2]]
+			page = 0
+			seq.liveAddr[0], seq.liveAddr[1], seq.liveAddr[2] = origAddress[page], origAddress[page], origAddress[page]
+			while(rawRegisters.mem32[0x70//4] != origAddress[page]): pass
+			page ^= 1
+			img = numpy.asarray(pychronos.readframe(seq.liveAddr[page], xres, yres))
+			for i in range(15):
+				seq.liveAddr[0], seq.liveAddr[1], seq.liveAddr[2] = origAddress[page], origAddress[page], origAddress[page]
+				while(rawRegisters.mem32[0x70//4] != origAddress[page]): pass
+				page ^= 1
+				img += pychronos.readframe(seq.liveAddr[page], xres, yres)
+		else:
+			# record 16 frames
+			# read out the first one (make the numpy object)
+			# loop through the other 15 and add them to the buffer
+			self.recordFrames(16)		
+
+			#first frame
+			img = numpy.asarray(pychronos.readframe(seq.regionStart, xres, yres))
+
+			for i in range(15):
+				img += pychronos.readframe(seq.regionStart + i * seq.frameSize, xres, yres)
+
+
+
+
+
+			pass
+		img /= 16
+
+		#-----------------------------------------------------------------------
+
+		img = numpy.float64(img)
+		
+		gains = numpy.float64([0.0]*xres)
+		linearity = numpy.float64([0.0]*xres)
+		for i in range(xres):
+			gains[i]     = columnGainMemory.mem16[i]
+			linearityVal = columnLinearityMemory.mem16[i]
+			if (linearityVal > 32767): linearityVal = -(65536-linearityVal)
+			linearity[i] = linearityVal
+		gains /= 4096
+		linearity /= (2**21)
+		print("gains:     ", gains[0:16])
+		print("linearity: ", linearity[0:16])
+
+		processed = (linearity * (img * img)) + (gains * img)
+		
+		columnOffset = numpy.average(processed, axis=0)
+		print("columnOffsets: ", columnOffset)
+
+		fpn = numpy.uint16(numpy.int16((processed - columnOffset)))
+		print("fpn: ", fpn)
+		pychronos.writeframe(0, fpn)
+
+		columnOffset = numpy.uint16(numpy.int16(-columnOffset))
+
+		for i in range(len(columnOffset)):
+			columnOffsetMemory.mem16[i] = int(columnOffset[i])
+
+
+
+	def callBlackCal(self):
+		self.doBlackCal()
+
+
+	def old_doBlackCal(self, xres=1280, yres=1024):
+
+
+		print (f"doBlackCal({xres}, {yres})")
+
+		#this part is from startRecording()
+		self.setRecSequencerModeSingleBlock(16, 0)
+		self.recordingData.valid = False
+		self.recordingData.hasBeenSaved = False
+		# vinst->flushRegions()
+		self.startSequencer()
+		self.mem.GPIOWrite("record-led.0", 1)
+		self.mem.GPIOWrite("record-led.1", 1)
+		self.recording = True
+		self.videoHasBeenReviewed = False
+
+
+
+		#-----------------------------------------------------------------------
+		# this needs to be switched to using the record sequencer
+		img = numpy.asarray(pychronos.readframe(seq.liveAddr[0], 1280, 1024))
+		for i in range(15):
+			# time.sleep(0.1)
+			# print (".")
+			img += pychronos.readframe(seq.liveAddr[0], 1280, 1024)
+		img /= 16
+		#-----------------------------------------------------------------------
+
+		img = numpy.float32(img)
+		
+		gains = numpy.float32([0.0]*xres)
+		linearity = numpy.float64([0.0]*xres)
+		for i in range(xres):
+			gains[i]     = columnGainMemory.mem16[i]
+			linearityVal = columnLinearityMemory.mem16[i]
+			if (linearityVal > 32767): linearityVal = -(65536-linearityVal)
+			linearity[i] = linearityVal
+		gains /= 4096
+		linearity /= (2**21)
+		print("gains:     ", gains[0:16])
+		print("linearity: ", linearity[0:16])
+
+		processed = (linearity * (img * img)) + (gains * img)
+		
+		columnOffset = numpy.average(processed, axis=0)
+		print("columnOffsets: ", columnOffset)
+
+		fpn = numpy.uint16(numpy.int16(processed + columnOffset))
+		print(" fpn: ", fpn)
+		pychronos.writeframe(0, fpn)
+
+		columnOffset = numpy.uint16(numpy.int16(columnOffset))
+
+		for i in range(len(columnOffset)):
+			columnOffsetMemory.mem16[i] = int(columnOffset[i])
+
+
+		self.stopRecording()
+
+
+
+	def doBlackCal0(self, xres=1280, yres=1024):
+		print ("doBlackCal0")
+		#-----------------------------------------------------------------------
+		# this needs to be switched to using the record sequencer
+		img = numpy.asarray(pychronos.readframe(seq.liveAddr[0], 1280, 1024))
+		for i in range(15):
+			# time.sleep(0.1)
+			# print (".")
+			img += pychronos.readframe(seq.liveAddr[0], 1280, 1024)
+		img /= 16
+		#-----------------------------------------------------------------------
+
+		img = numpy.float32(img)
+		
+		gains = numpy.float32([0.0]*xres)
+		linearity = numpy.float64([0.0]*xres)
+		for i in range(xres):
+			gains[i]     = columnGainMemory.mem16[i]
+			linearityVal = columnLinearityMemory.mem16[i]
+			if (linearityVal > 32767): linearityVal = -(65536-linearityVal)
+			linearity[i] = linearityVal
+		gains /= 4096
+		linearity /= (2**21)
+		print("gains:     ", gains[0:16])
+		print("linearity: ", linearity[0:16])
+
+		processed = (linearity * (img * img)) + (gains * img)
+		
+		columnOffset = numpy.average(processed, axis=0)
+		print("columnOffsets: ", columnOffset)
+
+		fpn = numpy.uint16(numpy.int16(processed + columnOffset))
+		print(" fpn: ", fpn)
+		pychronos.writeframe(0, fpn)
+
+		columnOffset = numpy.uint16(numpy.int16(columnOffset))
+
+		for i in range(len(columnOffset)):
+			columnOffsetMemory.mem16[i] = int(columnOffset[i])
+
+
+
+
+
+		'''
+
+		# Zero trigger delay for Gated Burst
+		if(settings.mode == RECORD_MODE_GATED_BURST)
+		io->setTriggerDelayFrames(0, FLAG_TEMPORARY);
+
+		self.imagerSettings.frameSizeWords = ROUND_UP_MULT((settings.stride * (settings.vRes+0) * 12 / 8 + (BYTES_PER_WORD - 1)) / BYTES_PER_WORD, FRAME_ALIGN_WORDS);	//Enough words to fit the frame, but make it even
+
+		UInt32 maxRecRegionSize = getMaxRecordRegionSizeFrames(self.imagerSettings.hRes, self.imagerSettings.vRes);  //(ramSize - REC_REGION_START) / self.imagerSettings.frameSizeWords;
+
+		if(settings.recRegionSizeFrames > maxRecRegionSize)
+		self.imagerSettings.recRegionSizeFrames = maxRecRegionSize;
+		else
+		self.imagerSettings.recRegionSizeFrames = settings.recRegionSizeFrames;
+
+		setFrameSizeWords(self.imagerSettings.frameSizeWords);
+
+		qDebug() << "About to sensor->loadADCOffsetsFromFile";
+		sensor->loadADCOffsetsFromFile();
+
+		loadColGainFromFile();
+
+		qDebug()	<< "\nSet imager settings:\nhRes" << self.imagerSettings.hRes
+					<< "vRes" << self.imagerSettings.vRes
+					<< "stride" << self.imagerSettings.stride
+					<< "hOffset" << self.imagerSettings.hOffset
+					<< "vOffset" << self.imagerSettings.vOffset
+					<< "exposure" << self.imagerSettings.exposure
+					<< "period" << self.imagerSettings.period
+					<< "frameSizeWords" << self.imagerSettings.frameSizeWords
+					<< "recRegionSizeFrames" << self.imagerSettings.recRegionSizeFrames;
 
 	if (settings.temporary) {
 		qDebug() << "--- settings --- temporary, not saving";
 	}
 	else {
 		qDebug() << "--- settings --- saving";
-	appSettings.setValue("camera/hRes",                 imagerSettings.hRes);
-	appSettings.setValue("camera/vRes",                 imagerSettings.vRes);
-	appSettings.setValue("camera/stride",               imagerSettings.stride);
-	appSettings.setValue("camera/hOffset",              imagerSettings.hOffset);
-	appSettings.setValue("camera/vOffset",              imagerSettings.vOffset);
-	appSettings.setValue("camera/gain",                 imagerSettings.gain);
-	appSettings.setValue("camera/period",               imagerSettings.period);
-	appSettings.setValue("camera/exposure",             imagerSettings.exposure);
-	appSettings.setValue("camera/recRegionSizeFrames",  imagerSettings.recRegionSizeFrames);
-	appSettings.setValue("camera/disableRingBuffer",    imagerSettings.disableRingBuffer);
-	appSettings.setValue("camera/mode",                 imagerSettings.mode);
-	appSettings.setValue("camera/prerecordFrames",      imagerSettings.prerecordFrames);
-	appSettings.setValue("camera/segmentLengthFrames",  imagerSettings.segmentLengthFrames);
-	appSettings.setValue("camera/segments",             imagerSettings.segments);
+	appSettings.setValue("camera/hRes",                 self.imagerSettings.hRes);
+	appSettings.setValue("camera/vRes",                 self.imagerSettings.vRes);
+	appSettings.setValue("camera/stride",               self.imagerSettings.stride);
+	appSettings.setValue("camera/hOffset",              self.imagerSettings.hOffset);
+	appSettings.setValue("camera/vOffset",              self.imagerSettings.vOffset);
+	appSettings.setValue("camera/gain",                 self.imagerSettings.gain);
+	appSettings.setValue("camera/period",               self.imagerSettings.period);
+	appSettings.setValue("camera/exposure",             self.imagerSettings.exposure);
+	appSettings.setValue("camera/recRegionSizeFrames",  self.imagerSettings.recRegionSizeFrames);
+	appSettings.setValue("camera/disableRingBuffer",    self.imagerSettings.disableRingBuffer);
+	appSettings.setValue("camera/mode",                 self.imagerSettings.mode);
+	appSettings.setValue("camera/prerecordFrames",      self.imagerSettings.prerecordFrames);
+	appSettings.setValue("camera/segmentLengthFrames",  self.imagerSettings.segmentLengthFrames);
+	appSettings.setValue("camera/segments",             self.imagerSettings.segments);
 	}
 '''
 
@@ -607,5 +1316,29 @@ class CamObject:
 
 # NumPy stuff
 
+
+
+
+
+
+
+
+
+
+
+'''
+	Camera::setRecSequencerModeSingleBlock
+	  Camera::setRecRegionEndWords
+		59
+	  Camera::writeSeqPgmMemory
+		60 - 61
+	  Camera::setFrameSizeWords
+		62
+	Camera::startRecording
+	  Camera::startSequencer
+		63 - 64
+	  Camera::setShutterGatingEnable
+	   65
+'''
 
 

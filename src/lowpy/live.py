@@ -8,6 +8,9 @@ print("\n\nLive Video Testing")
 import time
 from camobj import CamObject
 from termcolor import colored
+# from blackCal0 import *
+
+# import blackCal
 # import camobj
 
 # breakpoint()
@@ -47,12 +50,10 @@ sw = cam.mem.GPIORead("encoder-sw")
 # print(f"Encoder switch is {sw}")
 
 print ("----")
-for x in range(10):
-	cam.mem.GPIOWrite("record-led.0", x & 1)
-	# print("-")
-	cam.mem.GPIOWrite("record-led.1", not (x & 1))
-	time.sleep(0.08)
-	# print(x)
+# for x in range(10):
+# 	cam.mem.GPIOWrite("record-led.0", x & 1)
+# 	cam.mem.GPIOWrite("record-led.1", not (x & 1))
+# 	time.sleep(0.08)
 cam.mem.GPIOWrite("record-led.0", 0)
 cam.mem.GPIOWrite("record-led.1", 0)
 
@@ -69,8 +70,23 @@ while 0:
 # cam.sensor.Lux1310RegDump()
 print("........")
 
-breakpoint()
-cam.sensor.Lux1310ZeroFPNArea()
+
+
+# now test recording things
+
+# cam.setRecSequencerModeNormal();
+# cam.startRecording();
+# cam.stopRecording();
+
+
+# cam.doBlackCal()
+# doBlackCal()
+# cam.doBlackCal0()
+# cam.old_doBlackCal()
+cam.doBlackCal()
+
+# breakpoint()
+# cam.sensor.Lux1310ZeroFPNArea()
 
 # breakpoint()
 # cam.sensor.Lux1310ShowTestPattern()
