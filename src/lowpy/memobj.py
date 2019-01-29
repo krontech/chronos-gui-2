@@ -154,6 +154,7 @@ class MemObject:
 			self.fpga_mmio.write8(FPGAreg, data)
 
 	def FPGAWrite16(self, addr, data):
+		breakpoint()
 		if self.noFPGA: return
 		self.writesCount += 1
 		if self.FPGAmasked(addr): return

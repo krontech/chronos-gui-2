@@ -7,10 +7,10 @@ import pdb
 
 from blackCal0 import *
 
-
+# import recSequencer
 import numpy
 
-from termcolor import colored
+from termcolor import colored, cprint
 # from ppretty import ppretty
 
 from mmapregisters import *
@@ -143,9 +143,9 @@ SETTINGS_SAVE_ERROR                       = 902
 
 
 
-columnOffsetMemory    = pychronos.fpgamap(0x5000//2, 0x1000)
-columnGainMemory      = pychronos.fpgamap(0x1000//2, 0x1000)
-columnLinearityMemory = pychronos.fpgamap(0xD000//2, 0x1000)
+columnOffsetMemory    = pychronos.fpgamap(0x5000, 0x1000)
+columnGainMemory      = pychronos.fpgamap(0x1000, 0x1000)
+columnLinearityMemory = pychronos.fpgamap(0xD000, 0x1000)
 seq = pychronos.sequencer()
 display = pychronos.display()
 rawRegisters = pychronos.fpgamap(0x0000, 0x1000)
@@ -1068,17 +1068,31 @@ class CamObject:
 		self.imagerSettings.mode = oldMode
 		return SUCCESS
 	
+	timerTime = -1
+
+	def timer(self, message):
+		if self.timerTime == -1:
+			now = datetime.now()
+			self.timerTime = now.microsecond / 1000000 + now.second
+			return
+		else:
+			now = datetime.now()
+			nowTime = now.microsecond / 1000000 + now.second 
+			deltaTime = nowTime - self.timerTime
+			if deltaTime < 0:
+				deltaTime += 60
+			self.timerTime = nowTime
+			# print (f"timerTime is {self.timerTime:.6f}")
+		cprint (f"--> {message}: {deltaTime:.6f} seconds", "red")
 
 
 	def doBlackCal(self, useLiveBuffer=False):
-
+		self.timer("start")
 		
 		# get the resolution from the display properties
 		xres = display.hRes
 		yres = display.vRes
-		
-		#-----------------------------------------------------------------------
-		# this needs to be switched to using the record sequencer
+
 		if (useLiveBuffer):
 			origAddress = [seq.liveAddr[0], seq.liveAddr[1], seq.liveAddr[2]]
 			page = 0
@@ -1095,158 +1109,67 @@ class CamObject:
 			# record 16 frames
 			# read out the first one (make the numpy object)
 			# loop through the other 15 and add them to the buffer
+
 			self.recordFrames(16)		
+
+			self.timer ("recording frames")
+
 
 			#first frame
 			img = numpy.asarray(pychronos.readframe(seq.regionStart, xres, yres))
 
 			for i in range(15):
 				img += pychronos.readframe(seq.regionStart + i * seq.frameSize, xres, yres)
+			self.timer ("add images into array")
 
 
 
+		img >>= 4
+
+		self.timer ("divide by 16")
 
 
-			pass
-		img /= 16
-
-		#-----------------------------------------------------------------------
-
-		img = numpy.float64(img)
+		img = numpy.float32(img)
 		
-		gains = numpy.float64([0.0]*xres)
-		linearity = numpy.float64([0.0]*xres)
+		self.timer ("convert to float")
+
+
+		
+		gains = numpy.float32([0.0]*xres)
+		linearity = numpy.float32([0.0]*xres)
 		for i in range(xres):
 			gains[i]     = columnGainMemory.mem16[i]
 			linearityVal = columnLinearityMemory.mem16[i]
 			if (linearityVal > 32767): linearityVal = -(65536-linearityVal)
 			linearity[i] = linearityVal
 		gains /= 4096
+		self.timer ("gains divide")
 		linearity /= (2**21)
+		self.timer ("linearity divide")
+
 		print("gains:     ", gains[0:16])
 		print("linearity: ", linearity[0:16])
 
 		processed = (linearity * (img * img)) + (gains * img)
 		
+		self.timer("processing")
 		columnOffset = numpy.average(processed, axis=0)
+		self.timer("averaging columnOffset")
 		print("columnOffsets: ", columnOffset)
 
 		fpn = numpy.uint16(numpy.int16((processed - columnOffset)))
+		self.timer("calculating FPN")
+
 		print("fpn: ", fpn)
 		pychronos.writeframe(0, fpn)
+		self.timer("writing FPN")
 
 		columnOffset = numpy.uint16(numpy.int16(-columnOffset))
+		self.timer("calculating columnOffset")
 
 		for i in range(len(columnOffset)):
 			columnOffsetMemory.mem16[i] = int(columnOffset[i])
-
-
-
-	def callBlackCal(self):
-		self.doBlackCal()
-
-
-	def old_doBlackCal(self, xres=1280, yres=1024):
-
-
-		print (f"doBlackCal({xres}, {yres})")
-
-		#this part is from startRecording()
-		self.setRecSequencerModeSingleBlock(16, 0)
-		self.recordingData.valid = False
-		self.recordingData.hasBeenSaved = False
-		# vinst->flushRegions()
-		self.startSequencer()
-		self.mem.GPIOWrite("record-led.0", 1)
-		self.mem.GPIOWrite("record-led.1", 1)
-		self.recording = True
-		self.videoHasBeenReviewed = False
-
-
-
-		#-----------------------------------------------------------------------
-		# this needs to be switched to using the record sequencer
-		img = numpy.asarray(pychronos.readframe(seq.liveAddr[0], 1280, 1024))
-		for i in range(15):
-			# time.sleep(0.1)
-			# print (".")
-			img += pychronos.readframe(seq.liveAddr[0], 1280, 1024)
-		img /= 16
-		#-----------------------------------------------------------------------
-
-		img = numpy.float32(img)
-		
-		gains = numpy.float32([0.0]*xres)
-		linearity = numpy.float64([0.0]*xres)
-		for i in range(xres):
-			gains[i]     = columnGainMemory.mem16[i]
-			linearityVal = columnLinearityMemory.mem16[i]
-			if (linearityVal > 32767): linearityVal = -(65536-linearityVal)
-			linearity[i] = linearityVal
-		gains /= 4096
-		linearity /= (2**21)
-		print("gains:     ", gains[0:16])
-		print("linearity: ", linearity[0:16])
-
-		processed = (linearity * (img * img)) + (gains * img)
-		
-		columnOffset = numpy.average(processed, axis=0)
-		print("columnOffsets: ", columnOffset)
-
-		fpn = numpy.uint16(numpy.int16(processed + columnOffset))
-		print(" fpn: ", fpn)
-		pychronos.writeframe(0, fpn)
-
-		columnOffset = numpy.uint16(numpy.int16(columnOffset))
-
-		for i in range(len(columnOffset)):
-			columnOffsetMemory.mem16[i] = int(columnOffset[i])
-
-
-		self.stopRecording()
-
-
-
-	def doBlackCal0(self, xres=1280, yres=1024):
-		print ("doBlackCal0")
-		#-----------------------------------------------------------------------
-		# this needs to be switched to using the record sequencer
-		img = numpy.asarray(pychronos.readframe(seq.liveAddr[0], 1280, 1024))
-		for i in range(15):
-			# time.sleep(0.1)
-			# print (".")
-			img += pychronos.readframe(seq.liveAddr[0], 1280, 1024)
-		img /= 16
-		#-----------------------------------------------------------------------
-
-		img = numpy.float32(img)
-		
-		gains = numpy.float32([0.0]*xres)
-		linearity = numpy.float64([0.0]*xres)
-		for i in range(xres):
-			gains[i]     = columnGainMemory.mem16[i]
-			linearityVal = columnLinearityMemory.mem16[i]
-			if (linearityVal > 32767): linearityVal = -(65536-linearityVal)
-			linearity[i] = linearityVal
-		gains /= 4096
-		linearity /= (2**21)
-		print("gains:     ", gains[0:16])
-		print("linearity: ", linearity[0:16])
-
-		processed = (linearity * (img * img)) + (gains * img)
-		
-		columnOffset = numpy.average(processed, axis=0)
-		print("columnOffsets: ", columnOffset)
-
-		fpn = numpy.uint16(numpy.int16(processed + columnOffset))
-		print(" fpn: ", fpn)
-		pychronos.writeframe(0, fpn)
-
-		columnOffset = numpy.uint16(numpy.int16(columnOffset))
-
-		for i in range(len(columnOffset)):
-			columnOffsetMemory.mem16[i] = int(columnOffset[i])
-
+		self.timer("writing columnOffset")
 
 
 
