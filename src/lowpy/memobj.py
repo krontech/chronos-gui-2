@@ -91,21 +91,6 @@ class MemObject:
 
 	# print (f"globvar is {globvar}")
 
-	def CtypesTest(self):
-		print(f"\n0x0: 0x{self.FPGAlptr[0x0]:x}")
-
-
-		print("################\n32 bit:")
-		for i in range(0x0, 0x430//4):
-			print(f"  0x{4*i:x}: 0x{self.FPGAlptr[i]:x}")
-		print("16 bit:")
-		for i in range(20):
-			print(f"  0x{2*i:x}: 0x{self.FPGAwptr[i]:x}")
-		print("8 bit")
-		for i in range(40):
-			print(f"  0x{i:x}: 0x{self.FPGAbptr[i]:x}")
-
-		print(f"\n0x428: 0x{self.FPGAlptr[0x428//4]:x}")
 
 	def __init__(self):
 		pass
@@ -131,74 +116,36 @@ class MemObject:
 	#NEW: use Python dictionary to do FPGA writes
 
 	def FPGAWrite8(self, addr, data):
-		if self.noFPGA: return
-		self.writesCount += 1
-		if self.FPGAmasked(addr): return
+		# if self.noFPGA: return
+		# self.writesCount += 1
+		# if self.FPGAmasked(addr): return
 		if type(addr) is str:
 			FPGAreg = FPGA_dict[addr]
 		else:
 			FPGAreg = addr
 		# cprint (f'   [{self.writesCount}]- - - FPGAWrite8("{addr}":0x{FPGAreg:x}, 0x{data:x})', self.FPGAcol)
-		if self.breakFPGA: breakpoint()
-		if self.usePC:
-			old = self.fpga.mem8[FPGAreg]
-			self.fpga.mem8[FPGAreg] = data & 0xff
-			new = self.fpga.mem8[FPGAreg]
-			if old != new:
-				# cprint(f"0x{FPGAreg:x}: was 0x{old:x}, is 0x{new:x}", "white", "on_blue" )
-				pass
-			return
-		if self.FPGActypes:
-			self.FPGAbptr[FPGAreg] = data & 0xff
-		else:
-			self.fpga_mmio.write8(FPGAreg, data)
+		self.fpga.mem8[FPGAreg] = data & 0xff
 
 	def FPGAWrite16(self, addr, data):
-		breakpoint()
-		if self.noFPGA: return
-		self.writesCount += 1
-		if self.FPGAmasked(addr): return
+		# if self.noFPGA: return
+		# self.writesCount += 1
+		# if self.FPGAmasked(addr): return
 		if type(addr) is str:
 			FPGAreg = FPGA_dict[addr]
 		else:
 			FPGAreg = addr
 		# cprint (f'   [{self.writesCount}]----- FPGAWrite16("{addr}":0x{FPGAreg:x}, 0x{data:x})', self.FPGAcol)
-		if self.breakFPGA: breakpoint()
-		if self.usePC:
-			old = self.fpga.mem16[FPGAreg // 2]
-			self.fpga.mem16[FPGAreg // 2] = data & 0xffff
-			new = self.fpga.mem16[FPGAreg // 2]
-			if old != new:
-				# cprint(f"0x{FPGAreg:x}: was 0x{old:x}, is 0x{new:x}", "white", "on_blue" )
-				pass
-			return
-		if self.FPGActypes:
-			self.FPGAwptr[FPGAreg // 2] = data & 0xffff
-		else:
-			self.fpga_mmio.write16(FPGAreg, data)
+		self.fpga.mem16[FPGAreg // 2] = data & 0xffff
 
 	def FPGAWrite32(self, addr, data):
-		if self.noFPGA: return
-		self.writesCount += 1
-		if self.FPGAmasked(addr): return
+		# if self.noFPGA: return
+		# self.writesCount += 1
+		# if self.FPGAmasked(addr): return
 		if type(addr) is str:
 			FPGAreg = FPGA_dict[addr]
 		else:
 			FPGAreg = addr
-		# cprint (f'   [{self.writesCount}]===== FPGAWrite32("{addr}":0x{FPGAreg:x}, 0x{data:x})', self.FPGAcol)
-		if self.breakFPGA: breakpoint()
-		if self.usePC:
-			old = self.fpga.mem32[FPGAreg // 4]
-			self.fpga.mem32[FPGAreg // 4] = data
-			new = self.fpga.mem32[FPGAreg // 4]
-			if old != new:
-				# cprint(f"0x{FPGAreg:x}: was 0x{old:x}, is 0x{new:x}", "white", "on_blue" )
-				pass
-			return
-		if self.FPGActypes:
-			self.FPGAlptr[FPGAreg // 4] = data
-		else:
-			self.fpga_mmio.write32(FPGAreg, data)
+		self.fpga.mem32[FPGAreg // 4] = data
 
 # These are non-blockable FPGA writes:
 	def FPGAWrite16nb(self, addr, data):
@@ -236,57 +183,15 @@ class MemObject:
 			self.fpga_mmio.write32(FPGAreg, data)
 
 
-#duplicate functions without debug, for SCI writes
-
-	def FPGAWrite8s(self, addr, data):
-		if self.noFPGA: return
-		self.FPGAc = self.FPGAc + 1
-		if type(addr) is str:
-			FPGAreg = FPGA_dict[addr]
-		else:
-			FPGAreg = addr
-		if self.usePC:
-			self.fpga.mem8[FPGAreg] = data & 0xff
-			return
-		if self.FPGActypes:
-			self.FPGAbptr[FPGAreg] = data & 0xff
-		else:
-			self.fpga_mmio.write8(FPGAreg, data)
-
-	def FPGAWrite16s(self, addr, data):
-		if self.noFPGA: return
-		self.FPGAc = self.FPGAc + 1
-		if type(addr) is str:
-			FPGAreg = FPGA_dict[addr]
-		else:
-			FPGAreg = addr
-		if self.usePC:
-			self.fpga.mem16[FPGAreg // 2] = data & 0xffff
-			return
-		if self.FPGActypes:
-			self.FPGAwptr[FPGAreg // 2] = data & 0xffff
-		else:
-			self.fpga_mmio.write16(FPGAreg, data)
-
-	def FPGAWrite32s(self, addr, data):
-		if self.noFPGA: return
-		self.FPGAc = self.FPGAc + 1
-		if type(addr) is str:
-			FPGAreg = FPGA_dict[addr]
-		else:
-			FPGAreg = addr
-		if self.usePC:
-			self.fpga.mem32[FPGAreg // 4] = data
-			return
-		if self.FPGActypes:
-			self.FPGAlptr[FPGAreg // 4] = data 
-		else:
-			self.fpga_mmio.write32(FPGAreg, data)
-
 
 
 	def FPGARead16(self, addr):
-		FPGAreg = FPGA_dict[addr] * 1
+		if type(addr) is str:
+			FPGAreg = FPGA_dict[addr]
+		else:
+			FPGAreg = addr
+		return self.fpga.mem16[FPGAreg // 2]
+
 		if self.FPGActypes:
 			ret = self.FPGAwptr[FPGAreg // 2]
 		else:
@@ -294,6 +199,12 @@ class MemObject:
 		return ret
 
 	def FPGARead32(self, addr):
+		if type(addr) is str:
+			FPGAreg = FPGA_dict[addr]
+		else:
+			FPGAreg = addr
+		return self.fpga.mem16[FPGAreg // 4]
+
 		FPGAreg = FPGA_dict[addr] * 1
 		if self.FPGActypes:
 			ret = self.FPGAlptr[FPGAreg // 4]
@@ -301,95 +212,6 @@ class MemObject:
 			ret = self.fpga_mmio.read32(FPGAreg)
 		return ret
 
-
-
-
-
-	#OLDER non-Pythonic: use these three functions to write to the (16 bit) FPGA address
-	def fpga_write8(self, addr, data):
-		self.FPGAWrite8(addr, data)
-		return
-		if self.noFPGA: return
-		self.FPGAc = self.FPGAc + 1
-		if self.FPGAmasked(addr): return
-		cprint (f"   ({self.FPGAc})--- fpga_write8(0x{1 * addr:x}, 0x{data:x})", self.FPGAcol_old)
-		if self.breakFPGA: breakpoint()
-		if self.FPGActypes:
-			self.FPGAbptr[addr] = data & 0xff
-		else:
-			self.fpga_mmio.write8(1 * addr, data)
-
-	def fpga_write16(self, addr, data):
-		self.FPGAWrite16(addr, data)
-		return
-		if self.noFPGA: return
-		self.FPGAc = self.FPGAc + 1
-		if self.FPGAmasked(addr): return
-		cprint (f"   ({self.FPGAc})--- fpga_write16(0x{1 * addr:x}, 0x{data:x})", self.FPGAcol_old)
-		# breakpoint()
-		if self.breakFPGA: breakpoint()
-		if self.FPGActypes:
-			self.FPGAwptr[addr // 2] = data & 0xffff
-		else:
-			self.fpga_mmio.write16(1 * addr, data)
-
-	def fpga_write32(self, addr, data):
-		self.FPGAWrite32(addr, data)
-		return
-		if self.noFPGA: return
-		self.FPGAc = self.FPGAc + 1
-		if self.FPGAmasked(addr): return
-		cprint (f"   ({self.FPGAc})--- fpga_write32(0x{1 * addr:x}, 0x{data:x})", self.FPGAcol_old)
-		if self.breakFPGA: breakpoint()
-		if self.FPGActypes:
-			self.FPGAlptr[addr // 4] = data 
-		else:
-			self.fpga_mmio.write32(1 * addr, data)
-
-
-#duplicate functions without debug, for SCI writes
-	def fpga_write8s(self, addr, data):
-		self.FPGAWrite8s(addr, data)
-		return
-		if self.noFPGA: return
-		if self.FPGActypes:
-			self.FPGAbptr[addr] = data & 0xff
-		else:
-			self.fpga_mmio.write8(1 * addr, data)
-
-	def fpga_write16s(self, addr, data):
-		self.FPGAWrite16s(addr, data)
-		return
-		if self.noFPGA: return
-		if self.FPGActypes:
-			self.FPGAwptr[addr // 2] = data & 0xffff
-		else:
-			self.fpga_mmio.write16(1 * addr, data)
-
-	def fpga_write32s(self, addr, data):
-		self.FPGAWrite32s(addr, data)
-		return
-		if self.noFPGA: return
-		if self.FPGActypes:
-			self.FPGAlptr[addr // 4] = data
-		else:
-			self.fpga_mmio.write32(1 * addr, data)
-
-
-
-
-
-	def fpga_read32(self, addr):
-		# print (f"   $$$ fpga_read32(0x{2 * addr:x})")
-		res = self.fpga_mmio.read32(1 * addr)
-		# print (f"    ->0x{res:x}")
-		return res
-
-	def fpga_read16(self, addr):
-		# print (f"   $$$ fpga_read16(0x{2 * addr:x})")
-		res = self.fpga_mmio.read16(1 * addr)
-		# print (f"    ->0x{res:x}")
-		return res
 
 
 

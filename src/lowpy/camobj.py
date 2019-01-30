@@ -5,10 +5,12 @@ import time
 from datetime import datetime
 import pdb
 
-from blackCal0 import *
+from blackCal import *
 
 # import recSequencer
 import numpy
+
+import blackCal
 
 from termcolor import colored, cprint
 # from ppretty import ppretty
@@ -243,7 +245,9 @@ class CamObject:
 
 	def __init__(self):
 		print ("CamObject Init")
+		self.checkSeqStatus()
 		self.CamInit()
+		self.checkSeqStatus()
 		#thiscam = self
 	
 		
@@ -449,19 +453,31 @@ class CamObject:
 		self.Fake16(0x20e, 0x1)		# DISPLAY_V_SYNC_LEN
 		self.Fake16(0x212, 0x4)		# DISPLAY_V_BACK_PORCH
 		
+		self.checkSeqStatus("1")
+
 		self.Fake32(0x30, 0x0)		# SEQ_TRIG_DELAY
 		self.Fake16(0x5e, 0x0)		# EXT_SHUTTER_CTL
+		self.checkSeqStatus("1a")
+
 		self.Fake32(0x10, 0x78)		# IMAGER_INT_TIME
 		self.Fake32(0x28, 0x1fffe000)	# SEQ_REGION_END
+		self.checkSeqStatus("1b")
+
 		self.Fake32(0x82, 0x0)		# ????
 		self.Fake32(0x80, 0x200c)	# SEQ_PGM_MEM_START
 		self.Fake16(0x24, 0xf000)	# SEQ_FRAME_SIZE
+		self.checkSeqStatus("1c0")
 		self.Fake32(0x20, 0x2)		# SEQ_CTL
+		self.checkSeqStatus("1c1")
 		self.Fake32(0x20, 0x0)		# SEQ_CTL
+		self.checkSeqStatus("1c2")
 		self.Fake16(0x5e, 0x0)		# EXT_SHUTTER_CTL
+		self.checkSeqStatus("1d")
 		self.Fake32(0x10, 0x12e5a)	# IMAGER_INT_TIME
 		self.Fake32(0x10, 0x0)		# IMAGER_INT_TIME
 		self.Fake32(0x10, 0x12e5a)	# IMAGER_INT_TIME
+		self.checkSeqStatus("2")
+
 		self.Fake16(0x278, 0x10e5)	# WL_DYNDLY_2
 		self.Fake16(0x27a, 0x10e5)	# WL_DYNDLY_3
 		self.Fake16(0x27c, 0x10e5)	# ???
@@ -481,12 +497,16 @@ class CamObject:
 		self.Fake32(0x222, 0x19)	# DISPLAY_PEAKING_THRESH
 		self.Fake32(0x10, 0x12c31)	# IMAGER_INT_TIME
 
+		self.checkSeqStatus("3")
+
 	#latest fakery:
 		self.Fake16b(0x20, 0x15b9)	# 
 		self.Fake16b(0x4f0, 0x10cc)	# 
 		self.Fake16b(0x4f4, 0x10cc)	# 
 		self.Fake16b(0x4f8, 0x10cc)	# 
 		
+		self.checkSeqStatus("4")
+
 		self.Fake16b(0x4c0, 0x1ea2)	# CCM
 		self.Fake16b(0x4c4, 0xf6c6)	# CCM
 		self.Fake16b(0x4c8, 0xfc41)	# CCM
@@ -503,6 +523,8 @@ class CamObject:
 		self.Fake16b(0x444, 0x19)	# DISPLAY_PEAKING_THRESH
 		self.Fake16b(0x20, 0x15b9)	# IMAGER_INT_TIME
 
+		time.sleep(0.001)	# without this, blackCal fails
+		self.checkSeqStatus("5")
 
 
 
@@ -515,10 +537,6 @@ class CamObject:
 		print("CamInit()")
 		
 	
-		#breakpoint()	
-
-		# Reset the FPGA
-		#self.mem.fpga_write16(SYSTEM_RESET, 1)
 		
 		#TESTING! no reset
 		# self.mem.FPGAWrite16("SYSTEM_RESET", 1)
@@ -550,6 +568,7 @@ class CamObject:
 		# print (self.sensor)
 		# Configure the FIFO threshold and image sequencer
 
+		self.checkSeqStatus()
 
 		self.mem.FPGAWrite16("SENSOR_FIFO_START_W_THRESH", 0x100)
 		self.mem.FPGAWrite16("SENSOR_FIFO_STOP_W_THRESH", 0x100)
@@ -565,7 +584,7 @@ class CamObject:
 		#temporary single definition; move to fpgah.py
 		DISPLAY_CTL_READOUT_INHIBIT = (1 << 3)
 
-		dctrl = self.mem.fpga_read32(DISPLAY_CTL)
+		dctrl = self.mem.FPGARead32("DISPLAY_CTL")
 		print (f"dctrl is 0x{dctrl:x}")
 		dctrl &= ~DISPLAY_CTL_READOUT_INHIBIT
 		print (f"AND mask is 0x{DISPLAY_CTL_READOUT_INHIBIT:x}")
@@ -581,6 +600,8 @@ class CamObject:
 		self.mem.FPGAWrite32("IMAGER_INT_TIME", 100 * 3900)			# 19
 
 		# exit()
+
+		self.checkSeqStatus()
 
 
 		#TODO - dereference through SensorObj:
@@ -610,25 +631,31 @@ class CamObject:
 		self.sensor.SensorInit2()
 
 		# exit()
+		self.checkSeqStatus()
 
 		#self.sensor.Lux1310AutoPhaseCal()			
 
 		self.sensor.LuxInit2()
 
 		# exit()
+		self.checkSeqStatus()
 
 		# breakpoint()
 
 		self.FakeIO()
 
 		# breakpoint()
+		self.checkSeqStatus()
 
 		self.setImagerSettings()
 
 		# exit()
+		self.checkSeqStatus()
 
 			# breakpoint()
 		self.FakeInit()
+
+		self.checkSeqStatus()
 
 		# frame_words = int(((self.sensor.hMaxRes * self.sensor.vMaxRes * self.image_sensor_bpp()) / 8 + (32 - 1)) / 32)
 		# print(f"frame_words = {frame_words}")
@@ -1008,7 +1035,15 @@ class CamObject:
 	def recordFrames(self, numframes):
 		print (f"Starting record of {numframes} frames")
 
-		self.stopRecording()
+
+		rec  = self.mem.FPGARead32("SEQ_STATUS") and SEQ_STATUS_RECORDING_MASK
+		print (f"rec is {rec}")
+
+
+		print ("stopRecording")
+		breakpoint()
+		# self.stopRecording()
+		self.terminateRecord()
 
 
 		oldMode = self.imagerSettings.mode
@@ -1086,7 +1121,7 @@ class CamObject:
 		cprint (f"--> {message}: {deltaTime:.6f} seconds", "red")
 
 
-	def doBlackCal(self, useLiveBuffer=False):
+	def doBlackCalTimed(self, useLiveBuffer=False):
 		self.timer("start")
 		
 		# get the resolution from the display properties
@@ -1174,75 +1209,25 @@ class CamObject:
 
 
 
-		'''
 
-		# Zero trigger delay for Gated Burst
-		if(settings.mode == RECORD_MODE_GATED_BURST)
-		io->setTriggerDelayFrames(0, FLAG_TEMPORARY);
-
-		self.imagerSettings.frameSizeWords = ROUND_UP_MULT((settings.stride * (settings.vRes+0) * 12 / 8 + (BYTES_PER_WORD - 1)) / BYTES_PER_WORD, FRAME_ALIGN_WORDS);	//Enough words to fit the frame, but make it even
-
-		UInt32 maxRecRegionSize = getMaxRecordRegionSizeFrames(self.imagerSettings.hRes, self.imagerSettings.vRes);  //(ramSize - REC_REGION_START) / self.imagerSettings.frameSizeWords;
-
-		if(settings.recRegionSizeFrames > maxRecRegionSize)
-		self.imagerSettings.recRegionSizeFrames = maxRecRegionSize;
-		else
-		self.imagerSettings.recRegionSizeFrames = settings.recRegionSizeFrames;
-
-		setFrameSizeWords(self.imagerSettings.frameSizeWords);
-
-		qDebug() << "About to sensor->loadADCOffsetsFromFile";
-		sensor->loadADCOffsetsFromFile();
-
-		loadColGainFromFile();
-
-		qDebug()	<< "\nSet imager settings:\nhRes" << self.imagerSettings.hRes
-					<< "vRes" << self.imagerSettings.vRes
-					<< "stride" << self.imagerSettings.stride
-					<< "hOffset" << self.imagerSettings.hOffset
-					<< "vOffset" << self.imagerSettings.vOffset
-					<< "exposure" << self.imagerSettings.exposure
-					<< "period" << self.imagerSettings.period
-					<< "frameSizeWords" << self.imagerSettings.frameSizeWords
-					<< "recRegionSizeFrames" << self.imagerSettings.recRegionSizeFrames;
-
-	if (settings.temporary) {
-		qDebug() << "--- settings --- temporary, not saving";
-	}
-	else {
-		qDebug() << "--- settings --- saving";
-	appSettings.setValue("camera/hRes",                 self.imagerSettings.hRes);
-	appSettings.setValue("camera/vRes",                 self.imagerSettings.vRes);
-	appSettings.setValue("camera/stride",               self.imagerSettings.stride);
-	appSettings.setValue("camera/hOffset",              self.imagerSettings.hOffset);
-	appSettings.setValue("camera/vOffset",              self.imagerSettings.vOffset);
-	appSettings.setValue("camera/gain",                 self.imagerSettings.gain);
-	appSettings.setValue("camera/period",               self.imagerSettings.period);
-	appSettings.setValue("camera/exposure",             self.imagerSettings.exposure);
-	appSettings.setValue("camera/recRegionSizeFrames",  self.imagerSettings.recRegionSizeFrames);
-	appSettings.setValue("camera/disableRingBuffer",    self.imagerSettings.disableRingBuffer);
-	appSettings.setValue("camera/mode",                 self.imagerSettings.mode);
-	appSettings.setValue("camera/prerecordFrames",      self.imagerSettings.prerecordFrames);
-	appSettings.setValue("camera/segmentLengthFrames",  self.imagerSettings.segmentLengthFrames);
-	appSettings.setValue("camera/segments",             self.imagerSettings.segments);
-	}
-'''
-
-
-		#TODO do this properly
-
-
-	# self.SetLiveTiming()
-
-
-
-
+	def callBlackCal(self):
+		self.checkSeqStatus()
 # NumPy stuff
 
+		doBlackCal(False)
+	
+	sCount = 0
 
-
-
-
+	def checkSeqStatus(self, msg = ""):
+		time.sleep(0.00001)
+		# cprint ("   ", "white", "on_blue")
+		return
+		self.sCount += 1
+		if self.sCount < 15:
+			# cprint ("   ", "white", "on_blue")
+			return
+		else:
+			cprint (f"Sequencer status {msg}: 0x{seq.status:x}", "white", "on_blue" )
 
 
 

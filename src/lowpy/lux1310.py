@@ -184,16 +184,16 @@ class Lux1310Object(SensorObject):
 
 	def FPGAAndBits(self, addr, mask):
 		'''Write to the FPGA with an AND mask.'''
-		readdata = self.mem.fpga_read16(addr)
+		readdata = self.mem.FPGARead16(addr)
 		readdata &= mask
-		self.mem.FPGAWrite16s(addr, readdata)
+		self.mem.FPGAWrite16(addr, readdata)
 		# cprint (f"FPGAndBits: FPGAwrite16 - 0x{addr:x}: 0x{readdata:x}", "white", "on_blue")
 
 	def FPGAOrBits(self, addr, mask):
 		'''Write to the FPGA with an OR mask.'''
-		readdata = self.mem.fpga_read16(addr)
+		readdata = self.mem.FPGARead16(addr)
 		readdata |= mask
-		self.mem.FPGAWrite16s(addr, readdata)
+		self.mem.FPGAWrite16(addr, readdata)
 		# cprint (f"FPGAOrBits: FPGAwrite16 - 0x{addr:x}: 0x{readdata:x}", "white", "on_blue")
 
 	def Lux1310SCIWriteWithMask(self, addr, value):
@@ -203,34 +203,16 @@ class Lux1310Object(SensorObject):
 		if self.noSCI: return
 		if self.breakSCI: breakpoint()
 
-		self.mem.fpga_write16s(SENSOR_SCI_CONTROL, 0x8000)
+		self.mem.FPGAWrite16(SENSOR_SCI_CONTROL, 0x8000)
 		self.FPGAAndBits(SENSOR_SCI_CONTROL, 0xffff - SENSOR_SCI_CONTROL_RW_MASK)
-		self.mem.fpga_write16s(SENSOR_SCI_ADDRESS, addr)
-		self.mem.fpga_write16s(SENSOR_SCI_DATALEN, 2)
-		self.mem.fpga_write8s(SENSOR_SCI_FIFO_WR_ADDR, (value >> 8) & 0xff)
-		self.mem.fpga_write8s(SENSOR_SCI_FIFO_WR_ADDR, value & 0xff)
+		self.mem.FPGAWrite16(SENSOR_SCI_ADDRESS, addr)
+		self.mem.FPGAWrite16(SENSOR_SCI_DATALEN, 2)
+		self.mem.FPGAWrite8(SENSOR_SCI_FIFO_WR_ADDR, (value >> 8) & 0xff)
+		self.mem.FPGAWrite8(SENSOR_SCI_FIFO_WR_ADDR, value & 0xff)
 
 		# Start the transfer and then wait for completion.
 		self.FPGAOrBits(SENSOR_SCI_CONTROL, SENSOR_SCI_CONTROL_RUN_MASK)
-		while self.mem.fpga_read16(SENSOR_SCI_CONTROL) & SENSOR_SCI_CONTROL_RUN_MASK:
-			pass
-
-	def Lux1310SCIWritePure(self, addr, value):
-		'''with pure writes instead of masked read-modify-write
-		Perform a simple 16bit register write'''
-		if self.noSCI: return
-		if self.breakSCI: breakpoint()
-
-		self.mem.fpga_write16(SENSOR_SCI_CONTROL, 0x8000)
-		self.mem.fpga_write16(SENSOR_SCI_CONTROL, 0)
-		self.mem.fpga_write16(SENSOR_SCI_ADDRESS, addr)
-		self.mem.fpga_write16(SENSOR_SCI_DATALEN, 4)
-		self.mem.fpga_write16(SENSOR_SCI_FIFO_WR_ADDR, (value >> 8) & 0xff)
-		self.mem.fpga_write16(SENSOR_SCI_FIFO_WR_ADDR, value & 0xff)
-	
-		# Start the transfer and then wait for completion.
-		self.mem.fpga_write16(SENSOR_SCI_CONTROL, 1)
-		while self.mem.fpga_read16(SENSOR_SCI_CONTROL) & SENSOR_SCI_CONTROL_RUN_MASK:
+		while self.mem.FPGARead16(SENSOR_SCI_CONTROL) & SENSOR_SCI_CONTROL_RUN_MASK:
 			pass
 
 	def Lux1310SCIWrite(self, addr, value):
@@ -247,30 +229,30 @@ class Lux1310Object(SensorObject):
 		if self.breakSCI: breakpoint()
 
 		# cprint (f"$$$ Lux1310SCIWriteBuf to 0x{addr:x}: {len(values)} entries", "white", "on_blue")
-		rw = self.mem.fpga_read16(SENSOR_SCI_CONTROL) & (0xffff - SENSOR_SCI_CONTROL_RW_MASK)
+		rw = self.mem.FPGARead16(SENSOR_SCI_CONTROL) & (0xffff - SENSOR_SCI_CONTROL_RW_MASK)
 		self.mem.FPGAWrite16(SENSOR_SCI_CONTROL, 0x8000 | rw)
 		if debugWB:
-			cprint (f"WB: fpga_write16s - 0x{SENSOR_SCI_CONTROL:x}: 0x{(0x8000 | rw):x}", "white", "on_blue")
+			cprint (f"WB: FPGAWrite16 - 0x{SENSOR_SCI_CONTROL:x}: 0x{(0x8000 | rw):x}", "white", "on_blue")
 
 		self.mem.FPGAWrite16(SENSOR_SCI_ADDRESS, addr)
 		if debugWB:
-			cprint (f"WB: fpga_write16s - 0x{SENSOR_SCI_ADDRESS:x}: 0x{addr:x}", "white", "on_blue")
+			cprint (f"WB: FPGAWrite16 - 0x{SENSOR_SCI_ADDRESS:x}: 0x{addr:x}", "white", "on_blue")
 		self.mem.FPGAWrite16(SENSOR_SCI_DATALEN, len(values))
 		if debugWB:
-			cprint (f"WB: fpga_write16s - 0x{SENSOR_SCI_DATALEN:x}: 0x{len(values):x}", "white", "on_blue")
+			cprint (f"WB: FPGAWrite16 - 0x{SENSOR_SCI_DATALEN:x}: 0x{len(values):x}", "white", "on_blue")
 		for b in values:
-			self.mem.FPGAWrite16s(SENSOR_SCI_FIFO_WR_ADDR, b)
+			self.mem.FPGAWrite16(SENSOR_SCI_FIFO_WR_ADDR, b)
 			if debugWB:
-				# cprint (f"WB: fpga_write16s - 0x{SENSOR_SCI_FIFO_WR_ADDR:x}: 0x{b:x}", "white", "on_blue")
+				# cprint (f"WB: FPGAWrite16 - 0x{SENSOR_SCI_FIFO_WR_ADDR:x}: 0x{b:x}", "white", "on_blue")
 				print (b)
 			# print (f"  - 0x{b:x}")
 
 		# Start the transfer and then wait for completion.
 		self.FPGAOrBits(SENSOR_SCI_CONTROL, SENSOR_SCI_CONTROL_RUN_MASK)
-		f = self.mem.fpga_read16(SENSOR_SCI_CONTROL)
+		f = self.mem.FPGARead16(SENSOR_SCI_CONTROL)
 		f = f & SENSOR_SCI_CONTROL_RUN_MASK
 		# print (f"f is {f}")
-		while self.mem.fpga_read16(SENSOR_SCI_CONTROL) & SENSOR_SCI_CONTROL_RUN_MASK:
+		while self.mem.FPGARead16(SENSOR_SCI_CONTROL) & SENSOR_SCI_CONTROL_RUN_MASK:
 			# print (".")
 			pass
 
@@ -279,15 +261,15 @@ class Lux1310Object(SensorObject):
 		# print(f" ### Lux1310SCIRead(0x{addr:x})")
 		# Set RW, address and length.
 		self.FPGAOrBits(SENSOR_SCI_CONTROL, SENSOR_SCI_CONTROL_RW_MASK)
-		self.mem.fpga_write16s(SENSOR_SCI_ADDRESS, addr)
-		self.mem.fpga_write16s(SENSOR_SCI_DATALEN, 2)
+		self.mem.FPGAWrite16(SENSOR_SCI_ADDRESS, addr)
+		self.mem.FPGAWrite16(SENSOR_SCI_DATALEN, 2)
 		
 		# Start the transfer and then wait for completion.
 		self.FPGAOrBits(SENSOR_SCI_CONTROL, SENSOR_SCI_CONTROL_RUN_MASK)
-		while self.mem.fpga_read16(SENSOR_SCI_CONTROL) & SENSOR_SCI_CONTROL_RUN_MASK:
+		while self.mem.FPGARead16(SENSOR_SCI_CONTROL) & SENSOR_SCI_CONTROL_RUN_MASK:
 			pass
 
-		return self.mem.fpga_read16(SENSOR_SCI_READ_DATA)
+		return self.mem.FPGARead16(SENSOR_SCI_READ_DATA)
 	
 	def Lux1310Read(self, reg):
 		# print(f"### Lux1310Read(0x{reg:x})")
@@ -387,7 +369,7 @@ class Lux1310Object(SensorObject):
 		 
 		exp_lines = (t_exposure + t_line/2) / t_line
 		int_time = int((t_start + (t_line * exp_lines)) * LUX1310_TIMING_CLOCK_RATE / LUX1310_SENSOR_CLOCK_RATE)
-		self.mem.fpga_write32(IMAGER_INT_TIME, int_time)
+		self.mem.FPGAWrite32(IMAGER_INT_TIME, int_time)
 		
 
 	def Lux1310SetPeriod(self, nsec):
@@ -395,7 +377,7 @@ class Lux1310Object(SensorObject):
 		t_frame = ((nsec * LUX1310_TIMING_CLOCK_RATE) + 999999999) / 1000000000
 		# print (f" t_frame = {t_frame}")
 		
-		self.mem.fpga_write32(IMAGER_FRAME_PERIOD, int(t_frame))
+		self.mem.FPGAWrite32(IMAGER_FRAME_PERIOD, int(t_frame))
 		for i in Lux1310WaveTables:
 			# if t_frame >= self.lux1310_min_period(i[""])
 			#print (i["read_delay"])
@@ -1015,7 +997,7 @@ class Lux1310Object(SensorObject):
 		DCGstart = 0x1000
 		for i in range(LUX1310_MAX_H_RES):
 			gain = 1.0
-			self.mem.fpga_write16s(DCGstart + 2 * (i ), int(gain * 4096.0))
+			self.mem.FPGAWrite16(DCGstart + 2 * (i ), int(gain * 4096.0))
 			#self.Lux1310WriteDGCMem(gainCorrection[i % 16], i);
 
 	def Lux1310ZeroFPNArea(self):
@@ -1048,8 +1030,8 @@ class Lux1310Object(SensorObject):
 
 		print ("Setting display addresses")
 		cr = self.mem.FPGARead16("DISPLAY_CTL") | 1	
-		self.mem.FPGAWrite16nb("DISPLAY_CTL", cr) #Set to display from display frame address register
-		self.mem.FPGAWrite32nb("DISPLAY_FRAME_ADDRESS", 0x40000)	# Set display address
+		self.mem.FPGAWrite16("DISPLAY_CTL", cr) #Set to display from display frame address register
+		self.mem.FPGAWrite32("DISPLAY_FRAME_ADDRESS", 0x40000)	# Set display address
 
 
 		print ("Testing RAM R/W")

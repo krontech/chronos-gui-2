@@ -18,7 +18,6 @@ from termcolor import colored
 # exit()
 # main part
 
-globvar = 123
 
 cam = CamObject()
 
@@ -83,7 +82,7 @@ print("........")
 # doBlackCal()
 # cam.doBlackCal0()
 # cam.old_doBlackCal()
-cam.doBlackCal()
+cam.callBlackCal()
 
 # breakpoint()
 # cam.sensor.Lux1310ZeroFPNArea()
