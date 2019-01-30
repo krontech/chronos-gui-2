@@ -31,6 +31,9 @@ def doBlackCal(useLiveBuffer=False):
     # get the resolution from the display properties
     xres = display.hRes
     yres = display.vRes
+
+    # for col in range(16):
+    #     columnLinearityMemory[col] = 1
   
     
     #-----------------------------------------------------------------------

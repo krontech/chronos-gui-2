@@ -74,6 +74,7 @@ FPGA_dict = {
 	"DISPLAY_PEAKING_THRESH" :		0x444,        #0x222,
 	"DISPLAY_PIPELINE" :			0x448,     #0x224,
 	"DISPLAY_MANUAL_SYNC" :			0x450,      #0x228,
+	"DISPLAY_GAINCTL_3POINT" :		0x454,
 
 	"CCM_11" :						0x4c0,        #0x260,
 	"CCM_12" :						0x4c4,        #0x262,

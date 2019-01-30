@@ -535,7 +535,6 @@ class CamObject:
 	def CamInit(self):
 
 		print("CamInit()")
-		
 	
 		
 		#TESTING! no reset
@@ -627,6 +626,10 @@ class CamObject:
 		self.sensor.Lux1310Write("LUX1310_SCI_SRESET_B", 0)
 
 		# exit()
+
+		# 3 point calibration:
+		self.mem.FPGAWrite32("DISPLAY_GAINCTL_3POINT", 1)
+		
 
 		self.sensor.SensorInit2()
 
