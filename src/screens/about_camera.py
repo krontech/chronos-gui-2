@@ -1,3 +1,5 @@
+# -*- coding: future_fstrings -*-
+
 from PyQt5 import uic, QtWidgets, QtCore
 from PyQt5.QtWidgets import QScroller
 # from PyQt5.QtCore import pyqtSlot

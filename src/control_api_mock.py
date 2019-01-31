@@ -1,3 +1,5 @@
+# -*- coding: future_fstrings -*-
+
 """Mock for api.py. Allows easier development & testing of the QT interface.
 
 	This mock is less "complete" than the C-based mock, as this mock only returns

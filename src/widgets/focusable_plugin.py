@@ -1,3 +1,5 @@
+# -*- coding: future_fstrings -*-
+
 from PyQt5.QtCore import Qt, pyqtSignal, QObject, QEvent
 from PyQt5.QtGui import QKeyEvent
 from PyQt5.QtWidgets import QApplication

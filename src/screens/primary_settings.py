@@ -1,3 +1,5 @@
+# -*- coding: future_fstrings -*-
+
 from datetime import datetime
 
 from PyQt5 import uic, QtWidgets, QtCore

@@ -1,3 +1,5 @@
+# -*- coding: future_fstrings -*-
+
 """Little wrapper class for QSettings which implements subscriptions.
 
 Observe a key with a callback, called when the key is changed or initialized.

@@ -1,3 +1,5 @@
+# -*- coding: future_fstrings -*-
+
 """Python client library for Chronos D-Bus API.
 
 	This module provides a convenient wrapper around the D-Bus API,

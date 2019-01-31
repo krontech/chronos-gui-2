@@ -1,3 +1,5 @@
+# -*- coding: future_fstrings -*-
+
 from PyQt5.QtWidgets import QLabel
 from PyQt5.QtCore import QSize, pyqtProperty
 

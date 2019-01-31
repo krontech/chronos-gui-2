@@ -1,3 +1,5 @@
+# -*- coding: future_fstrings -*-
+
 from string import ascii_uppercase, digits
 
 from PyQt5 import uic, QtWidgets, QtCore, QtGui

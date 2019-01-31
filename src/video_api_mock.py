@@ -1,3 +1,5 @@
+# -*- coding: future_fstrings -*-
+
 """Mock for the C-based video API.
 
 	Usage:

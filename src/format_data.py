@@ -1,3 +1,5 @@
+# -*- coding: future_fstrings -*-
+
 def µsShortHuman(µs: float, maxWidth: int = 6) -> {'units': str, 'value': float, 'decimals': int}:
 	"""Slightly inaccurate human-readable formatting data for microseconds.
 	

@@ -1,3 +1,5 @@
+# -*- coding: future_fstrings -*-
+
 from PyQt5.QtCore import pyqtProperty, pyqtSlot
 
 #Importing API may fail in Qt Designer, since we may not have it set up on the designing machine.

@@ -1,3 +1,5 @@
+# -*- coding: future_fstrings -*-
+
 from PyQt5 import uic, QtCore
 from PyQt5.QtCore import pyqtSlot, QPropertyAnimation, QPoint
 from PyQt5.QtWidgets import QWidget, QApplication

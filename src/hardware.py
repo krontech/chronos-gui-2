@@ -1,3 +1,5 @@
+# -*- coding: future_fstrings -*-
+
 import os, signal
 from pathlib import Path
 from typing import Callable, Optional

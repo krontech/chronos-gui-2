@@ -1,3 +1,5 @@
+# -*- coding: future_fstrings -*-
+
 """
 Module for communicating with the power controller. It runs on a timer, and updates the
 batt* variables sent by the power controller

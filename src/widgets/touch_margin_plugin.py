@@ -1,3 +1,5 @@
+# -*- coding: future_fstrings -*-
+
 from PyQt5.QtCore import Q_ENUMS, pyqtProperty
 
 from random import randint

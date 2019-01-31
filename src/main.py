@@ -1,3 +1,5 @@
+# -*- coding: future_fstrings -*-
+
 """
 Launch point for the Python QT back-of-camera interface.
 
