@@ -12,9 +12,12 @@ set -euxo pipefail #enable "safe mode"
 #   read this script. Follow any instructions in the block, and run
 #   the block by pasting it into your SSH session. 
 
+killall camApp --quiet || true
 
 # install deps
-    killall camApp --quiet || true
+    #Add backports. (Not needed for base debian images released after January 2019.)
+    sed -e 's/jessie/jessie-backports/g' /etc/apt/sources.list.d/multistrap-debian.list > /etc/apt/sources.list.d/backports-debian.list
+    
     apt update && apt-get upgrade --yes
     apt install ntpdate ca-certificates cowsay vim rsync python3-pyqt5 curl --yes
     ntpdate -s time.nist.gov
