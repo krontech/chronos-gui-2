@@ -1,3 +1,5 @@
+# -*- coding: future_fstrings -*-
+
 from copy import deepcopy
 
 from PyQt5 import uic, QtWidgets, QtCore, QtGui

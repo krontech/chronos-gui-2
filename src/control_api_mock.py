@@ -1,3 +1,5 @@
+# -*- coding: future_fstrings -*-
+
 """Mock for api.py. Allows easier development & testing of the QT interface.
 
 	This mock is less "complete" than the C-based mock, as this mock only returns
@@ -979,3 +981,27 @@ class ControlAPIMock(QObject):
 		sleep(3)
 		print(" ok.")
 		return ""
+
+
+#Launch the API if not imported as a library.
+if __name__ == '__main__':
+	from PyQt5.QtCore import QCoreApplication
+	import signal
+	
+	app = QCoreApplication(sys.argv)
+	
+	#Quit on ctrl-c.
+	signal.signal(signal.SIGINT, signal.SIG_DFL)
+	
+	
+	if not QDBusConnection.systemBus().registerService('com.krontech.chronos.control'):
+		sys.stderr.write(f"Could not register control service: {QDBusConnection.systemBus().lastError().message() or '(no message)'}\n")
+		raise Exception("D-Bus Setup Error")
+
+	controlAPI = ControlAPIMock() #This absolutely, positively can't be inlined or it throws error "No such object path ...". Possibly, this is because a live reference must be kept so GC doesn't eat it?
+	QDBusConnection.systemBus().registerObject('/com/krontech/chronos/control', controlAPI, QDBusConnection.ExportAllSlots)
+	
+	pdb.set_trace()
+	
+	print("Running control api mock.")
+	sys.exit(app.exec_())

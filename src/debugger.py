@@ -1,3 +1,5 @@
+# -*- coding: future_fstrings -*-
+
 """Simple, short debugging methods.
 
 Both the provided dbg() and brk() calls are the same, calling up an interactive

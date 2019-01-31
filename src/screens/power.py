@@ -1,3 +1,5 @@
+# -*- coding: future_fstrings -*-
+
 from collections import deque
 from math import copysign
 

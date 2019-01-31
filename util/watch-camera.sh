@@ -27,6 +27,7 @@ PYTHON_PARENT_SHELL=$! #Used to limit pkill to the subshell we're running our py
 
 #Watch for filesystem changes and run a command. If another change comes in during the timeout period, ignore the first change.
 python3 - $PYTHON_PARENT_SHELL << 'EOL'
+# -*- coding: future_fstrings -*-
 from watchdog.observers import Observer
 from watchdog.events import PatternMatchingEventHandler
 import subprocess, sys

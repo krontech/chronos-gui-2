@@ -1,3 +1,5 @@
+# -*- coding: future_fstrings -*-
+
 import random
 
 from PyQt5 import uic, QtWidgets, QtCore

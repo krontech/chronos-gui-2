@@ -1,3 +1,5 @@
+# -*- coding: future_fstrings -*-
+
 from PyQt5 import uic, QtWidgets, QtCore
 
 from debugger import *; dbg

@@ -1,3 +1,5 @@
+# -*- coding: future_fstrings -*-
+
 # Run like `python3 screens/about_camera.minimal.py` in ~src/.
 
 import sys

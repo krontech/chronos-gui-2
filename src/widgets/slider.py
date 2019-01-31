@@ -1,3 +1,5 @@
+# -*- coding: future_fstrings -*-
+
 from random import randint
 
 from PyQt5.QtCore import QSize, Qt

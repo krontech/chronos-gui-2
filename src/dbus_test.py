@@ -1,3 +1,5 @@
+# -*- coding: future_fstrings -*-
+
 import sys
 
 from PyQt5.QtCore import QObject, pyqtSlot
