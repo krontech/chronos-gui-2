@@ -3,7 +3,7 @@
 import os, signal
 from pathlib import Path
 from typing import Callable, Optional
-from subprocess import run, Popen, PIPE
+from subprocess import call, check_output, Popen, PIPE
 from fcntl import fcntl, F_GETFL, F_SETFL
 
 from PyQt5.QtCore import QTimer
@@ -52,14 +52,13 @@ class Hardware():
 		encoderReader = 'src/read_jog_wheel_encoder'
 		if not Path(encoderReader).exists():
 			print('Compiling jog wheel encoder reader application…') #Should be cached, so this should not show up every time!
-			gcc = run([f'gcc {encoderReader}.c -O3 -o {encoderReader}'], shell=True)
-			if gcc.returncode:
+			if call([f'gcc {encoderReader}.c -O3 -o {encoderReader}'], shell=True):
 				raise Exception('Could not compile required jog wheel reader application.')
 			print('Done.')
 		
 		#Clean up after previous runs, if any spare jog wheel readers are left over.
-		for pid in str(run(['pgrep', 'read_jog_wheel'], stdout=PIPE).stdout, 'utf-8').split('\n'):
-			pid and run(['kill', pid])
+		for pid in str(check_output(['pgrep', 'read_jog_wheel'], stdout=PIPE), 'utf-8').split('\n'):
+			pid and call(['kill', pid])
 		
 		encoderProcess = Popen([encoderReader], stdout=PIPE)
 		signal.signal(signal.SIGINT, #Kill encoder process when we exit.
