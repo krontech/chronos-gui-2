@@ -1,0 +1,14 @@
+## Loopback interface
+auto lo
+iface lo inet loopback
+
+auto eth0
+iface eth0 inet static
+    address 192.168.1.213
+    netmask 255.255.255.0
+    gateway 192.168.1.1
+
+auto usb0
+iface usb0 inet static
+	address 192.168.12.1
+	netmask 255.255.255.0
