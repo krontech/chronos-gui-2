@@ -523,11 +523,76 @@ class CamObject:
 		self.Fake16b(0x444, 0x19)	# DISPLAY_PEAKING_THRESH
 		self.Fake16b(0x20, 0x15b9)	# IMAGER_INT_TIME
 
+
+
+
+
+
+
+
 		time.sleep(0.001)	# without this, blackCal fails
 		self.checkSeqStatus("5")
 
 
+# IO things
 
+
+
+		
+	def setTrigEnable(self, val):
+		self.mem.FPGAWrite32("TRIG_ENABLE", val)
+		
+	def getTrigEnable():
+		return self.mem.FPGARead32("TRIG_ENABLE")
+		
+		
+	def setTrigInvert(self, val):
+		self.mem.FPGAWrite32("TRIG_INVERT", val)
+		
+	def getTrigInvert():
+		return self.mem.FPGARead32("TRIG_INVERT")
+		
+		
+	def setTrigDebounce(self, val):
+		self.mem.FPGAWrite32("TRIG_DEBOUNCE", val)
+		
+	def getTrigDebounce():
+		return self.mem.FPGARead32("TRIG_DEBOUNCE")
+		
+		
+	def setSeqTrigDelay(self, val):
+		self.mem.FPGAWrite32("SEQ_TRIG_DELAY", val)
+		
+	def getSeqTrigDelay():
+		return self.mem.FPGARead32("SEQ_TRIG_DELAY")
+		
+		
+	def setIOOutInvert(self, val):
+		self.mem.FPGAWrite32("IO_OUT_INVERT", val)
+		
+	def getIOOutInvert():
+		return self.mem.FPGARead32("IO_OUT_INVERT")
+		
+		
+	def setIOOutSource(self, val):
+		self.mem.FPGAWrite32("IO_OUT_SOURCE", val)
+		
+	def getIOOutSource():
+		return self.mem.FPGARead32("IO_OUT_SOURCE")
+		
+		
+	def setIOOutLevel(self, val):
+		self.mem.FPGAWrite32("IO_OUT_LEVEL", val)
+		
+	def getIOOutLevel():
+		return self.mem.FPGARead32("IO_OUT_LEVEL")
+		
+
+	def setExtShutterCtl(self, val):
+		self.mem.FPGAWrite32("EXT_SHUTTER_CTL", val)
+	
+	def getExtShutterCtl():
+		return self.mem.FPGARead32("EXT_SHUTTER_CTL")
 
 
 
@@ -625,7 +690,6 @@ class CamObject:
 		#TODO: this goes into sensor abstraction
 		self.sensor.Lux1310Write("LUX1310_SCI_SRESET_B", 0)
 
-		# exit()
 
 		# 3 point calibration:
 		self.mem.FPGAWrite32("DISPLAY_GAINCTL_3POINT", 1)
@@ -633,19 +697,23 @@ class CamObject:
 
 		self.sensor.SensorInit2()
 
-		# exit()
 		self.checkSeqStatus()
-
-		#self.sensor.Lux1310AutoPhaseCal()			
 
 		self.sensor.LuxInit2()
 
-		# exit()
 		self.checkSeqStatus()
 
-		# breakpoint()
+		# IO
+		self.setTrigEnable(0x1)
+		self.setTrigInvert(0x1)
+		self.setTrigDebounce(0x0)
+		self.setSeqTrigDelay(0x0)
+		self.setIOOutInvert(0x0)
+		self.setIOOutSource(0x0)
+		self.setIOOutLevel(0x2)
+		self.setExtShutterCtl(0x0)
 
-		self.FakeIO()
+
 
 		# breakpoint()
 		self.checkSeqStatus()
@@ -1253,3 +1321,8 @@ class CamObject:
 '''
 
 
+def runCode():
+	cam = CamObject()
+
+if __name__ == '__main__':
+    runCode()
