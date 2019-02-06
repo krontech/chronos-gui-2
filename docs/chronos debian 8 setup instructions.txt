@@ -34,6 +34,9 @@ killall camApp --quiet || true
 export QSG_RENDER_LOOP=basic
 export QT_QPA_PLATFORM=linuxfb:fb=/dev/fb0
 export QT_QPA_GENERIC_PLUGINS=tslib:/dev/input/event0
+
+#Make Python 3.4 not choke on unicode characters.
+export PYTHONIOENCODING=utf-8
 EOL
     
     #Set up the Video API, since it's not mocked. (ed note: this doesn't work, so it's half-heartedly mocked now)

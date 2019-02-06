@@ -211,7 +211,7 @@ def observe(name: str, callback: Callable[[Any], None], saftyCheckForSilencedWid
 			callback: Function called when the state updates and upon subscription.
 				Called with one parameter, the new value. Called when registered
 				and when the value updates.
-			isNonUpdatingCallback=False: Indicates no API requests will be made from
+			saftyCheckForSilencedWidgets=True: Indicates no API requests will be made from
 				this function. This is usually false, because most callbacks *do*
 				cause updates to the API, and it's really hard to detect this. A
 				silenced callback does not update anything, since it should silence

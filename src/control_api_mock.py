@@ -21,6 +21,8 @@
 	changed if need be.
 """
 
+from __future__ import unicode_literals
+
 import sys
 import random
 from typing import *
@@ -28,6 +30,7 @@ from time import sleep
 
 from PyQt5.QtCore import pyqtSlot, QObject, QTimer, Qt, QByteArray
 from PyQt5.QtDBus import QDBusConnection, QDBusMessage, QDBusError
+
 
 from debugger import *; dbg
 
@@ -691,7 +694,7 @@ class ControlAPIMock(QObject):
 	
 	
 	@action('get')
-	@pyqtSlot(list, result='QVariantMap')
+	@pyqtSlot('QVariantList', result='QVariantMap')
 	def get(self, keys: List[str]) -> Union[Dict[str, Any], str]:
 		retval = {}
 		
@@ -740,14 +743,14 @@ class ControlAPIMock(QObject):
 	
 	
 	@action('get')
-	@pyqtSlot(result=list)
+	@pyqtSlot(result="QVariantList")
 	def available_keys(self) -> List[str]:
 		keys = [i for i in dir(state) if i[0] != '_'] #Don't expose private items.
 		return keys
 	
 	
 	@action('get')
-	@pyqtSlot(result=list)
+	@pyqtSlot(result="QVariantList")
 	def available_calls(self) -> List[Dict[str, str]]:
 		return [{
 			"name": i,
