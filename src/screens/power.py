@@ -8,6 +8,8 @@ from PyQt5 import uic, QtWidgets, QtCore, QtGui
 from debugger import *; dbg
 import api_mock as api
 
+from functools import partial
+
 
 chartDuration = 90 #minutes
 chartPadding = { #in px
@@ -175,10 +177,10 @@ class Power(QtWidgets.QDialog):
 			p.setPen(pen)
 			p.setFont(tinyFont)
 			powerDownThreshold = pct2dec(self.uiPowerDownThreshold.currentText())
-			p.drawLine(
-				*projectToPlotSpace(0, powerDownThreshold), 
-				*projectToPlotSpace(chartLineWidth-(20 if powerDownThreshold < 0.15 or powerDownThreshold > 0.77 else 0), powerDownThreshold), #Don't draw the line over the voltage labels.
-			)
+			partial( #Work around lack of PEP-0448, introduced in python 3.5. #backport-from-5.11
+				p.drawLine,
+				*projectToPlotSpace(0, powerDownThreshold)
+			)(*projectToPlotSpace(chartLineWidth-(20 if powerDownThreshold < 0.15 or powerDownThreshold > 0.77 else 0), powerDownThreshold)), #Don't draw the line over the voltage labels.)
 			p.drawText(
 				projectToPlotSpace(chartLineWidth, powerDownThreshold)[0] + 20,
 				projectToPlotSpace(chartLineWidth, powerDownThreshold)[1] + (-3 if powerDownThreshold < 0.90 else 12),

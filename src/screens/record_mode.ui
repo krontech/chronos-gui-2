@@ -151,7 +151,7 @@
        <height>71</height>
       </rect>
      </property>
-     <property name="clickMarginTopSetter" stdset="0">
+     <property name="clickMarginTop" stdset="0">
       <enum>SpinBox::half</enum>
      </property>
     </widget>
@@ -164,7 +164,7 @@
        <height>71</height>
       </rect>
      </property>
-     <property name="clickMarginBottomSetter" stdset="0">
+     <property name="clickMarginBottom" stdset="0">
       <enum>DecimalSpinBox::half</enum>
      </property>
     </widget>

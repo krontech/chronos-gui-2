@@ -45,16 +45,16 @@
    <property name="text">
     <string>Trigger/IO</string>
    </property>
-   <property name="clickMarginLeftSetter" stdset="0">
+   <property name="clickMarginLeft" stdset="0">
     <enum>Button::none</enum>
    </property>
-   <property name="clickMarginRightSetter" stdset="0">
+   <property name="clickMarginRight" stdset="0">
     <enum>Button::none</enum>
    </property>
-   <property name="clickMarginTopSetter" stdset="0">
+   <property name="clickMarginTop" stdset="0">
     <enum>Button::none</enum>
    </property>
-   <property name="clickMarginBottomSetter" stdset="0">
+   <property name="clickMarginBottom" stdset="0">
     <enum>Button::full</enum>
    </property>
   </widget>
@@ -70,16 +70,16 @@
    <property name="text">
     <string>Trigger Delay</string>
    </property>
-   <property name="clickMarginLeftSetter" stdset="0">
+   <property name="clickMarginLeft" stdset="0">
     <enum>Button::none</enum>
    </property>
-   <property name="clickMarginRightSetter" stdset="0">
+   <property name="clickMarginRight" stdset="0">
     <enum>Button::none</enum>
    </property>
-   <property name="clickMarginTopSetter" stdset="0">
+   <property name="clickMarginTop" stdset="0">
     <enum>Button::none</enum>
    </property>
-   <property name="clickMarginBottomSetter" stdset="0">
+   <property name="clickMarginBottom" stdset="0">
     <enum>Button::full</enum>
    </property>
   </widget>
@@ -95,16 +95,16 @@
    <property name="text">
     <string>Prefs &amp;&amp; Utils</string>
    </property>
-   <property name="clickMarginLeftSetter" stdset="0">
+   <property name="clickMarginLeft" stdset="0">
     <enum>Button::none</enum>
    </property>
-   <property name="clickMarginRightSetter" stdset="0">
+   <property name="clickMarginRight" stdset="0">
     <enum>Button::none</enum>
    </property>
-   <property name="clickMarginTopSetter" stdset="0">
+   <property name="clickMarginTop" stdset="0">
     <enum>Button::none</enum>
    </property>
-   <property name="clickMarginBottomSetter" stdset="0">
+   <property name="clickMarginBottom" stdset="0">
     <enum>Button::full</enum>
    </property>
   </widget>
@@ -120,16 +120,16 @@
    <property name="text">
     <string>Recording Settings</string>
    </property>
-   <property name="clickMarginLeftSetter" stdset="0">
+   <property name="clickMarginLeft" stdset="0">
     <enum>Button::none</enum>
    </property>
-   <property name="clickMarginRightSetter" stdset="0">
+   <property name="clickMarginRight" stdset="0">
     <enum>Button::none</enum>
    </property>
-   <property name="clickMarginTopSetter" stdset="0">
+   <property name="clickMarginTop" stdset="0">
     <enum>Button::none</enum>
    </property>
-   <property name="clickMarginBottomSetter" stdset="0">
+   <property name="clickMarginBottom" stdset="0">
     <enum>Button::full</enum>
    </property>
   </widget>
@@ -145,16 +145,16 @@
    <property name="text">
     <string>100%</string>
    </property>
-   <property name="clickMarginLeftSetter" stdset="0">
+   <property name="clickMarginLeft" stdset="0">
     <enum>Button::none</enum>
    </property>
-   <property name="clickMarginRightSetter" stdset="0">
+   <property name="clickMarginRight" stdset="0">
     <enum>Button::none</enum>
    </property>
-   <property name="clickMarginTopSetter" stdset="0">
+   <property name="clickMarginTop" stdset="0">
     <enum>Button::none</enum>
    </property>
-   <property name="clickMarginBottomSetter" stdset="0">
+   <property name="clickMarginBottom" stdset="0">
     <enum>Button::none</enum>
    </property>
   </widget>
@@ -171,16 +171,16 @@
     <string>Black
 Calibration</string>
    </property>
-   <property name="clickMarginLeftSetter" stdset="0">
+   <property name="clickMarginLeft" stdset="0">
     <enum>Button::none</enum>
    </property>
-   <property name="clickMarginRightSetter" stdset="0">
+   <property name="clickMarginRight" stdset="0">
     <enum>Button::none</enum>
    </property>
-   <property name="clickMarginTopSetter" stdset="0">
+   <property name="clickMarginTop" stdset="0">
     <enum>Button::none</enum>
    </property>
-   <property name="clickMarginBottomSetter" stdset="0">
+   <property name="clickMarginBottom" stdset="0">
     <enum>Button::none</enum>
    </property>
   </widget>
@@ -196,16 +196,16 @@ Calibration</string>
    <property name="text">
     <string>Focus Aid</string>
    </property>
-   <property name="clickMarginLeftSetter" stdset="0">
+   <property name="clickMarginLeft" stdset="0">
     <enum>Button::none</enum>
    </property>
-   <property name="clickMarginRightSetter" stdset="0">
+   <property name="clickMarginRight" stdset="0">
     <enum>Button::none</enum>
    </property>
-   <property name="clickMarginTopSetter" stdset="0">
+   <property name="clickMarginTop" stdset="0">
     <enum>Button::none</enum>
    </property>
-   <property name="clickMarginBottomSetter" stdset="0">
+   <property name="clickMarginBottom" stdset="0">
     <enum>Button::none</enum>
    </property>
   </widget>
@@ -221,16 +221,16 @@ Calibration</string>
    <property name="text">
     <string>Zebras</string>
    </property>
-   <property name="clickMarginLeftSetter" stdset="0">
+   <property name="clickMarginLeft" stdset="0">
     <enum>Button::none</enum>
    </property>
-   <property name="clickMarginRightSetter" stdset="0">
+   <property name="clickMarginRight" stdset="0">
     <enum>Button::none</enum>
    </property>
-   <property name="clickMarginTopSetter" stdset="0">
+   <property name="clickMarginTop" stdset="0">
     <enum>Button::none</enum>
    </property>
-   <property name="clickMarginBottomSetter" stdset="0">
+   <property name="clickMarginBottom" stdset="0">
     <enum>Button::none</enum>
    </property>
   </widget>
@@ -247,16 +247,16 @@ Calibration</string>
     <string>Set White
 Balance</string>
    </property>
-   <property name="clickMarginLeftSetter" stdset="0">
+   <property name="clickMarginLeft" stdset="0">
     <enum>Button::none</enum>
    </property>
-   <property name="clickMarginRightSetter" stdset="0">
+   <property name="clickMarginRight" stdset="0">
     <enum>Button::none</enum>
    </property>
-   <property name="clickMarginTopSetter" stdset="0">
+   <property name="clickMarginTop" stdset="0">
     <enum>Button::none</enum>
    </property>
-   <property name="clickMarginBottomSetter" stdset="0">
+   <property name="clickMarginBottom" stdset="0">
     <enum>Button::none</enum>
    </property>
   </widget>
@@ -273,16 +273,16 @@ Balance</string>
     <string>Play &amp;&amp;
 Save</string>
    </property>
-   <property name="clickMarginLeftSetter" stdset="0">
+   <property name="clickMarginLeft" stdset="0">
     <enum>Button::none</enum>
    </property>
-   <property name="clickMarginRightSetter" stdset="0">
+   <property name="clickMarginRight" stdset="0">
     <enum>Button::none</enum>
    </property>
-   <property name="clickMarginTopSetter" stdset="0">
+   <property name="clickMarginTop" stdset="0">
     <enum>Button::none</enum>
    </property>
-   <property name="clickMarginBottomSetter" stdset="0">
+   <property name="clickMarginBottom" stdset="0">
     <enum>Button::none</enum>
    </property>
   </widget>
@@ -298,16 +298,16 @@ Save</string>
    <property name="text">
     <string>Rec</string>
    </property>
-   <property name="clickMarginLeftSetter" stdset="0">
+   <property name="clickMarginLeft" stdset="0">
     <enum>Button::none</enum>
    </property>
-   <property name="clickMarginRightSetter" stdset="0">
+   <property name="clickMarginRight" stdset="0">
     <enum>Button::none</enum>
    </property>
-   <property name="clickMarginTopSetter" stdset="0">
+   <property name="clickMarginTop" stdset="0">
     <enum>Button::none</enum>
    </property>
-   <property name="clickMarginBottomSetter" stdset="0">
+   <property name="clickMarginBottom" stdset="0">
     <enum>Button::none</enum>
    </property>
   </widget>

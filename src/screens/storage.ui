@@ -48,7 +48,7 @@
    <property name="text">
     <string>Done</string>
    </property>
-   <property name="clickMarginLeftSetter" stdset="0">
+   <property name="clickMarginLeft" stdset="0">
     <enum>Button::half</enum>
    </property>
   </widget>
@@ -70,10 +70,10 @@
       <height>61</height>
      </rect>
     </property>
-    <property name="clickMarginTopSetter" stdset="0">
+    <property name="clickMarginTop" stdset="0">
      <enum>LineEdit::half</enum>
     </property>
-    <property name="clickMarginBottomSetter" stdset="0">
+    <property name="clickMarginBottom" stdset="0">
      <enum>LineEdit::half</enum>
     </property>
     <property name="linkedValueName" stdset="0">
@@ -92,7 +92,7 @@
     <property name="echoMode">
      <enum>QLineEdit::PasswordEchoOnEdit</enum>
     </property>
-    <property name="clickMarginTopSetter" stdset="0">
+    <property name="clickMarginTop" stdset="0">
      <enum>LineEdit::none</enum>
     </property>
     <property name="linkedValueName" stdset="0">
@@ -143,7 +143,7 @@
     <property name="text">
      <string>smb://</string>
     </property>
-    <property name="clickMarginBottomSetter" stdset="0">
+    <property name="clickMarginBottom" stdset="0">
      <enum>LineEdit::none</enum>
     </property>
     <property name="linkedValueName" stdset="0">
@@ -178,7 +178,7 @@
     <property name="text">
      <string>Test Connection</string>
     </property>
-    <property name="clickMarginTopSetter" stdset="0">
+    <property name="clickMarginTop" stdset="0">
      <enum>Button::half</enum>
     </property>
    </widget>
@@ -262,7 +262,7 @@ mmcblk0     179:0    0   7.4G  0 disk
    <property name="text">
     <string>Format</string>
    </property>
-   <property name="clickMarginRightSetter" stdset="0">
+   <property name="clickMarginRight" stdset="0">
     <enum>Button::half</enum>
    </property>
   </widget>
@@ -278,7 +278,7 @@ mmcblk0     179:0    0   7.4G  0 disk
    <property name="text">
     <string>Unmount</string>
    </property>
-   <property name="clickMarginLeftSetter" stdset="0">
+   <property name="clickMarginLeft" stdset="0">
     <enum>Button::half</enum>
    </property>
   </widget>
@@ -294,7 +294,7 @@ mmcblk0     179:0    0   7.4G  0 disk
    <property name="text">
     <string>Unmount</string>
    </property>
-   <property name="clickMarginLeftSetter" stdset="0">
+   <property name="clickMarginLeft" stdset="0">
     <enum>Button::half</enum>
    </property>
   </widget>
@@ -310,7 +310,7 @@ mmcblk0     179:0    0   7.4G  0 disk
    <property name="text">
     <string>Format</string>
    </property>
-   <property name="clickMarginRightSetter" stdset="0">
+   <property name="clickMarginRight" stdset="0">
     <enum>Button::half</enum>
    </property>
   </widget>
@@ -339,7 +339,7 @@ mmcblk0     179:0    0   7.4G  0 disk
    <property name="text">
     <string>File Saving</string>
    </property>
-   <property name="clickMarginRightSetter" stdset="0">
+   <property name="clickMarginRight" stdset="0">
     <enum>Button::half</enum>
    </property>
   </widget>

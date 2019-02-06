@@ -117,7 +117,7 @@
      <height>71</height>
     </rect>
    </property>
-   <property name="clickMarginBottomSetter" stdset="0">
+   <property name="clickMarginBottom" stdset="0">
     <enum>ComboBox::half</enum>
    </property>
   </widget>
@@ -179,7 +179,7 @@
      <height>81</height>
     </rect>
    </property>
-   <property name="clickMarginLeftSetter" stdset="0">
+   <property name="clickMarginLeft" stdset="0">
     <enum>SpinBox::half</enum>
    </property>
   </widget>
@@ -192,7 +192,7 @@
      <height>81</height>
     </rect>
    </property>
-   <property name="clickMarginBottomSetter" stdset="0">
+   <property name="clickMarginBottom" stdset="0">
     <enum>SpinBox::full</enum>
    </property>
   </widget>
@@ -274,7 +274,7 @@ Trigger</string>
    <property name="text">
     <string>Detailed Mode</string>
    </property>
-   <property name="clickMarginRightSetter" stdset="0">
+   <property name="clickMarginRight" stdset="0">
     <enum>Button::half</enum>
    </property>
   </widget>
@@ -290,7 +290,7 @@ Trigger</string>
    <property name="text">
     <string>Done</string>
    </property>
-   <property name="clickMarginLeftSetter" stdset="0">
+   <property name="clickMarginLeft" stdset="0">
     <enum>Button::half</enum>
    </property>
   </widget>

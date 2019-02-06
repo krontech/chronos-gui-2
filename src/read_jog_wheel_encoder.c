@@ -9,7 +9,7 @@
 #include <unistd.h> //stdout
 
 char a_old, a_new, b_old, b_new;
-uint stop;
+unsigned int stop;
 
 void sig_handler(int signo) { stop = 1; }
 

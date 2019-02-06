@@ -48,16 +48,16 @@
    <property name="text">
     <string>Debug</string>
    </property>
-   <property name="clickMarginLeftSetter" stdset="0">
+   <property name="clickMarginLeft" stdset="0">
     <enum>Button::full</enum>
    </property>
-   <property name="clickMarginRightSetter" stdset="0">
+   <property name="clickMarginRight" stdset="0">
     <enum>Button::full</enum>
    </property>
-   <property name="clickMarginTopSetter" stdset="0">
+   <property name="clickMarginTop" stdset="0">
     <enum>Button::full</enum>
    </property>
-   <property name="clickMarginBottomSetter" stdset="0">
+   <property name="clickMarginBottom" stdset="0">
     <enum>Button::full</enum>
    </property>
   </widget>
@@ -73,16 +73,16 @@
    <property name="text">
     <string>A Checkbox</string>
    </property>
-   <property name="clickMarginLeftSetter" stdset="0">
+   <property name="clickMarginLeft" stdset="0">
     <enum>CheckBox::full</enum>
    </property>
-   <property name="clickMarginRightSetter" stdset="0">
+   <property name="clickMarginRight" stdset="0">
     <enum>CheckBox::full</enum>
    </property>
-   <property name="clickMarginTopSetter" stdset="0">
+   <property name="clickMarginTop" stdset="0">
     <enum>CheckBox::full</enum>
    </property>
-   <property name="clickMarginBottomSetter" stdset="0">
+   <property name="clickMarginBottom" stdset="0">
     <enum>CheckBox::full</enum>
    </property>
   </widget>
@@ -95,16 +95,16 @@
      <height>81</height>
     </rect>
    </property>
-   <property name="clickMarginLeftSetter" stdset="0">
+   <property name="clickMarginLeft" stdset="0">
     <enum>DecimalSpinBox::full</enum>
    </property>
-   <property name="clickMarginRightSetter" stdset="0">
+   <property name="clickMarginRight" stdset="0">
     <enum>DecimalSpinBox::full</enum>
    </property>
-   <property name="clickMarginTopSetter" stdset="0">
+   <property name="clickMarginTop" stdset="0">
     <enum>DecimalSpinBox::full</enum>
    </property>
-   <property name="clickMarginBottomSetter" stdset="0">
+   <property name="clickMarginBottom" stdset="0">
     <enum>DecimalSpinBox::full</enum>
    </property>
   </widget>
@@ -522,16 +522,16 @@
    <property name="text">
     <string>Animate Triangle</string>
    </property>
-   <property name="clickMarginLeftSetter" stdset="0">
+   <property name="clickMarginLeft" stdset="0">
     <enum>Button::half</enum>
    </property>
-   <property name="clickMarginRightSetter" stdset="0">
+   <property name="clickMarginRight" stdset="0">
     <enum>Button::half</enum>
    </property>
-   <property name="clickMarginTopSetter" stdset="0">
+   <property name="clickMarginTop" stdset="0">
     <enum>Button::half</enum>
    </property>
-   <property name="clickMarginBottomSetter" stdset="0">
+   <property name="clickMarginBottom" stdset="0">
     <enum>Button::half</enum>
    </property>
   </widget>
@@ -544,16 +544,16 @@
      <height>81</height>
     </rect>
    </property>
-   <property name="clickMarginLeftSetter" stdset="0">
+   <property name="clickMarginLeft" stdset="0">
     <enum>ComboBox::full</enum>
    </property>
-   <property name="clickMarginRightSetter" stdset="0">
+   <property name="clickMarginRight" stdset="0">
     <enum>ComboBox::full</enum>
    </property>
-   <property name="clickMarginTopSetter" stdset="0">
+   <property name="clickMarginTop" stdset="0">
     <enum>ComboBox::full</enum>
    </property>
-   <property name="clickMarginBottomSetter" stdset="0">
+   <property name="clickMarginBottom" stdset="0">
     <enum>ComboBox::full</enum>
    </property>
    <item>
@@ -888,16 +888,16 @@
    <property name="text">
     <string>Another Radio B&amp;utton</string>
    </property>
-   <property name="clickMarginLeftSetter" stdset="0">
+   <property name="clickMarginLeft" stdset="0">
     <enum>RadioButton::full</enum>
    </property>
-   <property name="clickMarginRightSetter" stdset="0">
+   <property name="clickMarginRight" stdset="0">
     <enum>RadioButton::full</enum>
    </property>
-   <property name="clickMarginTopSetter" stdset="0">
+   <property name="clickMarginTop" stdset="0">
     <enum>RadioButton::full</enum>
    </property>
-   <property name="clickMarginBottomSetter" stdset="0">
+   <property name="clickMarginBottom" stdset="0">
     <enum>RadioButton::full</enum>
    </property>
   </widget>
@@ -997,7 +997,7 @@
      <height>61</height>
     </rect>
    </property>
-   <property name="clickMarginTopSetter" stdset="0">
+   <property name="clickMarginTop" stdset="0">
     <enum>ComboBox::none</enum>
    </property>
    <item>

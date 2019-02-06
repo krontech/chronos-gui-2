@@ -19,7 +19,7 @@ killall camApp --quiet || true
     sed -e 's/jessie/jessie-backports/g' /etc/apt/sources.list.d/multistrap-debian.list > /etc/apt/sources.list.d/backports-debian.list
     
     apt update && apt-get upgrade --yes
-    apt install ntpdate ca-certificates cowsay vim rsync python3-pyqt5 curl --yes
+    apt install ntpdate ca-certificates cowsay vim rsync python3-pyqt5 python3-pyqt5.qtsvg curl --yes
     ntpdate -s time.nist.gov
 
 # install the back-of-camera interface & dev environment
@@ -34,6 +34,9 @@ killall camApp --quiet || true
 export QSG_RENDER_LOOP=basic
 export QT_QPA_PLATFORM=linuxfb:fb=/dev/fb0
 export QT_QPA_GENERIC_PLUGINS=tslib:/dev/input/event0
+
+#Make Python 3.4 not choke on unicode characters.
+export PYTHONIOENCODING=utf-8
 EOL
     
     #Set up the Video API, since it's not mocked. (ed note: this doesn't work, so it's half-heartedly mocked now)
@@ -63,7 +66,7 @@ EOL
     python3 src/main.py
     
     #QoL
-    pip3 install pdbpp watchdog typing #watchdog provides watchmedo, used for automatic deployment.
+    pip3 install pdbpp watchdog typing future-fstrings #watchdog provides watchmedo, used for automatic deployment.
     cat >> ~/.pdbrc <<'EOL'
 #Refresh the terminal - something disables keyboard echoing when running watch_guest.sh.
 import os

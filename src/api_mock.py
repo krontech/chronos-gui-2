@@ -167,8 +167,9 @@ for key in _camState.keys():
 		def __init__(self):
 			super(Wrapper, self).__init__()
 			
-			QDBusConnection.systemBus().connect('com.krontech.chronos.control.mock', '/', '',
-				key, self.updateKey)
+			#TODO DDR: Fix this. #qMFOfWC3 #backport-from-5.11
+			#QDBusConnection.systemBus().connect('com.krontech.chronos.control.mock', '/', '',
+			#	key, self.updateKey)
 		
 		@pyqtSlot('QDBusMessage')
 		def updateKey(self, msg):
@@ -245,8 +246,9 @@ def observe(name: str, callback: Callable[[Any], None], saftyCheckForSilencedWid
 		raise CallbackNotSilenced(f"{callback} must consider silencing. Decorate with @silenceCallbacks(callback_name, …).")
 	
 	callback(_camState[name])
-	QDBusConnection.systemBus().connect('com.krontech.chronos.control.mock', '/com/krontech/chronos/control/mock', '',
-		name, callback)
+	#TODO DDR: Fix this. #qMFOfWC3 #backport-from-5.11
+	#QDBusConnection.systemBus().connect('com.krontech.chronos.control.mock', '/com/krontech/chronos/control/mock', '',
+	#	name, callback)
 
 
 def observe_future_only(name: str, callback: Callable[[Any], None], saftyCheckForSilencedWidgets=True) -> None:
@@ -258,8 +260,9 @@ def observe_future_only(name: str, callback: Callable[[Any], None], saftyCheckFo
 	if not hasattr(callback, '_isSilencedCallback') and saftyCheckForSilencedWidgets:
 		raise CallbackNotSilenced(f"{callback} must consider silencing. Decorate with @silenceCallbacks(callback_name, …).")
 	
-	QDBusConnection.systemBus().connect('com.krontech.chronos.control.mock', '/com/krontech/chronos/control/mock', '',
-		name, callback)
+	#TODO DDR: Fix this. #qMFOfWC3 #backport-from-5.11
+	#QDBusConnection.systemBus().connect('com.krontech.chronos.control.mock', '/com/krontech/chronos/control/mock', '',
+	#	name, callback)
 
 
 

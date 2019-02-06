@@ -149,10 +149,10 @@ Unsaved Video in RAM</string>
    <property name="text">
     <string>Video Saving</string>
    </property>
-   <property name="clickMarginTopSetter" stdset="0">
+   <property name="clickMarginTop" stdset="0">
     <enum>Button::none</enum>
    </property>
-   <property name="clickMarginBottomSetter" stdset="0">
+   <property name="clickMarginBottom" stdset="0">
     <enum>Button::none</enum>
    </property>
   </widget>
@@ -168,10 +168,10 @@ Unsaved Video in RAM</string>
    <property name="text">
     <string>User Settings</string>
    </property>
-   <property name="clickMarginTopSetter" stdset="0">
+   <property name="clickMarginTop" stdset="0">
     <enum>Button::none</enum>
    </property>
-   <property name="clickMarginBottomSetter" stdset="0">
+   <property name="clickMarginBottom" stdset="0">
     <enum>Button::full</enum>
    </property>
   </widget>
@@ -187,7 +187,7 @@ Unsaved Video in RAM</string>
    <property name="text">
     <string>About Camera</string>
    </property>
-   <property name="clickMarginBottomSetter" stdset="0">
+   <property name="clickMarginBottom" stdset="0">
     <enum>Button::none</enum>
    </property>
   </widget>
@@ -203,10 +203,10 @@ Unsaved Video in RAM</string>
    <property name="text">
     <string>Update Camera</string>
    </property>
-   <property name="clickMarginTopSetter" stdset="0">
+   <property name="clickMarginTop" stdset="0">
     <enum>Button::none</enum>
    </property>
-   <property name="clickMarginBottomSetter" stdset="0">
+   <property name="clickMarginBottom" stdset="0">
     <enum>Button::none</enum>
    </property>
   </widget>
@@ -222,10 +222,10 @@ Unsaved Video in RAM</string>
    <property name="text">
     <string>Factory Utilities</string>
    </property>
-   <property name="clickMarginTopSetter" stdset="0">
+   <property name="clickMarginTop" stdset="0">
     <enum>Button::none</enum>
    </property>
-   <property name="clickMarginBottomSetter" stdset="0">
+   <property name="clickMarginBottom" stdset="0">
     <enum>Button::none</enum>
    </property>
   </widget>
@@ -351,10 +351,10 @@ Unsaved Video in RAM</string>
    <property name="text">
     <string>App &amp;&amp; Internet</string>
    </property>
-   <property name="clickMarginTopSetter" stdset="0">
+   <property name="clickMarginTop" stdset="0">
     <enum>Button::none</enum>
    </property>
-   <property name="clickMarginBottomSetter" stdset="0">
+   <property name="clickMarginBottom" stdset="0">
     <enum>Button::none</enum>
    </property>
   </widget>
@@ -383,10 +383,10 @@ Unsaved Video in RAM</string>
    <property name="text">
     <string>Configure Storage</string>
    </property>
-   <property name="clickMarginTopSetter" stdset="0">
+   <property name="clickMarginTop" stdset="0">
     <enum>Button::none</enum>
    </property>
-   <property name="clickMarginBottomSetter" stdset="0">
+   <property name="clickMarginBottom" stdset="0">
     <enum>Button::none</enum>
    </property>
   </widget>

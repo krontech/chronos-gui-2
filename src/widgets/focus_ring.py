@@ -93,7 +93,7 @@ class FocusRing(QLabel):
 			border: 2px solid #1D6262;
 			background: rgba(196,196,255,32);
 			border-radius: {ringPadding}px;
-			widget-animation-duration: 1000;
+			/*widget-animation-duration: 1000; doesn't exist in pyqt 5.7 #backport-from-5.11*/
 		""")
 		
 		self._focussedOn and self.focusOn(self._focussedOn)

@@ -48,10 +48,10 @@
    <property name="text">
     <string>7</string>
    </property>
-   <property name="clickMarginRightSetter" stdset="0">
+   <property name="clickMarginRight" stdset="0">
     <enum>Button::none</enum>
    </property>
-   <property name="clickMarginBottomSetter" stdset="0">
+   <property name="clickMarginBottom" stdset="0">
     <enum>Button::none</enum>
    </property>
    <property name="customStyleSheet" stdset="0">
@@ -70,13 +70,13 @@
    <property name="text">
     <string>8</string>
    </property>
-   <property name="clickMarginLeftSetter" stdset="0">
+   <property name="clickMarginLeft" stdset="0">
     <enum>Button::none</enum>
    </property>
-   <property name="clickMarginRightSetter" stdset="0">
+   <property name="clickMarginRight" stdset="0">
     <enum>Button::none</enum>
    </property>
-   <property name="clickMarginBottomSetter" stdset="0">
+   <property name="clickMarginBottom" stdset="0">
     <enum>Button::none</enum>
    </property>
    <property name="customStyleSheet" stdset="0">
@@ -95,10 +95,10 @@
    <property name="text">
     <string>9</string>
    </property>
-   <property name="clickMarginLeftSetter" stdset="0">
+   <property name="clickMarginLeft" stdset="0">
     <enum>Button::none</enum>
    </property>
-   <property name="clickMarginBottomSetter" stdset="0">
+   <property name="clickMarginBottom" stdset="0">
     <enum>Button::none</enum>
    </property>
    <property name="customStyleSheet" stdset="0">
@@ -117,16 +117,16 @@
    <property name="text">
     <string>5</string>
    </property>
-   <property name="clickMarginLeftSetter" stdset="0">
+   <property name="clickMarginLeft" stdset="0">
     <enum>Button::none</enum>
    </property>
-   <property name="clickMarginRightSetter" stdset="0">
+   <property name="clickMarginRight" stdset="0">
     <enum>Button::none</enum>
    </property>
-   <property name="clickMarginTopSetter" stdset="0">
+   <property name="clickMarginTop" stdset="0">
     <enum>Button::none</enum>
    </property>
-   <property name="clickMarginBottomSetter" stdset="0">
+   <property name="clickMarginBottom" stdset="0">
     <enum>Button::none</enum>
    </property>
    <property name="customStyleSheet" stdset="0">
@@ -145,13 +145,13 @@
    <property name="text">
     <string>4</string>
    </property>
-   <property name="clickMarginRightSetter" stdset="0">
+   <property name="clickMarginRight" stdset="0">
     <enum>Button::none</enum>
    </property>
-   <property name="clickMarginTopSetter" stdset="0">
+   <property name="clickMarginTop" stdset="0">
     <enum>Button::none</enum>
    </property>
-   <property name="clickMarginBottomSetter" stdset="0">
+   <property name="clickMarginBottom" stdset="0">
     <enum>Button::none</enum>
    </property>
    <property name="customStyleSheet" stdset="0">
@@ -170,13 +170,13 @@
    <property name="text">
     <string>6</string>
    </property>
-   <property name="clickMarginLeftSetter" stdset="0">
+   <property name="clickMarginLeft" stdset="0">
     <enum>Button::none</enum>
    </property>
-   <property name="clickMarginTopSetter" stdset="0">
+   <property name="clickMarginTop" stdset="0">
     <enum>Button::none</enum>
    </property>
-   <property name="clickMarginBottomSetter" stdset="0">
+   <property name="clickMarginBottom" stdset="0">
     <enum>Button::none</enum>
    </property>
    <property name="customStyleSheet" stdset="0">
@@ -195,13 +195,13 @@
    <property name="text">
     <string>3</string>
    </property>
-   <property name="clickMarginLeftSetter" stdset="0">
+   <property name="clickMarginLeft" stdset="0">
     <enum>Button::none</enum>
    </property>
-   <property name="clickMarginTopSetter" stdset="0">
+   <property name="clickMarginTop" stdset="0">
     <enum>Button::none</enum>
    </property>
-   <property name="clickMarginBottomSetter" stdset="0">
+   <property name="clickMarginBottom" stdset="0">
     <enum>Button::none</enum>
    </property>
    <property name="customStyleSheet" stdset="0">
@@ -220,13 +220,13 @@
    <property name="text">
     <string>1</string>
    </property>
-   <property name="clickMarginRightSetter" stdset="0">
+   <property name="clickMarginRight" stdset="0">
     <enum>Button::none</enum>
    </property>
-   <property name="clickMarginTopSetter" stdset="0">
+   <property name="clickMarginTop" stdset="0">
     <enum>Button::none</enum>
    </property>
-   <property name="clickMarginBottomSetter" stdset="0">
+   <property name="clickMarginBottom" stdset="0">
     <enum>Button::none</enum>
    </property>
    <property name="customStyleSheet" stdset="0">
@@ -245,16 +245,16 @@
    <property name="text">
     <string>2</string>
    </property>
-   <property name="clickMarginLeftSetter" stdset="0">
+   <property name="clickMarginLeft" stdset="0">
     <enum>Button::none</enum>
    </property>
-   <property name="clickMarginRightSetter" stdset="0">
+   <property name="clickMarginRight" stdset="0">
     <enum>Button::none</enum>
    </property>
-   <property name="clickMarginTopSetter" stdset="0">
+   <property name="clickMarginTop" stdset="0">
     <enum>Button::none</enum>
    </property>
-   <property name="clickMarginBottomSetter" stdset="0">
+   <property name="clickMarginBottom" stdset="0">
     <enum>Button::none</enum>
    </property>
    <property name="customStyleSheet" stdset="0">
@@ -273,10 +273,10 @@
    <property name="text">
     <string>⌫</string>
    </property>
-   <property name="clickMarginLeftSetter" stdset="0">
+   <property name="clickMarginLeft" stdset="0">
     <enum>Button::none</enum>
    </property>
-   <property name="clickMarginTopSetter" stdset="0">
+   <property name="clickMarginTop" stdset="0">
     <enum>Button::none</enum>
    </property>
    <property name="customStyleSheet" stdset="0">
@@ -295,13 +295,13 @@
    <property name="text">
     <string>.</string>
    </property>
-   <property name="clickMarginLeftSetter" stdset="0">
+   <property name="clickMarginLeft" stdset="0">
     <enum>Button::none</enum>
    </property>
-   <property name="clickMarginRightSetter" stdset="0">
+   <property name="clickMarginRight" stdset="0">
     <enum>Button::none</enum>
    </property>
-   <property name="clickMarginTopSetter" stdset="0">
+   <property name="clickMarginTop" stdset="0">
     <enum>Button::none</enum>
    </property>
    <property name="customStyleSheet" stdset="0">
@@ -320,10 +320,10 @@
    <property name="text">
     <string>0</string>
    </property>
-   <property name="clickMarginRightSetter" stdset="0">
+   <property name="clickMarginRight" stdset="0">
     <enum>Button::none</enum>
    </property>
-   <property name="clickMarginTopSetter" stdset="0">
+   <property name="clickMarginTop" stdset="0">
     <enum>Button::none</enum>
    </property>
    <property name="customStyleSheet" stdset="0">
@@ -342,10 +342,10 @@
    <property name="text">
     <string>▶</string>
    </property>
-   <property name="clickMarginLeftSetter" stdset="0">
+   <property name="clickMarginLeft" stdset="0">
     <enum>Button::none</enum>
    </property>
-   <property name="clickMarginRightSetter" stdset="0">
+   <property name="clickMarginRight" stdset="0">
     <enum>Button::none</enum>
    </property>
    <property name="customStyleSheet" stdset="0">
@@ -364,7 +364,7 @@
    <property name="text">
     <string>Close</string>
    </property>
-   <property name="clickMarginLeftSetter" stdset="0">
+   <property name="clickMarginLeft" stdset="0">
     <enum>Button::none</enum>
    </property>
    <property name="customStyleSheet" stdset="0">
@@ -383,7 +383,7 @@
    <property name="text">
     <string>◀</string>
    </property>
-   <property name="clickMarginRightSetter" stdset="0">
+   <property name="clickMarginRight" stdset="0">
     <enum>Button::none</enum>
    </property>
    <property name="customStyleSheet" stdset="0">

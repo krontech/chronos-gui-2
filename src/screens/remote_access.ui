@@ -48,7 +48,7 @@
    <property name="echoMode">
     <enum>QLineEdit::Password</enum>
    </property>
-   <property name="clickMarginRightSetter" stdset="0">
+   <property name="clickMarginRight" stdset="0">
     <enum>LineEdit::none</enum>
    </property>
    <property name="linkedValueName" stdset="0">
@@ -86,10 +86,10 @@
    <property name="text">
     <string>👁</string>
    </property>
-   <property name="clickMarginLeftSetter" stdset="0">
+   <property name="clickMarginLeft" stdset="0">
     <enum>Button::half</enum>
    </property>
-   <property name="clickMarginRightSetter" stdset="0">
+   <property name="clickMarginRight" stdset="0">
     <enum>Button::half</enum>
    </property>
   </widget>
@@ -105,7 +105,7 @@
    <property name="text">
     <string>🎲</string>
    </property>
-   <property name="clickMarginLeftSetter" stdset="0">
+   <property name="clickMarginLeft" stdset="0">
     <enum>Button::none</enum>
    </property>
   </widget>
@@ -130,7 +130,7 @@
     <property name="text">
      <string>Enable Remote SSH Access</string>
     </property>
-    <property name="clickMarginTopSetter" stdset="0">
+    <property name="clickMarginTop" stdset="0">
      <enum>CheckBox::none</enum>
     </property>
     <property name="linkedValueName" stdset="0">
@@ -184,7 +184,7 @@
     <property name="text">
      <string>Enable Local SSH Access</string>
     </property>
-    <property name="clickMarginTopSetter" stdset="0">
+    <property name="clickMarginTop" stdset="0">
      <enum>CheckBox::none</enum>
     </property>
     <property name="linkedValueName" stdset="0">
@@ -225,7 +225,7 @@
     <property name="checked">
      <bool>true</bool>
     </property>
-    <property name="clickMarginBottomSetter" stdset="0">
+    <property name="clickMarginBottom" stdset="0">
      <enum>CheckBox::none</enum>
     </property>
     <property name="linkedValueName" stdset="0">
@@ -244,7 +244,7 @@
     <property name="text">
      <string>Enable Remote HTTPS Access</string>
     </property>
-    <property name="clickMarginBottomSetter" stdset="0">
+    <property name="clickMarginBottom" stdset="0">
      <enum>CheckBox::none</enum>
     </property>
     <property name="linkedValueName" stdset="0">
@@ -292,7 +292,7 @@
       <height>71</height>
      </rect>
     </property>
-    <property name="clickMarginBottomSetter" stdset="0">
+    <property name="clickMarginBottom" stdset="0">
      <enum>ComboBox::half</enum>
     </property>
    </widget>
@@ -330,10 +330,10 @@
      <property name="text">
       <string>🎲</string>
      </property>
-     <property name="clickMarginLeftSetter" stdset="0">
+     <property name="clickMarginLeft" stdset="0">
       <enum>Button::half</enum>
      </property>
-     <property name="clickMarginTopSetter" stdset="0">
+     <property name="clickMarginTop" stdset="0">
       <enum>Button::half</enum>
      </property>
     </widget>
@@ -355,10 +355,10 @@
      <property name="value">
       <number>80</number>
      </property>
-     <property name="clickMarginRightSetter" stdset="0">
+     <property name="clickMarginRight" stdset="0">
       <enum>SpinBox::none</enum>
      </property>
-     <property name="clickMarginTopSetter" stdset="0">
+     <property name="clickMarginTop" stdset="0">
       <enum>SpinBox::half</enum>
      </property>
      <property name="linkedValueName" stdset="0">
@@ -412,7 +412,7 @@
      <property name="value">
       <number>22</number>
      </property>
-     <property name="clickMarginRightSetter" stdset="0">
+     <property name="clickMarginRight" stdset="0">
       <enum>SpinBox::none</enum>
      </property>
      <property name="linkedValueName" stdset="0">
@@ -487,7 +487,7 @@
      <property name="text">
       <string>🎲</string>
      </property>
-     <property name="clickMarginLeftSetter" stdset="0">
+     <property name="clickMarginLeft" stdset="0">
       <enum>Button::half</enum>
      </property>
     </widget>
