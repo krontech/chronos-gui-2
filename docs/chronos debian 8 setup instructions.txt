@@ -19,7 +19,7 @@ killall camApp --quiet || true
     sed -e 's/jessie/jessie-backports/g' /etc/apt/sources.list.d/multistrap-debian.list > /etc/apt/sources.list.d/backports-debian.list
     
     apt update && apt-get upgrade --yes
-    apt install ntpdate ca-certificates cowsay vim rsync python3-pyqt5 curl --yes
+    apt install ntpdate ca-certificates cowsay vim rsync python3-pyqt5 python3-pyqt5.qtsvg curl --yes
     ntpdate -s time.nist.gov
 
 # install the back-of-camera interface & dev environment
