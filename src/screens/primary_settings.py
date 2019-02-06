@@ -66,7 +66,7 @@ class PrimarySettings(QtWidgets.QDialog):
 	
 	def updateInterfaceSide(self, *_):
 		self.uiLayoutPreview.setPixmap(QPixmap(
-			f"assets/images/interface-{'left' if self.uiInterfaceSide.currentIndex() else 'right'}-{'down' if self.uiInterfaceRotated.currentIndex() else 'up'}.svg"
+			f"assets/images/interface-{'left' if self.uiInterfaceSide.currentIndex() else 'right'}-{'down' if self.uiInterfaceRotated.currentIndex() else 'up'}.png"
 		))
 		
 		#How to rotate stuff:

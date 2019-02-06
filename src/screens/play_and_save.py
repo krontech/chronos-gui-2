@@ -54,7 +54,7 @@ class PlayAndSave(QtWidgets.QDialog):
 				/* ----- Play And Save Screen Styling ----- */
 				
 				Slider::handle:horizontal {{
-					image: url({"../../" if self.uiSeekSlider.showHitRects else ""}assets/images/handle-bars-156x61+40.svg); /* File name fields: width x height + horizontal padding. */
+					image: url({"../../" if self.uiSeekSlider.showHitRects else ""}assets/images/handle-bars-156x61+40.png); /* File name fields: width x height + horizontal padding. */
 					margin: -200px -40px; /* y: -slider groove margin. x: touch padding outsidet the groove. Clipped by Slider width. Should be enough for most customizations if we move stuff around. */
 				}}
 				
