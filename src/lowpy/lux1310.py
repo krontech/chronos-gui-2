@@ -855,9 +855,9 @@ class Lux1310Object(SensorObject):
 	def lux1310SetReset(self, value):
 		readvalue = self.mem.fpga_mmio.read16(IMAGE_SENSOR_CONTROL)
 		if value:
-			self.mem.FPGAWrite16(IMAGE_SENSOR_CONTROL, readvalue | IMAGE_SENSOR_RESET_MASK)
+			self.mem.FPGAWrite16("IMAGE_SENSOR_CONTROL", readvalue | IMAGE_SENSOR_RESET_MASK)
 		else:
-			self.mem.FPGAWrite16(IMAGE_SENSOR_CONTROL, readvalue & 0xffff - IMAGE_SENSOR_RESET_MASK)
+			self.mem.FPGAWrite16("IMAGE_SENSOR_CONTROL", readvalue & 0xffff - IMAGE_SENSOR_RESET_MASK)
 
 	def SensorInit(self):
 		print ("SensorInit")

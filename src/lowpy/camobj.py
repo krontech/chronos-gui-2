@@ -1,46 +1,29 @@
 # -*- coding: future_fstrings -*-
 # Camera class
-#from mem import fpga_mmio
+
 import time
 from datetime import datetime
 import pdb
 
 from blackCal import *
 
-# import recSequencer
 import numpy
 
 import blackCal
 
 from termcolor import colored, cprint
-# from ppretty import ppretty
 
 from mmapregisters import *
 from memobj import MemObject
 from sensorobj import SensorObject
 from lux1310 import Lux1310Object
-# import fpgah
-#import sys, smbus
-#import pyi2cflash-0.1.1
-
-#from smbus2 import SMBus
 
 from smbus2 import SMBusWrapper
 from smbus2 import SMBus
 
-# import blackCal
-
-'''    
-bus = SMBus()
-bus.open(1)
-
-v = bus.read_byte(80, 0)
-print (f"EEPROM: {hex(v)}")
-'''
 
 from ioports import board_chronos14_ioports
 
-# import errorcodes		
 import pychronos
 
 MAX_FRAME_LENGTH = 0xf000
@@ -154,10 +137,6 @@ rawRegisters = pychronos.fpgamap(0x0000, 0x1000)
 
 
 
-
-
-
-
 class SeqPgmMem:
 	termRecTrig = 0
 	termRecMem = 0 
@@ -173,11 +152,6 @@ class SeqPgmMem:
 
 def i2c_eeprom_do_read(addr,  offset,  leng):
 	bus = SMBus(1)
-	#for i in range(1):
-	#	b = bus.read_byte_data(CAMERA_SERIAL_I2CADDR + i, CAMERA_SERIAL_OFFSET)
-	#	print(b)
-	#bus.close()
-	# print ("huh?")
 
 	with SMBusWrapper(1) as bus:
 		# Read a block of 16 bytes from address 80, offset 0
@@ -221,7 +195,6 @@ class CamObject:
 
 	ioports = board_chronos14_ioports
 
-		# self.CamInit()
 
 	imagerSettings = imgSetObj()
 	recordingData = recordingDataObj()
@@ -231,15 +204,13 @@ class CamObject:
 	# mem.CtypesTest()
 	mem.MemTest()
 
-	# breakpoint()
-
-	# exit()
-
+	FPGARead32 = mem.FPGARead32
+	FPGARead16 = mem.FPGARead16
+	
 	FPGAWrite32 = mem.FPGAWrite32
 	FPGAWrite16 = mem.FPGAWrite16
 	FPGAWrite8 = mem.FPGAWrite8
 
-	#pdb.set_trace()
 	sensor = Lux1310Object(mem)
 
 
@@ -249,28 +220,7 @@ class CamObject:
 		self.CamInit()
 		self.checkSeqStatus()
 		#thiscam = self
-	
-		
-	#print("CamObject created")
-	# mem = MemObject()
 
-
-
-	'''
-	int err;
-	err = ioctl(fd, I2C_SLAVE, addr);
-	if (err < 0) {
-		return err;
-	}
-
-	err = i2c_eeprom_write_chunk(fd, addr, offset, NULL, 0, offsz);
-	if (err < 0) {
-		return err;
-	}
-	usleep(1000);
-	err = read(fd, buf, len);
-	return err;
-	'''
 
 	def image_sensor_bpp(self):
 		return 12
@@ -279,14 +229,9 @@ class CamObject:
 	def i2c_eeprom_read16(fd, addr, offset, leng):
 		return i2c_eeprom_do_read(fd, addr, offset, leng, 2)
 		pass
-		#print ("EEPROM")
-		#print (pyi2cflash.read(addr, offset, leng))
 
 
 	def ReadSerial():
-		#iofile = ioports["eeprom-i2c"]
-		#fd = open(iofile, O_RDWR)
-		#return i2c_eeprom_read16(fd, CAMERA_SERIAL_I2CADDR, CAMERA_SERIAL_OFFSET, CAMERA_SERIAL_LENGTH)
 		i2c_eeprom_do_read(CAMERA_SERIAL_I2CADDR, CAMERA_SERIAL_OFFSET, CAMERA_SERIAL_LENGTH)
 
 	def TestLive(self):
@@ -302,7 +247,6 @@ class CamObject:
 
 
 		
-		# self.CamInit()
 
 	def SetLiveTiming(self, hOutRes, vOutRes, maxFPS):
 
@@ -335,18 +279,18 @@ class CamObject:
 			   fps, hOutRes, vOutRes, maxFPS)
 
 		g = self.sensor.ImageGeometry
-		self.mem.FPGAWrite32("DISPLAY_H_RES", g.hres)
-		self.mem.FPGAWrite32("DISPLAY_V_RES", g.vres)
+		self.FPGAWrite32("DISPLAY_H_RES", g.hres)
+		self.FPGAWrite32("DISPLAY_V_RES", g.vres)
 		print (f"ImageGeometry: {g}")
 
 
 	def getFPGAVersion(self):
-		ver = self.mem.FPGARead16("FPGA_VERSION")
+		ver = self.FPGARead16("FPGA_VERSION")
 		print (f"Version is {ver}")
 		return ver
 
 	def getFPGASubVersion(self):
-		sver = self.mem.FPGARead16("FPGA_SUBVERSION")
+		sver = self.FPGARead16("FPGA_SUBVERSION")
 		print (f"Subversion is {sver}")
 		return sver
 
@@ -362,11 +306,6 @@ class CamObject:
 	
 		pxClock = 100000000
 	
-		# minHPeriod;
-		# hPeriod;
-		# vPeriod;
-		# UInt32 fps;
-
 		# FPGA revision 3.14 and higher use a 133MHz video clock. 
 		if ((self.getFPGAVersion() > 3) or (self.getFPGASubVersion() >= 14)):
 			print ("Faster FPGA clock enabled")
@@ -394,46 +333,46 @@ class CamObject:
 
 		print (f"pxClock is 0x{pxClock:x}, hPeriod is 0x{hPeriod:x}, vPeriod is 0x{vPeriod:x}")
 
-		self.mem.FPGAWrite16("DISPLAY_H_RES", hRes)
-		self.mem.FPGAWrite16("DISPLAY_H_OUT_RES", hOutRes)
-		self.mem.FPGAWrite16("DISPLAY_V_RES", vRes)
-		self.mem.FPGAWrite16("DISPLAY_V_OUT_RES", vOutRes)
+		self.FPGAWrite16("DISPLAY_H_RES", hRes)
+		self.FPGAWrite16("DISPLAY_H_OUT_RES", hOutRes)
+		self.FPGAWrite16("DISPLAY_V_RES", vRes)
+		self.FPGAWrite16("DISPLAY_V_OUT_RES", vOutRes)
 
-		self.mem.FPGAWrite16("DISPLAY_H_PERIOD", hPeriod - 1)
-		self.mem.FPGAWrite16("DISPLAY_H_SYNC_LEN", hSync)
-		self.mem.FPGAWrite16("DISPLAY_H_BACK_PORCH", hBackPorch)
+		self.FPGAWrite16("DISPLAY_H_PERIOD", hPeriod - 1)
+		self.FPGAWrite16("DISPLAY_H_SYNC_LEN", hSync)
+		self.FPGAWrite16("DISPLAY_H_BACK_PORCH", hBackPorch)
 
-		self.mem.FPGAWrite16("DISPLAY_V_PERIOD", vPeriod - 1)
-		self.mem.FPGAWrite16("DISPLAY_V_SYNC_LEN", vSync)
-		self.mem.FPGAWrite16("DISPLAY_V_BACK_PORCH", vBackPorch)
+		self.FPGAWrite16("DISPLAY_V_PERIOD", vPeriod - 1)
+		self.FPGAWrite16("DISPLAY_V_SYNC_LEN", vSync)
+		self.FPGAWrite16("DISPLAY_V_BACK_PORCH", vBackPorch)
 
 
 	def FakeIO(self):
 		print ("TODO: don't do fake IO")
-		self.mem.FPGAWrite16(0xa0, 0x1)
-		self.mem.FPGAWrite16(0xa4, 0x1)
-		self.mem.FPGAWrite16(0xa8, 0x0)
-		self.mem.FPGAWrite32(0x60, 0x0)	
-		self.mem.FPGAWrite16(0xb4, 0x0)
-		self.mem.FPGAWrite16(0xb0, 0x0)
-		self.mem.FPGAWrite16(0xac, 0x2)
-		self.mem.FPGAWrite16(0xbc, 0x0)
-		self.mem.FPGAWrite16(0xbc, 0x0)
-		self.mem.FPGAWrite16(0xbc, 0x0)
+		self.FPGAWrite16(0xa0, 0x1)
+		self.FPGAWrite16(0xa4, 0x1)
+		self.FPGAWrite16(0xa8, 0x0)
+		self.FPGAWrite32(0x60, 0x0)	
+		self.FPGAWrite16(0xb4, 0x0)
+		self.FPGAWrite16(0xb0, 0x0)
+		self.FPGAWrite16(0xac, 0x2)
+		self.FPGAWrite16(0xbc, 0x0)
+		self.FPGAWrite16(0xbc, 0x0)
+		self.FPGAWrite16(0xbc, 0x0)
 
 
 	def Fake16(self, addr, data):
 			# breakpoint()
 			# print (f"--- faking 16 bit (0x{(addr * 2):x}, (0x{data:x})")
-			self.mem.FPGAWrite16(addr * 2, data)
+			self.FPGAWrite16(addr * 2, data)
 	def Fake16b(self, addr, data):
 			# breakpoint()
 			# print (f"--- faking 16 bit (0x{(addr * 2):x}, (0x{data:x})")
-			self.mem.FPGAWrite16(addr, data)
+			self.FPGAWrite16(addr, data)
 	def Fake32(self, addr, data):
 			# breakpoint()
 			# print (f"=== faking 32 bit (0x{(addr * 2):x}, (0x{data:x})")
-			self.mem.FPGAWrite32(addr * 2, data)
+			self.FPGAWrite32(addr * 2, data)
 
 	def FakeInit(self):
 		print ("TODO: don't do fake init")
@@ -524,75 +463,88 @@ class CamObject:
 		self.Fake16b(0x20, 0x15b9)	# IMAGER_INT_TIME
 
 
-
-
-
-
-
-
 		time.sleep(0.001)	# without this, blackCal fails
 		self.checkSeqStatus("5")
 
 
 # IO things
 
-
-
 		
 	def setTrigEnable(self, val):
-		self.mem.FPGAWrite32("TRIG_ENABLE", val)
+		self.FPGAWrite16("TRIG_ENABLE", val)
 		
 	def getTrigEnable():
-		return self.mem.FPGARead32("TRIG_ENABLE")
+		return self.FPGARead16("TRIG_ENABLE")
 		
 		
 	def setTrigInvert(self, val):
-		self.mem.FPGAWrite32("TRIG_INVERT", val)
+		self.FPGAWrite16("TRIG_INVERT", val)
 		
 	def getTrigInvert():
-		return self.mem.FPGARead32("TRIG_INVERT")
+		return self.FPGARead16("TRIG_INVERT")
 		
 		
 	def setTrigDebounce(self, val):
-		self.mem.FPGAWrite32("TRIG_DEBOUNCE", val)
+		self.FPGAWrite16("TRIG_DEBOUNCE", val)
 		
 	def getTrigDebounce():
-		return self.mem.FPGARead32("TRIG_DEBOUNCE")
+		return self.FPGARead16("TRIG_DEBOUNCE")
 		
 		
 	def setSeqTrigDelay(self, val):
-		self.mem.FPGAWrite32("SEQ_TRIG_DELAY", val)
+		self.FPGAWrite32("SEQ_TRIG_DELAY", val)
 		
 	def getSeqTrigDelay():
-		return self.mem.FPGARead32("SEQ_TRIG_DELAY")
+		return self.FPGARead32("SEQ_TRIG_DELAY")
 		
 		
 	def setIOOutInvert(self, val):
-		self.mem.FPGAWrite32("IO_OUT_INVERT", val)
+		self.FPGAWrite16("IO_OUT_INVERT", val)
 		
 	def getIOOutInvert():
-		return self.mem.FPGARead32("IO_OUT_INVERT")
+		return self.FPGARead16("IO_OUT_INVERT")
 		
 		
 	def setIOOutSource(self, val):
-		self.mem.FPGAWrite32("IO_OUT_SOURCE", val)
+		self.FPGAWrite16("IO_OUT_SOURCE", val)
 		
 	def getIOOutSource():
-		return self.mem.FPGARead32("IO_OUT_SOURCE")
+		return self.FPGARead16("IO_OUT_SOURCE")
 		
 		
 	def setIOOutLevel(self, val):
-		self.mem.FPGAWrite32("IO_OUT_LEVEL", val)
+		self.FPGAWrite16("IO_OUT_LEVEL", val)
 		
 	def getIOOutLevel():
-		return self.mem.FPGARead32("IO_OUT_LEVEL")
+		return self.FPGARead16("IO_OUT_LEVEL")
 		
-
-	def setExtShutterCtl(self, val):
-		self.mem.FPGAWrite32("EXT_SHUTTER_CTL", val)
 	
-	def getExtShutterCtl():
-		return self.mem.FPGARead32("EXT_SHUTTER_CTL")
+	
+	def setExtShutterGatingEnable(en):
+		val = self.FPGARead16("EXT_SHUTTER_CTL") & (0xffff - EXT_SH_GATING_EN_MASK)
+		val |= (en << EXT_SH_GATING_EN_OFFSET)
+		self.FPGAWrite16("EXT_SHUTTER_CTL", val)
+
+	def getExtShutterGatingEnable():
+		return self.FPGARead16("EXT_SHUTTER_CTL") & EXT_SH_GATING_EN_MASK
+
+
+	def setTriggeredExpEnable():
+		val = self.FPGARead16("EXT_SHUTTER_CTL") & (0xffff - EXT_SH_TRIGD_EXP_EN_MASK)
+		val |= (en << EXT_SH_TRIGD_EXP_EN_OFFSET)
+		self.FPGAWrite16("EXT_SHUTTER_CTL", val)
+	
+	def getTriggeredExpEnable():
+		return self.FPGARead16("EXT_SHUTTER_CTL") & EXT_SH_TRIGD_EXP_EN_MASK
+
+
+	def setExtShutterSrcEnable(src):
+		val = self.FPGARead16("EXT_SHUTTER_CTL") & (0xffff - EXT_SH_SRC_EN_MASK)
+		val |= (src << EXT_SH_SRC_EN_OFFSET)
+		self.FPGAWrite16("EXT_SHUTTER_CTL", val)
+
+	def getExtShutterSrcEnable():
+		return (self.FPGARead16("EXT_SHUTTER_CTL") & EXT_SH_SRC_EN_MASK) >> EXT_SH_SRC_EN_OFFSET
 
 
 
@@ -603,7 +555,7 @@ class CamObject:
 	
 		
 		#TESTING! no reset
-		# self.mem.FPGAWrite16("SYSTEM_RESET", 1)
+		# self.FPGAWrite16("SYSTEM_RESET", 1)
 		
 
 		# Give it some time
@@ -634,21 +586,21 @@ class CamObject:
 
 		self.checkSeqStatus()
 
-		self.mem.FPGAWrite16("SENSOR_FIFO_START_W_THRESH", 0x100)
-		self.mem.FPGAWrite16("SENSOR_FIFO_STOP_W_THRESH", 0x100)
+		self.FPGAWrite16("SENSOR_FIFO_START_W_THRESH", 0x100)
+		self.FPGAWrite16("SENSOR_FIFO_STOP_W_THRESH", 0x100)
 
 
 
-		self.mem.FPGAWrite32("SEQ_LIVE_ADDR_0", MAX_FRAME_LENGTH)
-		self.mem.FPGAWrite32("SEQ_LIVE_ADDR_1", MAX_FRAME_LENGTH * 2)
-		self.mem.FPGAWrite32("SEQ_LIVE_ADDR_2", MAX_FRAME_LENGTH * 3)
-		self.mem.FPGAWrite32("SEQ_REC_REGION_START", REC_START_ADDR) #in camApp this uses setRecRegionStartWords
+		self.FPGAWrite32("SEQ_LIVE_ADDR_0", MAX_FRAME_LENGTH)
+		self.FPGAWrite32("SEQ_LIVE_ADDR_1", MAX_FRAME_LENGTH * 2)
+		self.FPGAWrite32("SEQ_LIVE_ADDR_2", MAX_FRAME_LENGTH * 3)
+		self.FPGAWrite32("SEQ_REC_REGION_START", REC_START_ADDR) #in camApp this uses setRecRegionStartWords
 
 		print ("---------")
 		#temporary single definition; move to fpgah.py
 		DISPLAY_CTL_READOUT_INHIBIT = (1 << 3)
 
-		dctrl = self.mem.FPGARead32("DISPLAY_CTL")
+		dctrl = self.FPGARead32("DISPLAY_CTL")
 		print (f"dctrl is 0x{dctrl:x}")
 		dctrl &= ~DISPLAY_CTL_READOUT_INHIBIT
 		print (f"AND mask is 0x{DISPLAY_CTL_READOUT_INHIBIT:x}")
@@ -656,12 +608,12 @@ class CamObject:
 		dctrl = 0x2f0
 		# exit()
 
-		self.mem.FPGAWrite32("DISPLAY_CTL", dctrl)  #(18)
+		self.FPGAWrite32("DISPLAY_CTL", dctrl)  #(18)
 
 		# exit()
 
-		self.mem.FPGAWrite32("IMAGER_FRAME_PERIOD", 100 * 4000)		# 18
-		self.mem.FPGAWrite32("IMAGER_INT_TIME", 100 * 3900)			# 19
+		self.FPGAWrite32("IMAGER_FRAME_PERIOD", 100 * 4000)		# 18
+		self.FPGAWrite32("IMAGER_INT_TIME", 100 * 3900)			# 19
 
 		# exit()
 
@@ -671,9 +623,6 @@ class CamObject:
 		#TODO - dereference through SensorObj:
 		# breakpoint()
 		self.sensor._writeDACVoltages()
-		# exit()
-
-		# breakpoint()
 
 		print (self.sensor)
 		time.sleep(0.01)
@@ -683,16 +632,12 @@ class CamObject:
 
 		print ("#############\nLux has been reset\n#############")
 
-		# self.sensor.Lux1310RegDump()
-
-		# breakpoint()
-
 		#TODO: this goes into sensor abstraction
 		self.sensor.Lux1310Write("LUX1310_SCI_SRESET_B", 0)
 
 
 		# 3 point calibration:
-		self.mem.FPGAWrite32("DISPLAY_GAINCTL_3POINT", 1)
+		self.FPGAWrite32("DISPLAY_GAINCTL_3POINT", 1)
 		
 
 		self.sensor.SensorInit2()
@@ -711,7 +656,9 @@ class CamObject:
 		self.setIOOutInvert(0x0)
 		self.setIOOutSource(0x0)
 		self.setIOOutLevel(0x2)
-		self.setExtShutterCtl(0x0)
+		
+		self.FPGAWrite16("EXT_SHUTTER_CTL", 0) 
+
 
 
 
@@ -727,42 +674,20 @@ class CamObject:
 		self.FakeInit()
 
 		self.checkSeqStatus()
-
-		# frame_words = int(((self.sensor.hMaxRes * self.sensor.vMaxRes * self.image_sensor_bpp()) / 8 + (32 - 1)) / 32)
-		# print(f"frame_words = {frame_words}")
-		# print(f"hMaxRes = {self.sensor.hMaxRes}")
-		# self.FPGAWrite32("SEQ_FRAME_SIZE", (frame_words + 0x3f) & ~0x3f)
-		
-
-
-
-		# this was from daemon:
-		# self.SetLiveTiming(self.sensor.hMaxRes, self.sensor.vMaxRes, 60)
-		# print ("--> SENSOR:")
-		# print (self.sensor.ImageGeometry)
-
-		#ReadSerial()
-
-		#sensor = SensorObject(mem)
-		#sensor = Lux1310Object(mem)
 	
 	
 	def setImagerSettings(self):
 		#TODO: all this
-		# self.mem.FPGAWrite32("IMAGER_INT_TIME", 0)
-		# self.mem.FPGAWrite16("SENSOR_LINE_PERIOD", 0)
-		self.mem.FPGAWrite32("IMAGER_INT_TIME", 0)
+		# self.FPGAWrite32("IMAGER_INT_TIME", 0)
+		# self.FPGAWrite16("SENSOR_LINE_PERIOD", 0)
+		self.FPGAWrite32("IMAGER_INT_TIME", 0)
 		
 
 		self.sensor.Lux1310SetResolutions()
-		#breakpoint()
-		#self.sensor.Lux1310SetFramePeriod(self.sensor.currentPeriod, self.sensor.currentHRes, self.sensor.currentVRes)
 
 		#FAKE:
-		self.sensor.mem.FPGAWrite32("IMAGER_FRAME_PERIOD", 0x1716f)
+		self.FPGAWrite32("IMAGER_FRAME_PERIOD", 0x1716f)
 
-
-		# self.sensor.Lux1310SetGain(self.sensor.gain)
 
 		self.sensor.Lux1310UpdateWavetableSetting()
 
@@ -808,11 +733,6 @@ class CamObject:
 		self.mem.GPIOWrite("record-led.1", 1)
 		self.recording = True
 		self.videoHasBeenReviewed = False
-
-		# while (True):
-		# 	print(self.recording)
-
-
 
 		return SUCCESS
 		
@@ -960,12 +880,6 @@ class CamObject:
 		
 		 # For now, just assume that we always captured something.
 
-		# this was commented out in camApp    
-		# if(0 == recDataLength)
-		# {
-		# 	recordingData.valid = false;
-		# 	recordingData.hasBeenSaved = true;		//We didn't record anything so there's nothing to lose by overwriting
-		# }
 
 		self.recordingData.imgset = self.imagerSettings
 		self.recordingData.valid = true
@@ -995,74 +909,40 @@ class CamObject:
 		datahigh = seqPgm.blkSize >> 20	# the other 28 bits go here
 
 		print (f"datahigh = {datahigh}, datalow = {datalow}")
-		self.mem.FPGAWrite32((SEQ_PGM_MEM_START + address * 16) + 4, datahigh)
-		self.mem.FPGAWrite32((SEQ_PGM_MEM_START + address * 16), datalow)
+		self.FPGAWrite32((SEQ_PGM_MEM_START + address * 16) + 4, datahigh)
+		self.FPGAWrite32((SEQ_PGM_MEM_START + address * 16), datalow)
 
 	def setFrameSizeWords(self, frameSize):
-		self.mem.FPGAWrite32("SEQ_FRAME_SIZE", frameSize)
+		self.FPGAWrite32("SEQ_FRAME_SIZE", frameSize)
 
 
 	def getRecording(self):
-		return self.mem.FPGARead32("SEQ_STATUS") and SEQ_STATUS_RECORDING_MASK
+		return self.FPGARead32("SEQ_STATUS") and SEQ_STATUS_RECORDING_MASK
 
 
 	def startSequencer(self):
-		reg = self.mem.FPGARead32("SEQ_CTL")
-		self.mem.FPGAWrite32("SEQ_CTL", reg or SEQ_CTL_START_REC_MASK)
-		self.mem.FPGAWrite32("SEQ_CTL", reg and (0xffffffff - SEQ_CTL_START_REC_MASK))
+		reg = self.FPGARead32("SEQ_CTL")
+		self.FPGAWrite32("SEQ_CTL", reg or SEQ_CTL_START_REC_MASK)
+		self.FPGAWrite32("SEQ_CTL", reg and (0xffffffff - SEQ_CTL_START_REC_MASK))
 
 
 	def terminateRecord(self):
-		reg = self.mem.FPGARead32("SEQ_CTL")
-		self.mem.FPGAWrite32("SEQ_CTL", reg or SEQ_CTL_STOP_REC_MASK)
-		self.mem.FPGAWrite32("SEQ_CTL", reg and (0xffffffff - SEQ_CTL_STOP_REC_MASK))
+		reg = self.FPGARead32("SEQ_CTL")
+		self.FPGAWrite32("SEQ_CTL", reg or SEQ_CTL_STOP_REC_MASK)
+		self.FPGAWrite32("SEQ_CTL", reg and (0xffffffff - SEQ_CTL_STOP_REC_MASK))
 
 	def setRecRegionStartWords(self, start):
-		self.mem.FPGAWrite32("SEQ_REC_REGION_START", start)
+		self.FPGAWrite32("SEQ_REC_REGION_START", start)
 
 
 	def setRecRegionEndWords(self, end):
-		self.mem.FPGAWrite32("SEQ_REC_REGION_END", end)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-		#TODO: finish this section instead of faking it
-
-
-		#Set the timing generator to handle the line period
-		# self.FPGAWrite16("SENSOR_LINE_PERIOD", \
-		# 	max((self.sensor.currentHRes / LUX1310_HRES_INCREMENT) + 2, (sensor.wavetableSize + 3)) - 1)
-		# time.sleep(0.01)
-		# print ("About to setSlaveExposure")
-
-		# self.sensor.setSlaveExposure(settings.exposure)
-		# self.sensor.seqOnOff(true)
-
-
-
+		self.FPGAWrite32("SEQ_REC_REGION_END", end)
 
 
 
 
 
 	def setSettings(self):
-
-
-
 		self.imagerSettings.hRes = settings.hRes
 		self.imagerSettings.stride = settings.stride
 		self.imagerSettings.vRes = settings.vRes
@@ -1078,9 +958,6 @@ class CamObject:
 		self.imagerSettings.segments = settings.segments
 
 		return
-
-
-
 
 
 	def doBlackCalSequenced(self):
@@ -1102,77 +979,6 @@ class CamObject:
 
 		self.stopRecording()
 
-
-	def recordFrames(self, numframes):
-		print (f"Starting record of {numframes} frames")
-
-
-		rec  = self.mem.FPGARead32("SEQ_STATUS") and SEQ_STATUS_RECORDING_MASK
-		print (f"rec is {rec}")
-
-
-		print ("stopRecording")
-		breakpoint()
-		# self.stopRecording()
-		self.terminateRecord()
-
-
-		oldMode = self.imagerSettings.mode
-		self.imagerSettings.mode = RECORD_MODE_FPN
-
-		rec  = self.mem.FPGARead32("SEQ_STATUS") and SEQ_STATUS_RECORDING_MASK
-		print (f"rec is {rec}")
-
-
-		retVal = self.setRecSequencerModeSingleBlock(numframes + 1, 0)
-		if SUCCESS != retVal:
-			return retVal
-
-		rec  = self.mem.FPGARead32("SEQ_STATUS") and SEQ_STATUS_RECORDING_MASK
-		print (f"rec is {rec}")
-
-
-		retVal = self.startRecording()
-		if SUCCESS != retVal:
-			return retVal
-
-		rec  = self.mem.FPGARead32("SEQ_STATUS") and SEQ_STATUS_RECORDING_MASK
-		print (f"rec is {rec}")
-
-
-		usStart = datetime.now().microsecond
-		print (f"now is {usStart} us")
-		looping = True
-		while looping:
-			rec  = self.mem.FPGARead32("SEQ_STATUS") and SEQ_STATUS_RECORDING_MASK
-			print (rec)
-			time.sleep(0.001)
-			looping = rec
-		
-		dsEnd = datetime.now().microsecond
-		print (f"now is {dsEnd} us")
-
-		elapsed = dsEnd - usStart
-		if elapsed < 0:
-			elapsed += 1000000
-
-		print (f"elapsed time = {elapsed} us")			
-			
-		retVal = self.stopRecording()			
-
-
-		if False:	#If after the timeout recording hasn't finished
-			print("Error: Record failed to stop within timeout period.")
-
-			retVal = self.stopRecording()
-			if SUCCESS != retVal:
-				print("Error: Stop Record failed")
-			return CAMERA_RECORD_FRAME_ERROR
-
-		print("Record done")
-
-		self.imagerSettings.mode = oldMode
-		return SUCCESS
 	
 	timerTime = -1
 
@@ -1192,100 +998,12 @@ class CamObject:
 		cprint (f"--> {message}: {deltaTime:.6f} seconds", "red")
 
 
-	def doBlackCalTimed(self, useLiveBuffer=False):
-		self.timer("start")
-		
-		# get the resolution from the display properties
-		xres = display.hRes
-		yres = display.vRes
-
-		if (useLiveBuffer):
-			origAddress = [seq.liveAddr[0], seq.liveAddr[1], seq.liveAddr[2]]
-			page = 0
-			seq.liveAddr[0], seq.liveAddr[1], seq.liveAddr[2] = origAddress[page], origAddress[page], origAddress[page]
-			while(rawRegisters.mem32[0x70//4] != origAddress[page]): pass
-			page ^= 1
-			img = numpy.asarray(pychronos.readframe(seq.liveAddr[page], xres, yres))
-			for i in range(15):
-				seq.liveAddr[0], seq.liveAddr[1], seq.liveAddr[2] = origAddress[page], origAddress[page], origAddress[page]
-				while(rawRegisters.mem32[0x70//4] != origAddress[page]): pass
-				page ^= 1
-				img += pychronos.readframe(seq.liveAddr[page], xres, yres)
-		else:
-			# record 16 frames
-			# read out the first one (make the numpy object)
-			# loop through the other 15 and add them to the buffer
-
-			self.recordFrames(16)		
-
-			self.timer ("recording frames")
-
-
-			#first frame
-			img = numpy.asarray(pychronos.readframe(seq.regionStart, xres, yres))
-
-			for i in range(15):
-				img += pychronos.readframe(seq.regionStart + i * seq.frameSize, xres, yres)
-			self.timer ("add images into array")
-
-
-
-		img >>= 4
-
-		self.timer ("divide by 16")
-
-
-		img = numpy.float32(img)
-		
-		self.timer ("convert to float")
-
-
-		
-		gains = numpy.float32([0.0]*xres)
-		linearity = numpy.float32([0.0]*xres)
-		for i in range(xres):
-			gains[i]     = columnGainMemory.mem16[i]
-			linearityVal = columnLinearityMemory.mem16[i]
-			if (linearityVal > 32767): linearityVal = -(65536-linearityVal)
-			linearity[i] = linearityVal
-		gains /= 4096
-		self.timer ("gains divide")
-		linearity /= (2**21)
-		self.timer ("linearity divide")
-
-		print("gains:     ", gains[0:16])
-		print("linearity: ", linearity[0:16])
-
-		processed = (linearity * (img * img)) + (gains * img)
-		
-		self.timer("processing")
-		columnOffset = numpy.average(processed, axis=0)
-		self.timer("averaging columnOffset")
-		print("columnOffsets: ", columnOffset)
-
-		fpn = numpy.uint16(numpy.int16((processed - columnOffset)))
-		self.timer("calculating FPN")
-
-		print("fpn: ", fpn)
-		pychronos.writeframe(0, fpn)
-		self.timer("writing FPN")
-
-		columnOffset = numpy.uint16(numpy.int16(-columnOffset))
-		self.timer("calculating columnOffset")
-
-		for i in range(len(columnOffset)):
-			columnOffsetMemory.mem16[i] = int(columnOffset[i])
-		self.timer("writing columnOffset")
-
-
-
 
 
 	def callBlackCal(self):
 		self.checkSeqStatus()
-# NumPy stuff
 
-		doBlackCal(False)
+		doBlackCal(self, False)
 	
 	sCount = 0
 
@@ -1300,25 +1018,6 @@ class CamObject:
 		else:
 			cprint (f"Sequencer status {msg}: 0x{seq.status:x}", "white", "on_blue" )
 
-
-
-
-
-
-'''
-	Camera::setRecSequencerModeSingleBlock
-	  Camera::setRecRegionEndWords
-		59
-	  Camera::writeSeqPgmMemory
-		60 - 61
-	  Camera::setFrameSizeWords
-		62
-	Camera::startRecording
-	  Camera::startSequencer
-		63 - 64
-	  Camera::setShutterGatingEnable
-	   65
-'''
 
 
 def runCode():

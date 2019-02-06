@@ -108,9 +108,17 @@ class SensorObject():
 		#print (mem)
 		self.SensorInit()
 
+		FPGARead32 = mem.FPGARead32
+		FPGARead16 = mem.FPGARead16
+		
+		FPGAWrite32 = mem.FPGAWrite32
+		FPGAWrite16 = mem.FPGAWrite16
+		FPGAWrite8 = mem.FPGAWrite8
+
 	# print ("class SensorObject")
 	# print (mem)
-	
+
+
 	ImageGeometry = ImageGeometryData()
 	ImageConstraints = ImageConstraintsData()
 	ImageSensor = ImageSensorData()
