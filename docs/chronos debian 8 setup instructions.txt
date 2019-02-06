@@ -56,6 +56,9 @@ EOL
     echo "-1" >> /opt/camera/serial_number
     echo "Chronos 1.4 16gb Color" >> /opt/camera/model
     
+    #Allow GUI2 to start D-Bus.
+    echo "Copy ~util/com.krontech.chronos.conf to the camera as noted in it."
+    
     #Install app dependancies.
     cd /opt/camera/chronos-gui-2
     apt install python3-pychronos
