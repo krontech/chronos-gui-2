@@ -64,7 +64,7 @@
    <property name="text">
     <string>Save User Settings</string>
    </property>
-   <property name="clickMarginRightSetter" stdset="0">
+   <property name="clickMarginRight" stdset="0">
     <enum>Button::half</enum>
    </property>
   </widget>
@@ -80,7 +80,7 @@
    <property name="text">
     <string>Load User Settings</string>
    </property>
-   <property name="clickMarginLeftSetter" stdset="0">
+   <property name="clickMarginLeft" stdset="0">
     <enum>Button::half</enum>
    </property>
   </widget>
@@ -132,7 +132,7 @@
    <property name="text">
     <string>Safely Remove</string>
    </property>
-   <property name="clickMarginLeftSetter" stdset="0">
+   <property name="clickMarginLeft" stdset="0">
     <enum>Button::none</enum>
    </property>
   </widget>

@@ -409,9 +409,9 @@ class Main(QWidget):
 	
 	def copyButton(_, *, src, dest):
 		dest.setText(src.text())
-		dest.clickMarginTopSetter = src.clickMarginTopSetter
-		dest.clickMarginLeftSetter = src.clickMarginLeftSetter
-		dest.clickMarginBottomSetter = src.clickMarginBottomSetter
-		dest.clickMarginRightSetter = src.clickMarginRightSetter
+		dest.clickMarginTop = src.clickMarginTop
+		dest.clickMarginLeft = src.clickMarginLeft
+		dest.clickMarginBottom = src.clickMarginBottom
+		dest.clickMarginRight = src.clickMarginRight
 		dest.setGeometry(src.geometry())
 		dest.customStyleSheet = src.customStyleSheet

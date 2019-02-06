@@ -66,7 +66,7 @@ EOL
     python3 src/main.py
     
     #QoL
-    pip3 install pdbpp watchdog typing #watchdog provides watchmedo, used for automatic deployment.
+    pip3 install pdbpp watchdog typing future-fstrings #watchdog provides watchmedo, used for automatic deployment.
     cat >> ~/.pdbrc <<'EOL'
 #Refresh the terminal - something disables keyboard echoing when running watch_guest.sh.
 import os

@@ -48,7 +48,7 @@
      <height>81</height>
     </rect>
    </property>
-   <property name="clickMarginRightSetter" stdset="0">
+   <property name="clickMarginRight" stdset="0">
     <enum>ComboBox::half</enum>
    </property>
   </widget>
@@ -209,7 +209,7 @@
      <height>81</height>
     </rect>
    </property>
-   <property name="clickMarginLeftSetter" stdset="0">
+   <property name="clickMarginLeft" stdset="0">
     <enum>ComboBox::none</enum>
    </property>
   </widget>
@@ -376,7 +376,7 @@ After Save Complete</string>
    <property name="text">
     <string>Stamp Data</string>
    </property>
-   <property name="clickMarginRightSetter" stdset="0">
+   <property name="clickMarginRight" stdset="0">
     <enum>Button::half</enum>
    </property>
   </widget>
@@ -392,7 +392,7 @@ After Save Complete</string>
    <property name="text">
     <string>Done</string>
    </property>
-   <property name="clickMarginLeftSetter" stdset="0">
+   <property name="clickMarginLeft" stdset="0">
     <enum>Button::half</enum>
    </property>
   </widget>
