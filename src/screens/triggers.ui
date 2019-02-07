@@ -233,7 +233,7 @@
       <string/>
      </property>
      <property name="pixmap">
-      <pixmap>../../assets/images/bnc-connector.svg</pixmap>
+      <pixmap>../../assets/images/bnc-connector.png</pixmap>
      </property>
     </widget>
     <zorder>backdrop_2</zorder>
@@ -407,7 +407,7 @@
       <string/>
      </property>
      <property name="pixmap">
-      <pixmap>../../assets/images/green-connector.svg</pixmap>
+      <pixmap>../../assets/images/green-connector.png</pixmap>
      </property>
     </widget>
     <widget class="ComboBox" name="uiTrigger2Action">
@@ -597,7 +597,7 @@
       <string/>
      </property>
      <property name="pixmap">
-      <pixmap>../../assets/images/green-connector-bottom.svg</pixmap>
+      <pixmap>../../assets/images/green-connector-bottom.png</pixmap>
      </property>
      <property name="alignment">
       <set>Qt::AlignCenter</set>
@@ -763,7 +763,7 @@
       <string/>
      </property>
      <property name="pixmap">
-      <pixmap>../../assets/images/motion.svg</pixmap>
+      <pixmap>../../assets/images/motion.png</pixmap>
      </property>
     </widget>
     <widget class="CheckBox" name="uiMotionTriggerInvert">

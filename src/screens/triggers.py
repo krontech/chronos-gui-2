@@ -465,10 +465,10 @@ class Triggers(QtWidgets.QDialog):
 			painter.setOpacity(strength(triggerIsActive))
 			
 			icon = QImage({
-				'trig1': 'assets/images/bnc-connector.svg',
-				'trig2': 'assets/images/green-connector.svg',
-				'trig3': 'assets/images/green-connector-bottom.svg',
-				'motion': 'assets/images/motion.svg',
+				'trig1': 'assets/images/bnc-connector.png',
+				'trig2': 'assets/images/green-connector.png',
+				'trig3': 'assets/images/green-connector-bottom.png',
+				'motion': 'assets/images/motion.png',
 			}[triggerId])
 			if triggerId == 'motion':
 				ioText = '{0:.1f}%'.format(triggerState["level"]*100)
