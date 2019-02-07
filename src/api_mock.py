@@ -158,24 +158,43 @@ _camState = control('get', control('available_keys'))
 if(not _camState):
 	raise Exception("Cache failed to populate. This indicates the get call is not working.")
 
-# Keep observe()'s state up-to-date.
-# TODO DDR 2018-06-22: This is broken currently, as connect() never returns here.
-# We're going to ignore the fact that this doesn't work for now, as it will only matter if we reinitialize something in the camApp from this cache. 😒
-__wrappers = [] #Keep a reference to the wrapper objects around. Might be needed so they don't get GC'd.
-for key in _camState.keys():
-	class Wrapper(QObject):
-		def __init__(self):
-			super(Wrapper, self).__init__()
-			
-			#TODO DDR: Fix this. #qMFOfWC3 #backport-from-5.11
-			#QDBusConnection.systemBus().connect('com.krontech.chronos.control.mock', '/', '',
-			#	key, self.updateKey)
+class APIValues(QObject):
+	"""Wrapper class for subscribing to API values in the chronos API."""
+	
+	def __init__(self):
+		super(APIValues, self).__init__()
 		
-		@pyqtSlot('QDBusMessage')
-		def updateKey(self, msg):
-			_camState[key] = msg.arguments()[0]
-			
-	__wrappers += [Wrapper()]
+		QDBusConnection.systemBus().registerObject('/', self) #The .connect call freezes if we don't do this. 
+		
+	
+		self._callbacks = {}
+		
+		for key in _camState.keys():
+			print('registered', key)
+			QDBusConnection.systemBus().connect('com.krontech.chronos.control.mock', '/com/krontech/chronos/control/mock', '',
+				key, self.__newKeyValue)
+			self._callbacks[key] = []
+	
+	def observe(self, key, callback):
+		"""Add a function to get called when a value is updated."""
+		self._callbacks[key] += [callback]
+	
+	def unobserve(self, key, callback):
+		"""Stop a function from getting called when a value is updated."""
+		raise Exception('unimplimented')
+	
+	@pyqtSlot('QDBusMessage')
+	def __newKeyValue(self, msg):
+		"""Update _camState and invoke any  registered observers."""
+		_camState[msg.member()] = msg.arguments()[0]
+		for callback in self._callbacks[msg.member()]:
+			callback(msg.arguments()[0])
+	
+	def get(self, key):
+		return _camState[key]
+
+apiValues = APIValues()
+
 
 
 class CallbackNotSilenced(Exception):
@@ -220,7 +239,7 @@ def observe(name: str, callback: Callable[[Any], None], saftyCheckForSilencedWid
 			callback: Function called when the state updates and upon subscription.
 				Called with one parameter, the new value. Called when registered
 				and when the value updates.
-			isNonUpdatingCallback=False: Indicates no API requests will be made from
+			saftyCheckForSilencedWidgets=True: Indicates no API requests will be made from
 				this function. This is usually false, because most callbacks *do*
 				cause updates to the API, and it's really hard to detect this. A
 				silenced callback does not update anything, since it should silence
@@ -245,10 +264,8 @@ def observe(name: str, callback: Callable[[Any], None], saftyCheckForSilencedWid
 	if not hasattr(callback, '_isSilencedCallback') and saftyCheckForSilencedWidgets:
 		raise CallbackNotSilenced(f"{callback} must consider silencing. Decorate with @silenceCallbacks(callback_name, …).")
 	
-	callback(_camState[name])
-	#TODO DDR: Fix this. #qMFOfWC3 #backport-from-5.11
-	#QDBusConnection.systemBus().connect('com.krontech.chronos.control.mock', '/com/krontech/chronos/control/mock', '',
-	#	name, callback)
+	callback(apiValues.get(name))
+	apiValues.observe(name, callback)
 
 
 def observe_future_only(name: str, callback: Callable[[Any], None], saftyCheckForSilencedWidgets=True) -> None:
@@ -260,9 +277,7 @@ def observe_future_only(name: str, callback: Callable[[Any], None], saftyCheckFo
 	if not hasattr(callback, '_isSilencedCallback') and saftyCheckForSilencedWidgets:
 		raise CallbackNotSilenced(f"{callback} must consider silencing. Decorate with @silenceCallbacks(callback_name, …).")
 	
-	#TODO DDR: Fix this. #qMFOfWC3 #backport-from-5.11
-	#QDBusConnection.systemBus().connect('com.krontech.chronos.control.mock', '/com/krontech/chronos/control/mock', '',
-	#	name, callback)
+	apiValues.observe(name, callback)
 
 
 
@@ -288,10 +303,6 @@ def silenceCallbacks(*elements):
 		return silencedCallback
 	return silenceCallbacksOf
 
-
-
-# Only export the functions we will use. Keep it simple. (This can be complicated later as the need arises.)
-__all__ = ['control', 'video', 'observe'] #This doesn't work. Why?
 
 
 #Launch the API if not imported as a library.
