@@ -19,7 +19,7 @@ killall camApp --quiet || true
     sed -e 's/jessie/jessie-backports/g' /etc/apt/sources.list.d/multistrap-debian.list > /etc/apt/sources.list.d/backports-debian.list
     
     apt update && apt-get upgrade --yes
-    apt install ntpdate ca-certificates cowsay vim rsync python3-pyqt5 python3-pyqt5.qtsvg curl --yes
+    apt install ntpdate ca-certificates cowsay vim rsync python3-pyqt5 python3-pyqt5.qtsvg curl python3-numpy python3-termcolor --yes
     ntpdate -s time.nist.gov
 
 # install the back-of-camera interface & dev environment
@@ -69,7 +69,9 @@ EOL
     python3 src/main.py
     
     #QoL
-    pip3 install pdbpp watchdog typing future-fstrings #watchdog provides watchmedo, used for automatic deployment.
+    pip3 install pdbpp watchdog typing future-fstrings python-periphery #watchdog provides watchmedo, used for automatic deployment.
+    pip3 install --upgrade setuptools #required for smbus2
+    pip3 install smbus2
     cat >> ~/.pdbrc <<'EOL'
 #Refresh the terminal - something disables keyboard echoing when running watch_guest.sh.
 import os
