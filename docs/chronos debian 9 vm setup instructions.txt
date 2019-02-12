@@ -1,25 +1,67 @@
-#!/keyboard/user
+#!/bin/bash
 set -euxo pipefail #enable "safe mode"
 
-#Installing GUI2 on a New Camera or Build Server:
-#   To run this script, SSH onto your camera. Then, block by block,
-#   read this script. Follow any instructions in the block, and run
-#   the block by pasting it into your SSH session. 
-
-killall camApp --quiet || true
+#Installing Mock UI and Web Server in a VM:
+#   To run this script, SSH onto your virtual machine. Then run this
+#   script, taking notes of any comments.
+#
+#   To SSH into your VM, you may need to first make it.
+#       - Grab the debian 9 netinst download iso.
+#       - Set up a new VirtualBox VM, set for linux → debian.
+#           - Before starting, set up port-forwarding in networking.
+#               - name: ssh
+#               - protocol: TCP
+#               - host IP: 127.0.0.1
+#               - host port: 9608 (or whatever)
+#               - guest IP: 10.0.2.15 (shown by `ip addr show` later)
+#               - guest port: 22
+#           - Select the netinst image when prompted for boot media.
+#       - Proceed through the text-based installer.
+#           - When prompted what components you want, select only the
+#             core components and SSH. They should be the bottom two.
+#       - Take a snapshot when that's done.
+#       - Now, log in as root at the vm prompt and run
+#           > vi /etc/ssh/sshd_config
+#           - change permit root password login or whatever to yes.
+#       - Use ssh-copy-id root@192.168.0.1:9608 (or ssh config alias)
+#       - Take another snapshot. (Generally, just do this often, OK?)
 
 # install deps
-    #Add backports. (Not needed for base debian images released after January 2019.)
-    sed -e 's/jessie/jessie-backports/g' /etc/apt/sources.list.d/multistrap-debian.list > /etc/apt/sources.list.d/backports-debian.list
-    
     apt update && apt-get upgrade --yes
     apt install ntpdate ca-certificates cowsay vim rsync python3-pyqt5 python3-pyqt5.qtsvg curl python3-numpy python3-termcolor --yes
-    ntpdate -s time.nist.gov
+    
+    #Python 3.4 doesn't come with the system. We'll make our own, because I can't figure out which PPA I need.
+    
+    #First, we need to get a compatible version of OpenSSL.
+    cd ~
+    wget https://www.openssl.org/source/openssl-1.0.2q.tar.gz
+    tar xvf openssl-1.0.2q.tar.gz
+    cd openssl-1.0.2q
+    ./config #to /usr/local/openssl
+    make -j$(nproc)
+    make install
+    
+    cd ~
+    wget https://www.python.org/ftp/python/3.4.9/Python-3.4.9.tgz
+    if [ `md5sum Python-3.4.9.tgz | awk '{print $1;}'` != "c706902881ef95e27e59f13fabbcdcac" ]; then
+        echo "INSECURE DOWNLOAD CHECKSUM MISMATCH - SUSPECT TAMPERING"
+        mv Python-3.4.9.tgz Python-3.4.9.tgz_INCORRECT_CHECKSUM
+        exit
+    fi
+    tar zxvf Python-3.4.9.tgz
+    rm Python-3.4.9.tgz
+    cd ~/Python-3.4.9
+    apt-get install make build-essential libssl-dev zlib1g-dev libbz2-dev libsqlite3-dev --yes #try to install openssl for pip3
+    mkdir buildroot -p
+    ./configure --prefix=$PWD/buildroot --enable-ipv6
+    make -j$(nproc)
+    make install
+    
 
 # install the back-of-camera interface & dev environment
-    #Copy over application.
-    mkdir /opt/camera
-    echo "Copy chronos-gui-2 over to /opt/camera/chronos-gui-2. You can use util/watch-computer.sh for this, or do it manually - in my case, I copy-pasted the folder chronos-gui-2 folder from `git checkout && xdg-open .` to fish://root@192.168.12.1 in my file manager, Dolphin. Your setup will probably be different, but as long as you have /opt/camera/chronos-gui-2/ with the .py files in it you should be good."
+    mkdir ~/virtual-camera -p
+    ~/Python-3.4.9/buildroot/bin/python3.4 -m venv ~/virtual-camera
+    read -sp "Copy chronos-gui-2 over to /opt/camera/chronos-gui-2. Press enter when done. (You can use util/watch-vm-host.sh for this, or do it manually - in my case, I copy-pasted the folder chronos-gui-2 folder from `git checkout && xdg-open .` to fish://root@192.168.0.1:9608 in my file manager, Dolphin. Your setup will probably be different, but as long as you have ~/chronos-gui-2/ with the .py files and a src/ folder in it you should be good.)"
     
     #Set up environment.
     cat >> ~/.bashrc <<'EOL'
@@ -33,32 +75,23 @@ export QT_QPA_GENERIC_PLUGINS=tslib:/dev/input/event0
 export PYTHONIOENCODING=utf-8
 EOL
     
-    #Set up the Video API, since it's not mocked. (ed note: this doesn't work, so it's half-heartedly mocked now)
-    #cd ~
-    #wget https://github.com/krontech/chronos-cli/archive/master.zip
-    #python3 <<< "from zipfile import PyZipFile; PyZipFile('chronos-cli-master.zip').extractall()"
-    #mv chronos-cli-master chronos-cli
-    #cd chronos-cli
-    #chmod +x bootstrap src/mock/gen-frames.sh
-    #./bootstrap
-    #./configure
-    #make -j$(nproc)
-    #cd src
-    #./cam-mock &
-    
     #Create a few "well-known" files.
-    echo "-1" >> /opt/camera/serial_number
-    echo "Chronos 1.4 16gb Color" >> /opt/camera/model
+    mkdir /opt/camera
+    echo "-1" > /opt/camera/serial_number
+    echo "Chronos Mock" > /opt/camera/model
     
     #Allow GUI2 to start D-Bus.
-    echo "Copy ~util/com.krontech.chronos.conf to the camera as noted in it."
+    read -sp "Copy ~util/com.krontech.chronos.conf to the camera as noted in it, then press enter."
+    
     
     #Install app dependancies.
-    cd /opt/camera/chronos-gui-2
-    apt install python3-pychronos
-    pip3 install typing future-fstrings python-periphery
-    pip3 install --upgrade setuptools #required for smbus2
-    pip3 install smbus2
+    #dne for i386: apt install python3-pychronos
+    cd ~/virtual-camera
+    source bin/activate #turn venv on
+    
+    python3 -m pip install typing future-fstrings python-periphery
+    python3 -m pip install --upgrade setuptools #required for smbus2
+    python3 -m pip install smbus2
     
     #Start the app.
     cd /opt/camera/chronos-gui-2 # Wait for the copy to this folder, started earlier, to finish.
