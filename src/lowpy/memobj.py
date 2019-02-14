@@ -123,7 +123,7 @@ class MemObject:
 			FPGAreg = FPGA_dict[addr]
 		else:
 			FPGAreg = addr
-		# cprint (f'   [{self.writesCount}]- - - FPGAWrite8("{addr}":0x{FPGAreg:x}, 0x{data:x})', self.FPGAcol)
+		cprint (f'   [{self.writesCount}]- - - FPGAWrite8("{addr}":0x{FPGAreg:x}, 0x{data:x})', self.FPGAcol)
 		self.fpga.mem8[FPGAreg] = data & 0xff
 
 	def FPGAWrite16(self, addr, data):
@@ -134,7 +134,7 @@ class MemObject:
 			FPGAreg = FPGA_dict[addr]
 		else:
 			FPGAreg = addr
-		# cprint (f'   [{self.writesCount}]----- FPGAWrite16("{addr}":0x{FPGAreg:x}, 0x{data:x})', self.FPGAcol)
+		cprint (f'   ----- FPGAWrite16("{addr}":0x{FPGAreg:x}, 0x{data:x})', self.FPGAcol)
 		self.fpga.mem16[FPGAreg // 2] = data & 0xffff
 
 	def FPGAWrite32(self, addr, data):
@@ -145,6 +145,7 @@ class MemObject:
 			FPGAreg = FPGA_dict[addr]
 		else:
 			FPGAreg = addr
+		cprint (f'   ----- FPGAWrite32("{addr}":0x{FPGAreg:x}, 0x{data:x})', self.FPGAcol)
 		self.fpga.mem32[FPGAreg // 4] = data
 
 # These are non-blockable FPGA writes:
@@ -192,25 +193,25 @@ class MemObject:
 			FPGAreg = addr
 		return self.fpga.mem16[FPGAreg // 2]
 
-		if self.FPGActypes:
-			ret = self.FPGAwptr[FPGAreg // 2]
-		else:
-			ret = self.fpga_mmio.read16(FPGAreg)
-		return ret
+		# if self.FPGActypes:
+		# 	ret = self.FPGAwptr[FPGAreg // 2]
+		# else:
+		# 	ret = self.fpga_mmio.read16(FPGAreg)
+		# return ret
 
 	def FPGARead32(self, addr):
 		if type(addr) is str:
 			FPGAreg = FPGA_dict[addr]
 		else:
 			FPGAreg = addr
-		return self.fpga.mem16[FPGAreg // 4]
+		return self.fpga.mem32[FPGAreg // 4]
 
-		FPGAreg = FPGA_dict[addr] * 1
-		if self.FPGActypes:
-			ret = self.FPGAlptr[FPGAreg // 4]
-		else:
-			ret = self.fpga_mmio.read32(FPGAreg)
-		return ret
+		# FPGAreg = FPGA_dict[addr] * 1
+		# if self.FPGActypes:
+		# 	ret = self.FPGAlptr[FPGAreg // 4]
+		# else:
+		# 	ret = self.fpga_mmio.read32(FPGAreg)
+		# return ret
 
 
 

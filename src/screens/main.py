@@ -5,8 +5,8 @@ from PyQt5.QtCore import pyqtSlot, QPropertyAnimation, QPoint
 from PyQt5.QtWidgets import QWidget, QApplication
 
 from debugger import *; dbg
-import api_mock as api
-from api_mock import silenceCallbacks
+import api as api
+from api import silenceCallbacks
 import settings
 from widgets.button import Button
 
