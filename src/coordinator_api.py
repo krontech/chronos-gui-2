@@ -123,13 +123,13 @@ pendingCallbacks = set()
 
 def changeRecordingResolution(state):
 	if state.currentCameraState == 'preview':
-		print(f'Mock: changing recording resolution to xywh {previewHOffset} {previewVOffset} {previewHRes} {previewVRes}.')
+		print(f"Mock: changing recording resolution to xywh {state.previewHOffset} {state.previewVOffset} {state.previewHRes} {state.previewVRes}.")
 	else:
-		print(f'Mock: changing recording resolution to xywh {recordingHOffset} {recordingVOffset} {recordingHRes} {recordingVRes}.')
+		print(f"Mock: changing recording resolution to xywh {state.recordingHOffset} {state.recordingVOffset} {state.recordingHRes} {state.recordingVRes}.")
 
 
 def notifyExposureChange(state):
-	print('TODO: Notify exposure change.')
+	print('Mock: Exposure change callback.')
 	#self.emitControlSignal('maxExposureNs', 7e8) # Example.
 	#self.emitControlSignal('minExposureNs', 3e2)
 
@@ -796,7 +796,7 @@ class ControlAPI(QObject):
 		
 		#Call each callback set. Good for multi-arg tasks such as recording resolution and trigger state.
 		for cb in pendingCallbacks:
-			cb(_state)
+			cb(state)
 		pendingCallbacks.clear()
 	
 	

@@ -19,6 +19,7 @@ class RecordingSettings(QtWidgets.QDialog):
 	def __init__(self, window):
 		super().__init__()
 		uic.loadUi("src/screens/recording_settings.ui", self)
+		self.window_ = window
 		
 		# Panel init.
 		self.move(0, 0)
@@ -70,8 +71,9 @@ class RecordingSettings(QtWidgets.QDialog):
 		#Presets
 		
 		# Button binding.
-		self.uiDone.clicked.connect(window.back)
 		self.uiCenterRecording.clicked.connect(self.centerRecording)
+		
+		self.uiDone.clicked.connect(self.doneWithRecSettingsWindow)
 		
 		api.observe('sensorMinExposureNs', self.setMinExposure)
 		api.observe('sensorMaxExposureNs', self.setMaxExposure)
@@ -282,3 +284,14 @@ class RecordingSettings(QtWidgets.QDialog):
 	@silenceCallbacks('uiExposure')
 	def updateExposure(self, ns):
 		self.uiExposure.setValue(ns)
+	
+	
+	def doneWithRecSettingsWindow(self):
+		self.window_.back()
+		api.set({
+			'recordingHRes': self.uiHRes.value(),
+			'recordingVRes': self.uiVRes.value(),
+			'recordingHOffset': self.uiHOffset.value(),
+			'recordingVOffset': self.uiVOffset.value(),
+			'recordingExposureNs': int(self.uiFrameDuration.value() * 1000)
+		})
