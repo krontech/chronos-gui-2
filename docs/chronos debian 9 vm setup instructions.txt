@@ -38,7 +38,7 @@ set -euxo pipefail #enable "safe mode"
 
 #enable framebuffers (camera screen res is 800*480
 apt install v86d --yes
-modprobe uvesafb
+modprobe uvesafb #modprobe or insmod to pass resolution to module. Find list of kernel modules loadable in FS, *fb*.ko, 
 cat >> /etc/default/grub <<'EOS'
 
 #Enable framebuffer in the style of the camera screen.
