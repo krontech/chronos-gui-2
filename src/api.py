@@ -19,41 +19,15 @@ from PyQt5.QtCore import pyqtSlot, QObject
 from PyQt5.QtDBus import QDBusConnection, QDBusInterface, QDBusReply
 from typing import Callable, Any
 
-from control_api import ControlAPI
-from video_api_mock import VideoAPIMock as VideoAPI
+import control_api #importing starts the service
+import video_api_mock
+
+
 
 # Set up d-bus interface. Connect to mock system buses. Check everything's working.
 if not QDBusConnection.systemBus().isConnected():
 	print("Error: Can not connect to D-Bus. Is D-Bus itself running?", file=sys.stderr)
 	raise Exception("D-Bus Setup Error")
-
-
-
-
-
-if not QDBusConnection.systemBus().registerService('com.krontech.chronos.control'):
-	sys.stderr.write(f"Could not register control service: {QDBusConnection.systemBus().lastError().message() or '(no message)'}\n")
-	raise Exception("D-Bus Setup Error")
-
-controlAPI = ControlAPI() #This absolutely, positively can't be inlined or it throws error "No such object path ...". Possibly, this is because a live reference must be kept so GC doesn't eat it?
-QDBusConnection.systemBus().registerObject('/com/krontech/chronos/control', controlAPI, QDBusConnection.ExportAllSlots)
-
-if not QDBusConnection.systemBus().registerService('com.krontech.chronos.video.mock'):
-	sys.stderr.write(f"Could not register video service: {QDBusConnection.systemBus().lastError().message() or '(no message)'}\n")
-	raise Exception("D-Bus Setup Error")
-
-videoAPI = VideoAPI() #This absolutely, positively can't be inlined or it throws error "No such object path ...".
-QDBusConnection.systemBus().registerObject('/com/krontech/chronos/video/mock', videoAPI, QDBusConnection.ExportAllSlots)
-
-
-
-
-
-################################
-#    D-Bus Interface Client    #
-################################
-
-
 
 cameraControlAPI = QDBusInterface(
 	'com.krontech.chronos.control', #Service
@@ -61,8 +35,8 @@ cameraControlAPI = QDBusInterface(
 	'', #Interface
 	QDBusConnection.systemBus() )
 cameraVideoAPI = QDBusInterface(
-	'com.krontech.chronos.video.mock', #Service
-	'/com/krontech/chronos/video/mock', #Path
+	'com.krontech.chronos.video_mock', #Service
+	'/com/krontech/chronos/video_mock', #Path
 	'', #Interface
 	QDBusConnection.systemBus() )
 
@@ -83,6 +57,7 @@ if not cameraVideoAPI.isValid():
 		cameraVideoAPI.lastError().message(),
 	), file=sys.stderr)
 	raise Exception("D-Bus Setup Error")
+
 
 
 class DBusException(Exception):
@@ -158,13 +133,11 @@ class APIValues(QObject):
 	def __init__(self):
 		super(APIValues, self).__init__()
 		
-		QDBusConnection.systemBus().registerObject('/', self) #The .connect call freezes if we don't do this. 
+		QDBusConnection.systemBus().registerObject('/com/krontech/chronos/control_hack', self) #The .connect call freezes if we don't do this, or if we do this twice.
 		
-	
 		self._callbacks = {}
 		
 		for key in _camState.keys():
-			print('registered', key)
 			QDBusConnection.systemBus().connect('com.krontech.chronos.control', '/com/krontech/chronos/control', '',
 				key, self.__newKeyValue)
 			self._callbacks[key] = []

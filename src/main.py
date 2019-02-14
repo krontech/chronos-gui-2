@@ -460,7 +460,7 @@ if __name__ == '__main__':
 	app.focusChanged.connect(focusChanged)
 
 	
-	forceHardwareInstantiation = True #This should be an env var.
+	forceHardwareInstantiation = False #This should be an env var.
 	if forceHardwareInstantiation:
 		hardware = Hardware()
 		connectHardwareEvents(app, hardware)

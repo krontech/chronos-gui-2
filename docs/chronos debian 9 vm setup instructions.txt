@@ -1,0 +1,133 @@
+#!/bin/bash
+set -euxo pipefail #enable "safe mode"
+
+#Installing Mock UI and Web Server in a VM:
+#   To run this script, SSH onto your virtual machine. Then run this
+#   script, taking notes of any comments.
+#
+#   To SSH into your VM, you may need to first make it.
+#       - Grab the debian 9 netinst download iso.
+#       - Set up a new VirtualBox VM, chronos-vm, for a debian os.
+#           - Before starting, set up port-forwarding in networking.
+#               - name: ssh
+#               - protocol: TCP
+#               - host IP: 127.0.0.1
+#               - host port: 9608 (or whatever)
+#               - guest IP: 10.0.2.15 (shown by `ip addr show` later)
+#               - guest port: 22
+#           - run the following command to configure a camera-sized framebuffer
+#               > VBoxManage setextradata chronos-vm ChronosScreen "800x480x24"
+#           - Select the netinst image when prompted for boot media.
+#       - Proceed through the text-based installer.
+#           - When prompted what components you want, select only the
+#             core components and SSH. They should be the bottom two.
+#       - Take a snapshot when that's done.
+#       - Now, log in as root at the vm prompt and run
+#           > vi /etc/ssh/sshd_config
+#           - change permit root password login or whatever to yes.
+#       - Use ssh-copy-id root@192.168.0.1:9608 (or ssh config alias)
+#       - Take another snapshot. (Generally, just do this often, OK?)
+
+
+#install guest additions
+#apt-get install -y dkms build-essential linux-headers-$(uname -r)
+#mount /dev/cdrom /media/cdrom
+#cd /media/cdrom
+#./VBoxLinuxAdditions.run
+
+
+#enable framebuffers (camera screen res is 800*480
+apt install v86d --yes
+modprobe uvesafb #modprobe or insmod to pass resolution to module. Find list of kernel modules loadable in FS, *fb*.ko, 
+cat >> /etc/default/grub <<'EOS'
+
+#Enable framebuffer in the style of the camera screen.
+GRUB_GFXMODE=800x480
+GRUB_GFXPAYLOAD_LINUX=keep
+GRUB_CMDLINE_LINUX="vga = 864" #special first mode of virtualbox
+EOS
+update-grub
+read -sp "Press enter to reboot your VM, to enable the framebuffer. Pick up this script on the next line when you get back, please."
+shutdown -r now
+
+#at some point:
+#fbset -xres 800 -yres 480 -vxres 800 -vyres 1440
+
+# install deps
+apt update && apt-get upgrade --yes
+apt install rsync --yes
+apt install ntpdate ca-certificates cowsay vim python3-pyqt5 python3-pyqt5.qtsvg curl python3-numpy python3-termcolor python3-pip fbset x11-xserver-utils --yes &
+
+# install the back-of-camera interface & dev environment
+read -sp "Copy chronos-gui-2 over to /opt/camera/chronos-gui-2. Press enter when done. (You can use util/watch-vm-host.sh for this, or do it manually - in my case, I copy-pasted the folder chronos-gui-2 folder from `git checkout && xdg-open .` to fish://root@192.168.0.1:9608 in my file manager, Dolphin. Your setup will probably be different, but as long as you have ~/chronos-gui-2/ with the .py files and a src/ folder in it you should be good.)"
+
+#Allow GUI2 to start D-Bus.
+read -sp "Copy ~util/com.krontech.chronos.conf to the camera as noted in it, then press enter."
+
+
+
+#Set up environment.
+cat >> ~/.bashrc <<'EOL'
+
+#env vars required by QT to run, display, and be touched:
+export QSG_RENDER_LOOP=basic
+export QT_QPA_PLATFORM=linuxfb:fb=/dev/fb0
+export QT_QPA_GENERIC_PLUGINS=tslib:/dev/input/event0
+
+#Make Python 3.4 not choke on unicode characters.
+export PYTHONIOENCODING=utf-8
+EOL
+    
+#Create a few "well-known" files.
+mkdir /opt/camera
+echo "-1" > /opt/camera/serial_number
+echo "Chronos Mock" > /opt/camera/model
+
+wait #for apt install to finish
+
+#Install app dependancies.
+#dne for i386: apt install python3-pychronos
+python3 -m pip install typing future-fstrings python-periphery
+python3 -m pip install --upgrade setuptools #required for smbus2?
+python3 -m pip install smbus2
+
+#useful deps, not strictly required to run
+python3 -m pip install pdbpp watchdog #watchdog provides watchmedo, used for automatic deployment.
+
+#Start the app.
+cd ~/chronos-gui
+util/watch-camera.sh
+
+#QoL
+cat >> ~/.pdbrc <<'EOL'
+#Refresh the terminal - something disables keyboard echoing when running watch_guest.sh.
+import os
+os.system("stty sane")
+EOL
+
+#Bonus Content - this is NOT required
+
+#ponysay, a cowsay replacement
+cd ~
+wget http://www.vcheng.org/ponysay/ponysay_3.0.2-1_all.deb
+dpkg -i ponysay_3.0.2-1_all.deb
+rm ponysay_3.0.2-1_all.deb
+cat >> /etc/profile.d/horse.sh <<'EOS'
+ponysay ++pony aquarius ++pony archlinux ++pony aries ++pony artemis ++pony aurora ++pony barbara ++pony bubbleberry ++pony butterscotch ++pony buttonmom ++pony calamity ++pony cancer ++pony capricorn ++pony childrenofthenight ++pony chrome ++pony coffeetalk ++pony coffeewalk ++pony danger ++pony doctornohat ++pony donutpony ++pony drhooves1 ++pony drhooves10 ++pony drhooves11 ++pony drhooves8 ++pony drhooves9 ++pony drhoovesdiscorded ++pony drizzle ++pony duskshine ++pony elusive ++pony faust ++pony firefox ++pony fluffle ++pony freckles ++pony fyrefly ++pony fyreflyready ++pony gemini ++pony gleamingshield ++pony gnupony ++pony hestelle ++pony internetexplorer ++pony johndelancie ++pony jristz ++pony kingsley ++pony kingsleybanner ++pony leo ++pony libra ++pony littlepip ++pony maandree ++pony milky ++pony milkylay ++pony molestia ++pony nyx ++pony nyxdisguised ++pony opera ++pony orion ++pony oscura ++pony paradise ++pony pinkaminacupcake ++pony pisces ++pony pizzapony ++pony posey ++pony princeartemis ++pony rainbowblitz ++pony reddit ++pony robodash ++pony sagittarius ++pony scorpio ++pony seabreeze ++pony sealyra ++pony slanderpony ++pony snowdrop ++pony snowdrop-crew ++pony solaris ++pony sparkler ++pony starstruck ++pony surprise ++pony sweetiebot ++pony taurus ++pony tempo ++pony ticket ++pony twibrain ++pony virgo ++pony wiggles ++pony woona ++pony woonanohat << EOQ
+Hello. Welcome to camera #$(cat /opt/camera/serial_number)! ($(cat /opt/camera/model))
+For help and documentation, see http://forum.krontech.ca/ and https://github.com/krontech.
+EOQ
+EOS
+    
+#Faster SSH:
+#If present, edit /etc/profile.d/horse.sh to use /usr/games/cowsay instead
+#   of ponysay. Ponysay takes a *moment* to run. 😭
+
+#Static IP
+#Edit the eth0 section in /etc/network/interfaces on the camera like:
+#   auto eth0
+#   iface eth0 inet static
+#           address 192.168.1.214
+#           netmask 255.255.255.0
+#           gateway 192.168.1.1
+#Where "214" is your static IP address choice.

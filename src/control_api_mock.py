@@ -20,7 +20,6 @@
 	Any comment or call in this file should be considered a proposal. It can all be
 	changed if need be.
 """
-
 from __future__ import unicode_literals
 
 import sys
@@ -134,7 +133,10 @@ pendingCallbacks = []
 
 
 def changeRecordingResolution(state):
-	print(f'Mock: changing recording resolution to xywh {recordingHOffset} {recordingVOffset} {recordingHRes} {recordingVRes}.')
+	if state.currentCameraState == 'preview':
+		print(f'Mock: changing recording resolution to xywh {previewHOffset} {previewVOffset} {previewHRes} {previewVRes}.')
+	else:
+		print(f'Mock: changing recording resolution to xywh {recordingHOffset} {recordingVOffset} {recordingHRes} {recordingVRes}.')
 
 
 def notifyExposureChange(state):
@@ -295,6 +297,70 @@ class State():
 	
 	recordingAnalogGainMultiplier = 2 #doesn't rebuild video pipeline, only takes gain multiplier
 	
+	
+	_previewHRes = 200 #rebuilds video pipeline
+	
+	@property
+	def previewHRes(self): #rebuilds video pipeline
+		return self._previewHRes
+	
+	@previewHRes.setter
+	def previewHRes(self, value):
+		global pendingCallbacks
+		self._previewHRes = value
+		pendingCallbacks += [changeRecordingResolution, notifyExposureChange]
+		
+	@property
+	def previewHStep(self): #constant, we only have the one sensor
+		return 16
+	
+	
+	_previewVRes = 300 
+	
+	@property
+	def previewVRes(self): 
+		return self._previewVRes
+	
+	@previewVRes.setter
+	def previewVRes(self, value):
+		global pendingCallbacks
+		self._previewVRes = value
+		pendingCallbacks += [changeRecordingResolution, notifyExposureChange]
+	
+	@property
+	def previewVStep(self): #constant, we only have the one sensor
+		return 2
+	
+	
+	_previewHOffset = 800 #rebuilds video pipeline
+	
+	@property
+	def previewHOffset(self): #rebuilds video pipeline
+		return self._previewHOffset
+	
+	@previewHOffset.setter
+	def previewHOffset(self, value):
+		global pendingCallbacks
+		self._previewHOffset = value
+		pendingCallbacks += [changeRecordingResolution]
+	
+	
+	_previewVOffset = 480
+	
+	@property
+	def previewVOffset(self):
+		return self._previewVOffset
+	
+	@previewVOffset.setter
+	def previewVOffset(self, value):
+		global pendingCallbacks
+		self._previewVOffset = value
+		pendingCallbacks += [changeRecordingResolution]
+	
+	
+	previewAnalogGainMultiplier = 2 #doesn't rebuild video pipeline, only takes gain multiplier
+	
+	
 	@property
 	def availableRecordingAnalogGains(self) -> list: 
 		return [{"multiplier":2**i, "dB":6*i} for i in range(0,5)]
@@ -312,6 +378,13 @@ class State():
 		if value > 5000: 
 			raise ValueError("Recording period is 5000ns greater than recording exposure - since exposure can't be negative, the total recording period can't be less than 5000.")
 		self.recordingExposureNs = value - 5000
+	
+	#rectangle of the video display area
+	videoDisplayDevice = "camera" #or "http". "camera" includes hdmi out. Not sure if this value is needed, depends if we can get video out over http at the same time we can display it on the back of the camera.
+	videoDisplayX = 0
+	videoDisplayY = 0
+	videoDisplayWidth = 200
+	videoDisplayHeight = 200
 		
 	
 	_currentCameraState = 'pre-recording' #There's going to be some interaction about what's valid when, wrt this variable and API calls.
@@ -322,8 +395,10 @@ class State():
 	
 	@currentCameraState.setter
 	def currentCameraState(self, value):
-		assert value in {'pre-recording', 'recording', 'playback', 'saving'}
+		global pendingCallbacks
+		assert value in {'pre-recording', 'recording', 'playback', 'saving', 'preview'}
 		self._currentCameraState = value
+		pendingCallbacks += [changeRecordingResolution]
 	
 	totalAvailableFrames = 80000 #This is the number of frames we *can* record. There is some overhead for each frame, so the increase in frames as we decrease resolution is not quite linear.
 	
@@ -683,7 +758,7 @@ class ControlAPIMock(QObject):
 	
 	def emitControlSignal(self, name: str, value=None) -> None:
 		"""Emit an update signal, usually for indicating a value has changed."""
-		signal = QDBusMessage.createSignal('/com/krontech/chronos/control/mock', 'com.krontech.chronos.control.mock', name)
+		signal = QDBusMessage.createSignal('/com/krontech/chronos/control_mock', 'com.krontech.chronos.control_mock', name)
 		signal << getattr(state, name) if value is None else value
 		QDBusConnection.systemBus().send(signal)
 	
@@ -986,6 +1061,14 @@ class ControlAPIMock(QObject):
 		return ""
 
 
+if not QDBusConnection.systemBus().registerService('com.krontech.chronos.control_mock'):
+	sys.stderr.write(f"Could not register control service: {QDBusConnection.systemBus().lastError().message() or '(no message)'}\n")
+	raise Exception("D-Bus Setup Error")
+
+controlAPI = ControlAPIMock() #This absolutely, positively can't be inlined or it throws error "No such object path ...". Possibly, this is because a live reference must be kept so GC doesn't eat it?
+QDBusConnection.systemBus().registerObject('/com/krontech/chronos/control_mock', controlAPI, QDBusConnection.ExportAllSlots)
+
+
 #Launch the API if not imported as a library.
 if __name__ == '__main__':
 	from PyQt5.QtCore import QCoreApplication
@@ -995,16 +1078,6 @@ if __name__ == '__main__':
 	
 	#Quit on ctrl-c.
 	signal.signal(signal.SIGINT, signal.SIG_DFL)
-	
-	
-	if not QDBusConnection.systemBus().registerService('com.krontech.chronos.control'):
-		sys.stderr.write(f"Could not register control service: {QDBusConnection.systemBus().lastError().message() or '(no message)'}\n")
-		raise Exception("D-Bus Setup Error")
-
-	controlAPI = ControlAPIMock() #This absolutely, positively can't be inlined or it throws error "No such object path ...". Possibly, this is because a live reference must be kept so GC doesn't eat it?
-	QDBusConnection.systemBus().registerObject('/com/krontech/chronos/control', controlAPI, QDBusConnection.ExportAllSlots)
-	
-	pdb.set_trace()
 	
 	print("Running control api mock.")
 	sys.exit(app.exec_())
