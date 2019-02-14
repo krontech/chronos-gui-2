@@ -21,6 +21,7 @@ from lux1310 import Lux1310Object
 from smbus2 import SMBusWrapper
 from smbus2 import SMBus
 
+# import debugger
 
 from ioports import board_chronos14_ioports
 
@@ -39,6 +40,13 @@ RECORD_MODE_NORMAL =		0
 RECORD_MODE_SEGMENTED =		1
 RECORD_MODE_GATED_BURST =	2
 RECORD_MODE_FPN =			3
+
+
+
+FOCUS_PEAK_THRESH_LOW		=	35
+FOCUS_PEAK_THRESH_MED		=	25
+FOCUS_PEAK_THRESH_HIGH		=	15
+
 
 #error codes:
 
@@ -469,82 +477,138 @@ class CamObject:
 
 # IO things
 
-		
 	def setTrigEnable(self, val):
 		self.FPGAWrite16("TRIG_ENABLE", val)
 		
-	def getTrigEnable():
+	def getTrigEnable(self):
 		return self.FPGARead16("TRIG_ENABLE")
 		
 		
 	def setTrigInvert(self, val):
 		self.FPGAWrite16("TRIG_INVERT", val)
 		
-	def getTrigInvert():
+	def getTrigInvert(self):
 		return self.FPGARead16("TRIG_INVERT")
 		
 		
 	def setTrigDebounce(self, val):
 		self.FPGAWrite16("TRIG_DEBOUNCE", val)
 		
-	def getTrigDebounce():
+	def getTrigDebounce(self):
 		return self.FPGARead16("TRIG_DEBOUNCE")
 		
 		
 	def setSeqTrigDelay(self, val):
 		self.FPGAWrite32("SEQ_TRIG_DELAY", val)
 		
-	def getSeqTrigDelay():
+	def getSeqTrigDelay(self):
 		return self.FPGARead32("SEQ_TRIG_DELAY")
 		
 		
 	def setIOOutInvert(self, val):
 		self.FPGAWrite16("IO_OUT_INVERT", val)
 		
-	def getIOOutInvert():
+	def getIOOutInvert(self):
 		return self.FPGARead16("IO_OUT_INVERT")
 		
 		
 	def setIOOutSource(self, val):
 		self.FPGAWrite16("IO_OUT_SOURCE", val)
 		
-	def getIOOutSource():
+	def getIOOutSource(self):
 		return self.FPGARead16("IO_OUT_SOURCE")
 		
 		
 	def setIOOutLevel(self, val):
 		self.FPGAWrite16("IO_OUT_LEVEL", val)
 		
-	def getIOOutLevel():
+	def getIOOutLevel(self):
 		return self.FPGARead16("IO_OUT_LEVEL")
 		
 	
 	
-	def setExtShutterGatingEnable(en):
-		val = self.FPGARead16("EXT_SHUTTER_CTL") & (0xffff - EXT_SH_GATING_EN_MASK)
+	def setExtShutterGatingEnable(self, en):
+		val = self.FPGARead16("EXT_SHUTTER_CTL") & ~EXT_SH_GATING_EN_MASK
 		val |= (en << EXT_SH_GATING_EN_OFFSET)
 		self.FPGAWrite16("EXT_SHUTTER_CTL", val)
 
-	def getExtShutterGatingEnable():
-		return self.FPGARead16("EXT_SHUTTER_CTL") & EXT_SH_GATING_EN_MASK
+	def getExtShutterGatingEnable(self):
+		return bool(self.FPGARead16("EXT_SHUTTER_CTL") & EXT_SH_GATING_EN_MASK)
 
 
-	def setTriggeredExpEnable():
-		val = self.FPGARead16("EXT_SHUTTER_CTL") & (0xffff - EXT_SH_TRIGD_EXP_EN_MASK)
+	def setTriggeredExpEnable(self, en):
+		val = self.FPGARead16("EXT_SHUTTER_CTL") & ~EXT_SH_TRIGD_EXP_EN_MASK
 		val |= (en << EXT_SH_TRIGD_EXP_EN_OFFSET)
 		self.FPGAWrite16("EXT_SHUTTER_CTL", val)
 	
-	def getTriggeredExpEnable():
-		return self.FPGARead16("EXT_SHUTTER_CTL") & EXT_SH_TRIGD_EXP_EN_MASK
+	def getTriggeredExpEnable(self):
+		return bool(self.FPGARead16("EXT_SHUTTER_CTL") & EXT_SH_TRIGD_EXP_EN_MASK)
 
 
-	def setExtShutterSrcEnable(src):
-		val = self.FPGARead16("EXT_SHUTTER_CTL") & (0xffff - EXT_SH_SRC_EN_MASK)
+	def setExtShutterSrcEnable(self,src):
+		val = self.FPGARead16("EXT_SHUTTER_CTL") & ~EXT_SH_SRC_EN_MASK
 		val |= (src << EXT_SH_SRC_EN_OFFSET)
 		self.FPGAWrite16("EXT_SHUTTER_CTL", val)
 
-	def getExtShutterSrcEnable():
+	def getExtShutterSrcEnable(self):
 		return (self.FPGARead16("EXT_SHUTTER_CTL") & EXT_SH_SRC_EN_MASK) >> EXT_SH_SRC_EN_OFFSET
+
+
+	def setFocusPeakEnable(self,en):
+		val = self.FPGARead16("DISPLAY_CTL") & ~DISPLAY_CTL_FOCUS_PEAK_EN_MASK
+		if en:
+			val |= DISPLAY_CTL_FOCUS_PEAK_EN_MASK
+		self.FPGAWrite32("DISPLAY_CTL", val)
+
+	def setFocusPeakThreshold(self, thresh):
+		self.FPGAWrite32("DISPLAY_PEAKING_THRESH", thresh)
+
+	def getFocusPeakThreshold(self, thresh):
+		return self.FPGARead32("DISPLAY_PEAKING_THRESH")
+
+	def setFocusPeakIntensity(self, level):
+		if level == 'off':
+			self.setFocusPeakEnable(False)
+		elif level == 'low':
+			self.setFocusPeakThreshold(FOCUS_PEAK_THRESH_LOW)
+			self.setFocusPeakEnable(True)
+		elif level == 'medium':
+			self.setFocusPeakThreshold(FOCUS_PEAK_THRESH_MED)
+			self.setFocusPeakEnable(True)
+		elif level == 'high':
+			self.setFocusPeakThreshold(FOCUS_PEAK_THRESH_HIGH)
+			self.setFocusPeakEnable(True)
+			
+		
+
+	def setFocusPeakColor(self, color):
+		val = self.FPGARead32("DISPLAY_CTL") & ~DISPLAY_CTL_FOCUS_PEAK_COLOR_MASK
+		
+		# convert from 0xff00ff to 0b101
+		shortColor = (color & 0x800000) >> 21
+		shortColor |= (color & 0x8000) >> 14
+		shortColor |= (color & 0x80) >> 7
+		print(f"Color is 0x{color:x}, set to 0b{shortColor:b}")
+		
+		self.FPGAWrite32("DISPLAY_CTL", val | (shortColor << DISPLAY_CTL_FOCUS_PEAK_COLOR_OFFSET))
+
+	def getFocusPeakColor(self, color):
+		#we probably won't need this...
+		#	return (gpmc->read32(DISPLAY_CTL_ADDR) & DISPLAY_CTL_FOCUS_PEAK_COLOR_MASK) >> DISPLAY_CTL_FOCUS_PEAK_COLOR_OFFSET;
+		return 0x010
+
+
+
+	def setZebraEnabled(self, en):
+		val = self.FPGARead16("DISPLAY_CTL")
+		if en:
+			val |= DISPLAY_CTL_ZEBRA_EN_MASK
+		else:
+			val &= (~DISPLAY_CTL_ZEBRA_EN_MASK)
+		self.FPGAWrite16("DISPLAY_CTL", val)
+
+	def getZebraEnabled(self):
+		return bool(self.FPGARead16("DISPLAY_CTL") & DISPLAY_CTL_ZEBRA_EN_MASK)
 
 
 
@@ -923,13 +987,13 @@ class CamObject:
 	def startSequencer(self):
 		reg = self.FPGARead32("SEQ_CTL")
 		self.FPGAWrite32("SEQ_CTL", reg or SEQ_CTL_START_REC_MASK)
-		self.FPGAWrite32("SEQ_CTL", reg and (0xffffffff - SEQ_CTL_START_REC_MASK))
+		self.FPGAWrite32("SEQ_CTL", reg and ~SEQ_CTL_START_REC_MASK)
 
 
 	def terminateRecord(self):
 		reg = self.FPGARead32("SEQ_CTL")
 		self.FPGAWrite32("SEQ_CTL", reg or SEQ_CTL_STOP_REC_MASK)
-		self.FPGAWrite32("SEQ_CTL", reg and (0xffffffff - SEQ_CTL_STOP_REC_MASK))
+		self.FPGAWrite32("SEQ_CTL", reg and ~SEQ_CTL_STOP_REC_MASK)
 
 	def setRecRegionStartWords(self, start):
 		self.FPGAWrite32("SEQ_REC_REGION_START", start)
