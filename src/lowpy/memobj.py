@@ -134,7 +134,7 @@ class MemObject:
 			FPGAreg = FPGA_dict[addr]
 		else:
 			FPGAreg = addr
-		cprint (f'   [{self.writesCount}]----- FPGAWrite16("{addr}":0x{FPGAreg:x}, 0x{data:x})', self.FPGAcol)
+		cprint (f'   ----- FPGAWrite16("{addr}":0x{FPGAreg:x}, 0x{data:x})', self.FPGAcol)
 		self.fpga.mem16[FPGAreg // 2] = data & 0xffff
 
 	def FPGAWrite32(self, addr, data):
@@ -145,7 +145,7 @@ class MemObject:
 			FPGAreg = FPGA_dict[addr]
 		else:
 			FPGAreg = addr
-		cprint (f'   [{self.writesCount}]----- FPGAWrite32("{addr}":0x{FPGAreg:x}, 0x{data:x})', self.FPGAcol)
+		cprint (f'   ----- FPGAWrite32("{addr}":0x{FPGAreg:x}, 0x{data:x})', self.FPGAcol)
 		self.fpga.mem32[FPGAreg // 4] = data
 
 # These are non-blockable FPGA writes:
