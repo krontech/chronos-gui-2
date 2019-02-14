@@ -118,7 +118,7 @@ def framerate_for_resolution(hRes: int, vRes: int) -> int:
 #contains x/y/w/h of a new camera resolution only actually resets the camera
 #video pipeline once. Each function which appears in the list is called only
 #once, after all values have been set.
-pendingCallbacks = []
+pendingCallbacks = set()
 
 
 def changeRecordingResolution(state):
@@ -234,7 +234,7 @@ class State():
 	def recordingHRes(self, value):
 		global pendingCallbacks
 		self._recordingHRes = value
-		pendingCallbacks += [changeRecordingResolution, notifyExposureChange]
+		pendingCallbacks |= set([changeRecordingResolution, notifyExposureChange])
 		
 	@property
 	def recordingHStep(self): #constant, we only have the one sensor
@@ -251,7 +251,7 @@ class State():
 	def recordingVRes(self, value):
 		global pendingCallbacks
 		self._recordingVRes = value
-		pendingCallbacks += [changeRecordingResolution, notifyExposureChange]
+		pendingCallbacks |= set([changeRecordingResolution, notifyExposureChange])
 	
 	@property
 	def recordingVStep(self): #constant, we only have the one sensor
@@ -268,7 +268,7 @@ class State():
 	def recordingHOffset(self, value):
 		global pendingCallbacks
 		self._recordingHOffset = value
-		pendingCallbacks += [changeRecordingResolution]
+		pendingCallbacks |= set([changeRecordingResolution])
 	
 	
 	_recordingVOffset = 480
@@ -281,7 +281,7 @@ class State():
 	def recordingVOffset(self, value):
 		global pendingCallbacks
 		self._recordingVOffset = value
-		pendingCallbacks += [changeRecordingResolution]
+		pendingCallbacks |= set([changeRecordingResolution])
 	
 	
 	recordingAnalogGainMultiplier = 2 #doesn't rebuild video pipeline, only takes gain multiplier
@@ -297,7 +297,7 @@ class State():
 	def previewHRes(self, value):
 		global pendingCallbacks
 		self._previewHRes = value
-		pendingCallbacks += [changeRecordingResolution, notifyExposureChange]
+		pendingCallbacks |= set([changeRecordingResolution, notifyExposureChange])
 		
 	@property
 	def previewHStep(self): #constant, we only have the one sensor
@@ -314,7 +314,7 @@ class State():
 	def previewVRes(self, value):
 		global pendingCallbacks
 		self._previewVRes = value
-		pendingCallbacks += [changeRecordingResolution, notifyExposureChange]
+		pendingCallbacks |= set([changeRecordingResolution, notifyExposureChange])
 	
 	@property
 	def previewVStep(self): #constant, we only have the one sensor
@@ -331,7 +331,7 @@ class State():
 	def previewHOffset(self, value):
 		global pendingCallbacks
 		self._previewHOffset = value
-		pendingCallbacks += [changeRecordingResolution]
+		pendingCallbacks |= set([changeRecordingResolution])
 	
 	
 	_previewVOffset = 480
@@ -344,7 +344,7 @@ class State():
 	def previewVOffset(self, value):
 		global pendingCallbacks
 		self._previewVOffset = value
-		pendingCallbacks += [changeRecordingResolution]
+		pendingCallbacks |= set([changeRecordingResolution])
 	
 	
 	previewAnalogGainMultiplier = 2 #doesn't rebuild video pipeline, only takes gain multiplier
@@ -386,7 +386,7 @@ class State():
 		global pendingCallbacks
 		assert value in {'pre-recording', 'recording', 'playback', 'saving', 'preview'}
 		self._currentCameraState = value
-		pendingCallbacks += [changeRecordingResolution]
+		pendingCallbacks |= set([changeRecordingResolution])
 	
 	totalAvailableFrames = 80000 #This is the number of frames we *can* record. There is some overhead for each frame, so the increase in frames as we decrease resolution is not quite linear.
 	
@@ -794,10 +794,10 @@ class ControlAPI(QObject):
 				self.ProcessSetting(key, value)
 				
 		
-		#Call each callback only once. For long-running callbacks ior multi-arg tasks.
-		global pendingCallbacks
-		[cb(_state) for cb in {cb for cb in pendingCallbacks}]
-		pendingCallbacks = []
+		#Call each callback set. Good for multi-arg tasks such as recording resolution and trigger state.
+		for cb in pendingCallbacks:
+			cb(_state)
+		pendingCallbacks.clear()
 	
 	
 	@action('set')
