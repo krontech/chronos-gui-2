@@ -133,7 +133,7 @@ class APIValues(QObject):
 	def __init__(self):
 		super(APIValues, self).__init__()
 		
-		QDBusConnection.systemBus().registerObject('/', self) #The .connect call freezes if we don't do this. 
+		QDBusConnection.systemBus().registerObject('/com/krontech/chronos/control_hack', self) #The .connect call freezes if we don't do this, or if we do this twice.
 		
 		self._callbacks = {}
 		
