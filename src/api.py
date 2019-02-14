@@ -19,7 +19,7 @@ from PyQt5.QtCore import pyqtSlot, QObject
 from PyQt5.QtDBus import QDBusConnection, QDBusInterface, QDBusReply
 from typing import Callable, Any
 
-import control_api #importing starts the service
+import coordinator_api #importing starts the service
 import video_api_mock
 
 
