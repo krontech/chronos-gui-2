@@ -616,7 +616,7 @@ class State():
 state = State() #Must be instantiated for QDBusMarshaller. 🙂
 
 
-class ControlAPIMock(QObject):
+class ControlAPI(QObject):
 	"""Function calls of the camera control D-Bus API."""
 	
 	def __init__(self):
@@ -969,6 +969,14 @@ class ControlAPIMock(QObject):
 		return ""
 
 
+if not QDBusConnection.systemBus().registerService('com.krontech.chronos.control'):
+	sys.stderr.write(f"Could not register control service: {QDBusConnection.systemBus().lastError().message() or '(no message)'}\n")
+	raise Exception("D-Bus Setup Error")
+
+controlAPI = ControlAPI() #This absolutely, positively can't be inlined or it throws error "No such object path ...". Possibly, this is because a live reference must be kept so GC doesn't eat it?
+QDBusConnection.systemBus().registerObject('/com/krontech/chronos/control', controlAPI, QDBusConnection.ExportAllSlots)
+
+
 #Launch the API if not imported as a library.
 if __name__ == '__main__':
 	from PyQt5.QtCore import QCoreApplication
@@ -978,16 +986,6 @@ if __name__ == '__main__':
 	
 	#Quit on ctrl-c.
 	signal.signal(signal.SIGINT, signal.SIG_DFL)
-	
-	
-	if not QDBusConnection.systemBus().registerService('com.krontech.chronos.control'):
-		sys.stderr.write(f"Could not register control service: {QDBusConnection.systemBus().lastError().message() or '(no message)'}\n")
-		raise Exception("D-Bus Setup Error")
-
-	controlAPI = ControlAPIMock() #This absolutely, positively can't be inlined or it throws error "No such object path ...". Possibly, this is because a live reference must be kept so GC doesn't eat it?
-	QDBusConnection.systemBus().registerObject('/com/krontech/chronos/control', controlAPI, QDBusConnection.ExportAllSlots)
-	
-	pdb.set_trace()
 	
 	print("Running control api.")
 	sys.exit(app.exec_())

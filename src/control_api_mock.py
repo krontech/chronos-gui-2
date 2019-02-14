@@ -20,7 +20,6 @@
 	Any comment or call in this file should be considered a proposal. It can all be
 	changed if need be.
 """
-
 from __future__ import unicode_literals
 
 import sys
@@ -683,7 +682,7 @@ class ControlAPIMock(QObject):
 	
 	def emitControlSignal(self, name: str, value=None) -> None:
 		"""Emit an update signal, usually for indicating a value has changed."""
-		signal = QDBusMessage.createSignal('/com/krontech/chronos/control/mock', 'com.krontech.chronos.control.mock', name)
+		signal = QDBusMessage.createSignal('/com/krontech/chronos/control_mock', 'com.krontech.chronos.control_mock', name)
 		signal << getattr(state, name) if value is None else value
 		QDBusConnection.systemBus().send(signal)
 	
@@ -986,6 +985,14 @@ class ControlAPIMock(QObject):
 		return ""
 
 
+if not QDBusConnection.systemBus().registerService('com.krontech.chronos.control_mock'):
+	sys.stderr.write(f"Could not register control service: {QDBusConnection.systemBus().lastError().message() or '(no message)'}\n")
+	raise Exception("D-Bus Setup Error")
+
+controlAPI = ControlAPIMock() #This absolutely, positively can't be inlined or it throws error "No such object path ...". Possibly, this is because a live reference must be kept so GC doesn't eat it?
+QDBusConnection.systemBus().registerObject('/com/krontech/chronos/control_mock', controlAPI, QDBusConnection.ExportAllSlots)
+
+
 #Launch the API if not imported as a library.
 if __name__ == '__main__':
 	from PyQt5.QtCore import QCoreApplication
@@ -995,16 +1002,6 @@ if __name__ == '__main__':
 	
 	#Quit on ctrl-c.
 	signal.signal(signal.SIGINT, signal.SIG_DFL)
-	
-	
-	if not QDBusConnection.systemBus().registerService('com.krontech.chronos.control'):
-		sys.stderr.write(f"Could not register control service: {QDBusConnection.systemBus().lastError().message() or '(no message)'}\n")
-		raise Exception("D-Bus Setup Error")
-
-	controlAPI = ControlAPIMock() #This absolutely, positively can't be inlined or it throws error "No such object path ...". Possibly, this is because a live reference must be kept so GC doesn't eat it?
-	QDBusConnection.systemBus().registerObject('/com/krontech/chronos/control', controlAPI, QDBusConnection.ExportAllSlots)
-	
-	pdb.set_trace()
 	
 	print("Running control api mock.")
 	sys.exit(app.exec_())
