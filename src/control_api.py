@@ -17,6 +17,11 @@ from PyQt5.QtDBus import QDBusConnection, QDBusMessage, QDBusError
 
 from debugger import *; dbg
 
+from camobj import CamObject
+from mmapregisters import *
+
+cam = CamObject()
+
 # Set up d-bus interface. Connect to mock system buses. Check everything's working.
 if not QDBusConnection.systemBus().isConnected():
 	print("Error: Can not connect to D-Bus. Is D-Bus itself running?", file=sys.stderr)
@@ -785,6 +790,8 @@ class ControlAPI(QObject):
 				setattr(state, key, value)
 				self.emitControlSignal(key)
 				print(f"updated {key} to {value}")
+				# Now update CamObject directly
+				self.ProcessSetting(key, value)
 				
 		
 		#Call each callback only once. For long-running callbacks ior multi-arg tasks.
@@ -898,8 +905,9 @@ class ControlAPI(QObject):
 	@action('set')
 	@pyqtSlot()
 	def doBlackCalibration(self) -> None:
-		print('MOCK: do black calibration')
-	
+		print('NOW REAL: do black calibration')
+		cam.callBlackCal()
+
 	
 	@action('set')
 	@pyqtSlot(str, result='QVariantMap')
@@ -1042,6 +1050,21 @@ class ControlAPI(QObject):
 		sleep(3)
 		print(" ok.")
 		return ""
+
+	def ProcessSetting(self, key, value):
+		print(f"Processing Setting: {key} is set to 0x{value:x}")
+
+		#implement dictionary here?
+		# brk()
+		if key == 'showWhiteClippingZebraStripes':
+			cam.setZebraEnabled(value)
+			
+		elif key == 'focusPeakingIntensity':
+			cam.setFocusPeakIntensity(value)
+
+		elif key == 'focusPeakingColor':
+			cam.setFocusPeakColor(value)
+
 
 
 if not QDBusConnection.systemBus().registerService('com.krontech.chronos.control'):
