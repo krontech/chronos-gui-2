@@ -211,6 +211,20 @@ class Main(QWidget):
 		self.uiShowWhiteClipping.stateChanged.connect(self.uiShotAssistMenu.setFocus)
 		self.uiShowBlackClipping.stateChanged.connect(self.uiShotAssistMenu.setFocus)
 	
+	def onShow(self):
+		videoState = api.get('videoState')
+		api.set({
+			'videoState':
+				videoState 
+				if videoState in ['pre-recording', 'recording'] else 
+				'pre-recording',
+			'videoDisplayDevice': 'camera',
+			'videoDisplayX': self.x(),
+			'videoDisplayY': self.y(),
+			'videoDisplayWidth': self.width() - 200, #-200 for the sidebar. This needs to be redone a little so it calculates the position on the fly.
+			'videoDisplayHeight': self.height(),
+		})
+	
 	# @pyqtSlot() is not strictly needed - see http://pyqt.sourceforge.net/Docs/PyQt5/signals_slots.html#the-pyqtslot-decorator for details. (import with `from PyQt5.QtCore import pyqtSlot`)
 	def printAnalogGain(self):
 		print("Analog gain is %ix." % api.get("recordingAnalogGainMultiplier"))

@@ -72,7 +72,7 @@ class PlayAndSave(QtWidgets.QDialog):
 		
 	def onShow(self):
 		#Don't update the labels while hidden. But do show with accurate info when we start.
-		api.set({'currentCameraState': 'playback'})
+		api.set({'videoState': 'playback'})
 		self.updateBatteryTimer.start()
 		self.updateBattery()
 		self.updateMotionHeatmap()
@@ -80,7 +80,6 @@ class PlayAndSave(QtWidgets.QDialog):
 		
 	def onHide(self):
 		self.updateBatteryTimer.stop()
-		api.set({'currentCameraState': 'pre-recording'})
 	
 	def updateBattery(self):
 		self.uiBatteryReadout.setText(

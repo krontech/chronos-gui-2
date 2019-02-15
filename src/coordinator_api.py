@@ -122,7 +122,7 @@ pendingCallbacks = set()
 
 
 def changeRecordingResolution(state):
-	if state.currentCameraState == 'preview':
+	if state.videoState == 'preview':
 		print(f"Mock: changing recording resolution to xywh {state.previewHOffset} {state.previewVOffset} {state.previewHRes} {state.previewVRes}.")
 		cam.sensor.sensorSetResolutions(state.previewHOffset, state.previewVOffset, state.previewHRes, state.previewVRes)
 	else:
@@ -301,10 +301,6 @@ class State():
 		global pendingCallbacks
 		self._previewHRes = value
 		pendingCallbacks |= set([changeRecordingResolution, notifyExposureChange])
-		
-	@property
-	def previewHStep(self): #constant, we only have the one sensor
-		return 16
 	
 	
 	_previewVRes = 300 
@@ -318,10 +314,6 @@ class State():
 		global pendingCallbacks
 		self._previewVRes = value
 		pendingCallbacks |= set([changeRecordingResolution, notifyExposureChange])
-	
-	@property
-	def previewVStep(self): #constant, we only have the one sensor
-		return 2
 	
 	
 	_previewHOffset = 800 #rebuilds video pipeline
@@ -378,17 +370,17 @@ class State():
 	videoDisplayWidth = 200
 	videoDisplayHeight = 200
 	
-	_currentCameraState = 'pre-recording' #There's going to be some interaction about what's valid when, wrt this variable and API calls.
+	_videoState = 'pre-recording' #There's going to be some interaction about what's valid when, wrt this variable and API calls.
 	
 	@property
-	def currentCameraState(self):
-		return self._currentCameraState
+	def videoState(self):
+		return self._videoState
 	
-	@currentCameraState.setter
-	def currentCameraState(self, value):
+	@videoState.setter
+	def videoState(self, value):
 		global pendingCallbacks
 		assert value in {'pre-recording', 'recording', 'playback', 'saving', 'preview'}
-		self._currentCameraState = value
+		self._videoState = value
 		pendingCallbacks |= set([changeRecordingResolution])
 	
 	totalAvailableFrames = 80000 #This is the number of frames we *can* record. There is some overhead for each frame, so the increase in frames as we decrease resolution is not quite linear.
