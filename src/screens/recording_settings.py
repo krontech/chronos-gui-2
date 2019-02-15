@@ -4,7 +4,7 @@ from PyQt5 import uic, QtWidgets, QtCore
 from PyQt5.QtCore import pyqtSlot
 
 from debugger import *; dbg
-import api_mock as api
+import api as api
 from api_mock import silenceCallbacks
 
 
@@ -88,6 +88,20 @@ class RecordingSettings(QtWidgets.QDialog):
 		
 	
 	presets = api.get('commonlySupportedResolutions')
+	
+	def onShow(self):
+		api.set({
+			'videoState': 'preview',
+			'videoDisplayDevice': 'camera',
+			'videoDisplayX': self.uiPreviewPanel.x(),
+			'videoDisplayY': self.uiPreviewPanel.y(),
+			'videoDisplayWidth': self.uiPreviewPanel.width(),
+			'videoDisplayHeight': self.uiPreviewPanel.height(),
+			'previewHRes': self.uiHRes.maximum(),
+			'previewVRes': self.uiVRes.maximum(),
+			'previewHOffset': self.uiHOffset.minimum(),
+			'previewVOffset': self.uiVOffset.minimum(),
+		})
 	
 	def populatePresets(self):
 		formatString = self.uiPresets.currentText()
