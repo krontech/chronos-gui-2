@@ -124,12 +124,15 @@ pendingCallbacks = set()
 def changeRecordingResolution(state):
 	if state.currentCameraState == 'preview':
 		print(f"Mock: changing recording resolution to xywh {state.previewHOffset} {state.previewVOffset} {state.previewHRes} {state.previewVRes}.")
+		cam.sensor.sensorSetResolutions(state.previewHOffset, state.previewVOffset, state.previewHRes, state.previewVRes)
 	else:
 		print(f"Mock: changing recording resolution to xywh {state.recordingHOffset} {state.recordingVOffset} {state.recordingHRes} {state.recordingVRes}.")
+		cam.sensor.sensorSetResolutions(state.recordingHOffset, state.recordingVOffset, state.recordingHRes, state.recordingVRes)
 
 
 def notifyExposureChange(state):
-	print('Mock: Exposure change callback.')
+	print('Real: Exposure change callback.')
+	cam.sensor.sensorSetExposure(state.recordingExposureNs)
 	#self.emitControlSignal('maxExposureNs', 7e8) # Example.
 	#self.emitControlSignal('minExposureNs', 3e2)
 
@@ -147,13 +150,13 @@ class State():
 	cameraMemoryGB = 16.
 	cameraSerial = "Captain Crunch"
 	sensorName = "acme9001"
-	sensorHMax = 1920
+	sensorHMax = 1280
 	sensorHMin = 256
 	sensorVMax = 1080
 	sensorVMin = 64
 	sensorHIncrement = 2
 	sensorVIncrement = 32
-	sensorPixelRate = 1920 * 1080 * 1000
+	sensorPixelRate = 1280 * 1080 * 1000
 	sensorPixelFormat = "BYR2" #Or "y12" for mono models.
 	sensorRecordsColor = True
 	sensorFramerate = 1000
@@ -791,7 +794,7 @@ class ControlAPI(QObject):
 				self.emitControlSignal(key)
 				print(f"updated {key} to {value}")
 				# Now update CamObject directly
-				self.ProcessSetting(key, value)
+				self.processSetting(key, value)
 				
 		
 		#Call each callback set. Good for multi-arg tasks such as recording resolution and trigger state.
@@ -1051,8 +1054,12 @@ class ControlAPI(QObject):
 		print(" ok.")
 		return ""
 
-	def ProcessSetting(self, key, value):
-		print(f"Processing Setting: {key} is set to 0x{value:x}")
+	def processSetting(self, key, value):
+		print("processSetting")
+		if type(value) is str:
+			print(f"Processing Setting: {key} is set to {value}")
+		else:
+			print(f"Processing Setting: {key} is set to 0x{value:x}")
 
 		#implement dictionary here?
 		# brk()
@@ -1064,6 +1071,12 @@ class ControlAPI(QObject):
 
 		elif key == 'focusPeakingColor':
 			cam.setFocusPeakColor(value)
+
+		elif key == 'recordingAnalogGainMultiplier':
+			cam.sensor.sensorSetGain(value)
+
+
+	
 
 
 
