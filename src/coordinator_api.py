@@ -69,6 +69,9 @@ def stringifyTypeClasses(typeClass: Any) -> str:
 	if hasattr(typeClass, '_name'): #typing types
 		return typeClass._name or 'Any' #Seems to be Unions mess it up, but I don't know how to break them.
 	
+	if hasattr(typeClass, '__class__'):
+		return str(typeClass.__class__)
+	
 	raise Exception(f'Unknown typeClass {typeClass}')
 
 def removeWhitespace(text:str):
