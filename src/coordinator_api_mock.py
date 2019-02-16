@@ -795,7 +795,7 @@ class ControlAPIMock(QObject):
 			if getattr(state, key) != value:
 				setattr(state, key, value)
 				self.emitControlSignal(key)
-				print(f"updated {key} to {value}")
+				print(f"MOCK: updated {key} to {value}")
 				
 		
 		#Call each callback set. Good for multi-arg tasks such as recording resolution and trigger state.

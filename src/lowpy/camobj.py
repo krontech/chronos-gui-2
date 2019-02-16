@@ -25,6 +25,8 @@ from smbus2 import SMBus
 
 from ioports import board_chronos14_ioports
 
+from debugger import *; dbg
+
 import pychronos
 
 MAX_FRAME_LENGTH = 0xf000
@@ -600,6 +602,7 @@ class CamObject:
 
 
 	def setZebraEnabled(self, en):
+		print("Zebra!")
 		val = self.FPGARead16("DISPLAY_CTL")
 		if en:
 			val |= DISPLAY_CTL_ZEBRA_EN_MASK
@@ -610,9 +613,18 @@ class CamObject:
 	def getZebraEnabled(self):
 		return bool(self.FPGARead16("DISPLAY_CTL") & DISPLAY_CTL_ZEBRA_EN_MASK)
 
-
-
 	 
+	def setResolution(self, hOffset, vOffset, hRes, vRes):
+		print(f"Setting resolution: offset = ({hOffset}, {vOffset}) resolution = ({hRes}, {vRes})")
+		self.sensor.ImageGeometry.hres = hRes
+		self.sensor.ImageGeometry.vres = vRes
+		self.sensor.ImageGeometry.hoffset = hOffset
+		self.sensor.ImageGeometry.voffset = vOffset
+		self.sensor.SetResolutions()
+
+	def setExposure(self, exp):
+		print(f"Setting exposure to {exp} ns")
+
 	def CamInit(self):
 
 		print("CamInit()")
