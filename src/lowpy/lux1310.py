@@ -364,7 +364,7 @@ class Lux1310Object(SensorObject):
 		self.Lux1310SetExposure(nsec)
 
 	def Lux1310SetExposure(self, nsec):
-		print ("Lux1310SetExposure: {nsec} ns")
+		print (f"Lux1310SetExposure: {nsec} ns")
 		g = self.ImageGeometry
 		t_line = max((g.hres / LUX1310_HRES_INCREMENT)+2, (self.keepdelay + 3))
 		t_exposure = (nsec * LUX1310_SENSOR_CLOCK_RATE + 500000000) / 1000000000

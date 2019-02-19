@@ -785,7 +785,7 @@ class ControlAPI(QObject):
 				setattr(state, key, value)
 				self.emitControlSignal(key)
 				print(f"updated {key} to {value}")
-				# Now update CamObject directly
+				# Now update CamObject directly, when necessary
 				self.processSetting(key, value)
 				
 		
@@ -1047,6 +1047,7 @@ class ControlAPI(QObject):
 		return ""
 
 	def processSetting(self, key, value):
+		'''Send data to CamObject'''
 		print("processSetting")
 		if type(value) is str:
 			print(f"Processing Setting: {key} is set to {value}")
