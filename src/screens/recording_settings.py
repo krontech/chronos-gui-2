@@ -240,13 +240,17 @@ class RecordingSettings(QtWidgets.QDialog):
 	@silenceCallbacks('uiFps', 'uiFrameDuration')
 	def updateFps(self, fps: float):
 		self.uiFps.setValue(fps)
-		self.uiFrameDuration.setValue(1/fps*1000)
+		# do not allow division by zero
+		if fps:
+			self.uiFrameDuration.setValue(1/fps*1000)
 		
 	@pyqtSlot(float, name="updateFrameDurationMicroseconds")
 	@silenceCallbacks('uiFps', 'uiFrameDuration')
 	def updateFrameDurationMicroseconds(self, µs: float):
 		self.uiFrameDuration.setValue(µs)
-		self.uiFps.setValue(1000/µs)
+		# do not allow division by zero
+		if µs:
+			self.uiFps.setValue(1000/µs)
 		
 	@pyqtSlot(float, name="updateFrameDurationNanoseconds")
 	@silenceCallbacks() #Taken care of by Microsecond version.

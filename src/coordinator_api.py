@@ -155,11 +155,11 @@ class State():
 	sensorName = "acme9001"
 	sensorHMax = 1280
 	sensorHMin = 256
-	sensorVMax = 1080
+	sensorVMax = 1024
 	sensorVMin = 64
 	sensorHIncrement = 2
 	sensorVIncrement = 32
-	sensorPixelRate = 1280 * 1080 * 1000
+	sensorPixelRate = 1280 * 1024 * 1000
 	sensorPixelFormat = "BYR2" #Or "y12" for mono models.
 	sensorRecordsColor = True
 	sensorFramerate = 1000
