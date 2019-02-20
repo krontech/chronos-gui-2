@@ -304,8 +304,6 @@ if __name__ == '__main__':
 	#Quit on ctrl-c.
 	signal.signal(signal.SIGINT, signal.SIG_DFL)
 	
-	print("Self-test: Retrieve battery charge.")
-	print(f"Battery charge: {get('batteryCharge')}")
-	print("Self-test passed. Python API is up and running!")
+	print("Skipping self-tests…")
 	
 	sys.exit(app.exec_())
