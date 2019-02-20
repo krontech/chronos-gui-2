@@ -39,6 +39,28 @@ if not QDBusConnection.systemBus().isConnected():
 	sys.exit(-1)
 
 
+class Reply(Dict):
+	"""D-Bus Reply class. Encapsulates standard error and value.
+		
+		Construct with a value and return from a D-Bus call (a
+		pyqtSlot(…, return='QVariantMap')-decorated function).
+		
+		Alternately, construct with an errorName (str) and message
+		(str) and return to indicate an error. (If errorName is not
+		supplied, message should be ignored.)"""
+	
+	def __init__(self, *args):
+		if not args:
+			pass #easy: no return value, no error, do nothing
+		elif len(args) == 1:
+			self['value'] = args[0]
+		elif len(args) == 2:
+			self['errorName'] = args[0]
+			self['message'] = args[1]
+		else:
+			raise ValueError(f'Reply expected 1 or 2 args, got {len(args)}.')
+
+
 def action(actionType: str) -> callable:
 	"""Function decorator to denote what class of action function performs.
 		
@@ -756,15 +778,14 @@ class ControlAPIMock(QObject):
 		signal << getattr(state, name) if value is None else value
 		QDBusConnection.systemBus().send(signal)
 	
-	def emitError(self, message: str) -> QDBusError:
-		error = QDBusMessage.createError(QDBusError.Other, message)
+	def emitError(self, message: str) -> None:
+		error = QDBusMessage.createError('failed', message)
 		QDBusConnection.systemBus().send(error)
-		return error
 	
 	
 	@action('get')
 	@pyqtSlot('QVariantList', result='QVariantMap')
-	def get(self, keys: List[str]) -> Union[Dict[str, Any], str]:
+	def get(self, keys: List[str]) -> Reply(): #Dict[str, Any]
 		retval = {}
 		
 		for key in keys:
@@ -772,23 +793,23 @@ class ControlAPIMock(QObject):
 				#QDBusMessage.createErrorReply does not exist in PyQt5, and QDBusMessage.errorReply can't be sent. As far as I can tell, we simply can not emit D-Bus errors.
 				#Can't reply with a single string, either, since QVariantMap MUST be key:value pairs and we don't seem to have unions or anything.
 				#The type overloading, as detailed at http://pyqt.sourceforge.net/Docs/PyQt5/signals_slots.html#the-pyqtslot-decorator, simply does not work in this case. The last pyqtSlot will override the first pyqtSlot with its return type.
-				return {'ERROR': dump(f"The value '{key}' is not a known key to set.\nValid keys are: {[i for i in dir(state) if i[0] != '_']}")}
+				return Reply('ERROR', dump(f"The value '{key}' is not a known key to set.\nValid keys are: {[i for i in dir(state) if i[0] != '_']}"))
 			
 			retval[key] = getattr(state, key)
 		
-		return retval
+		return Reply(retval)
 	
 	
 	@action('set')
 	@pyqtSlot('QVariantMap')
-	def set(self, data: Dict[str, Any]) -> None:
+	def set(self, data: Reply) -> None: #None.
 		# Check all errors first to avoid partially applying an update.
 		for key, value in data.items():
 			if key[0] is '_' or not hasattr(state, key):  # Don't allow setting of private variables.
 				# return self.sendError('unknownValue', f"The value '{key}' is not known.\nValid keys are: {[i for i in dir(state) if i[0] != '_']}")
-				return {'ERROR': dump(f"The value '{key}' is not a known key to set.\nValid keys are: {[i for i in dir(state) if i[0] != '_']}")}
+				return Reply('ERROR', dump(f"The value '{key}' is not a known key to set.\nValid keys are: {[i for i in dir(state) if i[0] != '_']}"))
 			if not isinstance(value, type(getattr(state, key))):
-				return {'ERROR': dump(f"Can not set '{key}', currently {getattr(state, key)}, to {value}.\nExpected {type(getattr(state, key))}, got {type(value)}.")}
+				return Reply('ERROR', dump(f"Can not set '{key}', currently {getattr(state, key)}, to {value}.\nExpected {type(getattr(state, key))}, got {type(value)}."))
 		
 		# Set only changed variables. Changing can be quite involved, such as with recordingHRes.
 		for key, value in data.items():
@@ -802,6 +823,8 @@ class ControlAPIMock(QObject):
 		for cb in pendingCallbacks:
 			cb(state)
 		pendingCallbacks.clear()
+		
+		return Reply()
 	
 	
 	@action('set')
@@ -812,16 +835,16 @@ class ControlAPIMock(QObject):
 	
 	
 	@action('get')
-	@pyqtSlot(result="QVariantList")
+	@pyqtSlot(result="QVariantMap")
 	def available_keys(self) -> List[str]:
 		keys = [i for i in dir(state) if i[0] != '_'] #Don't expose private items.
-		return keys
+		return Reply(keys)
 	
 	
 	@action('get')
-	@pyqtSlot(result="QVariantList")
+	@pyqtSlot(result="QVariantMap")
 	def available_calls(self) -> List[Dict[str, str]]:
-		return [{
+		return Reply([{
 			"name": i,
 			"args": { #Return args: type, stripping class down to string name for D-Bus.
 				argName: stringifyTypeClasses(typeClass) 
@@ -830,18 +853,18 @@ class ControlAPIMock(QObject):
 			},
 			"action": getattr(self, i)._action, #Type
 		} for i in self.__class__.__dict__ 
-			if hasattr(getattr(self, i), '_action') ]
+			if hasattr(getattr(self, i), '_action') ])
 		
 	
 	@action('get')
 	@pyqtSlot(int, int, result=int)
 	def framerate_for_resolution(self, hRes: int, vRes: int) -> int:
-		return framerate_for_resolution(hRes, vRes)
+		return Reply(framerate_for_resolution(hRes, vRes))
 	
 	@action('get')
 	@pyqtSlot(result=bool)
 	def resolution_is_valid(self, hOffset: int, vOffset: int, hRes: int, vRes: int) -> bool: #xywh px
-		return resolution_is_valid(hOffset, vOffset, hRes, vRes)
+		return Reply(resolution_is_valid(hOffset, vOffset, hRes, vRes))
 	
 	
 	@action('set')
@@ -917,7 +940,11 @@ class ControlAPIMock(QObject):
 	def saveCalibrationData(self, toFolder: str) -> Union[Dict[str, str], None]:
 		#return self.emitError('A fire! Oh no!') #Doesn't work.
 		print(f'MOCK: Save calibration data to {toFolder}.')
-		return {"message": "Out of space."} if 'sda' in toFolder else None
+		return (
+			Reply("out of space", "Out of space of sda.") 
+			if 'sda' in toFolder else 
+			Reply()
+		)
 	
 	@action('set')
 	@pyqtSlot(str, result='QVariantMap')
@@ -966,11 +993,11 @@ class ControlAPIMock(QObject):
 		
 		frameData = allMockFrameData[(startFrame):(1024)-((startFrame-3+1))] #Mock.
 		
-		return {
+		return Reply({
 			"startFrame": startFrame, #We may have got a request for frame 0, but no longer have the data. In that case, this will be the first frame we do have.
 			"endFrame": startFrame + len(frameData), #Number of frames of data being returned.
 			"heatmap": QByteArray(bytearray([byte for line in frameData for byte in line])), #The (mock) data being returned. Inefficient, but whatever. Also, what the _heck_, list comprehension syntax.
-		}
+		})
 	
 	
 	@action('set')
@@ -988,7 +1015,7 @@ class ControlAPIMock(QObject):
 		#	"format": {'fps': int, 'bpp': int, 'maxBitrate': int},
 		#}]
 		
-		return [{ #Each entry in this list a segment of recorded video. Although currently resolution/framerate is always the same having it in this data will make it easier to fix this in the future if we do.
+		return Reply([{ #Each entry in this list a segment of recorded video. Although currently resolution/framerate is always the same having it in this data will make it easier to fix this in the future if we do.
 			"id": "ldPxTT5R",
 			"success": True,
 			"message": "",
@@ -996,7 +1023,7 @@ class ControlAPIMock(QObject):
 			"id": "KxIjG09V",
 			"success": False,
 			"message": "Network error.",
-		}]
+		}])
 	
 	@action('set')
 	@pyqtSlot(str)
@@ -1033,12 +1060,12 @@ class ControlAPIMock(QObject):
 			Forms a nice little table if printed with a fixed-width font. See
 			"man df" for more details."""
 		
-		return removeWhitespace("""
+		return Reply(removeWhitespace("""
 			NAME        MAJ:MIN RM   SIZE RO TYPE MOUNTPOINT
 			mmcblk0     179:0    0   7.4G  0 disk
 			|-mmcblk0p1 179:1    0  39.2M  0 part /boot
 			`-mmcblk0p2 179:2    0   7.4G  0 part /
-		""")
+		"""))
 	
 	
 	@action('set')
@@ -1053,6 +1080,8 @@ class ControlAPIMock(QObject):
 		sleep(3)
 		print(" ok.")
 		return ""
+
+
 
 
 if not QDBusConnection.systemBus().registerService('com.krontech.chronos.control_mock'):

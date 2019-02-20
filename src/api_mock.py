@@ -70,6 +70,22 @@ class DBusException(Exception):
 	"""Raised when something goes wrong with dbus. Message comes from dbus' msg.error().message()."""
 	pass
 
+class APIException(Exception):
+	"""Raised when something goes wrong with dbus. Message comes from dbus' msg.error().message()."""
+	pass
+
+class ControlReply():
+	def __init__(self, value=None, errorName=None, message=None):
+		self.value = value
+		self.message = message
+		self.errorName = errorName
+	
+	def unwrap(self):
+		if self.errorName:
+			raise APIException(self.errorName + ': ' + self.message)
+		else:
+			return self.value
+
 
 def video(*args, **kwargs):
 	"""Call the camera video DBus API. First arg is the function name.
@@ -78,9 +94,11 @@ def video(*args, **kwargs):
 		See https://github.com/krontech/chronos-cli/tree/master/src/api for implementation details about the API being called.
 		See README.md at https://github.com/krontech/chronos-cli/tree/master/src/daemon for API documentation.
 	"""
+	
 	msg = QDBusReply(cameraVideoAPI.call(*args, **kwargs))
 	if not msg.isValid():
 		raise DBusException("%s: %s" % (msg.error().name(), msg.error().message()))
+	
 	return msg.value()
 
 
@@ -92,14 +110,19 @@ def control(*args, **kwargs):
 		See README.md at https://github.com/krontech/chronos-cli/tree/master/src/daemon for API documentation.
 	"""
 	
+	#Unwrap D-Bus errors from message.
 	msg = QDBusReply(cameraControlAPI.call(*args, **kwargs))
 	if not msg.isValid():
 		raise DBusException("%s: %s" % (msg.error().name(), msg.error().message()))
-	return msg.value()
+	
+	#Unwrap API errors from message.
+	return ControlReply(**msg.value() or {}).unwrap()
 
 
 def get(keyOrKeys):
 	"""Call the camera control DBus get method.
+	
+		Convenience method for `control('get', [value])[0]`.
 		
 		Accepts key or [key, …], where keys are strings.
 		
@@ -108,21 +131,14 @@ def get(keyOrKeys):
 		See control's `available_keys` for a list of valid inputs.
 	"""
 	
-	keyList = [keyOrKeys] if isinstance(keyOrKeys, str) else keyOrKeys
-	
-	msg = QDBusReply(cameraControlAPI.call('get', keyList))
-	if not msg.isValid():
-		raise DBusException("%s: %s" % (msg.error().name(), msg.error().message()))
-	return msg.value()[keyOrKeys] if isinstance(keyOrKeys, str) else msg.value()
+	valueList = control('get', 
+		[keyOrKeys] if isinstance(keyOrKeys, str) else keyOrKeys )
+	return valueList[keyOrKeys] if isinstance(keyOrKeys, str) else valueList
 
 
 def set(values):
 	"""Call the camera control DBus set method. Accepts {str: value}."""
-	
-	msg = QDBusReply(cameraControlAPI.call('set', values))
-	if not msg.isValid():
-		raise DBusException("%s: %s" % (msg.error().name(), msg.error().message()))
-	return msg.value()
+	control('set', values)
 
 
 

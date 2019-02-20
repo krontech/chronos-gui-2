@@ -5,8 +5,7 @@ from PyQt5.QtCore import pyqtSlot, QPropertyAnimation, QPoint
 from PyQt5.QtWidgets import QWidget, QApplication
 
 from debugger import *; dbg
-import api as api
-from api import silenceCallbacks
+import api_mock as api
 import settings
 from widgets.button import Button
 
@@ -33,7 +32,7 @@ class Main(QWidget):
 		self.setAttribute(QtCore.Qt.WA_TranslucentBackground, True)
 		
 		# Widget behavour.
-		self.uiDebugA.clicked.connect(self.printAnalogGain)
+		self.uiDebugA.clicked.connect(self.makeFailingCall)
 		self.uiDebugB.clicked.connect(lambda: window.show('test'))
 		self.uiDebugC.setFocusPolicy(QtCore.Qt.NoFocus) #Break into debugger without loosing focus, so you can debug focus issues.
 		self.uiDebugC.clicked.connect(lambda: self and dbg()) #"self" is needed here, won't be available otherwise.
@@ -234,19 +233,19 @@ class Main(QWidget):
 		self.uiBattery.setText(charged)
 		
 	@pyqtSlot(int, name="updateExposureNs")
-	@silenceCallbacks('uiExposureSlider')
+	@api.silenceCallbacks('uiExposureSlider')
 	def updateExposureNs(self, newExposureNs):
 		self.uiExposureSlider.setValue(newExposureNs) #hack in the limit from the API, replace with a proper queried constant when we have state
 		self.updateExposureDependancies()
 	
 	@pyqtSlot(int, name="updateExposureMax")
-	@silenceCallbacks('uiExposureSlider')
+	@api.silenceCallbacks('uiExposureSlider')
 	def updateExposureMax(self, newExposureNs):
 		self.uiExposureSlider.setMaximum(newExposureNs) #hack in the limit from the API, replace with a proper queried constant when we have state
 		self.updateExposureDependancies()
 	
 	@pyqtSlot(int, name="updateExposureMin")
-	@silenceCallbacks('uiExposureSlider')
+	@api.silenceCallbacks('uiExposureSlider')
 	def updateExposureMin(self, newExposureNs):
 		self.uiExposureSlider.setValue(newExposureNs) #hack in the limit from the API, replace with a proper queried constant when we have state
 		self.updateExposureDependancies()
@@ -262,7 +261,7 @@ class Main(QWidget):
 	
 	
 	@pyqtSlot('QVariantMap', name="updateBaWTriggers")
-	@silenceCallbacks()
+	@api.silenceCallbacks()
 	def updateBaWTriggers(self, triggers):
 		#	VAR IF no mocal
 		#		show black cal button
@@ -279,7 +278,7 @@ class Main(QWidget):
 		self.closeCalibrationMenu()
 	
 	@pyqtSlot('QVariantMap', name="updateColorTriggers")
-	@silenceCallbacks()
+	@api.silenceCallbacks()
 	def updateColorTriggers(self, triggers):
 		#	VAR IF no mocal
 		#		show cal menu button → wb/bc menu
@@ -298,13 +297,13 @@ class Main(QWidget):
 		
 	
 	@pyqtSlot(str, name="updateFocusPeakingIntensity")
-	@silenceCallbacks('uiFocusPeakingIntensity')
+	@api.silenceCallbacks('uiFocusPeakingIntensity')
 	def updateFocusPeakingIntensity(self, focusPeakingIntensity: str):
 		self.uiFocusPeakingIntensity.setCurrentIndex(
 			focusPeakingIntensities.index(focusPeakingIntensity) )
 	
 	@pyqtSlot(int, name="updateFocusPeakingColor")
-	@silenceCallbacks() #Causes pyqtSlot to overwrite earlier function.
+	@api.silenceCallbacks() #Causes pyqtSlot to overwrite earlier function.
 	def updateFocusPeakingColor(self, color: int):
 		QPoint = QtCore.QPoint
 		
@@ -429,3 +428,6 @@ class Main(QWidget):
 		dest.clickMarginRight = src.clickMarginRight
 		dest.setGeometry(src.geometry())
 		dest.customStyleSheet = src.customStyleSheet
+	
+	def makeFailingCall(self):
+		print(api.control('makeFailingCall', 1))

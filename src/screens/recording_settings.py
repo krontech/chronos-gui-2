@@ -5,8 +5,8 @@ from PyQt5.QtCore import pyqtSlot
 
 from debugger import *; dbg
 
-import api
-from api import silenceCallbacks
+import api_mock as api
+from api_mock import silenceCallbacks
 
 
 class RecordingSettings(QtWidgets.QDialog):
