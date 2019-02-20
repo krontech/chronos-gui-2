@@ -828,14 +828,14 @@ class ControlAPI(QObject):
 	
 	
 	@action('get')
-	@pyqtSlot(result="QVariantList")
+	@pyqtSlot(result="QVariantMap")
 	def available_keys(self) -> List[str]:
 		keys = [i for i in dir(state) if i[0] != '_'] #Don't expose private items.
 		return Reply(keys)
 	
 	
 	@action('get')
-	@pyqtSlot(result="QVariantList")
+	@pyqtSlot(result="QVariantMap")
 	def available_calls(self) -> List[Dict[str, str]]:
 		return Reply([{
 			"name": i,
@@ -996,7 +996,7 @@ class ControlAPI(QObject):
 	
 	
 	@action('set')
-	@pyqtSlot('QVariantList', result='QVariantList')
+	@pyqtSlot('QVariantList', result='QVariantMap')
 	def saveRegions(self, regions: List[Dict[str, Union[int, str, Dict[str, int]]]]) -> List[Dict[str, Union[bool, str]]]:
 		"""Save video clips to disk or network.
 			

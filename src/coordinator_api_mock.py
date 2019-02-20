@@ -1001,7 +1001,7 @@ class ControlAPIMock(QObject):
 	
 	
 	@action('set')
-	@pyqtSlot('QVariantList', result='QVariantList')
+	@pyqtSlot('QVariantList', result='QVariantMap')
 	def saveRegions(self, regions: List[Dict[str, Union[int, str, Dict[str, int]]]]) -> List[Dict[str, Union[bool, str]]]:
 		"""Save video clips to disk or network.
 			
