@@ -1126,4 +1126,13 @@ class Lux1310Object(SensorObject):
 
 ####################################
 #
-# new sensor-based
+# new sensor-based remote function calls
+#
+####################################
+
+	def GetMinMasterFramePeriod(self, hRes, vRes):
+		return Lux1310GetMinMasterFramePeriod(self, hRes, vRes)
+	def GetActualFramePeriod(self, targetPeriod, hRes, vRes):
+		return Lux1310GetActualFramePeriod(self, targetPeriod, hRes, vRes)
+	def IsValidResolution(self, hRes, vRes, hOffset, vOffset):
+		return Lux1310IsValidResolution(self, hRes, vRes, hOffset, vOffset)
