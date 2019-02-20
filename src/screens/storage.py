@@ -3,7 +3,12 @@
 from PyQt5 import uic, QtWidgets, QtCore
 
 from debugger import *; dbg
-import api_mock as api
+
+from os import environ
+if environ.get('USE_CHRONOS_API_MOCK') in ('always', 'gui'):
+	import api_mock as api
+else:
+	import api
 
 
 class Storage(QtWidgets.QWidget):

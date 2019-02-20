@@ -5,7 +5,12 @@ from PyQt5.QtWidgets import QScroller
 # from PyQt5.QtCore import pyqtSlot
 
 from debugger import *; dbg
-import api_mock as api
+
+from os import environ
+if environ.get('USE_CHRONOS_API_MOCK') in ('always', 'gui'):
+	import api_mock as api
+else:
+	import api
 from stats import app_version
 
 
