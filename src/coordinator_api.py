@@ -17,10 +17,10 @@ from PyQt5.QtDBus import QDBusConnection, QDBusMessage, QDBusError
 
 from debugger import *; dbg
 
-from camobj import CamObject
+# from camobj import CamObject
 from mmapregisters import *
 
-cam = CamObject()
+#cam = CamObject()
 
 # Set up d-bus interface. Connect to mock system buses. Check everything's working.
 if not QDBusConnection.systemBus().isConnected():
@@ -252,7 +252,7 @@ class State():
 		return random.choice((12.38, 12.38, 12.39, 12.39, 12.40))
 	
 	
-	_recordingHRes = 200 #rebuilds video pipeline
+	_recordingHRes = 1280 #rebuilds video pipeline
 	
 	@property
 	def recordingHRes(self): #rebuilds video pipeline
@@ -269,7 +269,7 @@ class State():
 		return 16
 	
 	
-	_recordingVRes = 300 
+	_recordingVRes = 1024 
 	
 	@property
 	def recordingVRes(self): 
@@ -286,7 +286,7 @@ class State():
 		return 2
 	
 	
-	_recordingHOffset = 800 #rebuilds video pipeline
+	_recordingHOffset = 0 #rebuilds video pipeline
 	
 	@property
 	def recordingHOffset(self): #rebuilds video pipeline
@@ -299,7 +299,7 @@ class State():
 		pendingCallbacks |= set([changeRecordingResolution])
 	
 	
-	_recordingVOffset = 480
+	_recordingVOffset = 0
 	
 	@property
 	def recordingVOffset(self):
