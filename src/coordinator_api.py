@@ -17,10 +17,10 @@ from PyQt5.QtDBus import QDBusConnection, QDBusMessage, QDBusError
 
 from debugger import *; dbg
 
-# from camobj import CamObject
+from camobj import CamObject
 from mmapregisters import *
 
-#cam = CamObject()
+cam = CamObject()
 
 # Set up d-bus interface. Connect to mock system buses. Check everything's working.
 if not QDBusConnection.systemBus().isConnected():
@@ -850,8 +850,8 @@ class ControlAPI(QObject):
 		
 	
 	@action('get')
-	@pyqtSlot(int, int, result=int)
-	def framerate_for_resolution(self, hRes: int, vRes: int) -> int:
+	@pyqtSlot(int, int, result="QVariantMap")
+	def framerate_for_resolution(self, hRes: int, vRes: int):
 		return Reply(framerate_for_resolution(hRes, vRes))
 	
 	@action('get')
