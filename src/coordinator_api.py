@@ -188,16 +188,6 @@ class State():
 	sensorPixelRate = 1280 * 1024 * 1000
 	sensorPixelFormat = "BYR2" #Or "y12" for mono models.
 	sensorRecordsColor = True
-	sensorFramerate = 1000
-	
-		
-	@property
-	def sensorFramerate(self):
-		return 1e6/self.recordingExposureNs
-	
-	@sensorFramerate.setter
-	def sensorFramerate(self, value):
-		self.recordingExposureNs = 1e6*value
 	
 	sensorQuantizeTimingNs = 250
 	sensorMinExposureNs = int(1)
@@ -396,9 +386,26 @@ class State():
 	def availableRecordingAnalogGains(self) -> list: 
 		return [{"multiplier":2**i, "dB":6*i} for i in range(0,5)]
 	
+	_sensorMilliframerate = int(1500e3)
+	
+	@property
+	def sensorMilliframerate(self):
+		return self._sensorMilliframerate
+	
+	@sensorMilliframerate.setter
+	def sensorMilliframerate(self, value):
+		newMaxRecordingPeriod = int(1e9/(value/1000))
+		if newMaxRecordingPeriod < self.recordingPeriod:
+			print('notification: new max recording period less than recording period')
+			#Perhaps we want to bump the recording period down? I think it would make
+			#sense for these numbers to generally "trail" each other. Or should it be
+			#a proportional thing? Like exposure is always n% of the frame? I think
+			#that might make more sense… so it's a shutter angle we actually store?
+		self._sensorMilliframerate = value
+	
 	
 	recordingExposureNs = int(850) #These don't have to have the pipeline torn down, so they don't need the hack where we set video settings atomically.
-		
+	
 	@property
 	def recordingPeriod(self):
 		return self.recordingExposureNs + 5000
