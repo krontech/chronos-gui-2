@@ -8,6 +8,8 @@ from __future__ import unicode_literals
 
 import sys
 import random
+from termcolor import colored, cprint
+
 from typing import *
 from time import sleep
 
@@ -154,6 +156,8 @@ def changeRecordingResolution(state):
 		print(f"Mock: changing recording resolution to xywh {state.recordingHOffset} {state.recordingVOffset} {state.recordingHRes} {state.recordingVRes}.")
 		cam.sensor.sensorSetResolutions(state.recordingHOffset, state.recordingVOffset, state.recordingHRes, state.recordingVRes)
 
+def checkValidExposureAndPeriod(state):
+	cprint("checkValidExposureAndPeriod", "blue") 
 
 def notifyExposureChange(state):
 	print('Real: Exposure change callback.')
@@ -196,8 +200,8 @@ class State():
 		self.recordingExposureNs = 1e6*value
 	
 	sensorQuantizeTimingNs = 250
-	sensorMinExposureNs = int(1e1)
-	sensorMaxExposureNs = int(1e9)
+	sensorMinExposureNs = int(1)
+	sensorMaxExposureNs = int(1000)
 	sensorMaxShutterAngle = 330
 	timingMaxPeriod = sys.maxsize
 	
@@ -312,7 +316,7 @@ class State():
 		pendingCallbacks |= set([changeRecordingResolution])
 	
 	
-	recordingAnalogGainMultiplier = 2 #doesn't rebuild video pipeline, only takes gain multiplier
+	__recordingAnalogGainMultiplier = 2 #doesn't rebuild video pipeline, only takes gain multiplier
 	
 	
 	_previewHRes = 200 #rebuilds video pipeline
@@ -325,6 +329,7 @@ class State():
 	def previewHRes(self, value):
 		global pendingCallbacks
 		self._previewHRes = value
+		# pendingCallbacks |= set([changeRecordingResolution, notifyExposureChange, notifyPeriodChange])
 		pendingCallbacks |= set([changeRecordingResolution, notifyExposureChange])
 	
 	
@@ -338,6 +343,7 @@ class State():
 	def previewVRes(self, value):
 		global pendingCallbacks
 		self._previewVRes = value
+		# pendingCallbacks |= set([changeRecordingResolution, notifyExposureChange, notifyPeriodChange])
 		pendingCallbacks |= set([changeRecordingResolution, notifyExposureChange])
 	
 	
@@ -366,6 +372,22 @@ class State():
 		self._previewVOffset = value
 		pendingCallbacks |= set([changeRecordingResolution])
 	
+
+	_recordingAnalogGainMultiplier = 8 #rebuilds video pipeline
+	
+	@property
+	def recordingAnalogGainMultiplier(self): #rebuilds video pipeline
+		return self._recordingAnalogGainMultiplier
+	
+	@recordingAnalogGainMultiplier.setter
+	def recordingAnalogGainMultiplier(self, value):
+		global pendingCallbacks
+		self._recordingAnalogGainMultiplier = value
+		cam.sensor.sensorSetGain(value)
+
+		#pendingCallbacks |= set([changeRecordingResolution])
+
+
 	
 	previewAnalogGainMultiplier = 2 #doesn't rebuild video pipeline, only takes gain multiplier
 	
@@ -1095,8 +1117,8 @@ class ControlAPI(QObject):
 		elif key == 'focusPeakingColor':
 			cam.setFocusPeakColor(value)
 
-		elif key == 'recordingAnalogGainMultiplier':
-			cam.sensor.sensorSetGain(value)
+		# elif key == 'recordingAnalogGainMultiplier':
+			# cam.sensor.sensorSetGain(value)
 
 
 	
