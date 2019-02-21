@@ -877,7 +877,7 @@ class ControlAPI(QObject):
 		return Reply(framerate_for_resolution(hRes, vRes))
 	
 	@action('get')
-	@pyqtSlot(result=bool)
+	@pyqtSlot(result="QVariantMap")
 	def resolution_is_valid(self, hOffset: int, vOffset: int, hRes: int, vRes: int) -> bool: #xywh px
 		return Reply(resolution_is_valid(hOffset, vOffset, hRes, vRes))
 	
@@ -1069,7 +1069,7 @@ class ControlAPI(QObject):
 		print(f"MOCK: Unmounting {path}.")
 	
 	@action('get')
-	@pyqtSlot(result=str)
+	@pyqtSlot(result="QVariantMap")
 	def df(self, ):
 		"""Run the df linux command, and return the output.
 			
@@ -1086,7 +1086,7 @@ class ControlAPI(QObject):
 	
 	
 	@action('set')
-	@pyqtSlot(result=str)
+	@pyqtSlot(result="QVariantMap")
 	def testNetworkStorageCredentials(self):
 		"""Check the remote file share works.
 			
@@ -1096,7 +1096,7 @@ class ControlAPI(QObject):
 		print("MOCK: Checking network storage…", end='', flush=True)
 		sleep(3)
 		print(" ok.")
-		return ""
+		return Reply('')
 
 	def processSetting(self, key, value):
 		'''Send data to CamObject'''

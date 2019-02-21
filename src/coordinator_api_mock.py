@@ -857,12 +857,12 @@ class ControlAPIMock(QObject):
 		
 	
 	@action('get')
-	@pyqtSlot(int, int, result=int)
+	@pyqtSlot(int, int, result="QVariantMap")
 	def framerate_for_resolution(self, hRes: int, vRes: int) -> int:
 		return Reply(framerate_for_resolution(hRes, vRes))
 	
 	@action('get')
-	@pyqtSlot(result=bool)
+	@pyqtSlot(result="QVariantMap")
 	def resolution_is_valid(self, hOffset: int, vOffset: int, hRes: int, vRes: int) -> bool: #xywh px
 		return Reply(resolution_is_valid(hOffset, vOffset, hRes, vRes))
 	
@@ -1052,7 +1052,7 @@ class ControlAPIMock(QObject):
 		print(f"MOCK: Unmounting {path}.")
 	
 	@action('get')
-	@pyqtSlot(result=str)
+	@pyqtSlot(result="QVariantMap")
 	def df(self, ):
 		"""Run the df linux command, and return the output.
 			
@@ -1069,7 +1069,7 @@ class ControlAPIMock(QObject):
 	
 	
 	@action('set')
-	@pyqtSlot(result=str)
+	@pyqtSlot(result="QVariantMap")
 	def testNetworkStorageCredentials(self):
 		"""Check the remote file share works.
 			
@@ -1079,7 +1079,7 @@ class ControlAPIMock(QObject):
 		print("MOCK: Checking network storage…", end='', flush=True)
 		sleep(3)
 		print(" ok.")
-		return ""
+		return Result('')
 
 
 
