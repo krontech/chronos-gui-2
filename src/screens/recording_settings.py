@@ -67,7 +67,7 @@ class RecordingSettings(QtWidgets.QDialog):
 		
 		self.uiFps.valueChanged.connect(self.updateFps)
 		self.uiFrameDuration.valueChanged.connect(self.updateFrameDurationMicroseconds)
-		api.observe('recordingExposureNs', self.updateFrameDurationNanoseconds)
+		api.observe('sensorMilliframerate', self.updateMilliframerate)
 		
 		#Analog gain
 		self.populateUiAnalogGain()
@@ -257,10 +257,10 @@ class RecordingSettings(QtWidgets.QDialog):
 		if µs:
 			self.uiFps.setValue(1000/µs)
 		
-	@pyqtSlot(float, name="updateFrameDurationNanoseconds")
+	@pyqtSlot(float, name="updateMilliframerate")
 	@silenceCallbacks() #Taken care of by Microsecond version.
-	def updateFrameDurationNanoseconds(self, ns: int):
-		self.updateFrameDurationMicroseconds(ns/1000)
+	def updateMilliframerate(self, mfps: int):
+		self.updateFrameDurationMicroseconds(1e6/(mfps/1000))
 		
 	
 	def centerRecording(self):
