@@ -226,10 +226,32 @@ class CamObject:
 
 	def __init__(self):
 		print ("CamObject Init")
+		# self.pulseLEDs(3)
 		self.checkSeqStatus()
 		self.CamInit()
 		self.checkSeqStatus()
 		#thiscam = self
+
+	def pulseLEDs(self, cycles):
+		# PWM in python at 100 Hz
+		divisor = 5000
+		for cyc in range(cycles):
+			for phase in range(50):
+			 	self.mem.GPIOWrite("record-led.0", 0)
+			 	self.mem.GPIOWrite("record-led.1", 0)
+			 	time.sleep(0.01 - phase / divisor)
+			 	self.mem.GPIOWrite("record-led.0", 1)
+			 	self.mem.GPIOWrite("record-led.1", 1)
+			 	time.sleep(phase / divisor)
+			for phase in range(50):
+			 	self.mem.GPIOWrite("record-led.0", 1)
+			 	self.mem.GPIOWrite("record-led.1", 1)
+			 	time.sleep(0.01 - phase / divisor)
+			 	self.mem.GPIOWrite("record-led.0", 0)
+			 	self.mem.GPIOWrite("record-led.1", 0)
+			 	time.sleep(phase / divisor)
+		
+
 
 
 	def image_sensor_bpp(self):
@@ -778,10 +800,17 @@ class CamObject:
 # Sequencer stuff
 
 	def startRecording(self):
+		print ("starting recording")
+		# for x in range(10):
+		# 	self.mem.GPIOWrite("record-led.0", x & 1)
+		# 	self.mem.GPIOWrite("record-led.1", not (x & 1))
+		# 	time.sleep(0.04)
+
 		if self.recording:
 			return CAMERA_ALREADY_RECORDING
 		if self.playbackMode:
 			return CAMERA_IN_PLAYBACK_MODE
+
 
 		print ("startRecording")
 		print (f"mode is {self.imagerSettings.mode}")
@@ -938,6 +967,8 @@ class CamObject:
 		self.mem.GPIOWrite("record-led.1", 0)
 		# self.recording = True
 		# self.videoHasBeenReviewed = False
+
+		self.recording = False
 
 		print (f"stopRecording: recording is {self.recording}")
 

@@ -4,6 +4,9 @@ from PyQt5 import uic, QtCore
 from PyQt5.QtCore import pyqtSlot, QPropertyAnimation, QPoint
 from PyQt5.QtWidgets import QWidget, QApplication
 
+import time
+from termcolor import cprint
+
 from debugger import *; dbg
 
 from os import environ
@@ -38,6 +41,7 @@ class Main(QWidget):
 		self.setAttribute(QtCore.Qt.WA_TranslucentBackground, True)
 		
 		# Widget behavour.
+		self.uiRecord.clicked.connect(self.recordPressed)
 		self.uiDebugA.clicked.connect(self.makeFailingCall)
 		self.uiDebugB.clicked.connect(lambda: window.show('test'))
 		self.uiDebugC.setFocusPolicy(QtCore.Qt.NoFocus) #Break into debugger without loosing focus, so you can debug focus issues.
@@ -437,3 +441,31 @@ class Main(QWidget):
 	
 	def makeFailingCall(self):
 		print(api.control('makeFailingCall', 1))
+
+	lastTime = -1
+	def debounceRecord(self):
+		now = time.time()
+		if now - self.lastTime > 0.05:
+			ret = True
+		else:
+			ret = False
+			cprint("  RECORD BUTTON BOUNCE SKIPPED  ", "red", "on_white")
+		self.lastTime = now
+		return ret
+
+	def recordPressed(self):
+		if self.debounceRecord():
+			videoState = api.get('videoState')
+			if videoState == 'recording':
+				api.set({'videoState': 'pre-recording'})
+				self.stopRecord()
+			else:
+				api.set({'videoState': 'recording'})
+				self.startRecord()
+
+
+	def startRecord(self):
+		print("startRecord")
+
+	def stopRecord(self):
+		print("stopRecord")

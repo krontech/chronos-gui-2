@@ -11,7 +11,7 @@ import random
 from termcolor import colored, cprint
 
 from typing import *
-from time import sleep
+from time import sleep, time
 
 from PyQt5.QtCore import pyqtSlot, QObject, QTimer, Qt, QByteArray
 from PyQt5.QtDBus import QDBusConnection, QDBusMessage, QDBusError
@@ -61,10 +61,11 @@ def action(actionType: str) -> callable:
 			- set: Function primarily updates a value. It may return
 				a status. The setting action is most important.
 			- pure: Function returns a value based solely on it's
+
 				inputs. Pure functions are cachable, for example.
 		
+		return 1000*1024*1280/(hRes*vRes)
 		Example:
-			@action('get')
 			@property
 			def availableRecordingAnalogGains(self) -> list: 
 				return [{"multiplier":2**i, "dB":6*i} for i in range(0,5)]
@@ -128,9 +129,12 @@ def resolution_is_valid(hOffset: int, vOffset: int, hRes: int, vRes: int):
 def framerate_for_resolution(hRes: int, vRes: int) -> int:
 	if type(hRes) is not int or type(vRes) is not int:
 		return print("D-BUS ERROR", QDBusError.InvalidArgs, f"framerate must be of type <class 'int'>, <class 'int'>. Got type {type(hRes)}, {type(vRes)}.")
-			
-	return 60*4e7/(hRes*vRes+1e6) #Mock. Total BS but feels about right at the higher resolutions.
+	
 
+
+	# TODO make dbus call		
+	return 1000*1024*1280/(hRes*vRes)
+	#return sensorPixelRate/(hRes*vRes) #Mock. Total BS but feels about right at the higher resolutions.
 
 
 
@@ -1098,16 +1102,16 @@ class ControlAPI(QObject):
 		print(" ok.")
 		return ""
 
+
 	def processSetting(self, key, value):
 		'''Send data to CamObject'''
-		print("processSetting")
+		# print("processSetting")
 		if type(value) is str:
-			print(f"Processing Setting: {key} is set to {value}")
+			cprint(f"Processing Setting: {key} is set to {value}", "magenta")
 		else:
-			print(f"Processing Setting: {key} is set to 0x{value:x}")
+			cprint(f"Processing Setting: {key} is set to 0x{value:x}", "magenta")
 
-		#implement dictionary here?
-		# brk()
+		# TODO: move these to independet setters?
 		if key == 'showWhiteClippingZebraStripes':
 			cam.setZebraEnabled(value)
 			
@@ -1116,6 +1120,14 @@ class ControlAPI(QObject):
 
 		elif key == 'focusPeakingColor':
 			cam.setFocusPeakColor(value)
+
+		#TODO this is probably not the right way to do this
+		elif key == 'videoState':
+			if value == 'recording':
+				cam.startRecording()
+			else:
+				cam.stopRecording()
+
 
 		# elif key == 'recordingAnalogGainMultiplier':
 			# cam.sensor.sensorSetGain(value)

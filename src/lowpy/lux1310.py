@@ -300,13 +300,17 @@ class Lux1310Object(SensorObject):
 			sciaddr = lreg >> self.SCI.LUX1310_SCI_REG_ADDR
 			scidata = setbits(val, lreg & self.SCI.LUX1310_SCI_REG_MASK)
 			cprint(f'  SCI WRITE: "{reg}": 0x{scidata:x}', "yellow")
+			self.mem.printFPGA = False
 			self.Lux1310SCIWrite(sciaddr, scidata)
+			self.mem.printFPGA = True
+
 		else:
 			sciaddr = reg >> self.SCI.LUX1310_SCI_REG_ADDR
 			scidata = setbits(val, reg & self.SCI.LUX1310_SCI_REG_MASK)
 			cprint(f"  SCI WRITE: 0x{sciaddr:x}: 0x{scidata:x}", "yellow")
+			self.mem.printFPGA = False
 			self.Lux1310SCIWrite(sciaddr, scidata)
-			# cprint(f"  SCI WRITE: 0x{sciaddr:x}: 0x{scidata:x}", "blue", "on_yellow")
+			self.mem.printFPGA = True
 
 
 	def Lux1310WriteWord(self, reg, val):
