@@ -183,9 +183,9 @@ class State():
 	cameraMemoryGB = 16.
 	cameraSerial = "Captain Crunch"
 	sensorName = "acme9001"
-	sensorHMax = 1920
+	sensorHMax = 1280
 	sensorHMin = 256
-	sensorVMax = 1080
+	sensorVMax = 1024
 	sensorVMin = 64
 	sensorHIncrement = 2
 	sensorVIncrement = 32
@@ -205,9 +205,21 @@ class State():
 	
 	timingMinExposureNs = sensorMinExposureNs
 	timingMaxExposureNs = sensorMaxExposureNs
-	timingExposureDelayNs = 1000
-	timingMaxShutterAngle = 330
+	timingExposureDelayNs = 960
 	timingQuantization = 1e9 / sensorQuantizeTimingNs
+	
+	
+	@property
+	def timingMaxShutterAngle(self):
+		return self.timingMaxExposureNs/self.timingExposureDelayNs * 359
+	
+	@timingMaxShutterAngle.setter
+	def timingMaxShutterAngle(self, value):
+		self._recordingHOffset = value
+		self.timingExposureDelayNs = value/359 * self.timingMaxExposureNs
+		self.emitControlSignal('timingExposureDelayNs')
+	
+	
 	
 	@property
 	def commonlySupportedResolutions(self): 
@@ -733,7 +745,11 @@ state = State() #Must be instantiated for QDBusMarshaller. 🙂
 
 
 class ControlAPIMock(QObject):
-	"""Function calls of the camera control D-Bus API."""
+	"""Function calls of the camera control D-Bus API.
+		
+		Any function decorated by a @pyqtSlot is callable over D-Bus.
+		The action decorator is used by the HTTP API, so it knows
+		what caching scheme it should use."""
 	
 	def __init__(self):
 		super().__init__()
@@ -946,7 +962,6 @@ class ControlAPIMock(QObject):
 	@action('set')
 	@pyqtSlot(str, result='QVariantMap')
 	def saveCalibrationData(self, toFolder: str) -> Union[Dict[str, str], None]:
-		#return self.emitError('A fire! Oh no!') #Doesn't work.
 		print(f'MOCK: Save calibration data to {toFolder}.')
 		return (
 			Reply("out of space", "Out of space of sda.") 
