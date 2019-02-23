@@ -91,6 +91,7 @@ class MemObject:
 
 	# print (f"globvar is {globvar}")
 
+	printFPGA = True
 
 	def __init__(self):
 		pass
@@ -102,10 +103,10 @@ class MemObject:
 	def FPGAmasked(self, addr):
 		ret = False
 		if self.writesCount <= self.writesFirst:
-			cprint(f"FPGA write #{self.writesCount} masked! ({addr})", "white", "on_red")
+			if self.printFPGA: cprint(f"FPGA write #{self.writesCount} masked! ({addr})", "white", "on_red")
 			ret = True
 		if self.FPGAc > self.FPGAlast:
-			cprint(f"FPGA write #{self.writesCount} masked! ({addr})", "white", "on_red")
+			if self.printFPGA: cprint(f"FPGA write #{self.writesCount} masked! ({addr})", "white", "on_red")
 			ret = True
 		if self.writesCount == self.writesBP:
 			breakpoint()
@@ -123,7 +124,7 @@ class MemObject:
 			FPGAreg = FPGA_dict[addr]
 		else:
 			FPGAreg = addr
-		cprint (f'   - - - FPGAWrite8("{addr}":0x{FPGAreg:x}, 0x{data:x})', self.FPGAcol)
+		if self.printFPGA: cprint (f'   - - - FPGAWrite8("{addr}":0x{FPGAreg:x}, 0x{data:x})', self.FPGAcol)
 		self.fpga.mem8[FPGAreg] = data & 0xff
 
 	def FPGAWrite16(self, addr, data):
@@ -134,7 +135,7 @@ class MemObject:
 			FPGAreg = FPGA_dict[addr]
 		else:
 			FPGAreg = addr
-		cprint (f'   ----- FPGAWrite16("{addr}":0x{FPGAreg:x}, 0x{data:x})', self.FPGAcol)
+		if self.printFPGA: cprint (f'   ----- FPGAWrite16("{addr}":0x{FPGAreg:x}, 0x{data:x})', self.FPGAcol)
 		self.fpga.mem16[FPGAreg // 2] = data & 0xffff
 
 	def FPGAWrite32(self, addr, data):
@@ -145,14 +146,14 @@ class MemObject:
 			FPGAreg = FPGA_dict[addr]
 		else:
 			FPGAreg = addr
-		cprint (f'   ===== FPGAWrite32("{addr}":0x{FPGAreg:x}, 0x{data:x})', self.FPGAcol)
+		if self.printFPGA: cprint (f'   ===== FPGAWrite32("{addr}":0x{FPGAreg:x}, 0x{data:x})', self.FPGAcol)
 		self.fpga.mem32[FPGAreg // 4] = data
 
 # These are non-blockable FPGA writes:
 	def FPGAWrite16nb(self, addr, data):
 		self.FPGAc = self.FPGAc + 1
 		FPGAreg = FPGA_dict[addr]
-		cprint (f'   ({self.FPGAc})----- FPGAWrite16("{addr}":0x{FPGAreg:x}, 0x{data:x})', self.FPGAcol)
+		if self.printFPGA: cprint (f'   ({self.FPGAc})----- FPGAWrite16("{addr}":0x{FPGAreg:x}, 0x{data:x})', self.FPGAcol)
 		if self.breakFPGA: breakpoint()
 		if self.usePC:
 			old = self.fpga.mem16[FPGAreg // 2]

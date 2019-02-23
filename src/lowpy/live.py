@@ -29,6 +29,12 @@ def nicehex4(n):
 	return "0x" + ("0000000" + hex(n)[2:])[-8:]
 
 
+# for x in range(10000):
+#  	cam.mem.GPIOWrite("record-led.0", x & 1)
+#  	cam.mem.GPIOWrite("record-led.1", not (x & 1))
+#  	time.sleep(0.005)
+
+
 cam = CamObject()
 
 
@@ -39,11 +45,7 @@ print("LIVE!")
 sw = cam.mem.GPIORead("encoder-sw")
 # print(f"Encoder switch is {sw}")
 
-print ("----")
-# for x in range(10):
-# 	cam.mem.GPIOWrite("record-led.0", x & 1)
-# 	cam.mem.GPIOWrite("record-led.1", not (x & 1))
-# 	time.sleep(0.08)
+
 cam.mem.GPIOWrite("record-led.0", 0)
 cam.mem.GPIOWrite("record-led.1", 0)
 
