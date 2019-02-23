@@ -175,9 +175,12 @@
     <rect>
      <x>120</x>
      <y>340</y>
-     <width>231</width>
+     <width>221</width>
      <height>61</height>
     </rect>
+   </property>
+   <property name="clickMarginRight" stdset="0">
+    <enum>SpinBox::half</enum>
    </property>
    <property name="clickMarginTop" stdset="0">
     <enum>SpinBox::half</enum>
@@ -252,22 +255,6 @@
    </property>
    <property name="text">
     <string>Analog Gain</string>
-   </property>
-  </widget>
-  <widget class="Button" name="uiSavePreset">
-   <property name="geometry">
-    <rect>
-     <x>460</x>
-     <y>400</y>
-     <width>171</width>
-     <height>81</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Save Preset</string>
-   </property>
-   <property name="clickMarginRight" stdset="0">
-    <enum>Button::half</enum>
    </property>
   </widget>
   <widget class="Button" name="uiDone">
@@ -542,6 +529,47 @@
     <string>Recording Settings</string>
    </property>
   </widget>
+  <widget class="Button" name="uiSavePreset">
+   <property name="geometry">
+    <rect>
+     <x>390</x>
+     <y>40</y>
+     <width>51</width>
+     <height>81</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>💾</string>
+   </property>
+   <property name="clickMarginLeft" stdset="0">
+    <enum>Button::half</enum>
+   </property>
+   <property name="clickMarginRight" stdset="0">
+    <enum>Button::none</enum>
+   </property>
+  </widget>
+  <widget class="Button" name="uiDeletePreset">
+   <property name="geometry">
+    <rect>
+     <x>390</x>
+     <y>40</y>
+     <width>51</width>
+     <height>81</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>×</string>
+   </property>
+   <property name="clickMarginLeft" stdset="0">
+    <enum>Button::half</enum>
+   </property>
+   <property name="clickMarginRight" stdset="0">
+    <enum>Button::none</enum>
+   </property>
+   <property name="customStyleSheet" stdset="0">
+    <string>Button { color: maroon }</string>
+   </property>
+  </widget>
   <zorder>backdrop</zorder>
   <zorder>label_3</zorder>
   <zorder>label_4</zorder>
@@ -572,8 +600,9 @@
   <zorder>uiAnalogGain</zorder>
   <zorder>uiUnsavedChangesWarning</zorder>
   <zorder>uiDone</zorder>
-  <zorder>uiSavePreset</zorder>
   <zorder>headerlabel_7</zorder>
+  <zorder>uiSavePreset</zorder>
+  <zorder>uiDeletePreset</zorder>
  </widget>
  <customwidgets>
   <customwidget>
@@ -631,7 +660,6 @@
   <tabstop>uiExposure</tabstop>
   <tabstop>uiMaximizeExposure</tabstop>
   <tabstop>uiAnalogGain</tabstop>
-  <tabstop>uiSavePreset</tabstop>
  </tabstops>
  <resources/>
  <connections/>
