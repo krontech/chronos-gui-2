@@ -38,12 +38,16 @@ if hasattr(pdb, 'hideframe'):
 dbg = brk #I keep using one or the other. Either should probably work, let's make debugging easy on ourselves.
 
 
-def dump(val, label=None):
-	"""Print and return the value. Useful for inline print-debugging."""
-	
-	print(label, val) if label else print(val)
-	
-	return val
+def dump(*args):
+	"""Print and return the value. Useful for inline print-debugging.
+		
+		1-arity: dump(val: any)
+			print val and return it.
+		2-arity: dump(label, val)"""
+	if not args:
+		raise ValueError('No args specified to dump!')
+	print(*args)
+	return args[0] if len(args) == 1 else args[1]
 	
 
 def breakIf(widget):
