@@ -230,6 +230,9 @@ class CamObject:
 		self.checkSeqStatus()
 		self.CamInit()
 		self.checkSeqStatus()
+
+		self.mem.printFPGAAfterBoot = True
+
 		#thiscam = self
 
 	def pulseLEDs(self, cycles):
