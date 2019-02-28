@@ -76,7 +76,7 @@ class RecordingSettings(QtWidgets.QDialog):
 		# Button binding.
 		self.uiCenterRecording.clicked.connect(self.centerRecording)
 		
-		self.uiDone.clicked.connect(self.doneWithRecSettingsWindow)
+		self.uiDone.clicked.connect(lambda: window.back())
 		
 		api.observe('sensorMinExposureNs', self.setMinExposure)
 		api.observe('sensorMaxExposureNs', self.setMaxExposure)
@@ -103,6 +103,12 @@ class RecordingSettings(QtWidgets.QDialog):
 		#to-last setting was set during setup.
 		if self.uiPresets.itemData(0)['temporary'] and not self.uiPresets.itemData(self.uiPresets.currentIndex())['temporary']:
 			self.uiPresets.removeItem(0)
+		
+		#Set up ui writes after everything is done.
+		self.uiHRes.valueChanged.connect(lambda v: api.set({'recordingHRes': v}))
+		self.uiVRes.valueChanged.connect(lambda v: api.set({'recordingVRes': v}))
+		self.uiHOffset.valueChanged.connect(lambda v: api.set({'recordingHOffset': v}))
+		self.uiVOffset.valueChanged.connect(lambda v: api.set({'recordingVOffset': v}))
 	
 	presets = api.get('commonlySupportedResolutions')
 	allRecordingGeometrySettings = ['uiHRes', 'uiVRes', 'uiHOffset', 'uiVOffset', 'uiFps', 'uiFrameDuration']
@@ -180,10 +186,9 @@ class RecordingSettings(QtWidgets.QDialog):
 	
 	@silenceCallbacks('uiPresets', *allRecordingGeometrySettings)
 	def selectCorrectPreset(self):
-		print('select correct')
 		try:
 			self.uiPresets.setCurrentIndex(
-				[False in [dump('k=v', dump('sv', int(getattr(self, dump('k', key)).value())) == dump('pv', int(value))) for key, value in values.items()] #fail fast, don't check every value. Round to nearest integer because framerate API gets quantized to two places by fps input.
+				[False in [int(getattr(self, (key)).value()) == int(value) for key, value in values.items()] #fail fast, don't check every value. Round to nearest integer because framerate API gets quantized to two places by fps input.
 					for values in [ #OK, so problem issss fps is stored different than it's displayed, and with different accuracy.
 						self.uiPresets.itemData(index)['values']
 						for index in 
@@ -364,6 +369,7 @@ class RecordingSettings(QtWidgets.QDialog):
 		self.uiFps.setValue(fps)
 		self.uiFrameDuration.setValue(1/fps*1000)
 		self.selectCorrectPreset()
+		api.set({'sensorMilliframerate': int((1/fps*1000)*1e6)})
 		
 		
 	@pyqtSlot(float, name="updateFrameDurationMicroseconds")
@@ -372,10 +378,12 @@ class RecordingSettings(QtWidgets.QDialog):
 		self.uiFrameDuration.setValue(µs)
 		self.uiFps.setValue(1000/µs)
 		self.selectCorrectPreset()
+		api.set({'sensorMilliframerate': int((1000/µs)*1e6)})
 		
 	@pyqtSlot(float, name="updateMilliframerate")
 	@silenceCallbacks() #Taken care of by Microsecond version.
 	def updateMilliframerate(self, mfps: int):
+		print('mfps', mfps)
 		self.updateFrameDurationMicroseconds(1e6/(mfps/1000))
 		
 	
@@ -425,14 +433,3 @@ class RecordingSettings(QtWidgets.QDialog):
 	@silenceCallbacks('uiExposure')
 	def updateExposure(self, ns):
 		self.uiExposure.setValue(ns)
-	
-	
-	def doneWithRecSettingsWindow(self):
-		self.window_.back()
-		api.set({
-			'recordingHRes': self.uiHRes.value(),
-			'recordingVRes': self.uiVRes.value(),
-			'recordingHOffset': self.uiHOffset.value(),
-			'recordingVOffset': self.uiVOffset.value(),
-			'recordingExposureNs': int(self.uiFrameDuration.value() * 1000)
-		})
