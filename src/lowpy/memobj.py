@@ -91,7 +91,8 @@ class MemObject:
 
 	# print (f"globvar is {globvar}")
 
-	printFPGA = True
+	printFPGA = False
+	printFPGAAfterBoot = False	
 
 	def __init__(self):
 		pass

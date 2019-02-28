@@ -449,7 +449,7 @@ class Main(QWidget):
 			ret = True
 		else:
 			ret = False
-			cprint("  RECORD BUTTON BOUNCE SKIPPED  ", "red", "on_white")
+			cprint("              RECORD BUTTON BOUNCE IGNORED              ", "red", "on_white")
 		self.lastTime = now
 		return ret
 
