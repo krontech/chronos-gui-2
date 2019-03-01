@@ -433,8 +433,9 @@ class State():
 	def videoState(self, value):
 		global pendingCallbacks
 		assert value in {'pre-recording', 'recording', 'playback', 'saving', 'preview'}
+		if 'preview' in (self._videoState, value):
+			pendingCallbacks |= set([changeRecordingResolution])
 		self._videoState = value
-		pendingCallbacks |= set([changeRecordingResolution])
 	
 	totalAvailableFrames = 80000 #This is the number of frames we *can* record. There is some overhead for each frame, so the increase in frames as we decrease resolution is not quite linear.
 	
