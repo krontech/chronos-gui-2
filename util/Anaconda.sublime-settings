@@ -23,6 +23,7 @@
 		"E305", /*DDR 2018-00-00: Too many or too few blank lines after function definition. I prefer flexible spacing, I feel it's more readable.*/
 		"E309", /*DDR 2018-00-00: From Anaconda base settings.*/
 		"E401", /*DDR 2018-09-10: Multiple imports on one line are fine. 🤷*/
+		"E402", /*DDR 2019-02-28: Allow conditional imports followed by nonconditional imports.*/
 		"E702", /*DDR 2018-00-00: Multiple statements on one line with semicolon. [;]*/
 		"E711", /*DDR 2018-11-20: No explicit comparisons in if statements sort of breaks when switching on Null, True, and False. It is best to be explicit in that case.*/
 		"E712", /*DDR 2018-11-20: No explicit comparisons in if statements sort of breaks when switching on Null, True, and False. It is best to be explicit in that case.*/
