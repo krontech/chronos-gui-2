@@ -208,6 +208,18 @@ class Window(QtCore.QObject):
 		
 		Example: self.uiPlayAndSave.clicked.connect(lambda: window.show('play_and_save'))"""
 		
+		#DDR 2019-03-01: This function will occasionally be reentered. This
+		#occurs when a nav button is tapped twice in a very short period of
+		#time. (Less than our touchscreen debounce should be.) This manifests
+		#itself as a black (frozen?) screen on the camera. I believe this has
+		#something to do with Qt's signals being inappropriately
+		#multithreaded, but I do not know for sure. This bug, at least, has
+		#the uncomfortable implication that *all* the signal handlers we've
+		#registered for buttons are reentrant, whether that's safe or not."""
+		if(self._screenStack[-1] != self.currentScreen):
+			print(f'Warning: Tried to open {screen}, but another screen ({self._screenStack[-1]}) is already in the process of being opened from {self.currentScreen}')
+			return
+		
 		# Prevent screen from disappearing entirely. Because we open the screen next screen then hide the current, if both are the same it shows then hides the screen so it goes away.
 		if(screen == self.currentScreen):
 			print(f'Warning: Tried to open {screen}, but it was already open. This probably indicates an application logic error.') # Also print a warning, because this probably indicates a logic error.
