@@ -7,11 +7,7 @@ from PyQt5 import uic, QtWidgets, QtCore, QtGui
 
 from debugger import *; dbg
 
-from os import environ
-if environ.get('USE_CHRONOS_API_MOCK') in ('always', 'gui'):
-	import api_mock as api
-else:
-	import api
+import api
 
 from functools import partial
 

@@ -8,13 +8,8 @@ from PyQt5.QtWidgets import QGraphicsOpacityEffect #Also available: QGraphicsBlu
 
 from debugger import *; dbg
 
-from os import environ
-if environ.get('USE_CHRONOS_API_MOCK') in ('always', 'gui'):
-	import api_mock as api
-	from api_mock import silenceCallbacks
-else:
-	import api
-	from api import silenceCallbacks
+import api
+from api import silenceCallbacks
 
 
 settings = QtCore.QSettings('Krontech', 'back-of-camera interface')

@@ -9,7 +9,7 @@
 	interface.
 
 	Usage:
-	import api_mock as api
+	import api
 	print(api.control('get_video_settings'))
 
 	Remarks:

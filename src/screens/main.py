@@ -9,11 +9,7 @@ from termcolor import cprint
 
 from debugger import *; dbg
 
-from os import environ
-if environ.get('USE_CHRONOS_API_MOCK') in ('always', 'gui'):
-	import api_mock as api
-else:
-	import api
+import api
 
 import settings
 from widgets.button import Button

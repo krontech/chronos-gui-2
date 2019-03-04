@@ -33,7 +33,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>100%</string>
+    <string>100% Charge</string>
    </property>
    <property name="clickMarginLeft" stdset="0">
     <enum>Button::none</enum>
@@ -756,10 +756,10 @@ Clipping</string>
 					background: rgba(255,255,255,127); /* The background is drawn under the button borders, so they are opaque if the background is opaque. */
 					
 					/* use borders instead of margins so we can see what we're doing */
-					border-left:   21px solid rgba(4, 20, 152, 37);
-					border-right:  1px solid rgba(4, 20, 152, 37);
-					border-top:    11px solid rgba(4, 20, 152, 37);
-					border-bottom: 1px solid rgba(4, 20, 152, 37);
+					border-left:   21px solid rgba(27, 20, 139, 59);
+					border-right:  1px solid rgba(27, 20, 139, 59);
+					border-top:    11px solid rgba(27, 20, 139, 59);
+					border-bottom: 1px solid rgba(27, 20, 139, 59);
 				}
 			Button { background: #7a70f7 }</string>
     </property>
@@ -1148,10 +1148,10 @@ Calibration</string>
   <tabstop>uiCalibrationOrBlackCal</tabstop>
   <tabstop>uiWhiteBalance1</tabstop>
   <tabstop>uiBlackCal1</tabstop>
+  <tabstop>uiPlayAndSave</tabstop>
   <tabstop>uiWhiteBalance2</tabstop>
   <tabstop>uiBlackCal2</tabstop>
   <tabstop>uiRecalibrateMotionTrigger</tabstop>
-  <tabstop>uiPlayAndSave</tabstop>
  </tabstops>
  <resources>
   <include location="../../assets.qrc"/>

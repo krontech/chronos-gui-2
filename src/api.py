@@ -15,12 +15,20 @@
 import sys
 from debugger import *; dbg
 
+from os import environ
+
 from PyQt5.QtCore import pyqtSlot, QObject
 from PyQt5.QtDBus import QDBusConnection, QDBusInterface, QDBusReply
 from typing import Callable, Any
 
-import coordinator_api #importing starts the service
-import video_api_mock
+
+USE_MOCK = environ.get('USE_CHRONOS_API_MOCK') in ('always', 'gui')
+if USE_MOCK:
+	import coordinator_api_mock #importing starts the service
+	import video_api_mock #[TODO DDR 2019-03-04]: launch this separately using systemd service units or whatever
+else:
+	import coordinator_api
+	import video_api_mock
 
 
 
@@ -30,28 +38,28 @@ if not QDBusConnection.systemBus().isConnected():
 	raise Exception("D-Bus Setup Error")
 
 cameraControlAPI = QDBusInterface(
-	'com.krontech.chronos.control', #Service
-	'/com/krontech/chronos/control', #Path
-	'', #Interface
+	f"com.krontech.chronos.{'control_mock' if USE_MOCK else 'control'}", #Service
+	f"/com/krontech/chronos/{'control_mock' if USE_MOCK else 'control'}", #Path
+	f"", #Interface
 	QDBusConnection.systemBus() )
 cameraVideoAPI = QDBusInterface(
-	'com.krontech.chronos.video_mock', #Service
-	'/com/krontech/chronos/video_mock', #Path
-	'', #Interface
+	f"com.krontech.chronos.{'video_mock' if USE_MOCK else 'video'}", #Service
+	f"/com/krontech/chronos/{'video_mock' if USE_MOCK else 'video'}", #Path
+	f"", #Interface
 	QDBusConnection.systemBus() )
 
-cameraControlAPI.setTimeout(16) #Default is -1, which means 25000ms. 25 seconds is too long to go without some sort of feedback, and the only real long-running operation we have - saving - can take upwards of 5 minutes. Instead of setting the timeout to half an hour, we should probably use events which are emitted as the event progresses. One frame (at 60fps) should be plenty of time for the API to respond, and also quick enough that we'll notice any slowness. The mock replies to messages in under 1ms, so I'm not too worried here.
-cameraVideoAPI.setTimeout(16)
+cameraControlAPI.setTimeout(32) #Default is -1, which means 25000ms. 25 seconds is too long to go without some sort of feedback, and the only real long-running operation we have - saving - can take upwards of 5 minutes. Instead of setting the timeout to half an hour, we should probably use events which are emitted as the event progresses. One frame (at 60fps) should be plenty of time for the API to respond, and also quick enough that we'll notice any slowness. The mock *generally* replies to messages in under 1ms, so I'm not too worried here.
+cameraVideoAPI.setTimeout(32)
 
 if not cameraControlAPI.isValid():
-	print("Error: Can not connect to Camera Control D-Bus API at %s. (%s: %s)" % (
+	print("Error: Can not connect to control D-Bus API at %s. (%s: %s)" % (
 		cameraControlAPI.service(), 
 		cameraControlAPI.lastError().name(), 
 		cameraControlAPI.lastError().message(),
 	), file=sys.stderr)
 	raise Exception("D-Bus Setup Error")
 if not cameraVideoAPI.isValid():
-	print("Error: Can not connect to Camera Video D-Bus API at %s. (%s: %s)" % (
+	print("Error: Can not connect to video D-Bus API at %s. (%s: %s)" % (
 		cameraVideoAPI.service(), 
 		cameraVideoAPI.lastError().name(), 
 		cameraVideoAPI.lastError().message(),
@@ -149,13 +157,22 @@ class APIValues(QObject):
 	def __init__(self):
 		super(APIValues, self).__init__()
 		
-		QDBusConnection.systemBus().registerObject('/com/krontech/chronos/control_hack', self) #The .connect call freezes if we don't do this, or if we do this twice.
+		#The .connect call freezes if we don't do this, or if we do this twice.
+		QDBusConnection.systemBus().registerObject(
+			f"/com/krontech/chronos/{'control_mock_hack' if USE_MOCK else 'control_hack'}", 
+			self,
+		)
 		
 		self._callbacks = {}
 		
 		for key in _camState.keys():
-			QDBusConnection.systemBus().connect('com.krontech.chronos.control', '/com/krontech/chronos/control', '',
-				key, self.__newKeyValue)
+			QDBusConnection.systemBus().connect(
+				f"com.krontech.chronos.{'control_mock' if USE_MOCK else 'control'}", 
+				f"/com/krontech/chronos/{'control_mock' if USE_MOCK else 'control'}",
+				f"",
+				key, 
+				self.__newKeyValue,
+			)
 			self._callbacks[key] = []
 	
 	def observe(self, key, callback):
@@ -288,7 +305,7 @@ def silenceCallbacks(*elements):
 
 
 
-#Launch the API if not imported as a library.
+#Test this component if launched on it's own.
 if __name__ == '__main__':
 	from PyQt5.QtCore import QCoreApplication
 	import signal
@@ -302,4 +319,4 @@ if __name__ == '__main__':
 	print(f"Battery charge: {get('batteryCharge')}")
 	print("Self-test passed. Python API is up and running!")
 	
-	sys.exit(app.exec_())
+	sys.exit(0)

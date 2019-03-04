@@ -2,7 +2,7 @@
 
 """control api implementation
 
-	See control_api_mock.py for a dummy interface to develop against.
+	See coordinator_api_mock.py for a dummy interface to develop against.
 """
 from __future__ import unicode_literals
 

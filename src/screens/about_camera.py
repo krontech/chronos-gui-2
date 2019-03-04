@@ -6,11 +6,7 @@ from PyQt5.QtWidgets import QScroller
 
 from debugger import *; dbg
 
-from os import environ
-if environ.get('USE_CHRONOS_API_MOCK') in ('always', 'gui'):
-	import api_mock as api
-else:
-	import api
+import api
 from stats import app_version
 
 
