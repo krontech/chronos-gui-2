@@ -182,6 +182,7 @@ class State():
 	cameraFpgaVersion = '3.15'
 	cameraMemoryGB = 16.
 	cameraSerial = "Captain Crunch"
+	cameraDescription = "Chronos SN:Captain Crunch"
 	sensorName = "acme9001"
 	sensorHMax = 1280
 	sensorHMin = 256
@@ -473,6 +474,11 @@ class State():
 		"id": "KxIjG09V",
 	}]
 	whiteBalance = [1., 1., 1.]
+	colorMatrix = [
+		[1,0,0],
+		[0,1,0],
+		[0,0,1],
+	]
 	triggerDelayNs = int(1e9)
 	
 	triggerConfiguration = { #read/write, what the triggers do
@@ -771,7 +777,7 @@ class ControlAPI(QObject):
 	
 	@action('get')
 	@pyqtSlot('QVariantList', result='QVariantMap')
-	def get(self, keys: List[str]) -> Union[Dict[str, Any], str]:
+	def get(self, keys: List[str]) -> Reply:
 		retval = {}
 		
 		for key in keys:
@@ -779,7 +785,7 @@ class ControlAPI(QObject):
 				#QDBusMessage.createErrorReply does not exist in PyQt5, and QDBusMessage.errorReply can't be sent. As far as I can tell, we simply can not emit D-Bus errors.
 				#Can't reply with a single string, either, since QVariantMap MUST be key:value pairs and we don't seem to have unions or anything.
 				#The type overloading, as detailed at http://pyqt.sourceforge.net/Docs/PyQt5/signals_slots.html#the-pyqtslot-decorator, simply does not work in this case. The last pyqtSlot will override the first pyqtSlot with its return type.
-				return Reply('ERROR', dump(f"The value '{key}' is not a known key to set.\nValid keys are: {[i for i in dir(state) if i[0] != '_']}"))
+				return Reply('ValueError', dump(f"The value '{key}' is not a known key to set.\nValid keys are: {[i for i in dir(state) if i[0] != '_']}"))
 			
 			retval[key] = getattr(state, key)
 		
@@ -787,15 +793,15 @@ class ControlAPI(QObject):
 	
 	
 	@action('set')
-	@pyqtSlot('QVariantMap')
-	def set(self, data: Dict[str, Any]) -> None:
+	@pyqtSlot('QVariantMap', result='QVariantMap')
+	def set(self, data: Reply) -> Reply:
 		# Check all errors first to avoid partially applying an update.
 		for key, value in data.items():
 			if key[0] is '_' or not hasattr(state, key):  # Don't allow setting of private variables.
 				# return self.sendError('unknownValue', f"The value '{key}' is not known.\nValid keys are: {[i for i in dir(state) if i[0] != '_']}")
-				return Reply('ERROR', dump(f"The value '{key}' is not a known key to set.\nValid keys are: {[i for i in dir(state) if i[0] != '_']}"))
+				return Reply('ValueError', (f"The value '{key}' is not a known key to set.\nValid keys are: {[i for i in dir(state) if i[0] != '_']}"))
 			if not isinstance(value, type(getattr(state, key))):
-				return Reply('ERROR', dump(f"Can not set '{key}', currently {getattr(state, key)}, to {value}.\nExpected {type(getattr(state, key))}, got {type(value)}."))
+				return Reply('ValueError', (f"Can not set '{key}', currently {getattr(state, key)}, to {value}.\nExpected {type(getattr(state, key))}, got {type(value)}."))
 		
 		# Set only changed variables. Changing can be quite involved, such as with recordingHRes.
 		for key, value in data.items():
@@ -811,6 +817,8 @@ class ControlAPI(QObject):
 		for cb in pendingCallbacks:
 			cb(state)
 		pendingCallbacks.clear()
+		
+		return Reply()
 	
 	
 	@action('set')
