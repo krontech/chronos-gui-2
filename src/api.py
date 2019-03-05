@@ -43,8 +43,8 @@ cameraControlAPI = QDBusInterface(
 	f"", #Interface
 	QDBusConnection.systemBus() )
 cameraVideoAPI = QDBusInterface(
-	f"com.krontech.chronos.{'video_mock' if USE_MOCK else 'video'}", #Service
-	f"/com/krontech/chronos/{'video_mock' if USE_MOCK else 'video'}", #Path
+	f"com.krontech.chronos.{'video_mock' if USE_MOCK else 'video_mock'}", #Service
+	f"/com/krontech/chronos/{'video_mock' if USE_MOCK else 'video_mock'}", #Path
 	f"", #Interface
 	QDBusConnection.systemBus() )
 

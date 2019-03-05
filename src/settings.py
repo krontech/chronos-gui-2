@@ -31,7 +31,7 @@ def observe(key: str, callback: Callable[[Optional[str]], None]) -> None:
 	"""
 	
 	if _settings.contains(key):
-		callback(_settings.value(key))
+		callback(json.loads(_settings.value(key)))
 	else:
 		callback()
 	
