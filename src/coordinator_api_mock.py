@@ -117,7 +117,7 @@ def removeWhitespace(text:str):
 ########################
 
 
-def resolution_is_valid(hOffset: int, vOffset: int, hRes: int, vRes: int):
+def resolutionIsValid(hOffset: int, vOffset: int, hRes: int, vRes: int):
 	LUX1310_MIN_HRES = 192 #The LUX1310 is our image sensor.
 	LUX1310_MAX_HRES = 1280
 	LUX1310_MIN_VRES = 96
@@ -134,7 +134,7 @@ def resolution_is_valid(hOffset: int, vOffset: int, hRes: int, vRes: int):
 	)
 
 
-def framerate_for_resolution(hRes: int, vRes: int) -> int:
+def framerateForResolution(hRes: int, vRes: int) -> int:
 	if type(hRes) is not int or type(vRes) is not int:
 		return print("D-BUS ERROR", QDBusError.InvalidArgs, f"framerate must be of type <class 'int'>, <class 'int'>. Got type {type(hRes)}, {type(vRes)}.")
 			
@@ -227,7 +227,7 @@ class State():
 		return [{
 			'hRes': x, 
 			'vRes': y, 
-			'framerate': framerate_for_resolution(x, y),
+			'framerate': framerateForResolution(x, y),
 		} for x, y in [
 			[1280, 1024],
 			[1280, 720],
@@ -858,23 +858,16 @@ class ControlAPIMock(QObject):
 		return Reply()
 	
 	
-	@action('set')
-	@pyqtSlot()
-	def power_down(self) -> None:
-		print('powering down camera…')
-		print('aborted, mock will not shut down machine')
-	
-	
 	@action('get')
 	@pyqtSlot(result="QVariantMap")
-	def available_keys(self) -> List[str]:
+	def availableKeys(self) -> List[str]:
 		keys = [i for i in dir(state) if i[0] != '_'] #Don't expose private items.
 		return Reply(keys)
 	
 	
 	@action('get')
 	@pyqtSlot(result="QVariantMap")
-	def available_calls(self) -> List[Dict[str, str]]:
+	def availableCalls(self) -> List[Dict[str, str]]:
 		return Reply([{
 			"name": i,
 			"args": { #Return args: type, stripping class down to string name for D-Bus.
@@ -885,67 +878,31 @@ class ControlAPIMock(QObject):
 			"action": getattr(self, i)._action, #Type
 		} for i in self.__class__.__dict__ 
 			if hasattr(getattr(self, i), '_action') ])
+	
+	
+	@action('set')
+	@pyqtSlot()
+	def powerDown(self) -> None:
+		print('powering down camera…')
+		print('aborted, mock will not shut down machine')
 		
 	
 	@action('get')
 	@pyqtSlot(int, int, result="QVariantMap")
-	def framerate_for_resolution(self, hRes: int, vRes: int) -> int:
-		return Reply(framerate_for_resolution(hRes, vRes))
+	def framerateForResolution(self, hRes: int, vRes: int) -> int:
+		return Reply(framerateForResolution(hRes, vRes))
 	
 	@action('get')
 	@pyqtSlot(result="QVariantMap")
-	def resolution_is_valid(self, hOffset: int, vOffset: int, hRes: int, vRes: int) -> bool: #xywh px
-		return Reply(resolution_is_valid(hOffset, vOffset, hRes, vRes))
+	def resolutionIsValid(self, hOffset: int, vOffset: int, hRes: int, vRes: int) -> bool: #xywh px
+		return Reply(resolutionIsValid(hOffset, vOffset, hRes, vRes))
 	
 	
 	@action('set')
-	@pyqtSlot(str)
-	def autoFactoryCal(self, passphrase: str) -> None:
-		if(passphrase != 'correct horse battery staple'): #The passphrase (which is not a password, and confers no security) is a safty precaution to prevent the API call from being placed inadvertently during normal scripting. It can be quite hard to undo the effects these factory functions.
-			print('incorrect passphrase specified')
-			return
-		
-		print('MOCK: perform auto factory calibration')
-	
-	
-	@action('set')
-	@pyqtSlot(str)
-	def adcOffsetCal(self, passphrase: str) -> None:
-		if(passphrase != 'correct horse battery staple'): 
-			print('incorrect passphrase specified')
-			return
-		
-		print('MOCK: perform adc offset calibration')
-	
-	
-	@action('set')
-	@pyqtSlot(str)
-	def columnGainCal(self, passphrase: str) -> None:
-		if(passphrase != 'correct horse battery staple'): 
-			print('incorrect passphrase specified')
-			return
-		
-		print('MOCK: perform column gain calibration')
-	
-	
-	@action('set')
-	@pyqtSlot(str)
-	def blackCalAllStandard(self, passphrase: str) -> None:
-		if(passphrase != 'correct horse battery staple'):
-			print('incorrect passphrase specified')
-			return
-		
-		print('MOCK: perform black calibration, all standard resolutions')
-	
-	
-	@action('set')
-	@pyqtSlot(str)
-	def whiteRefCal(self, passphrase: str) -> None:
-		if(passphrase != 'correct horse battery staple'): 
-			print('incorrect passphrase specified')
-			return
-		
-		print('MOCK: perform white reference calibration')
+	@pyqtSlot("QVariantMap", result="QVariantMap")
+	def calibrate(self, what) -> None:
+		print(f'Mock: not calibrating {", ".join([t for t, b in what.items() if b])}.')
+		return Reply()
 	
 	
 	@action('set')
@@ -955,23 +912,11 @@ class ControlAPIMock(QObject):
 	
 	
 	@action('set')
-	@pyqtSlot()
-	def setWhiteBalance(self) -> None:
-		print('MOCK: set white balance')
-	
-	
-	@action('set')
-	@pyqtSlot()
-	def doBlackCalibration(self) -> None:
-		print('MOCK: do black calibration')
-	
-	
-	@action('set')
 	@pyqtSlot(str, result='QVariantMap')
 	def saveCalibrationData(self, toFolder: str) -> Union[Dict[str, str], None]:
 		print(f'MOCK: Save calibration data to {toFolder}.')
 		return (
-			Reply("out of space", "Out of space of sda.") 
+			Reply("out of space", "Out of space on sda.") 
 			if 'sda' in toFolder else 
 			Reply()
 		)
@@ -989,18 +934,26 @@ class ControlAPIMock(QObject):
 		return None
 	
 	@action('get')
-	@pyqtSlot(str, int, result='QVariantMap')
-	def waterfallMotionMap(self, segmentId: str, startFrame: int) -> Dict[str, Union[str, bytearray]]:
-		"""Get a waterfall-style heatmap of movement in each of the 16 quadrants of the frame.
+	@pyqtSlot("QVariantMap", result='QVariantMap')
+	def waterfallMotionMap(self, options) -> Dict[str, Union[str, bytearray]]:
+		"""Get a waterfall-style heatmap of recorded movement.
+		
+			Generate a heatmap from each of the 16 quadrants of
+			recorded motion data. Returns an 16×n greyscale bitmap,
+			one byte per pixel.
 			
-			Arguments (should be):
-				startFrame: frame to start from, as in recordedSegments, or 0.
-				endFrame: frame to end at, as in recordedSegments or totalRecordedFrames.
+			Arguments are a map specifying:
+				segment: What segment ID to query. If not supplied,
+					all recorded data will be considered "the segment".
+				startFrame = 0: Optional frame to start from. Defaults
+					to the first frame of the segment.
+				endFrame = ∞: Optional frame to end at. Defaults to
+					the last frame of the segment.
 			
-			Note that both startFrame and endFrame are clamped to valid numbers, so
-			providing 0 will *always* result in the first frame, and INT_MAX will always
-			result in the last frame.
-			"""
+			Segment IDs, and their respective startFrame and
+				endFrames, can be read from the recordedSegments value."""
+		
+		startFrame = options.get('startFrame', 0)
 		startFrame = startFrame % 1024 #Cycle period of data below.
 		
 		allMockFrameData = ([
@@ -1042,7 +995,7 @@ class ControlAPIMock(QObject):
 		#	"end": int, 
 		#	"id": str,
 		#	"path": str,
-		#	"format": {'fps': int, 'bpp': int, 'maxBitrate': int},
+		#	"format": {'fps': float, 'bpp': float, 'maxBitrate': float},
 		#}]
 		
 		return Reply([{ #Each entry in this list a segment of recorded video. Although currently resolution/framerate is always the same having it in this data will make it easier to fix this in the future if we do.
@@ -1099,12 +1052,20 @@ class ControlAPIMock(QObject):
 	
 	
 	@action('set')
-	@pyqtSlot(result="QVariantMap")
-	def testNetworkStorageCredentials(self):
+	@pyqtSlot("QVariantMap", result="QVariantMap")
+	def testNetworkStorageCredentials(self, config):
 		"""Check the remote file share works.
 			
 			Returns an error message upon failure, or an empty string
-			on success."""
+			on success.
+			
+			Accepts one map parameter, config, which may contain
+				- networkStorageAddress: str
+				- networkStorageUsername: str
+				- networkStoragePassword: str
+			each overriding the API value of the same name."""
+			
+		
 		
 		print("MOCK: Checking network storage…", end='', flush=True)
 		sleep(3)

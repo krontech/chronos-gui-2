@@ -130,7 +130,7 @@ def get(keyOrKeys):
 		
 		Returns value or {key:value, …}, respectively.
 		
-		See control's `available_keys` for a list of valid inputs.
+		See control's `availableKeys` for a list of valid inputs.
 	"""
 	
 	valueList = control('get', 
@@ -147,7 +147,7 @@ def set(values):
 
 
 # State cache for observe(), so it doesn't have to query the status of a variable on each subscription.
-_camState = control('get', control('available_keys'))
+_camState = control('get', control('availableKeys'))
 if(not _camState):
 	raise Exception("Cache failed to populate. This indicates the get call is not working.")
 

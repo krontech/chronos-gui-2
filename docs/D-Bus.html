@@ -16,6 +16,7 @@
 				color: #444;
 				padding: 0 10px;
 				tab-size: 4;
+				overflow-wrap: break-word; /*Can't be "anywhere", because of FF bug with table sizing.*/
 			}
 			
 			body > * {
@@ -43,6 +44,10 @@
 				width: 100%;
 			}
 			
+			p {
+				width: 100%;
+			}
+			
 			thead, th {
 				position: sticky;
 				top: 0px;
@@ -52,6 +57,7 @@
 			
 			th, td {
 				padding: 1ex;
+				vertical-align: top;
 			}
 			
 			
@@ -103,17 +109,17 @@
 		<h1>Chronos D-Bus API</h1>
 		
 		
-		
-		<p>This documentation covers the Chronos 1.4 <a href="https://www.freedesktop.org/wiki/Software/dbus/">D-Bus</a> API. The API has two major components: The Control API and the Video API. There is also a reference client written in Python which is used for the user interface.</p>
+		<p>This documentation covers the Chronos 1.4 <a href="https://www.freedesktop.org/wiki/Software/dbus/">D-Bus</a> API. The API has two major components: The <a href="#control-api">Coordinator API</a> (formerly the Control API) and the <a href="#video-api">Video API</a>. There is also a reference client written in Python which is used for the user interface.</p>
 		
 		<p>You can use the D-Bus API to write your own application on the camera. This application will be able to display a UI on the back of the camera as well as respond to remote HTTP requests over MiniUSB and the network.</p>
 		
-		<p>If you only need to control the camera remotely, you should consider using the [planned, as of writing] HTTP interface instead. The HTTP interface lets you send commands to the camera over the network, and is used by the [planned, as of writing] remote-control app. It is easier to develop for the HTTP interface than the D-Bus interface.</p>
+		<p>If you only need to control the camera remotely, you should consider using the <a href="https://github.com/krontech/chronos-web-interface">HTTP interface</a> instead. The HTTP interface lets you send commands to the camera over the network, and is used by the (planned) remote-control app. It is easier to develop using the HTTP interface than it is using the D-Bus interfaces.</p>
 		
+		<p>Note: All examples in this document are given in Python, since the reference client was written in it.</p>
 		
 		<h2>Architecture</h2>
 		
-		<p>The D-Bus Control and Video APIs sit between the hardware and the applications running on the camera.</p>
+		<p>The D-Bus Coordinator and Video APIs sit between the hardware and the applications running on the camera.</p>
 		
 		<svg id="SVGRoot" version="1.1" viewBox="0 0 701 241" xmlns="http://www.w3.org/2000/svg">
 			<g id="layer1" transform="translate(-29.5,-119.5)" inkscape:groupmode="layer" inkscape:label="Layer 1">
@@ -127,7 +133,7 @@
 					<tspan id="tspan3350" x="120.00391" y="225.96484">Chronos 1.4</tspan><tspan id="tspan3354" x="120.00391" y="245.96484">Hardware</tspan>
 				</text>
 				<text id="text3358" x="380.33594" y="195.96484">
-					<tspan id="tspan3356" x="380.33594" y="195.96484">Control API</tspan>
+					<tspan id="tspan3356" x="380.33594" y="195.96484">Coordinator API</tspan>
 				</text>
 				<text id="text3362" x="380.72266" y="275.96484">
 					<tspan id="tspan3360" x="380.72266" y="275.96484">Video API</tspan>
@@ -161,21 +167,21 @@
 		<p>The APIs primarily drive the FPGA of the Chronos, as well as set up the video pipeline to display and save content. While the FPGA image itself is proprietary, the register definitions are available as part of the implementation of the APIs.</p>
 		
 		
-		<h2><a name="control-api">Control API</a></h2>
+		<h2><a name="control-api">Coordinator API</a></h2>
 		
-		<p>The control D-Bus API deals with configuring the camera, as opposed to the video API which is responsible for playing back and saving footage.</p>
+		<p>The Coordinator D-Bus API deals with configuring the camera, as opposed to the video API which is responsible for playing back and saving footage.</p>
 		
 		<h3>Connecting</h3>
 		
-		<p>To connect to the control API, connect to the D-Bus service/path/interface as in the following example:</p>
+		<p>To connect to the Coordinator API, connect to the D-Bus service/path/interface as in the following example:</p>
 		
 		<code>
 			from PyQt5.QtDBus import QDBusInterface, QDBusConnection
 			
 			cameraControlAPI = QDBusInterface(
-				'com.krontech.chronos.control', #Service
-				'/', #Path
-				'', #Interface
+				"com.krontech.chronos.control", #Service
+				"/com/krontech/chronos/control", #Path
+				"", #Interface
 				QDBusConnection.systemBus() )
 		</code>
 		
@@ -183,28 +189,115 @@
 		
 		<h3>Methods</h3>
 		
+		<p>All methods result in a reply containing key/value pairs. The map can contain an optional 'value' entry with the data resulting from the function call, <strong>or</strong> in the case of an error an 'errorName' and 'message' entry. If there is no errorName, then no error should have occured.</p>
+		
+		<p>Available methods are:</p>
 		<ul>
-			<li><code><strong>get</strong>([string, string, …])→{string:value, string:value, …}</code> — Return camera setting values. See <a href="#control-settings">Settings</a> for a list of valid keys.</li>
-			<li><code><strong>set</strong>({string:value, string:value, …})</code> — Update a camera setting value. See <a href="#control-settings">Settings</a> for a list of valid keys.</li>
-			<li><code><strong>available_keys</strong> → [string, string, …]</code> — Get a list of available camera settings keys, for use with <code>get</code> or <code>set</code>.</li>
-			<li><code><strong>framerate_for_resolution</strong>(hRes: int, vRes: int) → float</code> — Returns the frames per seconds a resolution will record at. Non-valid resolutions will return undefined results.</li>
-			<li><code><strong>resolution_is_valid</strong>(hOffset: int, vOffset: int, hRes: int, vRes: int) → bool</code> — Returns true if the supplied video resolution and offset is valid for recording. A resolution is not valid if it is offset too far. All parameters are positive integers.</li>
-			<li><code><strong>power_down</strong></code> — Turn off the camera. Useful in conjunction with the "Turn camera on when power connected" checkbox in the Battery & Power screen.</li>
+			<li><code><strong>get</strong>([string valueName, …]) → {string:value, …}</code> — Return camera setting values for all strings in the list passed in. See <a href="#values">Values</a> for a list of valid keys.</li>
+			
+			<li><code><strong>set</strong>({string valueName: any value, …})</code> — Update camera values named by string to their new value. See <a href="#values">Values</a> for a list of valid keys.</li>
+			
+			<li><code><strong>availableKeys</strong>() → [string valueName, …]</code> — Get a list of available camera settings keys, for use with <code>get</code> or <code>set</code>.</li>
+			
+			<li><code><strong>availableCalls</strong>() → [string callName, …]</code> — Get a list of available camera settings keys, for use with <code>get</code> or <code>set</code>.</li>
+			
+			<li><code><strong>powerDown</strong>()</code> — Turn off the camera. Useful in conjunction with the "Turn camera on when power connected" checkbox in the Battery & Power screen.</li>
+			
+			<li><code><strong>framerateForResolution</strong>(hRes: int, vRes: int) → float</code> — Returns the frames per seconds a resolution will record at. Non-valid resolutions will return undefined results.</li>
+			
+			<li><code><strong>resolutionIsValid</strong>(hOffset: int, vOffset: int, hRes: int, vRes: int) → bool</code> — Returns true if the supplied video resolution and offset is valid for recording. A resolution is not valid if it is offset too far. All parameters are positive integers.</li>
+			
+			<li>
+				<code><strong>calibrate</strong>({string testName: boolean run})</code> — Calibrate the camera. Each calibration for which run is true is ran. Warning - some calibrations may require equipment to run correctly. For example, while black cal is easy to re-run, it is much harder to run white balance since you will need a diffuse, true-white light source. Available calibrations are:
+				<ul>
+					<li><code>analogCal</code>: Sensor internal calibration.</li>
+					<li><code>blackCal</code>: The normal black calibration routine where you have to cover the lense.</li>
+					<li><code>zeroTimeBlackCal</code>: The fast black calibration where exposure time is set to as close to zero as possible.</li>
+					<li><code>whiteBalance</code>: Take a white reference and compute the white balance matrix. (API value <code>whiteBalance</code>.)</li>
+				</ul>
+			</li>
+			
+			<li><code><strong>takeStillReferenceForMotionTriggering</strong>()</code> — When motion triggering is used, the camera may need to be trained to recognise a still scene. For example, if there is some background motion such as trees swaying in the wind, this function will teach the camera to ignore it as background noise.</li>
+			
+			<li><code><strong>saveCalibrationData</strong>(str toFolder)</code> — Write all sensor calibration data (eg; black cal, white balance) to the folder specified. Usually, one would use the folder <code>'/dev/sda'</code>, as that represents the first external storage device plugged in on Linux systems such as the camera runs. Calibration data may be restored using the isomorphic <code>loadCalibrationData</code>.</li>
+			
+			<li><code><strong>loadCalibrationData</strong>(str fromFolder)</code> — Restores the calibration data saved by <code>saveCalibrationData</code>, overwriting all active calibration data.</li>
+			
+			<li><code><strong>applySoftwareUpdate</strong>()</code> — Install another firmware version from an external storage device. See the manual on "updating" for more details.</li>
+			
+			<li><code><strong>waterfallMotionMap</strong>({[id: str name], ['startFrame': int], ['endFrame': int]}) → {startFrame: int, endframe: int, heatmap: 16×n little-endian byte map}</code> — (unstable)
+				<p>Generate a waterfall-style heatmap from each of the 16 quadrants of recorded motion data. Returns an 16×n greyscale bitmap, one byte per pixel.</p>
+				<p>Arguments are a map specifying:
+					<ul>
+						<li>id: What segment ID to query. If not supplied, all recorded data will be considered "the segment".</li>
+						<li>startFrame = 0: Optional frame to start from. Defaults to the first frame of the segment.</li>
+						<li>endFrame = ∞: Optional frame to end at. Defaults to the last frame of the segment.</li>
+					</ul>
+				</p>
+				<p>Segment IDs, and their respective startFrame and endFrames, can be read from the recordedSegments value.</p>
+			</li>
+			
+			<li><code><strong>saveRegions</strong>([{[id: str], [start: int], [end: int], path: str, format: { fps: float, bpp: float, maxBitrate: float }}, …])</code> — (unstable) Save each region in the input list to file.
+				<p>Save video clips to disk or network.</p>
+				<p>Accepts a list of regions, returns a list of statuses.</p>
+				<p>As with waterfallMotionMap, if no segment id is specified, 'all recorded data' is considered to be the segment, and start/end is relative to all recorded data.</p>
+				Python example:
+				<code class=codeblock>
+					api.control('saveRegions', [{
+						"start": 19104, 
+						"end": 39801, 
+						"id": 'ldPxTT5R', #from api value recordedSegments
+						"path": '/dev/sda/',
+						"format": {
+							'fps': 29.97, #NTSC video
+							'bpp': .7,
+							'maxBitrate': 40, #mbps
+						},
+					}])
+				</code>
+				<p>A list of regions available to save and paths available to save to can be retrieved with <code>api.control('get', ['recordedSegments', 'externalStorage'])</code>.</p>
+			</li>
+			
+			<li><code><strong>formatStorage</strong>(str path)</code> — Erase and prepare the device at <em>path</em> for saving video to. A list of paths available to format to can be retrieved with <code>api.control('get', ['externalStorage'])</code>. Be careful not to erase saved footage!</li>
+			
+			<li><code><strong>unmount</strong>(str path)</code> — Unmount the storage device mounted at <em>path</em>. A list of paths available to unmount to can be retrieved with <code>api.control('get', ['externalStorage'])</code>.
+				<p>To remount a device, either reinsert it or SSH into the camera and run the mount command.</p>
+			</li>
+			
+			<li><code><strong>df</strong>() → str output</code> — Returns text written to stdout by the linux utility <code>df</code>. This is mostly useful for debugging.
+				<p>Example:
+					<code class=codeblock>
+						Filesystem     1K-blocks   Used Available Use% Mounted on
+						/dev/root         757856 158420   5683476  22% /
+						/dev/mmcblk0p1     39497   3961     35537  11% /boot
+						/dev/sda1          39497   2973     36525   8% /media/sda1
+						/dev/sda2         757856 167288   5574608  23% /media/sda2
+					</code>
+				</p>
+			</li>
+			
+			<li><code><strong>testNetworkStorageCredentials</strong>({[networkStorageAddress: str], [networkStorageUsername: str], [networkStoragePassword: str]}) → str error</code> — Check if a remote file share is available. Returns either a string containing the error message if the share is not connectable-to, or an empty string if the credentials were valid. networkStorageAddress, networkStorageUsername, and networkStoragePassword may be provided to override the API values of the same names.</li>
 		</ul>
 		
 		<p>In addition, when a camera setting is changed, a signal named the key is emitted on the D-Bus interface. It can be intercepted with <code>QDBusConnection.systemBus().connect('com.krontech.chronos.control.mock', '/', '', NAME_OF_KEY, CALLBACK)</code>.
 		
 		
-		<h3><a name="control-settings">Settings Keys</a></h3>
+		<h3><a name="values">Values</a></h3>
 		
-		<p>Control settings keys hold the state of the camera. These keys are used with the <code>get</code> and <code>set</code> method calls. They can be retrieved with the <code>available_keys</code> method.</p>
+		<p>API Values hold and reflect the state of the camera. They are read and written using the <code>get</code> and <code>set</code> method calls listed above. A list of value names can be retrieved by calling the <code>availableKeys</code> method.</p>
 		
-		<p>Keys have different levels of mutability. <strong>Constant</strong> keys do not change over the course of a connection, although they may be changed if the camera is upgraded. These are things like firmware version and the amount of RAM installed. Keys which are a <strong>property</strong>, on the other hand, only change in response to external stimulus. Properties can't be set through the API. These are things like battery level and trigger status. <strong>Variable</strong> keys are settable through the API, but may be changed externally as well.</p>
+		<p>Values can have different levels of mutability:</p>
+		<ul>
+			<li><strong>Variable</strong> values can be set through the API, but may be changed externally as well. They can be set, retrieved, and observed. (Observation, in this case, means a D-Bus signal with the same name as the value will be emitted. Refer to <a href="../src/api.py#observe">api.py:observe</a> for an example.)</li>
+			<li>Values which are a <strong>property</strong>, on the other hand, only change in response to external stimulus. Properties can't be set, but they can be retrieved and observed as they changed. These are things like battery level and trigger status.</li>
+			<li><strong>Constant</strong> values do not change over the course of a connection, although they may be changed if the camera firmware is upgraded. For example, firmware version and the amount of RAM installed are both constants.</li>
+		</ul>
 		
+		<p>Available values are:</p>
 		<table>
 			<thead>
 				<tr>
-					<th>Setting Key</th>
+					<th>Value Name</th>
 					<th>Type</th>
 					<th>Mutability</th>
 					<th>Description</th>
@@ -246,16 +339,16 @@
 					<td><code>cameraModel</code></td>
 					<td>string</td>
 					<td>constant</td>
-					<td>The product the API is running on. This corresponds to the model printed on the bottom of your camera. Example: <code>CR14-1.0</code></td>
+					<td>The product identifier of the camera hosting the API. This corresponds to the model printed on the bottom of your camera. Example: <code>CR14-1.0</code></td>
 				</tr>
 				<tr>
 					<td><code>cameraSerial</code></td>
 					<td>string</td>
 					<td>constant</td>
-					<td>The serial number of the product the API is running on. This corresponds to the SN printed on the bottom of your camera. Example: <code>00555</code></td>
+					<td>The serial number of the product the API is running on. This corresponds to the SN printed on the bottom of your camera. Example: <code>00204</code></td>
 				</tr>
 				<tr>
-					<td><code>commonlySupportedResolutions</code></td>
+					<td><code>commonlySupported<br>Resolutions</code></td>
 					<td>list</td>
 					<td>constant</td>
 					<td>
@@ -282,7 +375,7 @@
 					<td>Indicates what the video display is showing. One of <code>viewfinder</code> or <code>playback</code>.</colgroup>. In <code>viewfinder</code> mode, the video on the back of the camera is showing what the sensor is seeing. In <code>playback</code> mode, the video is showing footage previously recorded in RAM.</td>
 				</tr>
 				<tr>
-					<td><code>disableOverwritingRingBuffer</code></td>
+					<td><code>disableOverwriting<br>RingBuffer</code></td>
 					<td>boolean</td>
 					<td>variable</td>
 					<td>In segmented mode, disable overwriting earlier recorded ring buffer segments.</td>
@@ -303,172 +396,6 @@
 						To turn off/disable focus peaking, set this value to 0.
 					</td>
 				</tr>
-				<tr>
-					<td><code>overlayChronosWatermarkColor</code></td>
-					<td>integer</td>
-					<td>variable</td>
-					<td>8 bit per channel RGBA value indicating the color for the Chronos logo overlay. The watermark is burned into saved video. See <a href="#focusPeakingColor">focusPeakingColor</a> for more information about color.</td>
-				</tr>
-				<tr>
-					<td><code>overlayChronosWatermarkX</code></td>
-					<td>integer</td>
-					<td>variable</td>
-					<td rowspan=2>The x/y position (horizontal/vertical offset from the top-left corner) of the Chronos watermark.</td>
-				</tr>
-				<tr>
-					<td><code>overlayChronosWatermarkY</code></td>
-					<td>integer</td>
-					<td>variable</td>
-				</tr>
-				<tr>
-					<td><a name="overlayRGBImage"><code>overlayRGBImage</code></a></td>
-					<td>binary</td>
-					<td>variable</td>
-					<td>An image to burn on to the video. <a href="https://en.wikipedia.org/wiki/Indexed_color">Indexed color</a> (like a gif), 20480 pixels maximum. Dimensions are given by the <a href="#overlayRGBImageHeight">overlayRGBImageHeight</a> and <a href="#overlayRGBImageWidth">overlayRGBImageWidth</a> variables. Color index is given by <a href="#overlayRGBLogoPalette">overlayRGBLogoPalette</a>.</td>
-				</td>
-				<tr>
-					<td><a name="#overlayRGBImageHeight"><code>overlayRGBImageHeight</code></a></td>
-					<td>integer</td>
-					<td>variable</td>
-					<td rowspan=2>Set the width and the height of the <a href="#overlayRGBImage">overlay image/watermark</a> to burn into the video. Area (overlayRGBImageWidth × overlayRGBImageHeight) should be less than 20480.</td>
-				</td>
-				<tr>
-					<td><a name="#overlayRGBImageWidth"><code>overlayRGBImageWidth</code></a></td>
-					<td>integer</td>
-					<td>variable</td>
-				</td>
-				<tr>
-					<td><code>overlayRGBImageX</code></td>
-					<td>integer</td>
-					<td>variable</td>
-					<td rowspan=2>Set the offset left and top of the <a href="#overlayRGBImage">overlay/watermark image</a>.</td>
-				</td>
-				<tr>
-					<td><code>overlayRGBImageY</code></td>
-					<td>integer</td>
-					<td>variable</td>
-				</td>
-				<tr>
-					<td><code>overlayRGBLogoPalette</code></td>
-					<td>binary</td>
-					<td>variable</td>
-					<td>
-						The color index for the <a href="#overlayRGBImage">indexed overlay image</a>. Planar format, 256 8-bit bytes each for Red, Green, and Blue. (If you had two colors in your overlay image, pink and black, your color index might look like:
-						<code class=codeblock>
-							[
-								0xFF, 0x00, «254 more entries»,
-								0x00, 0x00, «254 more entries»,
-								0xFF, 0x00, «254 more entries»
-							]
-						</code>
-						The first column represents the first color, pink, with it's red and blue components. The second column represents black.
-						<br>
-						True black is rendered transparent. If you want to actually draw black, the color <code style="color: #000001;">0x000001</code> may be used instead of <code style="color: #000000;">0x000000</code>.
-					</td>
-				</td>
-				<tr>
-					<td><code>overlayTextbox0Color</code></td>
-					<td>integer</td>
-					<td>variable</td>
-					<td rowspan=2>Set the textbox's background color. (Text is always white.) Format RGBA. See <a href="#focusPeakingColor">focusPeakingColor</a> for more information about color.</td>
-				</td>
-				<tr>
-					<td><code>overlayTextbox1Color</code></td>
-					<td>integer</td>
-					<td>variable</td>
-				</td>
-				<tr>
-					<td><a name="overlayTextbox0Content"><code>overlayTextbox0Content</code></a></td>
-					<td>string</td>
-					<td>variable</td>
-					<td rowspan=2>A string of length no more than 128, including a required null terminator (0). Characters in this string are simple numeric indexes into the <a href="#overlayTextbox0Font">overlayTextboxFonts</a>, instead of into the standard <a href="https://en.wikipedia.org/wiki/List_of_Unicode_characters">Unicode</a> (utf-8) tables used elsewhere in this API.</td>
-				</td>
-				<tr>
-					<td><code>overlayTextbox1Content</code></td>
-					<td>string</td>
-					<td>variable</td>
-				</td>
-				<tr>
-					<td><a name="overlayTextbox0Font"><code>overlayTextbox0Font</code></a></td>
-					<td>binary</td>
-					<td>variable</td>
-					<td rowspan=2>A block of 128 16x32px characters indexed in to by <a href="#overlayTextbox0Content">overlayTextBoxContents</a>. 1<a href="https://en.wikipedia.org/wiki/Color_depth">bpp</a>.</td>
-				</td>
-				<tr>
-					<td><code>overlayTextbox1Font</code></td>
-					<td>binary</td>
-					<td>variable</td>
-				</td>
-				<tr>
-					<td><code>overlayTextbox0W</code></td>
-					<td>integer</td>
-					<td>variable</td>
-					<td rowspan=4>Textbox dimensions, <strong>w</strong>idth and <strong>h</strong>eight in pixels. Text is centered inside the box.</td>
-				</td>
-				<tr>
-					<td><code>overlayTextbox0H</code></td>
-					<td>integer</td>
-					<td>variable</td>
-				</td>
-				<tr>
-					<td><code>overlayTextbox1W</code></td>
-					<td>integer</td>
-					<td>variable</td>
-				</td>
-				<tr>
-					<td><code>overlayTextbox1H</code></td>
-					<td>integer</td>
-					<td>variable</td>
-				</td>
-				<tr>
-					<td><code>overlayTextbox0OffsetX</code></td>
-					<td>integer</td>
-					<td>variable</td>
-					<td rowspan=4>Distance from the top (y) left (x) corner of the recorded picture to the top left corner of the textbox in pixels.</td>
-				</td>
-				<tr>
-					<td><code>overlayTextbox0OffsetY</code></td>
-					<td>integer</td>
-					<td>variable</td>
-				</td>
-				<tr>
-					<td><code>overlayTextbox1OffsetX</code></td>
-					<td>integer</td>
-					<td>variable</td>
-				</td>
-				<tr>
-					<td><code>overlayTextbox1OffsetY</code></td>
-					<td>integer</td>
-					<td>variable</td>
-				</td>
-				<tr>
-					<td><code>overlayTextbox0X</code></td>
-					<td></td>
-					<td></td>
-					<td rowspan=2></td>
-				</td>
-				<tr>
-					<td><code>overlayTextbox1X</code></td>
-					<td></td>
-					<td></td>
-				</td>
-				<tr>
-					<td><code>overlayTextbox0Y</code></td>
-					<td></td>
-					<td></td>
-					<td rowspan=2></td>
-				</td>
-				<tr>
-					<td><code>overlayTextbox1Y</code></td>
-					<td></td>
-					<td></td>
-				</td>
-				<tr>
-					<td><code>overlayVersion</code></td>
-					<td></td>
-					<td></td>
-					<td></td>
-				</td>
 				<tr>
 					<td><code>recordedSegments</code></td>
 					<td></td>
@@ -702,9 +629,9 @@
 		<ul>
 			<li><code><strong>video</strong>(methodName: string, optional args: any)</code> — Convenience method to invoke one of the D-Bus API Video methods. See the <a href="https://github.com/krontech/chronos-cli/blob/master/src/pipeline/README.md">video api documentation</a> for details.</li>
 			<li><code><strong>control</strong>(methodName: string, optional args: any)</code> — </li>
-			<li><code><strong>get</strong>(string or [strings])</code> — Convenience method to invoke one of the D-Bus API Video methods. See the <a href="#control-settings">control settings keys</a> for a list of values. If a string is passed, this method will automatically wrap it in a list before calling the underlying D-Bus method and unwrap the returned list.</li>
-			<li><code><strong>set</strong>({key: value})</code> — Wrapper for <code>control('set', {…})</code>. See the <a href="#control-settings">control settings keys</a> for a list of values.</li>
-			<li><code><strong>observe</strong>(valueName: string, callback: Callable[[Any], None])</code> — Invoke the callback with the new value when the value changes. The value is initially presumed to be unknown, and so is considered to change to the current value is when the subscription is started. valueName is one of the <a href="#control-settings">control settings keys</a>.</li>
+			<li><code><strong>get</strong>(string or [strings])</code> — Convenience method to invoke one of the D-Bus API Video methods. See the <a href="#values">control settings keys</a> for a list of values. If a string is passed, this method will automatically wrap it in a list before calling the underlying D-Bus method and unwrap the returned list.</li>
+			<li><code><strong>set</strong>({key: value})</code> — Wrapper for <code>control('set', {…})</code>. See the <a href="#values">control settings keys</a> for a list of values.</li>
+			<li><code><strong>observe</strong>(valueName: string, callback: Callable[[Any], None])</code> — Invoke the callback with the new value when the value changes. The value is initially presumed to be unknown, and so is considered to change to the current value is when the subscription is started. valueName is one of the <a href="#values">control settings keys</a>.</li>
 			<li><code><strong>observe_future_only</strong></code> — Like <code>observe</code>, but the callback is not called on subscription. This is useful for some of the more complex compound values which can arise around sliders and such.</li>
 			<li><code><strong>@silenceCallbacks(Qt Widget)</strong></code> — Function decorator for a callback. Before a decorated callback is called, this turns off events for the supplied Qt Widget. For example, on the main screen of the UI, the callback
 				<code class="codeblock">

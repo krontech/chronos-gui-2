@@ -304,7 +304,7 @@ class RecordingSettings(QtWidgets.QDialog):
 		framerateIsMaxed = self.uiFps.value() == self.uiFps.maximum()
 		self.uiFps.setMaximum(
 			api.control(
-				'framerate_for_resolution', 
+				'framerateForResolution', 
 				self.uiHRes.value(),
 				self.uiVRes.value() ) )
 		if framerateIsMaxed:

@@ -97,7 +97,7 @@ class PlayAndSave(QtWidgets.QDialog):
 		
 		heatmapHeight = 16
 		
-		motionData = QByteArray.fromRawData(api.control('waterfallMotionMap', 'placeholder', 400)["heatmap"]) # 16×(n<1024) heatmap. motionData: {"startFrame": int, "endFrame": int, "heatmap": QByteArray}
+		motionData = QByteArray.fromRawData(api.control('waterfallMotionMap', {'segment':'placeholder', 'startFrame':400})["heatmap"]) # 16×(n<1024) heatmap. motionData: {"startFrame": int, "endFrame": int, "heatmap": QByteArray}
 		assert len(motionData) % heatmapHeight == 0, f"Incompatible heatmap size {len(motionData)}; must be a multiple of {heatmapHeight}."
 		
 		self.motionHeatmap = (
