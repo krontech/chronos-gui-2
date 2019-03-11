@@ -446,7 +446,7 @@ class State():
 	totalAvailableFrames = 80000 #This is the number of frames we *can* record. There is some overhead for each frame, so the increase in frames as we decrease resolution is not quite linear.
 	
 	playbackFrame = 0
-	playbackFrameDelta = 0 #Set this to play or rewind the video.
+	playbackFramerate = 0 #Set this to play or rewind the video.
 	totalRecordedFrames = 70000 #This only changes when we have a full segment recorded. Proposal: It does not change while recording. It changes at maximum rate of 30hz, in case segments are extremely short, in which case it may skip intermediate segments.
 	
 	triggerDelay = 0 #signed int, between -lots and totalAvailableFrames
@@ -457,7 +457,8 @@ class State():
 	showBlackClippingZebraStripes = True
 	disableOverwritingRingBuffer = False #In segmented mode, disable overwriting earlier recorded ring buffer segments. DDR 2018-06-19: Loial figures this was fixed, but neither of us know why it's hidden in the old UI.
 	
-	nanosegmentLengthPct = 50e9 #0 = no segmentation, which actually = all available frames. Multiply by 1e9 to get the percentage of the available record time that a segment takes. eg, 100e-9 is 100% of the buffer, or one segment. 50e9 grants two segments. 40e9 grants two full-length segments… and half-length one?
+	recordingMode = 'normal' #normal or segmented
+	recordingSegments = int(1e9) #0 = no segmentation, which actually = all available frames. Multiply by 1e9 to get the percentage of the available record time that a segment takes. eg, 100e-9 is 100% of the buffer, or one segment. 50e9 grants two segments. 40e9 grants two full-length segments… and half-length one?
 	recordedSegments = [{ #Each entry in this list a segment of recorded video. Although currently resolution/framerate is always the same having it in this data will make it easier to fix this in the future if we do.
 		"start": 0,
 		"end": 1000,
@@ -717,7 +718,7 @@ class State():
 			"interface": "usb", 
 		}]
 	
-	networkPassword = 'chronos' #Change this to be initally blank in the non-mock API. A blank password *means* no network access at all.
+	networkPassword = '' #Change this to be initally blank in the non-mock API. A blank password *means* no network access at all.
 	localHTTPAccess = True #If this changes, something must shut down or start the web server. The only thing the server will do is start up on the right HTTP port; it will even need to be restarted if that changes. (However, the server does not need to be restarted for changes to the password. The hash is re-updated as it changes.)
 	localSSHAccess = True
 	remoteHTTPAccess = True

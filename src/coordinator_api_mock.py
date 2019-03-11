@@ -19,6 +19,10 @@
 	
 	Any comment or call in this file should be considered a proposal. It can all be
 	changed if need be.
+	
+	TODO:
+	- Add a function to get the total amount of recording time available, in frames
+		and in seconds. Update recordingSegments documentation to mention it.
 """
 from __future__ import unicode_literals
 
@@ -441,7 +445,7 @@ class State():
 	totalAvailableFrames = 80000 #This is the number of frames we *can* record. There is some overhead for each frame, so the increase in frames as we decrease resolution is not quite linear.
 	
 	playbackFrame = 0
-	playbackFrameDelta = 0 #Set this to play or rewind the video.
+	playbackFramerate = 0 #Set this to play or rewind the video.
 	totalRecordedFrames = 70000 #This only changes when we have a full segment recorded. Proposal: It does not change while recording. It changes at maximum rate of 30hz, in case segments are extremely short, in which case it may skip intermediate segments.
 	
 	triggerDelay = 0 #signed int, between -lots and totalAvailableFrames
@@ -452,20 +456,21 @@ class State():
 	showBlackClippingZebraStripes = True
 	disableOverwritingRingBuffer = False #In segmented mode, disable overwriting earlier recorded ring buffer segments. DDR 2018-06-19: Loial figures this was fixed, but neither of us know why it's hidden in the old UI.
 	
-	nanosegmentLengthPct = 50e9 #0 = no segmentation, which actually = all available frames. Multiply by 1e9 to get the percentage of the available record time that a segment takes. eg, 100e-9 is 100% of the buffer, or one segment. 50e9 grants two segments. 40e9 grants two full-length segments… and half-length one?
+	recordingMode = 'normal' #Normal, segmented, or gated burst.
+	recordingSegments = int(1e9)
 	recordedSegments = [{ #Each entry in this list a segment of recorded video. Although currently resolution/framerate is always the same having it in this data will make it easier to fix this in the future if we do.
 		"start": 0,
 		"end": 1000,
 		"hres": 200,
 		"vres": 300,
-		"fps": 12580,
+		"milliframerate": 12580e3,
 		"id": "ldPxTT5R",
 	},{
 		"start": 1000,
 		"end": 1250,
 		"hres": 200,
 		"vres": 500,
-		"fps": 900,
+		"milliframerate": 900e3,
 		"id": "KxIjG09V",
 	}]
 	whiteBalance = [1., 1., 1.]
@@ -738,13 +743,17 @@ class State():
 		return [{
 			'id': 'enp0s25',
 			'name': 'Ethernet',
-			'localAddress': '192.168.0.1',
-			'remoteAddress': '205.250.126.92',
+			'localAddress4': '192.168.1.135',
+			'localAddress6': 'fe80::22c3:8fff:fe3b:966a',
+			'remoteAddress4': '205.250.126.92',
+			'remoteAddress6': '',
 		},{
 			'id': 'wlp4s0',
 			'name': 'Mini USB',
-			'localAddress': '192.168.12.1',
-			'remoteAddress': '',
+			'localAddress4': '192.168.12.1',
+			'localAddress6': 'fe80::f81b:26ff:fee7:24dd',
+			'remoteAddress4': '',
+			'remoteAddress6': '',
 		}]
 
 

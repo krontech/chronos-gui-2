@@ -37,10 +37,10 @@ class PlayAndSave(QtWidgets.QDialog):
 		self.seekForwardTimer.timeout.connect(self.updateBattery)
 		self.seekForwardTimer.setInterval(16) #ms, 1/frame hopefully
 		
-		self.uiSeekBackward.pressed.connect( lambda: api.set({'playbackFrameDelta': -self.seekRate }))
-		self.uiSeekBackward.released.connect(lambda: api.set({'playbackFrameDelta': 0 }))
-		self.uiSeekForward.pressed.connect(  lambda: api.set({'playbackFrameDelta': +self.seekRate }))
-		self.uiSeekForward.released.connect( lambda: api.set({'playbackFrameDelta': 0 }))
+		self.uiSeekBackward.pressed.connect( lambda: api.set({'playbackFramerate': -self.seekRate }))
+		self.uiSeekBackward.released.connect(lambda: api.set({'playbackFramerate': 0 }))
+		self.uiSeekForward.pressed.connect(  lambda: api.set({'playbackFramerate': +self.seekRate }))
+		self.uiSeekForward.released.connect( lambda: api.set({'playbackFramerate': 0 }))
 		
 		self.uiSeekFaster.clicked.connect(self.seekFaster)
 		self.uiSeekSlower.clicked.connect(self.seekSlower)

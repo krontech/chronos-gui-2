@@ -111,17 +111,17 @@ class RemoteAccess(QtWidgets.QWidget):
 		SSHPort = f'\n    -p {self.uiSSHPort.text()}' if not self.uiSSHPort.text() == '22' else ''
 		
 		if self.uiEnableRemoteHTTP.isChecked():
-			url = f"https://{data['remoteAddress'] or data['localAddress']}{HTTPPort}/"
+			url = f"https://{data['remoteAddress4'] or data['localAddress4']}{HTTPPort}/"
 		elif self.uiEnableLocalHTTP.isChecked():
-			url = f"http://{data['localAddress']}{HTTPPort}/"
+			url = f"http://{data['localAddress4']}{HTTPPort}/"
 		else:
 			url = 'disabled'
 		self.uiAppUrl.setText(url)
 		
 		if self.uiEnableRemoteSSH.isChecked():
-			command = f"ssh root@{data['remoteAddress'] or data['localAddress']}{SSHPort}"
+			command = f"ssh root@{data['remoteAddress4'] or data['localAddress4']}{SSHPort}"
 		elif self.uiEnableLocalSSH.isChecked():
-			command = f"ssh root@{data['localAddress']}{SSHPort}"
+			command = f"ssh root@{data['localAddress4']}{SSHPort}"
 		else:
 			command = 'disabled'
 		self.uiSSHCommand.setText(command)

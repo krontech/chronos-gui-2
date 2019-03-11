@@ -2,7 +2,7 @@
 <html lang="en">
 	<head>
 		<meta charset="utf-8">
-		<title>Chronos D-Bus API Documentation</title>
+		<title>Chronos Coordinator D-Bus API Documentation</title>
 		
 		<style>
 			/* Originally from http://bettermotherfuckingwebsite.com */
@@ -31,12 +31,22 @@
 				white-space: pre;
 				overflow-x: auto;
 				display: block;
+				-moz-tab-size: 4;
+				-o-tab-size:   4;
+				tab-size:      4;
 			}
 			
 			code, .codeblock {
 				background: rgba(0,0,0, 0.1);
 				border-radius: 0.2ex;
 				padding: 0 0.4ex;
+			}
+			
+			table .codeblock {
+				/*I don't know why I have to set this manually, but
+				if I don't, the codeblocks expand forever. They
+				completely ignore the table's max-width.*/
+				max-width: calc(975px/2.2);
 			}
 			
 			h1,h2,h3 {
@@ -109,13 +119,13 @@
 		<h1>Chronos D-Bus API</h1>
 		
 		
-		<p>This documentation covers the Chronos 1.4 <a href="https://www.freedesktop.org/wiki/Software/dbus/">D-Bus</a> API. The API has two major components: The <a href="#control-api">Coordinator API</a> (formerly the Control API) and the <a href="#video-api">Video API</a>. There is also a reference client written in Python which is used for the user interface.</p>
+		<p>This documentation covers the Chronos 1.4 Coordinator <a href="https://www.freedesktop.org/wiki/Software/dbus/">D-Bus</a> API. The internal camera D-Bus API has two major components: The D-Bus-based <a href="#control-api">Coordinator API</a> (formerly the Control API) and the D-Bus-based <a href="#video-api">Video API</a>.</p>
 		
-		<p>You can use the D-Bus API to write your own application on the camera. This application will be able to display a UI on the back of the camera as well as respond to remote HTTP requests over MiniUSB and the network.</p>
+		<p>You can use the internal D-Bus APIs to write your own application on the camera. This application will be able to display a UI on the back of the camera as well as respond to remote HTTP requests over MiniUSB and the network.</p>
 		
 		<p>If you only need to control the camera remotely, you should consider using the <a href="https://github.com/krontech/chronos-web-interface">HTTP interface</a> instead. The HTTP interface lets you send commands to the camera over the network, and is used by the (planned) remote-control app. It is easier to develop using the HTTP interface than it is using the D-Bus interfaces.</p>
 		
-		<p>Note: All examples in this document are given in Python, since the reference client was written in it.</p>
+		<p>Note: All examples in this document are given in Python, since the <a href="index.html">reference client</a> was written in it.</p>
 		
 		<h2>Architecture</h2>
 		
@@ -289,9 +299,11 @@
 		<p>Values can have different levels of mutability:</p>
 		<ul>
 			<li><strong>Variable</strong> values can be set through the API, but may be changed externally as well. They can be set, retrieved, and observed. (Observation, in this case, means a D-Bus signal with the same name as the value will be emitted. Refer to <a href="../src/api.py#observe">api.py:observe</a> for an example.)</li>
-			<li>Values which are a <strong>property</strong>, on the other hand, only change in response to external stimulus. Properties can't be set, but they can be retrieved and observed as they changed. These are things like battery level and trigger status.</li>
+			<li><strong>Property</strong> values, on the other hand, only change in response to external stimulus. Properties can't be set, but they can be retrieved and observed as they changed. These are things like battery level and trigger status.</li>
 			<li><strong>Constant</strong> values do not change over the course of a connection, although they may be changed if the camera firmware is upgraded. For example, firmware version and the amount of RAM installed are both constants.</li>
 		</ul>
+		
+		<p>All strings are <a href="https://en.wikipedia.org/wiki/UTF-8">UTF-8</a> encoded. All integers are little-endian. All float values are 64-bit <a href="http://ieeexplore.ieee.org/servlet/opac?punumber=2355">IEEE-754</a> encoded.</p>
 		
 		<p>Available values are:</p>
 		<table>
@@ -306,32 +318,56 @@
 			
 			<tbody>
 				<tr>
+					<td><code>HTTPPort</code></td>
+					<td>integer</td>
+					<td>variable</td>
+					<td>Specify the port for the web server to run on. This is used for the web app and HTTP API. You can enable the web app and HTTP API by setting <code>localHTTPAccess</code> or <code>remoteHTTPAccess</code> to <code>True</code>.</td>
+				</tr>
+				<tr>
+					<td><code>SSHPort</code></td>
+					<td>integer</td>
+					<td>variable</td>
+					<td>Set the Secure Shell port. By default, port 22 is used, but it is recommended to use a high random port for day-to-day use. It defaults to port 22 because it's easier to connect to, but it is less secure because this is where everyone looks for SSH.</td>
+				</tr>
+				<tr>
+					<td><code>availableRecording<br>AnalogGains</code></td>
+					<td>list</td>
+					<td>constant</td>
+					<td>Get a list of gains the image sensor output can be amplified by. Each element of the list is a map with two keys, <code>multiplier</code> and <code>dB</code>. The <code>multiplier</code> values can be used to set <code>previewAnalogGainMultiplier</code> and <code>recordingAnalogGainMultiplier</code>. The decibel values are purely informational. Higher amplification levels will produce a noisier image. Amplification is an analog operation, versus a digital operation like you might get post-processing a video to be brighter.</td>
+				</tr>
+				<tr>
 					<td><code>batteryCharge</code></td>
-					<td>decimal</td>
+					<td>float</td>
 					<td>property</td>
 					<td>On a scale of 0.0 to 1.0, how full is the camera battery? 0 is dead, and 1 is fully charged.</td>
 				</tr>
 				<tr>
 					<td><code>batteryVoltage</code></td>
-					<td>decimal</td>
+					<td>float</td>
 					<td>property</td>
-					<td>DThe voltage of the battery, in volts. A happy battery outputs between 12v and 12.5v.</td>
+					<td>A measure of the power the removable battery is putting out, in volts. A happy battery outputs between 12v and 12.5v. This value is graphed on the battery screen on the Chronos.</td>
 				</tr>
 				<tr>
 					<td><code>cameraApiVersion</code></td>
 					<td>string</td>
 					<td>constant</td>
-					<td>The iteration of this API. Adheres to <a href="https://semver.org/">SemVer</a>.</td>
+					<td>The current iteration of this API. Adheres to <a href="https://semver.org/">SemVer</a>. Example: <code>1.13.0</code></td>
+				</tr>
+				<tr>
+					<td><code>cameraDescription</code></td>
+					<td>string</td>
+					<td>variable</td>
+					<td>Does nothing. Can be used to give an easy-to-identify name to a camera when many cameras are being used. Supports emoji.</td>
 				</tr>
 				<tr>
 					<td><code>cameraFpgaVersion</code></td>
 					<td>string</td>
 					<td>constant</td>
-					<td>The firmware iteration the <a href="https://en.wikipedia.org/wiki/Field-programmable_gate_array">field-programmable gate array</a> inside the Chronos is running. (The FPGA is primarily responsible for recording the high-speed video coming off the sensor to a buffer in RAM.)</td>
+					<td>The firmware iteration the <a href="https://en.wikipedia.org/wiki/Field-programmable_gate_array">field-programmable gate array</a> inside the Chronos is running. (The FPGA is primarily responsible for recording the high-speed video coming off the sensor to a buffer in RAM.) Example: <code>1.13.0</code></td>
 				</tr>
 				<tr>
 					<td><code>cameraMemoryGB</code></td>
-					<td>decimal</td>
+					<td>float</td>
 					<td>constant</td>
 					<td>Amount of RAM installed in the Chronos in <a href="https://en.wikipedia.org/wiki/Gigabyte">GB</a> (vs <a href="https://en.wikipedia.org/wiki/Gibibyte">GiB</a>). This will correspond to the memory amount printed on the bottom of your camera, if you haven't made any modification.</td>
 				</tr>
@@ -348,11 +384,23 @@
 					<td>The serial number of the product the API is running on. This corresponds to the SN printed on the bottom of your camera. Example: <code>00204</code></td>
 				</tr>
 				<tr>
+					<td><code>colorMatrix</code></td>
+					<td>list</td>
+					<td>variable</td>
+					<td>A 3x3 matrix controlling <a href="https://en.wikipedia.org/wiki/Color_balance">colour balance</a> of the recorded video. To disable colour correction, set to the identity matrix:
+					<code class=codeblock>
+						[[1,0,0],
+						 [0,1,0],
+						 [0,0,1]]
+					</code>
+					</td>
+				</tr>
+				<tr>
 					<td><code>commonlySupported<br>Resolutions</code></td>
 					<td>list</td>
 					<td>constant</td>
 					<td>
-						A list of maps. Each map indicates a preset by specifying <code>hRes</code> (int, px), <code>vRes</code> (int, px), and <code>framerate</code> (decimal, frames per second). Partial example:
+						A list of maps. Each map indicates a preset by specifying <code>hRes</code> (int, px), <code>vRes</code> (int, px), and maximum <code>framerate</code> (float, frames per second). Partial example:
 						<code class="codeblock">
 							[{
 								'hRes': 1280, 
@@ -361,6 +409,12 @@
 							}, …]
 						</code>
 					</td>
+				</tr>
+				<tr>
+					<td><code>datetime</code></td>
+					<td>string</td>
+					<td>variable</td>
+					<td>iso 8601-formatted date, <code>YYYY-MM-DDTHH:MM:SS.mmmmmm</code>. Detailed in <a href="https://docs.python.org/3/library/datetime.html#datetime.datetime.isoformat">the Python datetime docs</a>.</td>
 				</tr>
 				<tr>
 					<td><code>currentCameraState</code></td>
@@ -375,10 +429,54 @@
 					<td>Indicates what the video display is showing. One of <code>viewfinder</code> or <code>playback</code>.</colgroup>. In <code>viewfinder</code> mode, the video on the back of the camera is showing what the sensor is seeing. In <code>playback</code> mode, the video is showing footage previously recorded in RAM.</td>
 				</tr>
 				<tr>
+					<td><code>dimScreenWhenNotInUse</code></td>
+					<td>boolean</td>
+					<td>variable</td>
+					<td>After a period, dim the screen backlight to conserve battery power. This has a fairly small effect overall.</td>
+				</tr>
+				<tr>
 					<td><code>disableOverwriting<br>RingBuffer</code></td>
 					<td>boolean</td>
 					<td>variable</td>
 					<td>In segmented mode, disable overwriting earlier recorded ring buffer segments.</td>
+				</tr>
+				<tr>
+					<td><code>externalStorage</code></td>
+					<td>list</td>
+					<td>property</td>
+					<td>External storage device partitions.
+			
+						<p>Returns a list of maps, one map per partition on each external storage device. (Storage devices are things like SD cards, USB thumb sticks, etc.)</p>
+						
+						Maps contain the following keys:
+						<ul>
+							<li>name: The given name of the partition.</li>
+							<li>device: The name of the device the partition is on. If a device has more than one partition, each partition will have the same device name.</li>
+							<li>path: Where on the camera's filesystem the device is mounted to. Unlike name, guaranteed to be unique.</li>
+							<li>size: The amount of space on the partition, in bytes.</li>
+							<li>free: The amount of available space on the partition, in bytes. Note that size and free may not fit in a 32-bit integer.</li>
+							<li>interface: Either a <code>usb</code> drive, an <code>sd</code> card port, or a <code>network</code> mount.</li>
+						</ul>
+						
+						<code>externalStorage</code> example:
+						<code class=codeblock>
+							[{
+								"name": "Testdisk",
+								"device": "mmcblk0p1",
+								"path": "/dev/sda",
+								"size": 1294839100, #bytes
+								"free": 4591,
+								"interface": "sd",
+							},{
+								"name": "Toastdesk",
+								"device": "sdc1",
+								"path": "/dev/sdc1",
+								"size": 2930232316000,
+								"free": 1418341032982,
+								"interface": "usb", 
+							}]
+						</code>
+					</td>
 				</tr>
 				<tr>
 					<td><code>externallyPowered</code></td>
@@ -393,8 +491,199 @@
 					<td>
 						An integer specifying the color of focus peaking, one of the available focus aids. Like HTML/CSS, this value is composed of four packed 8-bit channels, representing Red, Green, Blue, and Alpha (strength). In <a href="https://en.wikipedia.org/wiki/Hexadecimal">hexadecimal</a>, this is formatted as 0x<span style="color: #D00F;">RR</span><span style="color: #0B0F;">GG</span><span style="color: #00DF;">BB</span><span style="color: #000F;">AA</span>. For example, <code style="color: #AA00AAFF;">0xAA00AAFF</code> is maximum-strength purple, because red and blue are both set to AA, and alpha is set to FF. <code style="color: #C1681988;">0xC1681988</code> is half-strength brown.
 						<br>
-						To turn off/disable focus peaking, set this value to 0.
+						To turn focus peaking on or off, set <code>focusPeakingIntensity</code>.
 					</td>
+				</tr>
+				<tr>
+					<td><code>focusPeakingIntensity</code></td>
+					<td>string</td>
+					<td>variable</td>
+					<td>One of <code>'off'</code>, <code>'low'</code>, <code>'medium'</code>, <code>'high'</code>. Higher intensity means more color on screen.</td>
+				</tr>
+				<tr>
+					<td><code>localHTTPAccess</code></td>
+					<td>boolean</td>
+					<td>variable</td>
+					<td>Enable web access (HTTP API and web app) over the local network, ie, 192.168.x.x. Note that <code>networkPassword</code> <em>must</em> be set before any network-based control is actually turned on.</td>
+				</tr>
+				<tr>
+					<td><code>localSSHAccess</code></td>
+					<td>boolean</td>
+					<td>variable</td>
+					<td>Enable command-line access over the local network, ie, 192.168.x.x. Note that <code>networkPassword</code> <em>must</em> be set before any network-based control is actually turned on. It is strongly recommended to set up key-based authentication as soon as possible, and disable ssh password login via the command line.</td>
+				</tr>
+				<tr>
+					<td><code>motionTriggerAdaption</code></td>
+					<td>string</td>
+					<td>variable</td>
+					<td>Set how quickly the motion triggering algorithm adapts to non-triggering motion sources. Can be set to <code>high</code>, <code>medium</code>, <code>low</code>, or <code>off</code> to disable learning entirely. Even if adaption is disabled, you can call the <code>takeStillReferenceFor<br>MotionTriggering()</code> method to retrain the motion trigger.</td>
+				</tr>
+				<tr>
+					<td><code>motionTriggerHOffset</code></td>
+					<td>integer</td>
+					<td>variable</td>
+					<td rowspan="4">The region within the recorded picture which the motion trigger monitors for activity. HRes is the horizontal size of the box, VRes is vertical size of the box, HOffset is the horizontal offset from the upper-left corner of the recorded image, and VOffset is the vertical offset. (The recorded image can be changed with analogous recordingHRes/VRes/HOffset/VOffset, assuming <code>videoState</code> is <code>'recording'</code> or <code>'pre-recording'</code>. Otherwise, no motion triggering occurs.)<br>See <code>motionTriggerAdaption</code> and <code>takeStillReferenceForMotionTriggering()</code> for configuring motion within the motion trigger region.</td>
+				</tr>
+				<tr>
+					<td><code>motionTriggerHRes</code></td>
+					<td>integer</td>
+					<td>variable</td>
+					<!--Overridden, see motionTriggerHOffset.-->
+				</tr>
+				<tr>
+					<td><code>motionTriggerVOffset</code></td>
+					<td>integer</td>
+					<td>variable</td>
+					<!--Overridden, see motionTriggerHOffset.-->
+				</tr>
+				<tr>
+					<td><code>motionTriggerVRes</code></td>
+					<td>integer</td>
+					<td>variable</td>
+					<!--Overridden, see motionTriggerHOffset.-->
+				</tr>
+				<tr>
+					<td><code>recordingMode</code></td>
+					<td>string</td>
+					<td>variable</td>
+					<td>Configure how the camera records. <code>'normal'</code> causes one trigger to record the whole buffer. <code>'segmented'</code> causes one trigger to record one a segment, the size of which is determined by dividing the total available record length by <code>recordedSegments</code>. <code>gated burst</code> uses the full buffer, but only records when an input signal is high. Signals can be configured by setting <code>triggerConfiguration</code> value.</td>
+				</tr>
+				<tr>
+					<td><code>recordingSegments</code></td>
+					<td>float</td>
+					<td>variable</td>
+					<td>Set how many individual video clips are produced while in segmented record mode. (See <code>recordingMode</code> for details.) For example, if you wanted to record 4 events, you might call <code>api.set({'recordingSegments': 4, 'recordingMode', 'segmented'}))</code>. The minimum is 1, the maximum the of number of frames in the recording buffer. Note that the default on-board UI may not handle viewing extremely large numbers of segments well, since each segment is displayed and saved separately.</td>
+				</tr>
+				<tr>
+					<td><code>recordedSegments</code></td>
+					<td>list</td>
+					<td>property</td>
+					<td>A list of the recorded segments of video. Will always contain one entry unless <code>recordingMode</code> is <code>'segmented'</code>. Each entry is a map containing the following keys:
+						<ul>
+							<li>int <code>'start'</code>: First frame of the recorded segment, inclusive.</li>
+							<li>int <code>'end'</code>: Final frame of the recorded segment, exclusive.</li>
+							<li>int <code>'hres'</code>: Horizontal resolution of the video, in pixels.</li>
+							<li>int <code>'vres'</code>: Vertical resolution of the video, also in pixels.</li>
+							<li>int <code>'milliframerate'</code>: Framerate the segment was recorded at, in millionths of a frame per second. See <code>sensorMilliframerate</code> for details.</li>
+							<li>string <code>'id'</code>: A unique 8-character identifier for the segment. (Uniqueness is not guranteed long-term. Generate a UUID in that case.)</li>
+						</ul>
+					</td>
+				</tr>
+				<tr>
+					<td><code>networkInterfaces</code></td>
+					<td>list</td>
+					<td>property</td>
+					<td>A list of connections to the outside world through. Add an element to this list by plugging in an Ethernet cable, the On-The-Go Mini USB cable, or a supported Wi-Fi dongle. (No dongles are officially supported yet, however.) Each element contains the following keys:
+						<ul>
+							<li>str <code>'id'</code>: The name of the network device, for example, <code>'enp0s25'</code> or <code>'wlp4s0'</code>.</li>
+							<li>str <code>'name'</code>: The name of the physical item providing connectivity. Example: <code>'Ethernet'</code> or <code>'Mini USB'</code>.</li>
+							<li>str <code>'localAddress4'</code>: The IPv4 address of the camera on the local network. (You can often set up port forwarding to expose this to the internet.) For example, the camera was randomly assigned <code>'192.168.1.14'</code> when I connected it to the office network. Then, using the OTG cable, the camera assigned itself <code>'192.168.12.1'</code> as it always does.</li>
+							<li>str <code>'localAddress6'</code>: The IPv6 address of the camera on the local network. For example, on the office local-area network, I can access the camera at <code>'fe80::22c3:8fff:fe3b:966a'</code>.</li>
+							<li>str <code>'remoteAddress4'</code>: As with <code>'localAddress4'</code>, but the routable internet address instead of just the local address. You usually have to configure your local network to forward requests to your camera to get this.</li>
+							<li>str <code>'remoteAddress6'</code>: As above, but with IPv6 instead of IPv4.</li>
+						</ul>
+						<p>Note: If no address is available, then the field will be an empty string (<code>''</code>). At least one address will be populated, or the entry will not appear. Remote addresses <em>always</em> have a local version.</p>
+						For example, using the <a href="https://github.com/krontech/chronos-gui-2/blob/master/src/api.py">Python API client</a>, <code>api.get('networkInterfaces')</code> yields
+						<code class=codeblock>
+							[{
+								'id': 'enp0s25',
+								'name': 'Ethernet',
+								'localAddress4': '192.168.1.135',
+								'localAddress6':
+									'fe80::22c3:8fff:fe3b:966a',
+								'remoteAddress4': '205.250.126.92',
+								'remoteAddress6': '',
+							},{
+								'id': 'wlp4s0',
+								'name': 'Mini USB',
+								'localAddress4': '192.168.12.1',
+								'localAddress6':
+									'fe80::f81b:26ff:fee7:24dd',
+								'remoteAddress4': '',
+								'remoteAddress6': '',
+							}]
+						</code>
+					</td>
+				</tr>
+				<tr>
+					<td><code>networkPassword</code></td>
+					<td>string</td>
+					<td>variable</td>
+					<td>The password which must be supplied for HTTP or SSH access. <em>If no password is set, network access is disabled.</em> Retrieving this field will yield an arbitrary number of <code>•</code>s.</td>
+				</tr>
+				<tr>
+					<td><code>networkStorageAddress</code></td>
+					<td>string</td>
+					<td>variable</td>
+					<td rowspan=3>Network storage allows the camera to save video to a remote device via a network connection. Address: IP address of the network storage device (ie, a Samba share) to connect to when saving. Password and Username provide authentication. The currently set credentials can be tested by calling <code>testNetworkStorageCredentials({})</code>. If you want to test your credentials before setting them, you can pass them to the function.</td>
+				</tr>
+				<tr>
+					<td><code>networkStoragePassword</code></td>
+					<td>string</td>
+					<td>variable</td>
+					<!-- Overridden. -->
+				</tr>
+				<tr>
+					<td><code>networkStorageUsername</code></td>
+					<td>string</td>
+					<td>variable</td>
+					<!-- Overridden. -->
+				</tr>
+				<tr>
+					<td><code>playbackFrame</code></td>
+					<td>int</td>
+					<td>variable</td>
+					<td>The current frame video playback is on. Since this may update very frequently, change events will not fire for this value.</td>
+				</tr>
+				<tr>
+					<td><code>playbackFramerate</code></td>
+					<td>int</td>
+					<td>variable</td>
+					<td>A delta applied to playbackFrame, once every 16ms at most. Above 60fps, frames will be dropped, and below 60fps, the playbackFrame will be updated less frequently.</td>
+				</tr>
+				<tr>
+					<td><code>powerOnWhen<br>MainsConnected</code></td>
+					<td>boolean</td>
+					<td>variable</td>
+					<td>Set to <code>True</code> to have the camera turn on when it is plugged in. The inverse of this, turning off when the charger is disconnected, is achieved by setting the camera to turn off at any battery percentage. For example, to make the camera turn off when it is unpowered and turn on when it is powered again - effectively only using the battery to finish saving - you could make the following call:
+					<code class=codeblock>
+						api.control('set', {
+							'powerOnWhenMainsConnected': True,
+							'saveAndPowerDownWhenLowBattery': True,
+							'saveAndPowerDownLowBatteryLevel': 100,
+						})
+					</code>
+					</td>
+				</tr>
+				<tr>
+					<td><code>previewAnalog<br>GainMultiplier</code></td>
+					<td></td>
+					<td></td>
+					<td></td>
+				</tr>
+				<tr>
+					<td><code>previewHOffset</code></td>
+					<td></td>
+					<td></td>
+					<td></td>
+				</tr>
+				<tr>
+					<td><code>previewHRes</code></td>
+					<td></td>
+					<td></td>
+					<td></td>
+				</tr>
+				<tr>
+					<td><code>previewVOffset</code></td>
+					<td></td>
+					<td></td>
+					<td></td>
+				</tr>
+				<tr>
+					<td><code>previewVRes</code></td>
+					<td></td>
+					<td></td>
+					<td></td>
 				</tr>
 				<tr>
 					<td><code>recordedSegments</code></td>
@@ -403,7 +692,7 @@
 					<td></td>
 				</td>
 				<tr>
-					<td><code>recordingAnalogGain</code></td>
+					<td><code>recordingAnalog<br>GainMultiplier</code></td>
 					<td></td>
 					<td></td>
 					<td></td>
@@ -427,7 +716,7 @@
 					<td></td>
 				</td>
 				<tr>
-					<td><code>recordingPeriodNs</code></td>
+					<td><code>recordingPeriod</code></td>
 					<td></td>
 					<td></td>
 					<td></td>
@@ -444,6 +733,36 @@
 					<td></td>
 					<td></td>
 				</td>
+				<tr>
+					<td><code>recordingVStep</code></td>
+					<td></td>
+					<td></td>
+					<td></td>
+				</tr>
+				<tr>
+					<td><code>remoteHTTPAccess</code></td>
+					<td>boolean</td>
+					<td>variable</td>
+					<td>Enable web access (HTTP API and web app) with no restrictions. The HTTP API and web app will be accessible from any device able to route to it. Note that <code>networkPassword</code> <em>must</em> be set before any network-based control is actually turned on. It is strongly suggested to set <code>networkPassword</code> to a multi-word passphrase in this case, to make it hard to guess.</td>
+				</tr>
+				<tr>
+					<td><code>remoteSSHAccess</code></td>
+					<td>boolean</td>
+					<td>variable</td>
+					<td>Enable command-line access to the camera with no ip-based restrictions. Note that <code>networkPassword</code> <em>must</em> be set before any network-based control is actually turned on. It is strongly recommended to set up key-based authentication over the local network or the OTG cable (which is always enabled), and disable ssh password login via the command line.</td>
+				</tr>
+				<tr>
+					<td><code>saveAndPowerDown<br>LowBatteryLevel</code></td>
+					<td></td>
+					<td></td>
+					<td></td>
+				</tr>
+				<tr>
+					<td><code>saveAndPowerDown<br>WhenLowBattery</code></td>
+					<td></td>
+					<td></td>
+					<td></td>
+				</tr>
 				<tr>
 					<td><code>sensorFramerateMax</code></td>
 					<td></td>
@@ -481,6 +800,12 @@
 					<td></td>
 				</td>
 				<tr>
+					<td><code>sensorMilliframerate</code></td>
+					<td></td>
+					<td></td>
+					<td></td>
+				</tr>
+				<tr>
 					<td><code>sensorMinExposureNs</code></td>
 					<td></td>
 					<td></td>
@@ -511,6 +836,12 @@
 					<td></td>
 				</td>
 				<tr>
+					<td><code>sensorRecordsColor</code></td>
+					<td></td>
+					<td></td>
+					<td></td>
+				</tr>
+				<tr>
 					<td><code>sensorVIncrement</code></td>
 					<td></td>
 					<td></td>
@@ -528,6 +859,24 @@
 					<td></td>
 					<td></td>
 				</td>
+				<tr>
+					<td><code>showBlackClipping<br>ZebraStripes</code></td>
+					<td></td>
+					<td></td>
+					<td></td>
+				</tr>
+				<tr>
+					<td><code>showWhiteClipping<br>ZebraStripes</code></td>
+					<td></td>
+					<td></td>
+					<td></td>
+				</tr>
+				<tr>
+					<td><code>timingExposureDelayNs</code></td>
+					<td></td>
+					<td></td>
+					<td></td>
+				</tr>
 				<tr>
 					<td><code>timingExposureDelayNs</code></td>
 					<td></td>
@@ -571,6 +920,18 @@
 					<td></td>
 				</td>
 				<tr>
+					<td><code>totalAvailableFrames</code></td>
+					<td></td>
+					<td></td>
+					<td></td>
+				</tr>
+				<tr>
+					<td><code>totalRecordedFrames</code></td>
+					<td></td>
+					<td></td>
+					<td></td>
+				</tr>
+				<tr>
 					<td><code>triggerCapabilities</code></td>
 					<td></td>
 					<td></td>
@@ -583,10 +944,16 @@
 					<td></td>
 				</td>
 				<tr>
+					<td><code>triggerDelay</code></td>
+					<td></td>
+					<td></td>
+					<td>in frames</td>
+				</tr>
+				<tr>
 					<td><code>triggerDelayNs</code></td>
 					<td></td>
 					<td></td>
-					<td></td>
+					<td>in nanoseconds</td>
 				</td>
 				<tr>
 					<td><code>triggerState</code></td>
@@ -607,11 +974,47 @@
 					<td></td>
 				</td>
 				<tr>
-					<td><code>zebraStripesEnabled</code></td>
+					<td><code>videoDisplayDevice</code></td>
 					<td></td>
 					<td></td>
 					<td></td>
-				</td>
+				</tr>
+				<tr>
+					<td><code>videoDisplayHeight</code></td>
+					<td></td>
+					<td></td>
+					<td></td>
+				</tr>
+				<tr>
+					<td><code>videoDisplayWidth</code></td>
+					<td></td>
+					<td></td>
+					<td></td>
+				</tr>
+				<tr>
+					<td><code>videoDisplayX</code></td>
+					<td></td>
+					<td></td>
+					<td></td>
+				</tr>
+				<tr>
+					<td><code>videoDisplayY</code></td>
+					<td></td>
+					<td></td>
+					<td></td>
+				</tr>
+				<tr>
+					<td><code>videoState</code></td>
+					<td></td>
+					<td></td>
+					<td></td>
+				</tr>
+				<tr>
+					<td><code>whiteBalance</code></td>
+					<td></td>
+					<td></td>
+					<td></td>
+				</tr>
 			</tbody>
 		</table>
 		

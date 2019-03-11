@@ -26,8 +26,8 @@ class RecordMode(QtWidgets.QDialog):
 		self.setAttribute(QtCore.Qt.WA_TranslucentBackground, True)
 		
 		# Secret high-percision backing value.
-		self.nanosegmentLengthPct = 0
-		# api.observe('nanosegmentLengthPct', self.updateSegmentLength)
+		self.recordingSegments = 0
+		# api.observe('recordingSegments', self.updateSegmentLength)
 		# api.observe('totalAvailableFrames', )
 		# api.observe('recordingExposureNs', )
 		
@@ -65,6 +65,6 @@ class RecordMode(QtWidgets.QDialog):
 	
 	# @pyqtSlot(int, name="updateSegmentLength")
 	# @silenceCallbacks('uiExposureSlider')
-	# def updateSegmentLength(self, nanosegmentLengthPct: int):
-	# 	lengthPct = nanosegmentLengthPct*1e9
+	# def updateSegmentLength(self, recordingSegments: int):
+	# 	lengthPct = recordingSegments*1e9
 	# 	self.uiSegmentLengthInSeconds.setValue()
