@@ -10,10 +10,9 @@ Example:
 	dbg()
 """
 
-import sys
-import pdb
+import sys, pdb, pprint
+from os import system, popen
 from PyQt5 import QtCore
-from os import system
 
 
 # Start our interactive debugger when an error happens.
@@ -77,3 +76,10 @@ def breakIf(widget):
 
 if hasattr(pdb, 'hideframe'):
 	breakIf = pdb.hideframe(breakIf)
+
+
+def pp(*args, **kwargs):
+	pprint.PrettyPrinter(
+		width=int(popen('stty size').read().split()[1]), #Width of console.
+		compact=True,
+	).pprint(*args, **kwargs)
