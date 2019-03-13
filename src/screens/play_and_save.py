@@ -11,6 +11,9 @@ from api import silenceCallbacks
 
 
 class PlayAndSave(QtWidgets.QDialog):
+	saveRegionMarkerHeight = 20
+	saveRegionMarkerOffset = 10
+	
 	def __init__(self, window):
 		super().__init__()
 		uic.loadUi("src/screens/play_and_save.ui", self)
@@ -54,6 +57,9 @@ class PlayAndSave(QtWidgets.QDialog):
 		self.uiSeekFaster.clicked.connect(self.seekFaster)
 		self.uiSeekSlower.clicked.connect(self.seekSlower)
 		
+		self.uiMarkStart.clicked.connect(self.markStart)
+		self.uiMarkEnd.clicked.connect(self.markEnd)
+		
 		self.uiSave.clicked.connect(lambda: api.control('saveRegions', [{}, {}]))
 		
 		self.uiSavedFileSettings.clicked.connect(lambda: window.show('file_settings'))
@@ -79,12 +85,14 @@ class PlayAndSave(QtWidgets.QDialog):
 		self.motionHeatmap = QImage() #Updated by updateMotionHeatmap, used by self.paintMotionHeatmap.
 		self.uiTimelineVisualization.paintEvent = self.paintMotionHeatmap
 		
-		#Timeline marks are purely visual.
-		self.uiMarkedRegionVisualization.setAttribute(QtCore.Qt.WA_TransparentForMouseEvents, True)
-		
+		#Set up for marked regions.
+		self._tracks = [] #Used as cache for updateMarkedRegions / paintMarkedRegions.
 		self.uiEditMarkedRegions.formatString = self.uiEditMarkedRegions.text()
-		
+		self.uiMarkedRegionVisualization.setAttribute(QtCore.Qt.WA_TransparentForMouseEvents, True)
+		self.uiMarkedRegionVisualization.paintEvent = self.paintMarkedRegions
 		self.updateMarkedRegions()
+		
+		
 		
 	def onShow(self):
 		#Don't update the labels while hidden. But do show with accurate info when we start.
@@ -92,7 +100,7 @@ class PlayAndSave(QtWidgets.QDialog):
 		self.updateBatteryTimer.start()
 		self.updateBattery()
 		
-		data = api.get(['recordedSegments', 'totalRecordedFrames']) #No destructuring bind in python. ð­
+		data = api.get(['recordedSegments', 'totalRecordedFrames']) #No destructuring bind in python. 😭
 		self.recordedSegments = data['recordedSegments']
 		self.totalRecordedFrames = data['totalRecordedFrames']
 		
@@ -166,6 +174,7 @@ class PlayAndSave(QtWidgets.QDialog):
 		#TODO DDR 2018-11-19: This is very slow, tanking the framerate. Why is that?
 		self.uiFrameReadout.setText(self.uiFrameReadout.formatString % (frame, self.uiSeekSlider.maximum()))
 	
+	
 	def seekFaster(self):
 		if self.seekRate < 2000:
 			self.seekRate *= 2
@@ -191,4 +200,92 @@ class PlayAndSave(QtWidgets.QDialog):
 		
 		self.uiSeekSlider.setPageStep(self.seekRate * 5) #Multiplier: Compensate for key repeat delay.
 		self.uiSeekRateDisplay.setText(self.uiSeekRateDisplay.formatString % self.seekRate)
+	
+	
+	def markStart(self):
+		"""Set mark in."""
+		self.markedStart = api.get('playbackFrame')
+		
+		if self.markedStart == self.markedEnd:
+			self.markedEnd = None
+		
+		self.addMarkedRegion()
+	
+	def markEnd(self):
+		"""Set mark out."""
+		self.markedEnd = api.get('playbackFrame')
+		
+		if self.markedStart == self.markedEnd:
+			self.markedEnd = None
+		
+		self.addMarkedRegion()
+	
+	
+	def addMarkedRegion(self):
+		if None in (self.markedStart, self.markedEnd): #Be careful. 0 is valid, None is not, both are falsey.
+			return #No region marked.
+		
+		if self.markedStart > self.markedEnd:
+			self.markedEnd, self.markedStart = self.markedStart, self.markedEnd
+		
+		self.markedRegions += [{
+			"mark start": self.markedStart,
+			"mark end": self.markedEnd,
+			"segment ids": [
+				segment['id']
+				for segment in api.get('recordedSegments') 
+				if not (segment['start'] >= self.markedEnd or segment['end'] < self.markedStart)
+			],
+			"segment name": f'Clip {len(self.markedRegions)+1}',
+			"saved": 0., #ratio between 0 and 1
+		}]
+		
+		self.markedStart, self.markedEnd = None, None
+		
+		self.updateMarkedRegions()
+	
+	
+	def updateMarkedRegions(self):
+		"""Recalculate marked regions and mark in/out marker."""
+		
+		#First thing, update the marked region count.
+		self.uiEditMarkedRegions.setText(
+			self.uiEditMarkedRegions.formatString % len(self.markedRegions) )
+		
+		#We'll assign each marked region a track. Regions can't overlap on the
+		#same track. They should always use the lowest track available.
+		tracks = []
+		for newRegion in self.markedRegions:
+			availableTrack = [
+				track
+				for track in tracks
+				if not [ #overlapping region in track
+					trackedRegion
+					for trackedRegion in track
+					if not (trackedRegion['mark start'] >= newRegion['mark end'] or trackedRegion['mark end'] < newRegion['mark start'])
+				][:1]
+			][:1]
 			
+			if availableTrack:
+				availableTrack[0] += [newRegion]
+			else:
+				tracks += [[newRegion]]
+		
+		#Recalculate height.
+		height = self.saveRegionMarkerHeight + self.saveRegionMarkerOffset*(len(tracks)-1)
+		self.uiMarkedRegionVisualization.setGeometry(
+			self.uiTimelineVisualization.x(),
+			self.uiTimelineVisualization.y() - height,
+			self.uiTimelineVisualization.width(),
+			height,
+		)
+		
+		pp(tracks)
+		
+		#Redraw
+		self._tracks = tracks
+		self.uiMarkedRegionVisualization.update()
+	
+	def paintMarkedRegions(self, evt):
+		chartTotalWidth = evt.rect().width()
+		print('repainting marked regions')
