@@ -446,7 +446,7 @@ class State():
 	
 	playbackFrame = 0
 	playbackFramerate = 0 #Set this to play or rewind the video.
-	totalRecordedFrames = 70000 #This only changes when we have a full segment recorded. Proposal: It does not change while recording. It changes at maximum rate of 30hz, in case segments are extremely short, in which case it may skip intermediate segments.
+	totalRecordedFrames = 80000 #This only changes when we have a full segment recorded. Proposal: It does not change while recording. It changes at maximum rate of 30hz, in case segments are extremely short, in which case it may skip intermediate segments.
 	
 	triggerDelay = 0 #signed int, between -lots and totalAvailableFrames
 	
@@ -460,14 +460,14 @@ class State():
 	recordingSegments = int(1e9)
 	recordedSegments = [{ #Each entry in this list a segment of recorded video. Although currently resolution/framerate is always the same having it in this data will make it easier to fix this in the future if we do.
 		"start": 0,
-		"end": 1000,
+		"end": 5000,
 		"hres": 200,
 		"vres": 300,
 		"milliframerate": 12580e3,
 		"id": "ldPxTT5R",
 	},{
-		"start": 1000,
-		"end": 1250,
+		"start": 5000,
+		"end": 80000,
 		"hres": 200,
 		"vres": 500,
 		"milliframerate": 900e3,

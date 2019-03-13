@@ -2,7 +2,7 @@
 
 from PyQt5 import uic, QtWidgets, QtCore
 from PyQt5.QtCore import pyqtSlot, QByteArray
-from PyQt5.QtGui import QImage, QTransform, QPainter
+from PyQt5.QtGui import QImage, QTransform, QPainter, QColor, QPainterPath, QBrush
 
 from debugger import *; dbg
 
@@ -14,6 +14,15 @@ class PlayAndSave(QtWidgets.QDialog):
 	def __init__(self, window):
 		super().__init__()
 		uic.loadUi("src/screens/play_and_save.ui", self)
+		
+		self.recordedSegments = []
+		self.totalRecordedFrames = 0
+		
+		#Use get and set marked regions, they redraw.
+		self.markedRegions = [] #{mark start, mark end, segment ids, segment name}
+		self.markedRegions = [{'mark end': 3184, 'segment ids': ['ldPxTT5R'], 'segment name': 'Clip 1', 'mark start': 0}, {'mark end': 41128, 'segment ids': ['KxIjG09V'], 'segment name': 'Clip 2', 'mark start': 35821}, {'mark end': 41128, 'segment ids': ['ldPxTT5R', 'KxIjG09V'], 'segment name': 'Clip 3', 'mark start': 0}]
+		self.markedStart = None #Note: Mark start/end are reversed if start is after end.
+		self.markedEnd = None
 		
 		# Panel init.
 		self.move(0, 0)
@@ -70,12 +79,23 @@ class PlayAndSave(QtWidgets.QDialog):
 		self.motionHeatmap = QImage() #Updated by updateMotionHeatmap, used by self.paintMotionHeatmap.
 		self.uiTimelineVisualization.paintEvent = self.paintMotionHeatmap
 		
+		#Timeline marks are purely visual.
+		self.uiMarkedRegionVisualization.setAttribute(QtCore.Qt.WA_TransparentForMouseEvents, True)
+		
+		self.uiEditMarkedRegions.formatString = self.uiEditMarkedRegions.text()
+		
+		self.updateMarkedRegions()
 		
 	def onShow(self):
 		#Don't update the labels while hidden. But do show with accurate info when we start.
 		api.set({'videoState': 'playback'})
 		self.updateBatteryTimer.start()
 		self.updateBattery()
+		
+		data = api.get(['recordedSegments', 'totalRecordedFrames']) #No destructuring bind in python. ð­
+		self.recordedSegments = data['recordedSegments']
+		self.totalRecordedFrames = data['totalRecordedFrames']
+		
 		self.updateMotionHeatmap()
 		#Set camera to video playback mode here.
 		
@@ -116,8 +136,21 @@ class PlayAndSave(QtWidgets.QDialog):
 	
 	def paintMotionHeatmap(self, paintEvent):
 		p = QPainter(self.uiTimelineVisualization)
+		
+		#Draw the scrollbar motion heatmap.
 		p.setCompositionMode(QPainter.CompositionMode_Darken)
 		p.drawImage(QtCore.QPoint(0,0), self.motionHeatmap)
+		
+		#Mark the heatmap segments.
+		p.setCompositionMode(QPainter.CompositionMode_SourceOver)
+		p.setPen(QColor(255,255,255,255//2))
+		
+		path = QPainterPath()
+		for border in [rs['start'] for rs in self.recordedSegments[1:]]:
+			x = round(border / self.totalRecordedFrames * self.uiTimelineVisualization.width())+0.5
+			path.moveTo(x, 0); path.lineTo(x, self.uiTimelineVisualization.height())
+		p.drawPath(path)
+		
 	
 	@pyqtSlot(int, name="onRecordingLengthChange")
 	@silenceCallbacks('uiSeekSlider')
