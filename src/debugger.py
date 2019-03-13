@@ -13,14 +13,22 @@ Example:
 import sys
 import pdb
 from PyQt5 import QtCore
+from os import system
 
 
 # Start our interactive debugger when an error happens.
-sys.excepthook = lambda t, v, tb: (
-	QtCore.pyqtRemoveInputHook(),
-	pdb.traceback.print_exception(t, v, tb),
+def eh(t,v,tb):
+	QtCore.pyqtRemoveInputHook()
+	
+	#Fix system not echoing keystrokes after first auto restart.
+	try:
+		system('stty sane')
+	except Exception as e:
+		pass
+	
+	pdb.traceback.print_exception(t, v, tb)
 	pdb.post_mortem(t=tb)
-)
+sys.excepthook = eh
 
 
 def brk():
