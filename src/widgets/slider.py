@@ -2,7 +2,7 @@
 
 from random import randint
 
-from PyQt5.QtCore import QSize, Qt
+from PyQt5.QtCore import QSize, Qt, pyqtSignal
 from PyQt5.QtWidgets import QSlider
 
 from debugger import *; dbg
@@ -10,6 +10,14 @@ from focusable_plugin import FocusablePlugin
 
 
 class Slider(QSlider, FocusablePlugin):
+	"""Styled, focussable QSlider. Contains fixed valueChanged event.
+		
+		When overriding self.paintEvent, always make sure to call
+		self.checkForVisualChange."""
+	
+	#Less frequent version of parent valueChanged. Only fires on visual changes.
+	valueChanged = pyqtSignal(int)
+	
 	def __init__(self, parent=None, showHitRects=False):
 		super().__init__(parent)
 		
@@ -22,6 +30,10 @@ class Slider(QSlider, FocusablePlugin):
 		self.jogWheelLowResolutionRotation.connect(lambda delta, pressed: 
 			not pressed and self.selectWidget(delta) )
 		self.jogWheelClick.connect(lambda: self.injectKeystrokes(Qt.Key_Space))
+		
+		#Synthesize an update signal which does not fire much faster than repaint, as valueChanged does.
+		self.__lastValue = self.value()
+		self.paintEvent = self.checkForVisualChange
 
 	def sizeHint(self):
 		return QSize(81, 201)
@@ -71,3 +83,16 @@ class Slider(QSlider, FocusablePlugin):
 			"bottom": 10,
 			"right": 20,
 		}
+	
+	def checkForVisualChange(self, evt):
+		"""Change event which only fires when visual change happens.
+			
+			This fixes the normal valueChanged event firing 3-8 times
+			per frame, when dragging the slider."""
+		
+		super().paintEvent(evt)
+		
+		val = self.value()
+		if val != self.__lastValue:
+			self.__lastValue = val
+			self.valueChanged.emit(val)
