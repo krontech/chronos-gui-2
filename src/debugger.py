@@ -12,6 +12,7 @@ Example:
 
 import sys, pdb, pprint
 from os import system, popen
+from faulthandler import enable; enable() #Enable segfault backtraces, usually from C libs. (exit code 139)
 from PyQt5 import QtCore
 
 
