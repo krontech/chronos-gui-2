@@ -1,4 +1,5 @@
 # -*- coding: future_fstrings -*-
+from random import sample
 
 from PyQt5 import uic, QtWidgets, QtCore
 from PyQt5.QtCore import pyqtSlot, QByteArray
@@ -11,8 +12,11 @@ from api import silenceCallbacks
 
 
 class PlayAndSave(QtWidgets.QDialog):
-	saveRegionMarkerHeight = 20
-	saveRegionMarkerOffset = 10
+	saveRegionMarkerHeight = 12
+	saveRegionMarkerOffset = 7
+	saveRegionBorder = 1
+	#Choose well-separated random hues, then fill in the gaps. Avoid green; that indicates saving for now.
+	saveRegionHues = sample(range(180, 421, 60), 5) + sample(range(210, 421, 60), 4)
 	
 	def __init__(self, window):
 		super().__init__()
@@ -23,7 +27,6 @@ class PlayAndSave(QtWidgets.QDialog):
 		
 		#Use get and set marked regions, they redraw.
 		self.markedRegions = [] #{mark start, mark end, segment ids, segment name}
-		self.markedRegions = [{'mark end': 3184, 'segment ids': ['ldPxTT5R'], 'segment name': 'Clip 1', 'mark start': 0}, {'mark end': 41128, 'segment ids': ['KxIjG09V'], 'segment name': 'Clip 2', 'mark start': 35821}, {'mark end': 41128, 'segment ids': ['ldPxTT5R', 'KxIjG09V'], 'segment name': 'Clip 3', 'mark start': 0}]
 		self.markedStart = None #Note: Mark start/end are reversed if start is after end.
 		self.markedEnd = None
 		
@@ -103,6 +106,7 @@ class PlayAndSave(QtWidgets.QDialog):
 		data = api.get(['recordedSegments', 'totalRecordedFrames']) #No destructuring bind in python. 😭
 		self.recordedSegments = data['recordedSegments']
 		self.totalRecordedFrames = data['totalRecordedFrames']
+		self.checkMarkedRegionsValid()
 		
 		self.updateMotionHeatmap()
 		#Set camera to video playback mode here.
@@ -151,13 +155,22 @@ class PlayAndSave(QtWidgets.QDialog):
 		
 		#Mark the heatmap segments.
 		p.setCompositionMode(QPainter.CompositionMode_SourceOver)
-		p.setPen(QColor(255,255,255,255//2))
 		
+		p.setPen(QColor(255,255,255,255//2))
 		path = QPainterPath()
 		for border in [rs['start'] for rs in self.recordedSegments[1:]]:
-			x = round(border / self.totalRecordedFrames * self.uiTimelineVisualization.width())+0.5
+			x = round(border / self.totalRecordedFrames * (self.uiTimelineVisualization.width()-1))+0.5
 			path.moveTo(x, 0); path.lineTo(x, self.uiTimelineVisualization.height())
 		p.drawPath(path)
+		
+		#Mark save start/save end.
+		mark = self.markedStart if self.markedStart is not None else self.markedEnd
+		if mark is not None:
+			p.setPen(QColor(100,230,100,255))
+			path = QPainterPath()
+			x = round(mark / self.totalRecordedFrames * (self.uiTimelineVisualization.width()-1))+0.5
+			path.moveTo(x, 0); path.lineTo(x, self.uiTimelineVisualization.height())
+			p.drawPath(path)
 		
 	
 	@pyqtSlot(int, name="onRecordingLengthChange")
@@ -210,6 +223,7 @@ class PlayAndSave(QtWidgets.QDialog):
 			self.markedEnd = None
 		
 		self.addMarkedRegion()
+		self.uiTimelineVisualization.update()
 	
 	def markEnd(self):
 		"""Set mark out."""
@@ -219,6 +233,7 @@ class PlayAndSave(QtWidgets.QDialog):
 			self.markedEnd = None
 		
 		self.addMarkedRegion()
+		self.uiTimelineVisualization.update()
 	
 	
 	def addMarkedRegion(self):
@@ -238,6 +253,7 @@ class PlayAndSave(QtWidgets.QDialog):
 			],
 			"segment name": f'Clip {len(self.markedRegions)+1}',
 			"saved": 0., #ratio between 0 and 1
+			"hue": self.saveRegionHues[len(self.markedRegions) % len(self.saveRegionHues)],
 		}]
 		
 		self.markedStart, self.markedEnd = None, None
@@ -262,7 +278,7 @@ class PlayAndSave(QtWidgets.QDialog):
 				if not [ #overlapping region in track
 					trackedRegion
 					for trackedRegion in track
-					if not (trackedRegion['mark start'] >= newRegion['mark end'] or trackedRegion['mark end'] < newRegion['mark start'])
+					if not (trackedRegion['mark start'] >= newRegion['mark end'] or trackedRegion['mark end'] <= newRegion['mark start'])
 				][:1]
 			][:1]
 			
@@ -272,20 +288,70 @@ class PlayAndSave(QtWidgets.QDialog):
 				tracks += [[newRegion]]
 		
 		#Recalculate height.
-		height = self.saveRegionMarkerHeight + self.saveRegionMarkerOffset*(len(tracks)-1)
+		height = self.saveRegionMarkerHeight + self.saveRegionMarkerOffset*(len(tracks)-1) + self.saveRegionBorder
 		self.uiMarkedRegionVisualization.setGeometry(
 			self.uiTimelineVisualization.x(),
-			self.uiTimelineVisualization.y() - height,
+			min(
+				self.uiTimelineVisualization.y() + self.uiTimelineVisualization.height()/2 - height/2,
+				self.height() - height,
+			),
 			self.uiTimelineVisualization.width(),
 			height,
 		)
-		
-		pp(tracks)
 		
 		#Redraw
 		self._tracks = tracks
 		self.uiMarkedRegionVisualization.update()
 	
 	def paintMarkedRegions(self, evt):
-		chartTotalWidth = evt.rect().width()
-		print('repainting marked regions')
+		"""Draw the marked region indicators."""
+		
+		def f2px(frameNumber):
+			"""Convert frame number to pixel coordinates."""
+			return round(frameNumber / self.totalRecordedFrames * (self.uiMarkedRegionVisualization.width()-1))
+		
+		def hsva(h,s,v,a=255):
+			"""Convenience function normalising QColor.fromHsv weirdness.
+				
+				QT interperets hsv saturation and value inverse of the rest of the world.
+				Flip these values, and wrap hue because we use non-zero-indexed arcs."""
+			return QColor.fromHsv(h % 360, s, v, a)
+		
+		p = QPainter(self.uiMarkedRegionVisualization)
+		
+		#This causes borders to get merged and generally mis-drawn.
+		#Could otherwise be used to simplify math when calculating rect position.
+		#p.setCompositionMode(QPainter.CompositionMode_DestinationOver)
+		
+		#This causes graphics glitches in 5.7 upon redraw.
+		#Could otherwise be used to simplify math when calculating rect position.
+		#p.scale(1,-1)
+		#p.translate(0, -evt.rect().height()+1)
+		
+		#Draw the tracks of marked regions.
+		trackOffset = -1
+		for track in reversed(self._tracks):
+			for region in track:
+				p.setPen(hsva(region['hue'], 230, 190))
+				p.setBrush(QBrush(hsva(region['hue'], 153, 230)))
+				
+				p.drawRect(
+					f2px(region['mark start']),
+					trackOffset + self.saveRegionBorder,
+					f2px(region['mark end'] - region['mark start']),
+					self.saveRegionMarkerHeight,
+				)
+			
+			trackOffset += self.saveRegionMarkerOffset
+	
+	
+	def checkMarkedRegionsValid(self):
+		self.markedRegions = list([
+			region 
+			for region in self.markedRegions
+			if set(region['segment ids']).issubset([
+				segment['id']
+				for segment in self.recordedSegments
+			])
+		])
+		self.updateMarkedRegions()

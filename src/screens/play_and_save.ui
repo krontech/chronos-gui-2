@@ -13,262 +13,12 @@
   <property name="windowTitle">
    <string>Play &amp; Save</string>
   </property>
-  <widget class="QWidget" name="gridLayoutWidget">
-   <property name="geometry">
-    <rect>
-     <x>580</x>
-     <y>0</y>
-     <width>241</width>
-     <height>421</height>
-    </rect>
-   </property>
-   <layout class="QGridLayout" name="gridLayout" rowstretch="2,1,2,2,2,2,2" columnstretch="1,1">
-    <property name="spacing">
-     <number>0</number>
-    </property>
-    <item row="0" column="1">
-     <widget class="Button" name="uiSeekForward">
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Ignored" vsizetype="Ignored">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
-      </property>
-      <property name="text">
-       <string>▶▶</string>
-      </property>
-      <property name="clickMarginLeft" stdset="0">
-       <enum>Button::none</enum>
-      </property>
-      <property name="clickMarginTop" stdset="0">
-       <enum>Button::none</enum>
-      </property>
-      <property name="clickMarginBottom" stdset="0">
-       <enum>Button::none</enum>
-      </property>
-      <property name="customStyleSheet" stdset="0">
-       <string>Button { border-top-width: 0px; border-left-width: 0px; font-size: 20pt; }</string>
-      </property>
-     </widget>
-    </item>
-    <item row="3" column="1">
-     <widget class="Button" name="uiMarkEnd">
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Ignored" vsizetype="Ignored">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
-      </property>
-      <property name="text">
-       <string>Mark
-Save End</string>
-      </property>
-      <property name="clickMarginLeft" stdset="0">
-       <enum>Button::none</enum>
-      </property>
-      <property name="clickMarginTop" stdset="0">
-       <enum>Button::none</enum>
-      </property>
-      <property name="clickMarginBottom" stdset="0">
-       <enum>Button::none</enum>
-      </property>
-      <property name="customStyleSheet" stdset="0">
-       <string>Button { border-top-width: 0; border-left-width: 0; }</string>
-      </property>
-     </widget>
-    </item>
-    <item row="4" column="0" colspan="2">
-     <widget class="Button" name="uiSave">
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Ignored" vsizetype="Ignored">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
-      </property>
-      <property name="text">
-       <string>Save</string>
-      </property>
-      <property name="clickMarginTop" stdset="0">
-       <enum>Button::none</enum>
-      </property>
-      <property name="clickMarginBottom" stdset="0">
-       <enum>Button::none</enum>
-      </property>
-      <property name="customStyleSheet" stdset="0">
-       <string>Button { border-top-width: 0 }</string>
-      </property>
-     </widget>
-    </item>
-    <item row="6" column="0" colspan="2">
-     <widget class="Button" name="uiDone">
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Ignored" vsizetype="Ignored">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
-      </property>
-      <property name="text">
-       <string>Done</string>
-      </property>
-      <property name="clickMarginTop" stdset="0">
-       <enum>Button::none</enum>
-      </property>
-      <property name="clickMarginBottom" stdset="0">
-       <enum>Button::none</enum>
-      </property>
-      <property name="customStyleSheet" stdset="0">
-       <string>Button { border-top-width: 0 }</string>
-      </property>
-     </widget>
-    </item>
-    <item row="3" column="0">
-     <widget class="Button" name="uiMarkStart">
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Ignored" vsizetype="Ignored">
-        <horstretch>2</horstretch>
-        <verstretch>2</verstretch>
-       </sizepolicy>
-      </property>
-      <property name="text">
-       <string>Mark
-Save Start</string>
-      </property>
-      <property name="clickMarginRight" stdset="0">
-       <enum>Button::none</enum>
-      </property>
-      <property name="clickMarginTop" stdset="0">
-       <enum>Button::none</enum>
-      </property>
-      <property name="clickMarginBottom" stdset="0">
-       <enum>Button::none</enum>
-      </property>
-      <property name="customStyleSheet" stdset="0">
-       <string>Button { border-top-width: 0 }</string>
-      </property>
-     </widget>
-    </item>
-    <item row="0" column="0">
-     <widget class="Button" name="uiSeekBackward">
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Ignored" vsizetype="Ignored">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
-      </property>
-      <property name="text">
-       <string>◀◀</string>
-      </property>
-      <property name="clickMarginRight" stdset="0">
-       <enum>Button::none</enum>
-      </property>
-      <property name="clickMarginTop" stdset="0">
-       <enum>Button::none</enum>
-      </property>
-      <property name="clickMarginBottom" stdset="0">
-       <enum>Button::none</enum>
-      </property>
-      <property name="customStyleSheet" stdset="0">
-       <string>Button { border-top-width: 0px; font-size: 20pt; }</string>
-      </property>
-     </widget>
-    </item>
-    <item row="1" column="0" colspan="2">
-     <widget class="Label" name="uiSeekRateDisplay">
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Ignored" vsizetype="Ignored">
-        <horstretch>1</horstretch>
-        <verstretch>1</verstretch>
-       </sizepolicy>
-      </property>
-      <property name="text">
-       <string>Seek Rate: %ifps</string>
-      </property>
-      <property name="alignment">
-       <set>Qt::AlignCenter</set>
-      </property>
-     </widget>
-    </item>
-    <item row="5" column="0" colspan="2">
-     <widget class="Button" name="uiSavedFileSettings">
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Ignored" vsizetype="Ignored">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
-      </property>
-      <property name="text">
-       <string>Saved File
-Settings</string>
-      </property>
-      <property name="clickMarginTop" stdset="0">
-       <enum>Button::none</enum>
-      </property>
-      <property name="clickMarginBottom" stdset="0">
-       <enum>Button::none</enum>
-      </property>
-      <property name="customStyleSheet" stdset="0">
-       <string>Button { border-top-width: 0 }</string>
-      </property>
-     </widget>
-    </item>
-    <item row="2" column="0">
-     <widget class="Button" name="uiSeekSlower">
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Ignored" vsizetype="Ignored">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
-      </property>
-      <property name="text">
-       <string>-</string>
-      </property>
-      <property name="clickMarginRight" stdset="0">
-       <enum>Button::none</enum>
-      </property>
-      <property name="clickMarginTop" stdset="0">
-       <enum>Button::none</enum>
-      </property>
-      <property name="clickMarginBottom" stdset="0">
-       <enum>Button::none</enum>
-      </property>
-      <property name="customStyleSheet" stdset="0">
-       <string>Button { font-size: 20pt; }</string>
-      </property>
-     </widget>
-    </item>
-    <item row="2" column="1">
-     <widget class="Button" name="uiSeekFaster">
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Ignored" vsizetype="Ignored">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
-      </property>
-      <property name="text">
-       <string>+</string>
-      </property>
-      <property name="clickMarginLeft" stdset="0">
-       <enum>Button::none</enum>
-      </property>
-      <property name="clickMarginTop" stdset="0">
-       <enum>Button::none</enum>
-      </property>
-      <property name="clickMarginBottom" stdset="0">
-       <enum>Button::none</enum>
-      </property>
-      <property name="customStyleSheet" stdset="0">
-       <string>Button { border-left-width: 0; font-size: 20pt; }</string>
-      </property>
-     </widget>
-    </item>
-   </layout>
-  </widget>
   <widget class="QWidget" name="uiTimelineVisualization" native="true">
    <property name="geometry">
     <rect>
-     <x>77</x>
+     <x>76</x>
      <y>421</y>
-     <width>644</width>
+     <width>645</width>
      <height>59</height>
     </rect>
    </property>
@@ -330,9 +80,9 @@ Settings</string>
    <property name="geometry">
     <rect>
      <x>600</x>
-     <y>0</y>
+     <y>50</y>
      <width>201</width>
-     <height>420</height>
+     <height>51</height>
     </rect>
    </property>
    <property name="customStyleSheet" stdset="0">
@@ -386,21 +136,406 @@ Settings</string>
   <widget class="QWidget" name="uiMarkedRegionVisualization" native="true">
    <property name="geometry">
     <rect>
-     <x>0</x>
+     <x>80</x>
      <y>390</y>
-     <width>801</width>
+     <width>641</width>
      <height>30</height>
     </rect>
    </property>
   </widget>
+  <widget class="Comment" name="comment">
+   <property name="geometry">
+    <rect>
+     <x>160</x>
+     <y>360</y>
+     <width>291</width>
+     <height>51</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Marked regions may exceed top of visualisation region and be clipped by Done button. This is OK, because you usually only save the same clip two-three times max.</string>
+   </property>
+  </widget>
+  <widget class="Button" name="uiSeekFaster">
+   <property name="geometry">
+    <rect>
+     <x>700</x>
+     <y>-1</y>
+     <width>101</width>
+     <height>75</height>
+    </rect>
+   </property>
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="Ignored" vsizetype="Ignored">
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
+   </property>
+   <property name="text">
+    <string>+</string>
+   </property>
+   <property name="clickMarginLeft" stdset="0">
+    <enum>Button::none</enum>
+   </property>
+   <property name="clickMarginRight" stdset="0">
+    <enum>Button::none</enum>
+   </property>
+   <property name="clickMarginTop" stdset="0">
+    <enum>Button::none</enum>
+   </property>
+   <property name="clickMarginBottom" stdset="0">
+    <enum>Button::full</enum>
+   </property>
+   <property name="customStyleSheet" stdset="0">
+    <string>Button { font-size: 20pt; }</string>
+   </property>
+  </widget>
+  <widget class="Button" name="uiSeekBackward">
+   <property name="geometry">
+    <rect>
+     <x>580</x>
+     <y>80</y>
+     <width>121</width>
+     <height>81</height>
+    </rect>
+   </property>
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="Ignored" vsizetype="Ignored">
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
+   </property>
+   <property name="text">
+    <string>◀◀</string>
+   </property>
+   <property name="clickMarginRight" stdset="0">
+    <enum>Button::none</enum>
+   </property>
+   <property name="clickMarginTop" stdset="0">
+    <enum>Button::full</enum>
+   </property>
+   <property name="clickMarginBottom" stdset="0">
+    <enum>Button::none</enum>
+   </property>
+   <property name="customStyleSheet" stdset="0">
+    <string>Button { font-size: 20pt; }</string>
+   </property>
+  </widget>
+  <widget class="Button" name="uiSavedFileSettings">
+   <property name="geometry">
+    <rect>
+     <x>580</x>
+     <y>290</y>
+     <width>221</width>
+     <height>61</height>
+    </rect>
+   </property>
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="Ignored" vsizetype="Ignored">
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
+   </property>
+   <property name="text">
+    <string>Saved File
+Settings</string>
+   </property>
+   <property name="clickMarginRight" stdset="0">
+    <enum>Button::none</enum>
+   </property>
+   <property name="clickMarginTop" stdset="0">
+    <enum>Button::none</enum>
+   </property>
+   <property name="clickMarginBottom" stdset="0">
+    <enum>Button::none</enum>
+   </property>
+  </widget>
+  <widget class="Label" name="uiSeekRateDisplay">
+   <property name="geometry">
+    <rect>
+     <x>600</x>
+     <y>63</y>
+     <width>201</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="Ignored" vsizetype="Ignored">
+     <horstretch>1</horstretch>
+     <verstretch>1</verstretch>
+    </sizepolicy>
+   </property>
+   <property name="text">
+    <string>Seek Rate: %ifps</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignCenter</set>
+   </property>
+  </widget>
+  <widget class="Button" name="uiSeekForward">
+   <property name="geometry">
+    <rect>
+     <x>700</x>
+     <y>80</y>
+     <width>101</width>
+     <height>81</height>
+    </rect>
+   </property>
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="Ignored" vsizetype="Ignored">
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
+   </property>
+   <property name="text">
+    <string>▶▶</string>
+   </property>
+   <property name="clickMarginLeft" stdset="0">
+    <enum>Button::none</enum>
+   </property>
+   <property name="clickMarginRight" stdset="0">
+    <enum>Button::none</enum>
+   </property>
+   <property name="clickMarginTop" stdset="0">
+    <enum>Button::full</enum>
+   </property>
+   <property name="clickMarginBottom" stdset="0">
+    <enum>Button::none</enum>
+   </property>
+   <property name="customStyleSheet" stdset="0">
+    <string>Button { font-size: 20pt; }</string>
+   </property>
+  </widget>
+  <widget class="Button" name="uiSave">
+   <property name="geometry">
+    <rect>
+     <x>580</x>
+     <y>230</y>
+     <width>221</width>
+     <height>61</height>
+    </rect>
+   </property>
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="Ignored" vsizetype="Ignored">
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
+   </property>
+   <property name="text">
+    <string>Save</string>
+   </property>
+   <property name="clickMarginRight" stdset="0">
+    <enum>Button::none</enum>
+   </property>
+   <property name="clickMarginTop" stdset="0">
+    <enum>Button::none</enum>
+   </property>
+   <property name="clickMarginBottom" stdset="0">
+    <enum>Button::none</enum>
+   </property>
+  </widget>
+  <widget class="Button" name="uiMarkEnd">
+   <property name="geometry">
+    <rect>
+     <x>700</x>
+     <y>170</y>
+     <width>101</width>
+     <height>61</height>
+    </rect>
+   </property>
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="Ignored" vsizetype="Ignored">
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
+   </property>
+   <property name="text">
+    <string>Mark
+Save End</string>
+   </property>
+   <property name="clickMarginLeft" stdset="0">
+    <enum>Button::none</enum>
+   </property>
+   <property name="clickMarginRight" stdset="0">
+    <enum>Button::none</enum>
+   </property>
+   <property name="clickMarginTop" stdset="0">
+    <enum>Button::none</enum>
+   </property>
+   <property name="clickMarginBottom" stdset="0">
+    <enum>Button::none</enum>
+   </property>
+  </widget>
+  <widget class="Button" name="uiDone">
+   <property name="geometry">
+    <rect>
+     <x>580</x>
+     <y>360</y>
+     <width>221</width>
+     <height>61</height>
+    </rect>
+   </property>
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="Ignored" vsizetype="Ignored">
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
+   </property>
+   <property name="text">
+    <string>Done</string>
+   </property>
+   <property name="clickMarginRight" stdset="0">
+    <enum>Button::none</enum>
+   </property>
+   <property name="clickMarginTop" stdset="0">
+    <enum>Button::none</enum>
+   </property>
+   <property name="clickMarginBottom" stdset="0">
+    <enum>Button::none</enum>
+   </property>
+  </widget>
+  <widget class="Button" name="uiSeekSlower">
+   <property name="geometry">
+    <rect>
+     <x>580</x>
+     <y>-1</y>
+     <width>121</width>
+     <height>75</height>
+    </rect>
+   </property>
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="Ignored" vsizetype="Ignored">
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
+   </property>
+   <property name="text">
+    <string>-</string>
+   </property>
+   <property name="clickMarginRight" stdset="0">
+    <enum>Button::none</enum>
+   </property>
+   <property name="clickMarginTop" stdset="0">
+    <enum>Button::none</enum>
+   </property>
+   <property name="clickMarginBottom" stdset="0">
+    <enum>Button::full</enum>
+   </property>
+   <property name="customStyleSheet" stdset="0">
+    <string>Button { font-size: 20pt; }</string>
+   </property>
+  </widget>
+  <widget class="Button" name="uiMarkStart">
+   <property name="geometry">
+    <rect>
+     <x>580</x>
+     <y>170</y>
+     <width>121</width>
+     <height>61</height>
+    </rect>
+   </property>
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="Ignored" vsizetype="Ignored">
+     <horstretch>2</horstretch>
+     <verstretch>2</verstretch>
+    </sizepolicy>
+   </property>
+   <property name="text">
+    <string>Mark
+Save Start</string>
+   </property>
+   <property name="clickMarginRight" stdset="0">
+    <enum>Button::none</enum>
+   </property>
+   <property name="clickMarginTop" stdset="0">
+    <enum>Button::none</enum>
+   </property>
+   <property name="clickMarginBottom" stdset="0">
+    <enum>Button::none</enum>
+   </property>
+  </widget>
+  <widget class="Backdrop" name="backdrop_2">
+   <property name="geometry">
+    <rect>
+     <x>600</x>
+     <y>160</y>
+     <width>201</width>
+     <height>11</height>
+    </rect>
+   </property>
+   <property name="customStyleSheet" stdset="0">
+    <string>
+      border-left: 1px solid black;
+      background-image: url(../../assets/images/diagonal-hatching-sparse.png);
+      background-image: url(assets/images/diagonal-hatching-sparse.png);
+    </string>
+   </property>
+  </widget>
+  <widget class="Backdrop" name="backdrop_3">
+   <property name="geometry">
+    <rect>
+     <x>600</x>
+     <y>350</y>
+     <width>201</width>
+     <height>11</height>
+    </rect>
+   </property>
+   <property name="customStyleSheet" stdset="0">
+    <string>
+      border-left: 1px solid black;
+      background-image: url(../../assets/images/diagonal-hatching-sparse.png);
+      background-image: url(assets/images/diagonal-hatching-sparse.png);
+    </string>
+   </property>
+  </widget>
+  <widget class="Backdrop" name="backdrop_4">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>420</y>
+     <width>76</width>
+     <height>61</height>
+    </rect>
+   </property>
+   <property name="customStyleSheet" stdset="0">
+    <string>border-top: 1px solid black; border-right: 1px solid darkgrey; background: darkgrey;</string>
+   </property>
+  </widget>
+  <widget class="Backdrop" name="backdrop_5">
+   <property name="geometry">
+    <rect>
+     <x>721</x>
+     <y>420</y>
+     <width>79</width>
+     <height>61</height>
+    </rect>
+   </property>
+   <property name="customStyleSheet" stdset="0">
+    <string>border-top: 1px solid black; border-left: 1px solid darkgrey; background: darkgrey;</string>
+   </property>
+  </widget>
+  <zorder>backdrop_4</zorder>
+  <zorder>backdrop_5</zorder>
+  <zorder>backdrop_3</zorder>
+  <zorder>backdrop_2</zorder>
+  <zorder>backdrop</zorder>
+  <zorder>uiSeekBackward</zorder>
+  <zorder>uiSavedFileSettings</zorder>
+  <zorder>uiSeekRateDisplay</zorder>
+  <zorder>uiSeekForward</zorder>
+  <zorder>uiSave</zorder>
+  <zorder>uiMarkEnd</zorder>
+  <zorder>uiDone</zorder>
+  <zorder>uiMarkStart</zorder>
   <zorder>uiTimelineVisualization</zorder>
+  <zorder>uiMarkedRegionVisualization</zorder>
   <zorder>uiSeekSlider</zorder>
   <zorder>uiBatteryReadout</zorder>
-  <zorder>backdrop</zorder>
   <zorder>uiFrameReadout</zorder>
-  <zorder>gridLayoutWidget</zorder>
   <zorder>uiEditMarkedRegions</zorder>
-  <zorder>uiMarkedRegionVisualization</zorder>
+  <zorder>comment</zorder>
+  <zorder>uiSeekSlower</zorder>
+  <zorder>uiSeekFaster</zorder>
  </widget>
  <customwidgets>
   <customwidget>
@@ -412,6 +547,11 @@ Settings</string>
    <class>Button</class>
    <extends>QPushButton</extends>
    <header>button</header>
+  </customwidget>
+  <customwidget>
+   <class>Comment</class>
+   <extends>QLabel</extends>
+   <header>comment</header>
   </customwidget>
   <customwidget>
    <class>Label</class>
