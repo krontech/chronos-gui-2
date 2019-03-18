@@ -27,6 +27,21 @@ class PlayAndSave(QtWidgets.QDialog):
 		
 		#Use get and set marked regions, they redraw.
 		self.markedRegions = [] #{mark start, mark end, segment ids, segment name}
+		self.markedRegions = [
+			{'hue': 240, 'mark end': 19900, 'mark start': 13002, 'saved': 0.0, 'segment ids': ['KxIjG09V'], 'segment name': 'Clip 1'},
+			{'hue': 300, 'mark end': 41797, 'mark start': 40597, 'saved': 0.0, 'segment ids': ['KxIjG09V'], 'segment name': 'Clip 2'},
+			{'hue': 420, 'mark end': 43897, 'mark start': 41797, 'saved': 0.0, 'segment ids': ['KxIjG09V'], 'segment name': 'Clip 3'},
+			{'hue': 180, 'mark end': 53599, 'mark start': 52699, 'saved': 0.0, 'segment ids': ['KxIjG09V'], 'segment name': 'Clip 4'},
+			{'hue': 360, 'mark end': 52699, 'mark start': 51799, 'saved': 0.0, 'segment ids': ['KxIjG09V'], 'segment name': 'Clip 5'},
+			{'hue': 210, 'mark end': 80000, 'mark start': 35290, 'saved': 0.0, 'segment ids': ['KxIjG09V'], 'segment name': 'Clip 6'},
+			{'hue': 390, 'mark end': 42587, 'mark start': 16716, 'saved': 0.0, 'segment ids': ['KxIjG09V'], 'segment name': 'Clip 7'},
+			{'hue': 270, 'mark end': 25075, 'mark start': 17016, 'saved': 0.0, 'segment ids': ['KxIjG09V'], 'segment name': 'Clip 8'},
+			{'hue': 330, 'mark end': 36617, 'mark start': 28259, 'saved': 0.0, 'segment ids': ['KxIjG09V'], 'segment name': 'Clip 9'},
+			{'hue': 240, 'mark end': 39005, 'mark start': 32637, 'saved': 0.0, 'segment ids': ['KxIjG09V'], 'segment name': 'Clip 10'},
+			{'hue': 300, 'mark end': 39668, 'mark start': 36219, 'saved': 0.0, 'segment ids': ['KxIjG09V'], 'segment name': 'Clip 11'},
+			{'hue': 420, 'mark end': 39068, 'mark start': 37868, 'saved': 0.0, 'segment ids': ['KxIjG09V'], 'segment name': 'Clip 12'},
+			{'hue': 180, 'mark end': 13930, 'mark start': 0, 'saved': 0.0, 'segment ids': ['ldPxTT5R', 'KxIjG09V'], 'segment name': 'Clip 13'},
+		]
 		self.markedStart = None #Note: Mark start/end are reversed if start is after end.
 		self.markedEnd = None
 		
@@ -63,7 +78,14 @@ class PlayAndSave(QtWidgets.QDialog):
 		self.uiMarkStart.clicked.connect(self.markStart)
 		self.uiMarkEnd.clicked.connect(self.markEnd)
 		
-		self.uiSave.clicked.connect(lambda: api.control('saveRegions', [{}, {}]))
+		self.uiSave.clicked.connect(lambda: api.control('saveRegions', [{
+			"start": region['mark start'],
+			"end": region['mark end'],
+			"path": '/dev/sda', #TODO: Retrieve this from saved file settings screen, via local settings.
+			"format": {'fps': 30, 'encoding': 'h264'},
+			"filename": r'普通棕色蝙蝠_%DATE%_劃分_%SEGMENT NAME%-%START FRAME%-%END FRAME%.mp4'
+				.replace(r'%SEGMENT NAME%', region['segment name']),
+		} for region in self.markedRegions]))
 		
 		self.uiSavedFileSettings.clicked.connect(lambda: window.show('file_settings'))
 		self.uiDone.clicked.connect(window.back)

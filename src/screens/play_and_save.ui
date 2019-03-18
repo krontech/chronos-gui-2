@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>800</width>
+    <width>1229</width>
     <height>480</height>
    </rect>
   </property>
@@ -514,9 +514,58 @@ Save Start</string>
     <string>border-top: 1px solid black; border-left: 1px solid darkgrey; background: darkgrey;</string>
    </property>
   </widget>
+  <widget class="Comment" name="comment_2">
+   <property name="geometry">
+    <rect>
+     <x>820</x>
+     <y>10</y>
+     <width>51</width>
+     <height>91</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Edit Marked Regions Menu</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignRight|Qt::AlignTop|Qt::AlignTrailing</set>
+   </property>
+  </widget>
+  <widget class="QWidget" name="widget" native="true">
+   <property name="geometry">
+    <rect>
+     <x>880</x>
+     <y>0</y>
+     <width>241</width>
+     <height>421</height>
+    </rect>
+   </property>
+   <widget class="Subheader" name="header">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>10</y>
+      <width>221</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Edit Marked Regions</string>
+    </property>
+   </widget>
+   <widget class="ScrollList" name="scrolllist">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>40</y>
+      <width>241</width>
+      <height>381</height>
+     </rect>
+    </property>
+   </widget>
+  </widget>
+  <zorder>backdrop_3</zorder>
   <zorder>backdrop_4</zorder>
   <zorder>backdrop_5</zorder>
-  <zorder>backdrop_3</zorder>
   <zorder>backdrop_2</zorder>
   <zorder>backdrop</zorder>
   <zorder>uiSeekBackward</zorder>
@@ -525,7 +574,6 @@ Save Start</string>
   <zorder>uiSeekForward</zorder>
   <zorder>uiSave</zorder>
   <zorder>uiMarkEnd</zorder>
-  <zorder>uiDone</zorder>
   <zorder>uiMarkStart</zorder>
   <zorder>uiTimelineVisualization</zorder>
   <zorder>uiMarkedRegionVisualization</zorder>
@@ -536,6 +584,9 @@ Save Start</string>
   <zorder>comment</zorder>
   <zorder>uiSeekSlower</zorder>
   <zorder>uiSeekFaster</zorder>
+  <zorder>uiDone</zorder>
+  <zorder>comment_2</zorder>
+  <zorder>widget</zorder>
  </widget>
  <customwidgets>
   <customwidget>
@@ -559,9 +610,19 @@ Save Start</string>
    <header>label</header>
   </customwidget>
   <customwidget>
+   <class>ScrollList</class>
+   <extends>QListView</extends>
+   <header>scroll_list</header>
+  </customwidget>
+  <customwidget>
    <class>Slider</class>
    <extends>QSlider</extends>
    <header>slider</header>
+  </customwidget>
+  <customwidget>
+   <class>Subheader</class>
+   <extends>QLabel</extends>
+   <header>subheader</header>
   </customwidget>
  </customwidgets>
  <tabstops>

@@ -997,24 +997,41 @@ class ControlAPIMock(QObject):
 	def saveRegions(self, regions: List[Dict[str, Union[int, str, Dict[str, int]]]]) -> List[Dict[str, Union[bool, str]]]:
 		"""Save video clips to disk or network.
 			
-			Accepts a list of regions, returns a list of statuses."""
+			Accepts a list of regions, returns a list of statuses.
+			
+			Args:
+				Regions: [{
+					"id": str,
+					"start": int,
+					"end": int,
+					"path": str,
+					"filename": str, #pertent-escaped filename template? We need something where we can specify what format to put, say, frame numbers and other metadata into the .tiff or .mp4 or whatever file names in.
+					"format": { #Optional, these values should have sane defaults if not specified.
+						'fps': float, #default 30? or 60?
+						'bpp': float,
+						'maxBitrate': float,
+						'encoding': str, #defaults to h264
+						"h264Profile": str if encoding = 'h264', #optional otherwise and ignored
+						"h264Level": str if encoding = 'h264',
+					},
+				}]
+		"""
 		
-		#Regions: [{
-		#	"start": int, 
-		#	"end": int, 
-		#	"id": str,
-		#	"path": str,
-		#	"format": {'fps': float, 'bpp': float, 'maxBitrate': float},
-		#}]
+		print('saving:')
+		pp(regions)
+		
+		#For each region:
+		# .replace(r'%START FRAME%', '{:07d}'.format(region['mark start']))
+		# .replace(r'%END FRAME%', '{:07d}'.format(region['mark end']))
 		
 		return Reply([{ #Each entry in this list a segment of recorded video. Although currently resolution/framerate is always the same having it in this data will make it easier to fix this in the future if we do.
 			"id": "ldPxTT5R",
 			"success": True,
-			"message": "",
+			"error": "",
 		},{
 			"id": "KxIjG09V",
 			"success": False,
-			"message": "Network error.",
+			"error": "Network error.",
 		}])
 	
 	@action('set')
