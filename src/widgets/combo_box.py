@@ -3,9 +3,10 @@
 from random import randint
 
 from PyQt5.QtCore import Q_ENUMS, QSize, Qt
-from PyQt5.QtWidgets import QComboBox, QListView, QScroller
+from PyQt5.QtWidgets import QComboBox
 
 from debugger import *; dbg
+from scroll_list import ScrollList
 from touch_margin_plugin import TouchMarginPlugin, MarginWidth
 #Can't directly link, because the API generally doesn't use capitalized values and our combo boxes generally do.
 from focusable_plugin import FocusablePlugin
@@ -27,7 +28,7 @@ class ComboBox(QComboBox, TouchMarginPlugin, FocusablePlugin):
 		self.jogWheelClick.connect(lambda: self.injectKeystrokes(Qt.Key_Space))
 		
 		#Set up the custom list view (larger, accepts tap etc)
-		self.dropdown = ComboBoxDropdown()
+		self.dropdown = ScrollList()
 		self.setView(self.dropdown)
 		
 		self.__nativeDropdownSize = None
@@ -176,43 +177,3 @@ class ComboBox(QComboBox, TouchMarginPlugin, FocusablePlugin):
 			0, -heightAdjustment if isBelow else 0,
 		)
 		self.dropdown.window().setGeometry(geom)
-		
-
-
-
-class ComboBoxDropdown(QListView, FocusablePlugin):
-	"""The dropdown for a ComboBox.
-		
-		Provides custom styling & behaviour, most notably for jog wheel
-		interaction."""
-	
-	
-	#TODO DDR 2019-01-14: Make smoothly scrollable via https://forum.qt.io/topic/96010/scroll-items-by-using-touching-dragging-without-using-scrollbar-in-qscrollarea/3
-	
-	hideFocusRingFocus = True
-	
-	def __init__(self):
-		super().__init__()
-		
-		self.setMouseTracking(False) #Something do do with the scroller?
-		self.setUniformItemSizes(True) #This enables the view to do some optimizations for performance purposes.
-		self.setHorizontalScrollMode(self.ScrollPerPixel) #Make grab gesture work, otherwise moves dropdown 1 entry per pixel dragged.
-		self.setVerticalScrollMode(self.ScrollPerPixel)
-		self.setAttribute(Qt.WA_AcceptTouchEvents, True) #Enable touch gestures according to http://doc.qt.io/qt-5/qtouchevent.html#enabling-touch-events, which appears to be lieing.
-		
-		self.jogWheelLowResolutionRotation.connect(lambda delta:
-			self.injectKeystrokes(
-				Qt.Key_Up if delta < 0 else Qt.Key_Down, count=abs(delta) ) )
-		
-		self.jogWheelClick.connect(lambda: self.injectKeystrokes(Qt.Key_Enter))
-		
-		#Add drag-to-scroll to dropdown menus.
-		QScroller.grabGesture(self.viewport(), QScroller.LeftMouseButtonGesture) #DDR 2019-01-15: Defaults to TouchGesture - which should work, according to WA_AcceptTouchEvents, but doesn't.
-		scroller = QScroller.scroller(self.viewport())
-		properties = scroller.scrollerProperties()
-		properties.setScrollMetric(properties.AxisLockThreshold, 0.0)
-		properties.setScrollMetric(properties.DragStartDistance, 0.003) #default: 0.005 - tweaked for "feel", the platform defaults are overly dramatic.
-		properties.setScrollMetric(properties.OvershootDragDistanceFactor, 0.3) #default: 1
-		properties.setScrollMetric(properties.OvershootScrollDistanceFactor, 0.3) #default: 1
-		properties.setScrollMetric(properties.OvershootScrollTime, 0.5) #default: 0.7
-		scroller.setScrollerProperties(properties)
