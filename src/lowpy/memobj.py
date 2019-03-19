@@ -68,8 +68,8 @@ class MemObject:
 	RAM_mmio = MMIO(0x02000000, 0x1000000)    
 
 	ptr = fpga_mmio.pointer
-	print(f"ptr is {ptr}")
-	print(f"base is {fpga_mmio.base}")
+	# print(f"ptr is {ptr}")
+	# print(f"base is {fpga_mmio.base}")
 
 	FPGAlptr = cast(ptr, POINTER(c_ulong))
 	FPGAwptr = cast(ptr, POINTER(c_ushort))
@@ -81,13 +81,13 @@ class MemObject:
 	# breakpoint()
 
 
-	print ("Testing RAM R/W")
+	# print ("Testing RAM R/W")
 	x = RAM_mmio.read8(0)
-	print (f" - reading {x}")
-	print (" - writing...")
+	# print (f" - reading {x}")
+	# print (" - writing...")
 	RAM_mmio.write8(0, 123)
 	x = RAM_mmio.read8(0)
-	print (f" - reading {x}")
+	# print (f" - reading {x}")
 
 	# print (f"globvar is {globvar}")
 
@@ -311,7 +311,7 @@ class MemObject:
 		self.RAMWrite8(addr, 0x23)
 		ram2 = self.RAMRead8(addr)
 
-		cprint(f"MEMTEST: was 0x{ram1:x}, is 0x{ram2:x}", "blue", "on_yellow")
+		# cprint(f"MEMTEST: was 0x{ram1:x}, is 0x{ram2:x}", "blue", "on_yellow")
 		
 
 

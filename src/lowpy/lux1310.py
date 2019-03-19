@@ -412,7 +412,7 @@ class Lux1310Object(SensorObject):
 		#TODO: why are these the same
 		tFovb = (50) * LUX1310_CLOCK_PERIOD #Duration between PRSTN falling and TXN falling (I think)
 		tFrame = tRow * vRes + tTx + tFovf + tFovb
-		print (f"getMinFramePeriod: {tFrame}")
+		# print (f"getMinFramePeriod: {tFrame}")
 		return math.ceil(tFrame * 100000000.0)
 
 	def Lux1310GetIntegrationTime(self):
@@ -420,7 +420,7 @@ class Lux1310Object(SensorObject):
 
 	#from camApp:
 	def Lux1310SetResolutions(self):
-		print ("### Lux1310SetResolutions")
+		# print ("### Lux1310SetResolutions")
 		g = self.ImageGeometry
 		h_start = int(g.hoffset / LUX1310_HRES_INCREMENT)
 		h_width = int(g.hres / LUX1310_HRES_INCREMENT)
@@ -584,7 +584,7 @@ class Lux1310Object(SensorObject):
 		#Round to nearest 10ns period
 		# breakpoint()
 		period = round(period * (100000000.0)) / 100000000.0
-		print (f"Requested period {period}")
+		# print (f"Requested period {period}")
 		minPeriod = self.Lux1310GetMinMasterFramePeriod(hRes, vRes)
 		maxPeriod = LUX1310_MAX_SLAVE_PERIOD / 100000000.0
 
@@ -665,7 +665,7 @@ class Lux1310Object(SensorObject):
 
 
 	def __init__(self, mem):
-		cprint ("### lux1310 __init__", "red", "on_white")
+		# cprint ("### lux1310 __init__", "red", "on_white")
 		# print (f"mem is {mem}")
 		SensorObject.__init__(self, mem)
 
@@ -681,11 +681,11 @@ class Lux1310Object(SensorObject):
 
 		# self.Lux1310RegDump()
 
-		print ("LuxInit2")
+		# print ("LuxInit2")
 		# Grab the sensor revision for further tuning.
 		rev = self.Lux1310Read(self.SCI.LUX1310_SCI_REV_CHIP) 
 		#rev = self.Lux1310Read("LUX1310_SCI_REV_CHIP") & 0xff
-		print(f"configuring for LUX1310 silicon rev {rev}")
+		# print(f"configuring for LUX1310 silicon rev {rev}")
 		if rev == 2:
 			#self.Lux1310SCIWrite(0x5B, 0x307f)
 			self.Lux1310WriteWord("LUX1310_SCI_TERMB_RXCLK", 0x307f)
@@ -739,7 +739,7 @@ class Lux1310Object(SensorObject):
 		#mem problem before this
 		self.Lux1310SetIntegrationTime(self.Lux1310GetMaxExposure(self.currentPeriod) / 100000000.0, self.currentHRes, self.currentVRes)
 
-		print ("done LuxInit2")
+		# print ("done LuxInit2")
 
 
 	def _htole16(self,bigend):
@@ -791,7 +791,7 @@ class Lux1310Object(SensorObject):
 	def _initDAC(self):
 		# spi.spi_open()
 		self.thisSPIobj.spi_open3()
-		cprint(f" initDAC:     writeDACSPI 0x{0x9000:x}", "blue", "on_white")
+		# cprint(f" initDAC:     writeDACSPI 0x{0x9000:x}", "blue", "on_white")
 		self.mem.GPIOWrite("lux1310-dac-cs", 0)
 		self.thisSPIobj.spi_transfer3(0x9000)	
 		self.mem.GPIOWrite("lux1310-dac-cs", 1)
@@ -832,7 +832,7 @@ class Lux1310Object(SensorObject):
 
 	def _writeDACVoltages(self):	
 		# breakpoint()
-		print("_writeDACVoltages")
+		# print("_writeDACVoltages")
 		self._initDAC()
 		self._writeDACVoltage(VABL_VOLTAGE, 0.3);
 		self._writeDACVoltage(VRSTB_VOLTAGE, 2.7);
@@ -853,7 +853,7 @@ class Lux1310Object(SensorObject):
 		self.wavetableSize = Lux1310Wavetables[mode]["read_delay"]
 		self.Lux1310SetABNDelayClocks(Lux1310Wavetables[mode]["read_delay"])
 		
-		print (f"Wavetable size set to {self.wavetableSize}")
+		# print (f"Wavetable size set to {self.wavetableSize}")
 
 
 	def Lux1310SetABNDelayClocks(self, ABNOffset):
@@ -883,7 +883,7 @@ class Lux1310Object(SensorObject):
 			self.mem.FPGAWrite16("IMAGE_SENSOR_CONTROL", readvalue & 0xffff - IMAGE_SENSOR_RESET_MASK)
 
 	def SensorInit(self):
-		print ("SensorInit")
+		# print ("SensorInit")
 
 		self.ImageSensor.name = "lux1310"
 		self.ImageSensor.mfr = "Luxima";
@@ -948,7 +948,7 @@ class Lux1310Object(SensorObject):
 		self.mem.FPGAWrite16("SENSOR_CLK_PHASE", 0)
 		#/ TODO: Shouldn't there be a while loop here? */
 		data_correct = self.Lux1310GetDataCorrect()
-		print(f"\nlux1310_data_correct: {data_correct}")
+		# print(f"\nlux1310_data_correct: {data_correct}")
 
 		self.Lux1310Write("LUX1310_SCI_PCLK_VBLANK", 0xf00)
 		self.Lux1310Write("LUX1310_SCI_TST_PAT", 0x0)  # ADC clock control
@@ -1010,7 +1010,7 @@ class Lux1310Object(SensorObject):
 		# right now this sets gain of 1.0
 		# breakpoint()
 		if(True):
-			print("Resetting cal gain to 1.0")
+			# print("Resetting cal gain to 1.0")
 			for i in range(16):
 				#self.gainCorrection[i] = 1.0
 				pass
@@ -1057,13 +1057,13 @@ class Lux1310Object(SensorObject):
 		self.mem.FPGAWrite32("DISPLAY_FRAME_ADDRESS", 0x40000)	# Set display address
 
 
-		print ("Testing RAM R/W")
+		# print ("Testing RAM R/W")
 		x = self.mem.RAMRead8(0)
-		print (f" - reading {x}")
-		print (" - writing...")
+		# print (f" - reading {x}")
+		# print (" - writing...")
 		self.mem.RAMWrite8(0, 123)
 		x = self.mem.RAMRead8(0)
-		print (f" - reading {x}")
+		# print (f" - reading {x}")
 		
 
 

@@ -13,7 +13,7 @@ SPI_BITS = 16
 
 def spi_open2():
 	breakpoint()
-	print ("spi_open!!!!")
+	# print ("spi_open!!!!")
 	global spiobj
 	spiobj = SPI(SPI_DEV, SPI_MODE, SPI_SPEED, SPI_BITORDER, SPI_BITS)
 	#print (spi)
@@ -34,9 +34,10 @@ class SPIobj:
 	spi_obj = SPI(SPI_DEV, SPI_MODE, SPI_SPEED, SPI_BITORDER, SPI_BITS)
 
 	def spi_open3(self):
-		print ("spi_open!!!!")
+		# print ("spi_open!!!!")
 		# spiobj = SPI(SPI_DEV, SPI_MODE, SPI_SPEED, SPI_BITORDER, SPI_BITS)
 		#print (spi)
+		pass
 
 	def spi_transfer3(self, data):
 		# print (f"-->spi_transfer 0x{data:x}")

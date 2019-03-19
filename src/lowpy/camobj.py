@@ -209,7 +209,7 @@ class CamObject:
 	imagerSettings = imgSetObj()
 	recordingData = recordingDataObj()
 
-	print ("continue")
+	# print ("continue")
 	mem = MemObject()
 	# mem.CtypesTest()
 	mem.MemTest()
@@ -225,7 +225,7 @@ class CamObject:
 
 
 	def __init__(self):
-		print ("CamObject Init")
+		# print ("CamObject Init")
 		# self.pulseLEDs(3)
 		self.checkSeqStatus()
 		self.CamInit()
@@ -321,12 +321,12 @@ class CamObject:
 
 	def getFPGAVersion(self):
 		ver = self.FPGARead16("FPGA_VERSION")
-		print (f"Version is {ver}")
+		# print (f"Version is {ver}")
 		return ver
 
 	def getFPGASubVersion(self):
 		sver = self.FPGARead16("FPGA_SUBVERSION")
-		print (f"Subversion is {sver}")
+		# print (f"Subversion is {sver}")
 		return sver
 
 	def setLiveOutputTiming(self, hRes, vRes, hOutRes, vOutRes, maxFps):
@@ -343,7 +343,7 @@ class CamObject:
 	
 		# FPGA revision 3.14 and higher use a 133MHz video clock. 
 		if ((self.getFPGAVersion() > 3) or (self.getFPGASubVersion() >= 14)):
-			print ("Faster FPGA clock enabled")
+			# print ("Faster FPGA clock enabled")
 			pxClock = 133333333
 
 		hPeriod = hSync + hBackPorch + hOutRes + hFrontPorch
@@ -361,12 +361,12 @@ class CamObject:
 	
 		# calculate FPS for debug output
 		fps = pxClock // (vPeriod * hPeriod)
-		print ("setLiveOutputTiming: %d*%d@%d (%d*%d max: %d)" % \
-		   ((hPeriod - hBackPorch - hSync - hFrontPorch),
-		   (vPeriod - vBackPorch - vSync - vFrontPorch),
-		   fps, hOutRes, vOutRes, maxFps))
+		# print ("setLiveOutputTiming: %d*%d@%d (%d*%d max: %d)" % \
+		#    ((hPeriod - hBackPorch - hSync - hFrontPorch),
+		#    (vPeriod - vBackPorch - vSync - vFrontPorch),
+		#    fps, hOutRes, vOutRes, maxFps))
 
-		print (f"pxClock is 0x{pxClock:x}, hPeriod is 0x{hPeriod:x}, vPeriod is 0x{vPeriod:x}")
+		# print (f"pxClock is 0x{pxClock:x}, hPeriod is 0x{hPeriod:x}, vPeriod is 0x{vPeriod:x}")
 
 		self.FPGAWrite16("DISPLAY_H_RES", hRes)
 		self.FPGAWrite16("DISPLAY_H_OUT_RES", hOutRes)
@@ -383,7 +383,7 @@ class CamObject:
 
 
 	def FakeIO(self):
-		print ("TODO: don't do fake IO")
+		# print ("TODO: don't do fake IO")
 		self.FPGAWrite16(0xa0, 0x1)
 		self.FPGAWrite16(0xa4, 0x1)
 		self.FPGAWrite16(0xa8, 0x0)
@@ -410,7 +410,7 @@ class CamObject:
 			self.FPGAWrite32(addr * 2, data)
 
 	def FakeInit(self):
-		print ("TODO: don't do fake init")
+		# print ("TODO: don't do fake init")
 
 		self.Fake16(0x36, 0x52)		# SENSOR_LINE_PERIOD
 		self.Fake32(0x10, 0x12e5a)	# IMAGER_INT_TIME
@@ -652,7 +652,7 @@ class CamObject:
 
 	def CamInit(self):
 
-		print("CamInit()")
+		# print("CamInit()")
 	
 		
 		#TESTING! no reset
@@ -664,11 +664,11 @@ class CamObject:
 
 		self.setLiveOutputTiming(1296, 1024, 1280, 1024, 60)
 
-		print (f"pixel rate is {self.sensor.ImageSensor.pixel_rate}")
+		# print (f"pixel rate is {self.sensor.ImageSensor.pixel_rate}")
 		 
 		maxfps = self.sensor.ImageSensor.pixel_rate / \
 			(self.sensor.ImageSensor.h_max_res * self.sensor.ImageSensor.v_max_res)
-		print (f"maxfps is {maxfps}")
+		# print (f"maxfps is {maxfps}")
 		
 		g = self.sensor.ImageGeometry 
 		g.hres = self.sensor.ImageSensor.h_max_res
@@ -676,7 +676,7 @@ class CamObject:
 		g.hoffset = 0
 		g.voffset = 0
 
-		print (f"h_max_res = {self.sensor.ImageSensor.h_max_res}")
+		# print (f"h_max_res = {self.sensor.ImageSensor.h_max_res}")
 
 		#TODO: move this to somewhere better
 		self.sensor.hMaxRes = self.sensor.ImageSensor.h_max_res
@@ -697,14 +697,14 @@ class CamObject:
 		self.FPGAWrite32("SEQ_LIVE_ADDR_2", MAX_FRAME_LENGTH * 3)
 		self.FPGAWrite32("SEQ_REC_REGION_START", REC_START_ADDR) #in camApp this uses setRecRegionStartWords
 
-		print ("---------")
+		# print ("---------")
 		#temporary single definition; move to fpgah.py
 		DISPLAY_CTL_READOUT_INHIBIT = (1 << 3)
 
 		dctrl = self.FPGARead32("DISPLAY_CTL")
-		print (f"dctrl is 0x{dctrl:x}")
+		# print (f"dctrl is 0x{dctrl:x}")
 		dctrl &= ~DISPLAY_CTL_READOUT_INHIBIT
-		print (f"AND mask is 0x{DISPLAY_CTL_READOUT_INHIBIT:x}")
+		# print (f"AND mask is 0x{DISPLAY_CTL_READOUT_INHIBIT:x}")
 		#MANUAL KLUDGE!
 		dctrl = 0x2f0
 		# exit()
@@ -725,13 +725,13 @@ class CamObject:
 		# breakpoint()
 		self.sensor._writeDACVoltages()
 
-		print (self.sensor)
+		# print (self.sensor)
 		time.sleep(0.01)
 		self.sensor.lux1310SetReset(True)
 		self.sensor.lux1310SetReset(False)
 		time.sleep(0.001)
 
-		print ("#############\nLux has been reset\n#############")
+		# print ("#############\nLux has been reset\n#############")
 
 		#TODO: this goes into sensor abstraction
 		self.sensor.Lux1310Write("LUX1310_SCI_SRESET_B", 0)

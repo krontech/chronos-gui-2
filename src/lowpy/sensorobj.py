@@ -103,7 +103,7 @@ class ImageSensorData:
 class SensorObject():
 	# def __init__(self, mem):
 	def __init__(self, mem):
-		print ("SensorObject Init")
+		# print ("SensorObject Init")
 		self.mem = mem
 		#print (mem)
 		self.SensorInit()
