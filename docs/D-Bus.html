@@ -58,7 +58,11 @@
 				width: 100%;
 			}
 			
-			thead, th {
+			table {
+				border-collapse: collapse; /*Fix transparent space between cells, where sticky elements weren't hiding content completely.*/
+			}
+			
+			thead {
 				position: sticky;
 				top: 0px;
 				background: white;
@@ -70,6 +74,11 @@
 				vertical-align: top;
 			}
 			
+			body > table td:not(:last-child) {
+				position: sticky;
+				top: 3.4ex;
+				background: white;
+			}
 			
 			svg path {
 				stroke: black;
@@ -240,8 +249,8 @@
 				<p>Arguments are a map specifying:
 					<ul>
 						<li>id: What segment ID to query. If not supplied, all recorded data will be considered "the segment".</li>
-						<li>startFrame = 0: Optional frame to start from. Defaults to the first frame of the segment.</li>
-						<li>endFrame = ∞: Optional frame to end at. Defaults to the last frame of the segment.</li>
+						<li>[startFrame = 0]: Optional frame to start from. Defaults to the first frame of the segment.</li>
+						<li>[endFrame = ∞]: Optional frame to end at. Defaults to the last frame of the segment.</li>
 					</ul>
 				</p>
 				<p>Segment IDs, and their respective startFrame and endFrames, can be read from the recordedSegments value.</p>
@@ -333,7 +342,7 @@
 					<td><code>availableRecording<br>AnalogGains</code></td>
 					<td>list</td>
 					<td>constant</td>
-					<td>Get a list of gains the image sensor output can be amplified by. Each element of the list is a map with two keys, <code>multiplier</code> and <code>dB</code>. The <code>multiplier</code> values can be used to set <code>previewAnalogGainMultiplier</code> and <code>recordingAnalogGainMultiplier</code>. The decibel values are purely informational. Higher amplification levels will produce a noisier image. Amplification is an analog operation, versus a digital operation like you might get post-processing a video to be brighter.</td>
+					<td>Get a list of integer gains the image sensor output can be amplified by. Each element of the list is a map with two keys, <code>multiplier</code> and <code>dB</code>. The <code>multiplier</code> values can be used to set <code>previewAnalogGainMultiplier</code> and <code>recordingAnalogGainMultiplier</code>. The decibel values are purely informational. Higher amplification levels will produce a noisier image. Amplification is an analog operation, versus a digital operation like you might get post-processing a video to be brighter.</td>
 				</tr>
 				<tr>
 					<td><code>batteryCharge</code></td>
@@ -522,7 +531,7 @@
 					<td><code>motionTriggerHOffset</code></td>
 					<td>integer</td>
 					<td>variable</td>
-					<td rowspan="4">The region within the recorded picture which the motion trigger monitors for activity. HRes is the horizontal size of the box, VRes is vertical size of the box, HOffset is the horizontal offset from the upper-left corner of the recorded image, and VOffset is the vertical offset. (The recorded image can be changed with analogous recordingHRes/VRes/HOffset/VOffset, assuming <code>videoState</code> is <code>'recording'</code> or <code>'pre-recording'</code>. Otherwise, no motion triggering occurs.)<br>See <code>motionTriggerAdaption</code> and <code>takeStillReferenceForMotionTriggering()</code> for configuring motion within the motion trigger region.</td>
+					<td rowspan=4>The region within the recorded picture which the motion trigger monitors for activity. HRes is the horizontal size of the box, VRes is vertical size of the box, HOffset is the horizontal offset from the upper-left corner of the recorded image, and VOffset is the vertical offset. (The recorded image can be changed with analogous recordingHRes/VRes/HOffset/VOffset, assuming <code>videoState</code> is <code>'recording'</code> or <code>'pre-recording'</code>. Otherwise, no motion triggering occurs.)<br>See <code>motionTriggerAdaption</code> and <code>takeStillReferenceForMotionTriggering()</code> for configuring motion within the motion trigger region.</td>
 				</tr>
 				<tr>
 					<td><code>motionTriggerHRes</code></td>
@@ -657,81 +666,91 @@
 				</tr>
 				<tr>
 					<td><code>previewAnalog<br>GainMultiplier</code></td>
-					<td></td>
-					<td></td>
-					<td></td>
+					<td>integer</td>
+					<td>variable</td>
+					<td>One of the <code>availableRecordingAnalogGains</code>. Higher values amplify the light level, but as this is an analog operation this also increases image noise. Only used if in preview mode. See also <code>recordingAnalogGainMultiplier</code>.</td>
 				</tr>
 				<tr>
 					<td><code>previewHOffset</code></td>
-					<td></td>
-					<td></td>
-					<td></td>
+					<td>integer</td>
+					<td>variable</td>
+					<td rowspan=4>Like <code>recordingHOffset</code>/<code>recordingHRes</code>/<code>recordingVOffset</code>/<code>recordingVRes</code> but used for preview mode. If <code>currentCameraState</code> is not set to <code>preview</code>, these properties has no effect.</td>
 				</tr>
 				<tr>
 					<td><code>previewHRes</code></td>
-					<td></td>
-					<td></td>
-					<td></td>
+					<td>integer</td>
+					<td>variable</td>
+					<!-- Overridden. -->
 				</tr>
 				<tr>
 					<td><code>previewVOffset</code></td>
-					<td></td>
-					<td></td>
-					<td></td>
+					<td>integer</td>
+					<td>variable</td>
+					<!-- Overridden. -->
 				</tr>
 				<tr>
 					<td><code>previewVRes</code></td>
-					<td></td>
-					<td></td>
-					<td></td>
+					<td>integer</td>
+					<td>variable</td>
+					<!-- Overridden. -->
 				</tr>
 				<tr>
 					<td><code>recordedSegments</code></td>
-					<td></td>
-					<td></td>
-					<td></td>
+					<td>list</td>
+					<td>property</td>
+					<td>A list of maps, one for each separate segment of video recorded. Each map having the following keys:
+						<ul>
+							<li>str <code>'id'</code>: A short unique random identifier for this segment. Useful for disambiguating segments.</li>
+							<li>int <code>'start'</code>: Start frame (relative to beginning of buffer) of this segment.</li>
+							<li>int <code>'end'</code>: End frame (relative to beginning of buffer) of this segment. Segment length, in frames, may be calculated by subtracting start from end.</li>
+							<li>int <code>'hres'</code>: The horizontal resolution of the recorded video.</li>
+							<li>int <code>'vres'</code>: The vertical resolution of the recorded video.</li>
+							<li>[int <code>'milliframerate'</code>]: The framerate the segment was recorded at. <code>None</code> if <code>recordingMode</code> is <code>'gated burst'</code>, since the camera can't calculate a single framerate from the gating signal in that case. <!--However, timing data will be embedded in the video if saved in TIFF or DNG formats.--></li>
+						</ul>
+						The maximum number of segments is <code>recordingSegments</code>. There can only be more than one segment if <code>recordingMode</code> was set to <code>'segmented'</code> while recording.
+					</td>
 				</td>
 				<tr>
 					<td><code>recordingAnalog<br>GainMultiplier</code></td>
-					<td></td>
-					<td></td>
-					<td></td>
+					<td>integer</td>
+					<td>variable</td>
+					<td>One of the <code>availableRecordingAnalogGains</code>. Higher values amplify the light level, but as this is an analog operation this also increases image noise. Overridden by <code>previewAnalogGainMultiplier</code> when in <code>videoState</code> is <code>'preview'</code>.</td>
 				</td>
 				<tr>
 					<td><code>recordingExposureNs</code></td>
-					<td></td>
-					<td></td>
-					<td></td>
+					<td>integer</td>
+					<td>variable</td>
+					<td>Controls image brightness. Longer exposures lead to a brighter image, but shorter exposures cause less motion blur. The exposure must be 5000ns shorter than the recording period. If set to a value greater than that, it will bump up the recording period appropriately.</td>
+				</td>
+				<tr>
+					<td><code>recordingPeriod</code></td>
+					<td>integer</td>
+					<td>variable</td>
+					<td>Value, in nanoseconds, indicating the total amount of time to take to record a frame.</td>
 				</td>
 				<tr>
 					<td><code>recordingHRes</code></td>
 					<td></td>
 					<td></td>
-					<td></td>
+					<td rowspan=4></td>
 				</td>
 				<tr>
 					<td><code>recordingHoffset</code></td>
 					<td></td>
 					<td></td>
-					<td></td>
-				</td>
-				<tr>
-					<td><code>recordingPeriod</code></td>
-					<td></td>
-					<td></td>
-					<td></td>
+					<!-- Overridden. -->
 				</td>
 				<tr>
 					<td><code>recordingVRes</code></td>
 					<td></td>
 					<td></td>
-					<td></td>
+					<!-- Overridden. -->
 				</td>
 				<tr>
 					<td><code>recordingVoffset</code></td>
 					<td></td>
 					<td></td>
-					<td></td>
+					<!-- Overridden. -->
 				</td>
 				<tr>
 					<td><code>recordingVStep</code></td>
