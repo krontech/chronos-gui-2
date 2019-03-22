@@ -56,7 +56,7 @@ class PlayAndSave(QtWidgets.QDialog):
 		self.updateBatteryTimer.timeout.connect(self.updateBattery)
 		self.updateBatteryTimer.setInterval(2000) #ms
 		
-		self.uiFrameReadout.formatString = self.uiFrameReadout.text()
+		self.uiCurrentFrame.suffixFormatString = self.uiCurrentFrame.suffix()
 		
 		self.seekRate = 60
 		self.uiSeekRate.setValue(self.seekRate)
@@ -127,26 +127,35 @@ class PlayAndSave(QtWidgets.QDialog):
 		data = api.get(['recordedSegments', 'totalRecordedFrames']) #No destructuring bind in python. 😭
 		self.recordedSegments = data['recordedSegments']
 		self.totalRecordedFrames = data['totalRecordedFrames']
+		self.uiCurrentFrame.setMaximum(data['totalRecordedFrames'])
+		self.uiCurrentFrame.setSuffix(
+			self.uiCurrentFrame.suffixFormatString % data['totalRecordedFrames']
+		)
+		
 		self.checkMarkedRegionsValid()
 		
 		#Recalculate width width of frame readout and battery readout, choosing max.
 		#This tends to jump around otherwise, unlike the edit marked regions button, so keep it static.
-		geom = self.uiFrameReadout.geometry()
+		geom = self.uiCurrentFrame.geometry()
 		geom.setLeft(
 			geom.right() 
 			- 10*2 - 5 #qss margin, magic
-			- self.uiFrameReadout.fontMetrics().width(
-				self.uiFrameReadout.formatString % (
-					data['totalRecordedFrames'], data['totalRecordedFrames'] ) ) )
-		self.uiFrameReadout.setGeometry(geom)
+			- self.uiCurrentFrame.fontMetrics().width(
+				self.uiCurrentFrame.prefix()
+				+ str(data['totalRecordedFrames'])
+				+ self.uiCurrentFrame.suffixFormatString % data['totalRecordedFrames']
+			)
+		)
+		self.uiCurrentFrame.setGeometry(geom)
 		
 		geom = self.uiBatteryReadout.geometry()
 		geom.setLeft(
 			geom.right() 
 			- 10*2 - 20 - 2 #qss margin, click margin, magic
 			- self.uiBatteryReadout.fontMetrics().width(
-				self.uiBatteryReadout.formatString.format(
-					100 ) ) )
+				self.uiBatteryReadout.formatString.format(100)
+			)
+		)
 		self.uiBatteryReadout.setGeometry(geom)
 		
 		
@@ -221,12 +230,12 @@ class PlayAndSave(QtWidgets.QDialog):
 		self.isVisible() and self.updateMotionHeatmap() #Don't update motion heatmap if not visible. It's actually a little expensive.
 	
 	@pyqtSlot(int, name="setCurrentFrame")
-	@silenceCallbacks('uiSeekSlider', 'uiFrameReadout')
+	@silenceCallbacks('uiSeekSlider', 'uiCurrentFrame')
 	def updateCurrentFrame(self, frame):
 		self.uiSeekSlider.setValue(frame)
 		
 		#TODO DDR 2018-11-19: This is very slow, tanking the framerate. Why is that?
-		self.uiFrameReadout.setText(self.uiFrameReadout.formatString % (frame, self.uiSeekSlider.maximum()))
+		self.uiCurrentFrame.setValue(frame)
 	
 	
 	def seekFaster(self):

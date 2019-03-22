@@ -26,33 +26,6 @@
     <string notr="true">background: qlineargradient( x1:0 y1:0, x2:0 y2:1, stop:0 #F55, stop:0.05 red, stop:0.95 red, stop:1 #F55);</string>
    </property>
   </widget>
-  <widget class="Label" name="uiFrameReadout">
-   <property name="geometry">
-    <rect>
-     <x>380</x>
-     <y>390</y>
-     <width>221</width>
-     <height>31</height>
-    </rect>
-   </property>
-   <property name="styleSheet">
-    <string notr="true">			font-size: 16px;
-			background: rgba(255,255,255, 128);
-		text-align: left;       padding: 0 10px 0 0;</string>
-   </property>
-   <property name="text">
-    <string>Frame %i/%i</string>
-   </property>
-   <property name="textFormat">
-    <enum>Qt::PlainText</enum>
-   </property>
-   <property name="alignment">
-    <set>Qt::AlignRight|Qt::AlignTop|Qt::AlignTrailing</set>
-   </property>
-   <property name="textInteractionFlags">
-    <set>Qt::NoTextInteraction</set>
-   </property>
-  </widget>
   <widget class="Slider" name="uiSeekSlider">
    <property name="geometry">
     <rect>
@@ -286,7 +259,7 @@ Save End</string>
      <x>600</x>
      <y>360</y>
      <width>201</width>
-     <height>61</height>
+     <height>60</height>
     </rect>
    </property>
    <property name="sizePolicy">
@@ -502,7 +475,7 @@ Save Start</string>
     <enum>Button::none</enum>
    </property>
    <property name="customStyleSheet" stdset="0">
-    <string>      Button {       font-size: 16px;       background: rgba(255,255,255, 128);       text-align: left;       padding: 0 10px;      }     </string>
+    <string>      Button {       font-size: 16px;       background: rgba(255,255,255, 128);       text-align: left;       padding: 0 10px;      border-color: transparent;      }     </string>
    </property>
   </widget>
   <widget class="Backdrop" name="backdrop_6">
@@ -537,7 +510,7 @@ Save Start</string>
     <enum>Button::none</enum>
    </property>
    <property name="customStyleSheet" stdset="0">
-    <string>      Button {       font-size: 16px;       background: rgba(255,255,255, 128);       text-align: left;       padding: 0 10px;      }     </string>
+    <string>      Button {       font-size: 16px;       background: rgba(255,255,255, 128);       text-align: left;       padding: 0 10px;      border-color: transparent;      }     </string>
    </property>
   </widget>
   <widget class="SpinBox" name="uiSeekRate">
@@ -583,6 +556,46 @@ Save Start</string>
     <enum>SpinBox::none</enum>
    </property>
   </widget>
+  <widget class="SpinBox" name="uiCurrentFrame">
+   <property name="geometry">
+    <rect>
+     <x>400</x>
+     <y>370</y>
+     <width>200</width>
+     <height>49</height>
+    </rect>
+   </property>
+   <property name="focusPolicy">
+    <enum>Qt::NoFocus</enum>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+   </property>
+   <property name="buttonSymbols">
+    <enum>QAbstractSpinBox::NoButtons</enum>
+   </property>
+   <property name="suffix">
+    <string>/%i</string>
+   </property>
+   <property name="prefix">
+    <string>Frame </string>
+   </property>
+   <property name="singleStep">
+    <number>1</number>
+   </property>
+   <property name="clickMarginLeft" stdset="0">
+    <enum>SpinBox::none</enum>
+   </property>
+   <property name="clickMarginRight" stdset="0">
+    <enum>SpinBox::none</enum>
+   </property>
+   <property name="clickMarginBottom" stdset="0">
+    <enum>SpinBox::none</enum>
+   </property>
+   <property name="customStyleSheet" stdset="0">
+    <string>SpinBox { border-color: transparent }</string>
+   </property>
+  </widget>
   <zorder>backdrop_6</zorder>
   <zorder>backdrop_3</zorder>
   <zorder>backdrop_4</zorder>
@@ -605,8 +618,8 @@ Save Start</string>
   <zorder>uiEditMarkedRegions</zorder>
   <zorder>uiBatteryReadout</zorder>
   <zorder>uiSeekSlower</zorder>
-  <zorder>uiFrameReadout</zorder>
   <zorder>uiSeekRate</zorder>
+  <zorder>uiCurrentFrame</zorder>
  </widget>
  <customwidgets>
   <customwidget>
@@ -623,11 +636,6 @@ Save Start</string>
    <class>Comment</class>
    <extends>QLabel</extends>
    <header>comment</header>
-  </customwidget>
-  <customwidget>
-   <class>Label</class>
-   <extends>QLabel</extends>
-   <header>label</header>
   </customwidget>
   <customwidget>
    <class>ScrollList</class>
