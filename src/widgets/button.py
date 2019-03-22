@@ -16,6 +16,7 @@ class Button(QPushButton, TouchMarginPlugin, FocusablePlugin):
 	
 	def __init__(self, parent=None, showHitRects=False):
 		self.keepActiveLook = False
+		self._fake_disability = False
 		
 		super().__init__(parent, showHitRects=showHitRects)
 		
@@ -24,6 +25,7 @@ class Button(QPushButton, TouchMarginPlugin, FocusablePlugin):
 			self.setText('Button')
 			
 		self.clickMarginColor = f"rgba({randint(0, 32)}, {randint(0, 32)}, {randint(128, 255)}, {randint(32,96)})"
+		
 		
 		self.jogWheelLowResolutionRotation.connect(lambda delta, pressed: 
 			not pressed and self.selectWidget(delta) )
@@ -69,6 +71,7 @@ class Button(QPushButton, TouchMarginPlugin, FocusablePlugin):
 					border: 1px solid black;
 					border-left-color: rgb(50,50,50);
 					border-top-color: rgb(50,50,50); /* Add a subtle 3d-ness until we figure out drop-shadows. */
+					color: {'black' if not self._fake_disability else 'darkgrey'};
 					
 					/* Add some touch space so this widget is easier to press. */
 					margin-left: {self.clickMarginLeft*10}px;
@@ -77,10 +80,26 @@ class Button(QPushButton, TouchMarginPlugin, FocusablePlugin):
 					margin-bottom: {self.clickMarginBottom*10}px;
 				}}
 				
-				Button{'' if self.keepActiveLook else ':pressed'} {{
+				Button{'' if self.keepActiveLook or self._fake_disability else ':pressed'} {{ /*Look active if faking disability; gives a radio-button-esque feel to disabled buttons. ¯\\_(ツ)_/¯ */
 					border-color: rgb(50,50,50);
 					border-top-color: black;
 					border-left-color: black;
 					background: rgb(240,240,240);
 				}}
 			""" + self.originalStyleSheet())
+	
+	@property
+	def fake_disability(self):
+		"""Look greyed-out but still allow selection.
+		
+			Don't actually disable the button because that turns off selection. Event
+			callbacks must check for this manually, since the button will still work
+			fine."""
+		
+		return self._fake_disability
+		
+	@fake_disability.setter
+	def fake_disability(self, disabled: bool):
+		self._fake_disability = disabled
+		print('setting disabled', disabled)
+		self.refreshStyle()
