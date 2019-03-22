@@ -14,10 +14,19 @@ import settings
 
 def randomCharacters(count: int):
 	"""Return a random string without lookalike characters, 1/l, 0/O, etc."""
-	return ''.join(random.choices(
-		'23456789abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ!@#$%&',
-		k=count ))
-
+	
+	#No random.choices yet.
+	#return ''.join(random.choices(
+	#	'0123456789abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ!@#$%&',
+	#	k=count ))
+	
+	#OK, try this:
+	letters = list('0123456789abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ!@#$%&')
+	random.shuffle(letters)
+	return ''.join(letters[:count])
+	
+	#Perhaps a random phrase would be better? If we install a dictionary...
+	#bash: shuf -n3 /usr/share/dict/american-english
 
 class RemoteAccess(QtWidgets.QWidget):
 	def __init__(self, window):
