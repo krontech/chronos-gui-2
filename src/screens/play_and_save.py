@@ -52,11 +52,13 @@ class PlayAndSave(QtWidgets.QDialog):
 		
 		self.uiBatteryReadout.anchorPoint = self.uiBatteryReadout.rect()
 		self.uiBatteryReadout.formatString = self.uiBatteryReadout.text()
+		self.uiBatteryReadout.clicked.connect(lambda: window.show('power'))
 		self.updateBatteryTimer = QtCore.QTimer()
 		self.updateBatteryTimer.timeout.connect(self.updateBattery)
 		self.updateBatteryTimer.setInterval(2000) #ms
 		
 		self.uiCurrentFrame.suffixFormatString = self.uiCurrentFrame.suffix()
+		self.uiCurrentFrame.valueChanged.connect(lambda f: api.set({'playbackFrame': f}))
 		
 		self.seekRate = 60
 		self.uiSeekRate.setValue(self.seekRate)

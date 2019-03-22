@@ -69,9 +69,9 @@
    <property name="geometry">
     <rect>
      <x>700</x>
-     <y>-1</y>
+     <y>100</y>
      <width>101</width>
-     <height>51</height>
+     <height>61</height>
     </rect>
    </property>
    <property name="sizePolicy">
@@ -102,9 +102,9 @@
   <widget class="Button" name="uiSeekBackward">
    <property name="geometry">
     <rect>
-     <x>580</x>
-     <y>100</y>
-     <width>121</width>
+     <x>590</x>
+     <y>-1</y>
+     <width>111</width>
      <height>61</height>
     </rect>
    </property>
@@ -116,6 +116,9 @@
    </property>
    <property name="text">
     <string>◀◀</string>
+   </property>
+   <property name="clickMarginLeft" stdset="0">
+    <enum>Button::half</enum>
    </property>
    <property name="clickMarginRight" stdset="0">
     <enum>Button::none</enum>
@@ -163,7 +166,7 @@ Settings</string>
    <property name="geometry">
     <rect>
      <x>700</x>
-     <y>100</y>
+     <y>-1</y>
      <width>101</width>
      <height>61</height>
     </rect>
@@ -287,10 +290,10 @@ Save End</string>
   <widget class="Button" name="uiSeekSlower">
    <property name="geometry">
     <rect>
-     <x>590</x>
-     <y>-1</y>
-     <width>111</width>
-     <height>51</height>
+     <x>580</x>
+     <y>100</y>
+     <width>121</width>
+     <height>61</height>
     </rect>
    </property>
    <property name="sizePolicy">
@@ -303,7 +306,7 @@ Save End</string>
     <string>-</string>
    </property>
    <property name="clickMarginLeft" stdset="0">
-    <enum>Button::half</enum>
+    <enum>Button::full</enum>
    </property>
    <property name="clickMarginRight" stdset="0">
     <enum>Button::none</enum>
@@ -517,9 +520,9 @@ Save Start</string>
    <property name="geometry">
     <rect>
      <x>600</x>
-     <y>49</y>
+     <y>59</y>
      <width>201</width>
-     <height>52</height>
+     <height>42</height>
     </rect>
    </property>
    <property name="alignment">
@@ -664,11 +667,11 @@ Save Start</string>
   <tabstop>uiEditMarkedRegions</tabstop>
   <tabstop>uiMarkedRegions</tabstop>
   <tabstop>uiBatteryReadout</tabstop>
-  <tabstop>uiSeekSlower</tabstop>
-  <tabstop>uiSeekFaster</tabstop>
-  <tabstop>uiSeekRate</tabstop>
   <tabstop>uiSeekBackward</tabstop>
   <tabstop>uiSeekForward</tabstop>
+  <tabstop>uiSeekRate</tabstop>
+  <tabstop>uiSeekSlower</tabstop>
+  <tabstop>uiSeekFaster</tabstop>
   <tabstop>uiMarkStart</tabstop>
   <tabstop>uiMarkEnd</tabstop>
   <tabstop>uiSave</tabstop>
