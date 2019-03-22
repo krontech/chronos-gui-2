@@ -130,8 +130,28 @@ class PlayAndSave(QtWidgets.QDialog):
 		self.totalRecordedFrames = data['totalRecordedFrames']
 		self.checkMarkedRegionsValid()
 		
+		#Recalculate width width of frame readout and battery readout, choosing max.
+		#This tends to jump around otherwise, unlike the edit marked regions button, so keep it static.
+		geom = self.uiFrameReadout.geometry()
+		geom.setLeft(
+			geom.right() 
+			- 10*2 - 5 #qss margin, magic
+			- self.uiFrameReadout.fontMetrics().width(
+				self.uiFrameReadout.formatString % (
+					data['totalRecordedFrames'], data['totalRecordedFrames'] ) ) )
+		self.uiFrameReadout.setGeometry(geom)
+		
+		geom = self.uiBatteryReadout.geometry()
+		geom.setLeft(
+			geom.right() 
+			- 10*2 - 5 #qss margin, magic
+			- self.uiBatteryReadout.fontMetrics().width(
+				self.uiBatteryReadout.formatString.format(
+					100 ) ) )
+		self.uiBatteryReadout.setGeometry(geom)
+		
+		
 		self.updateMotionHeatmap()
-		#Set camera to video playback mode here.
 		
 	def onHide(self):
 		self.updateBatteryTimer.stop()
@@ -280,6 +300,8 @@ class PlayAndSave(QtWidgets.QDialog):
 		
 		self.markedStart, self.markedEnd = None, None
 		
+		pp(self.markedRegions)
+		
 		self.updateMarkedRegions()
 	
 	
@@ -289,6 +311,15 @@ class PlayAndSave(QtWidgets.QDialog):
 		#First thing, update the marked region count.
 		self.uiEditMarkedRegions.setText(
 			self.uiEditMarkedRegions.formatString % len(self.markedRegions) )
+		
+		self.uiEditMarkedRegions.resize(
+			self.uiEditMarkedRegions.fontMetrics().width(self.uiEditMarkedRegions.text())
+				+ self.uiEditMarkedRegions.touchMargins()['right'] 
+				+ (10*2) #padding
+				+ (1*2) #border?
+				+ 1, #magic
+			self.uiEditMarkedRegions.height(),
+		)
 		
 		#We'll assign each marked region a track. Regions can't overlap on the
 		#same track. They should always use the lowest track available.
