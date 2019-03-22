@@ -53,46 +53,6 @@
     <set>Qt::NoTextInteraction</set>
    </property>
   </widget>
-  <widget class="Backdrop" name="backdrop">
-   <property name="geometry">
-    <rect>
-     <x>600</x>
-     <y>50</y>
-     <width>201</width>
-     <height>51</height>
-    </rect>
-   </property>
-   <property name="customStyleSheet" stdset="0">
-    <string>border-left: 1px solid black;</string>
-   </property>
-  </widget>
-  <widget class="Label" name="uiBatteryReadout">
-   <property name="geometry">
-    <rect>
-     <x>380</x>
-     <y>0</y>
-     <width>221</width>
-     <height>31</height>
-    </rect>
-   </property>
-   <property name="styleSheet">
-    <string notr="true">			font-size: 16px;
-			background: rgba(255,255,255, 128);
-		text-align: left;       padding: 0 9px 0 0;</string>
-   </property>
-   <property name="text">
-    <string>Battery {:2.0f}%</string>
-   </property>
-   <property name="textFormat">
-    <enum>Qt::PlainText</enum>
-   </property>
-   <property name="alignment">
-    <set>Qt::AlignRight|Qt::AlignTop|Qt::AlignTrailing</set>
-   </property>
-   <property name="textInteractionFlags">
-    <set>Qt::NoTextInteraction</set>
-   </property>
-  </widget>
   <widget class="Slider" name="uiSeekSlider">
    <property name="geometry">
     <rect>
@@ -138,7 +98,7 @@
      <x>700</x>
      <y>-1</y>
      <width>101</width>
-     <height>75</height>
+     <height>51</height>
     </rect>
    </property>
    <property name="sizePolicy">
@@ -160,7 +120,7 @@
     <enum>Button::none</enum>
    </property>
    <property name="clickMarginBottom" stdset="0">
-    <enum>Button::full</enum>
+    <enum>Button::none</enum>
    </property>
    <property name="customStyleSheet" stdset="0">
     <string>Button { font-size: 20pt; }</string>
@@ -170,9 +130,9 @@
    <property name="geometry">
     <rect>
      <x>580</x>
-     <y>80</y>
+     <y>100</y>
      <width>121</width>
-     <height>81</height>
+     <height>61</height>
     </rect>
    </property>
    <property name="sizePolicy">
@@ -188,7 +148,7 @@
     <enum>Button::none</enum>
    </property>
    <property name="clickMarginTop" stdset="0">
-    <enum>Button::full</enum>
+    <enum>Button::none</enum>
    </property>
    <property name="clickMarginBottom" stdset="0">
     <enum>Button::none</enum>
@@ -226,35 +186,13 @@ Settings</string>
     <enum>Button::none</enum>
    </property>
   </widget>
-  <widget class="Label" name="uiSeekRateDisplay">
-   <property name="geometry">
-    <rect>
-     <x>600</x>
-     <y>63</y>
-     <width>201</width>
-     <height>31</height>
-    </rect>
-   </property>
-   <property name="sizePolicy">
-    <sizepolicy hsizetype="Ignored" vsizetype="Ignored">
-     <horstretch>1</horstretch>
-     <verstretch>1</verstretch>
-    </sizepolicy>
-   </property>
-   <property name="text">
-    <string>Seek Rate: %ifps</string>
-   </property>
-   <property name="alignment">
-    <set>Qt::AlignCenter</set>
-   </property>
-  </widget>
   <widget class="Button" name="uiSeekForward">
    <property name="geometry">
     <rect>
      <x>700</x>
-     <y>80</y>
+     <y>100</y>
      <width>101</width>
-     <height>81</height>
+     <height>61</height>
     </rect>
    </property>
    <property name="sizePolicy">
@@ -273,7 +211,7 @@ Settings</string>
     <enum>Button::none</enum>
    </property>
    <property name="clickMarginTop" stdset="0">
-    <enum>Button::full</enum>
+    <enum>Button::none</enum>
    </property>
    <property name="clickMarginBottom" stdset="0">
     <enum>Button::none</enum>
@@ -345,9 +283,9 @@ Save End</string>
   <widget class="Button" name="uiDone">
    <property name="geometry">
     <rect>
-     <x>580</x>
+     <x>600</x>
      <y>360</y>
-     <width>221</width>
+     <width>201</width>
      <height>61</height>
     </rect>
    </property>
@@ -359,6 +297,9 @@ Save End</string>
    </property>
    <property name="text">
     <string>Done</string>
+   </property>
+   <property name="clickMarginLeft" stdset="0">
+    <enum>Button::none</enum>
    </property>
    <property name="clickMarginRight" stdset="0">
     <enum>Button::none</enum>
@@ -373,10 +314,10 @@ Save End</string>
   <widget class="Button" name="uiSeekSlower">
    <property name="geometry">
     <rect>
-     <x>580</x>
+     <x>590</x>
      <y>-1</y>
-     <width>121</width>
-     <height>75</height>
+     <width>111</width>
+     <height>51</height>
     </rect>
    </property>
    <property name="sizePolicy">
@@ -388,6 +329,9 @@ Save End</string>
    <property name="text">
     <string>-</string>
    </property>
+   <property name="clickMarginLeft" stdset="0">
+    <enum>Button::half</enum>
+   </property>
    <property name="clickMarginRight" stdset="0">
     <enum>Button::none</enum>
    </property>
@@ -395,7 +339,7 @@ Save End</string>
     <enum>Button::none</enum>
    </property>
    <property name="clickMarginBottom" stdset="0">
-    <enum>Button::full</enum>
+    <enum>Button::none</enum>
    </property>
    <property name="customStyleSheet" stdset="0">
     <string>Button { font-size: 20pt; }</string>
@@ -574,17 +518,78 @@ Save Start</string>
     <string>border: 1px solid black;</string>
    </property>
   </widget>
+  <widget class="Button" name="uiBatteryReadout">
+   <property name="geometry">
+    <rect>
+     <x>440</x>
+     <y>0</y>
+     <width>161</width>
+     <height>51</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Battery {:2.0f}%</string>
+   </property>
+   <property name="clickMarginRight" stdset="0">
+    <enum>Button::none</enum>
+   </property>
+   <property name="clickMarginTop" stdset="0">
+    <enum>Button::none</enum>
+   </property>
+   <property name="customStyleSheet" stdset="0">
+    <string>      Button {       font-size: 16px;       background: rgba(255,255,255, 128);       text-align: left;       padding: 0 10px;      }     </string>
+   </property>
+  </widget>
+  <widget class="SpinBox" name="uiSeekRate">
+   <property name="geometry">
+    <rect>
+     <x>600</x>
+     <y>49</y>
+     <width>201</width>
+     <height>52</height>
+    </rect>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignCenter</set>
+   </property>
+   <property name="buttonSymbols">
+    <enum>QAbstractSpinBox::NoButtons</enum>
+   </property>
+   <property name="suffix">
+    <string>fps</string>
+   </property>
+   <property name="prefix">
+    <string>Seek Rate: </string>
+   </property>
+   <property name="minimum">
+    <number>15</number>
+   </property>
+   <property name="maximum">
+    <number>20480</number>
+   </property>
+   <property name="singleStep">
+    <number>10</number>
+   </property>
+   <property name="clickMarginLeft" stdset="0">
+    <enum>SpinBox::none</enum>
+   </property>
+   <property name="clickMarginRight" stdset="0">
+    <enum>SpinBox::none</enum>
+   </property>
+   <property name="clickMarginTop" stdset="0">
+    <enum>SpinBox::none</enum>
+   </property>
+   <property name="clickMarginBottom" stdset="0">
+    <enum>SpinBox::none</enum>
+   </property>
+  </widget>
   <zorder>backdrop_6</zorder>
-  <zorder>uiBatteryReadout</zorder>
-  <zorder>uiFrameReadout</zorder>
   <zorder>backdrop_3</zorder>
   <zorder>backdrop_4</zorder>
   <zorder>backdrop_5</zorder>
   <zorder>backdrop_2</zorder>
-  <zorder>backdrop</zorder>
   <zorder>uiSeekBackward</zorder>
   <zorder>uiSavedFileSettings</zorder>
-  <zorder>uiSeekRateDisplay</zorder>
   <zorder>uiSeekForward</zorder>
   <zorder>uiSave</zorder>
   <zorder>uiMarkEnd</zorder>
@@ -593,12 +598,15 @@ Save Start</string>
   <zorder>uiMarkedRegionVisualization</zorder>
   <zorder>uiSeekSlider</zorder>
   <zorder>comment</zorder>
-  <zorder>uiSeekSlower</zorder>
   <zorder>uiSeekFaster</zorder>
   <zorder>uiDone</zorder>
   <zorder>comment_2</zorder>
   <zorder>uiMarkedRegionsPanel</zorder>
   <zorder>uiEditMarkedRegions</zorder>
+  <zorder>uiBatteryReadout</zorder>
+  <zorder>uiSeekSlower</zorder>
+  <zorder>uiFrameReadout</zorder>
+  <zorder>uiSeekRate</zorder>
  </widget>
  <customwidgets>
   <customwidget>
@@ -632,6 +640,11 @@ Save Start</string>
    <header>slider</header>
   </customwidget>
   <customwidget>
+   <class>SpinBox</class>
+   <extends>QSpinBox</extends>
+   <header>spin_box</header>
+  </customwidget>
+  <customwidget>
    <class>Subheader</class>
    <extends>QLabel</extends>
    <header>subheader</header>
@@ -639,15 +652,19 @@ Save Start</string>
  </customwidgets>
  <tabstops>
   <tabstop>uiDone</tabstop>
-  <tabstop>uiSeekBackward</tabstop>
-  <tabstop>uiSeekForward</tabstop>
+  <tabstop>uiSeekSlider</tabstop>
+  <tabstop>uiEditMarkedRegions</tabstop>
+  <tabstop>uiMarkedRegions</tabstop>
+  <tabstop>uiBatteryReadout</tabstop>
   <tabstop>uiSeekSlower</tabstop>
   <tabstop>uiSeekFaster</tabstop>
+  <tabstop>uiSeekRate</tabstop>
+  <tabstop>uiSeekBackward</tabstop>
+  <tabstop>uiSeekForward</tabstop>
   <tabstop>uiMarkStart</tabstop>
   <tabstop>uiMarkEnd</tabstop>
   <tabstop>uiSave</tabstop>
   <tabstop>uiSavedFileSettings</tabstop>
-  <tabstop>uiSeekSlider</tabstop>
  </tabstops>
  <resources/>
  <connections/>

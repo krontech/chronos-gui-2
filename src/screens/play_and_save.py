@@ -59,8 +59,7 @@ class PlayAndSave(QtWidgets.QDialog):
 		self.uiFrameReadout.formatString = self.uiFrameReadout.text()
 		
 		self.seekRate = 60
-		self.uiSeekRateDisplay.formatString = self.uiSeekRateDisplay.text()
-		self.seekFaster(), self.seekSlower() #Initialize dependant state by wiggling the value around. Ideally, we'd just have a setSeekRate function. ¯\_(ツ)_/¯
+		self.uiSeekRate.setValue(self.seekRate)
 		
 		
 		self.seekForwardTimer = QtCore.QTimer()
@@ -144,7 +143,7 @@ class PlayAndSave(QtWidgets.QDialog):
 		geom = self.uiBatteryReadout.geometry()
 		geom.setLeft(
 			geom.right() 
-			- 10*2 - 5 #qss margin, magic
+			- 10*2 - 20 - 2 #qss margin, click margin, magic
 			- self.uiBatteryReadout.fontMetrics().width(
 				self.uiBatteryReadout.formatString.format(
 					100 ) ) )
@@ -233,28 +232,29 @@ class PlayAndSave(QtWidgets.QDialog):
 	def seekFaster(self):
 		if self.seekRate < 2000:
 			self.seekRate *= 2
-			self.uiSeekSlower.setEnabled(True)	
+			self.uiSeekSlower.fake_disability = False
 		
 		if self.seekRate < 2000:
-			self.uiSeekFaster.setEnabled(True)
+			self.uiSeekFaster.fake_disability = False
 		else:
-			self.uiSeekFaster.setEnabled(False)
+			self.uiSeekFaster.fake_disability = True
 		
 		self.uiSeekSlider.setPageStep(self.seekRate * 5) #Multiplier: Compensate for key repeat delay.
-		self.uiSeekRateDisplay.setText(self.uiSeekRateDisplay.formatString % self.seekRate)
+		self.uiSeekRate.setValue(self.seekRate)
 		
 	def seekSlower(self):
 		if self.seekRate / 2 == self.seekRate // 2:
 			self.seekRate //= 2
-			self.uiSeekFaster.setEnabled(True)
+			self.uiSeekFaster.fake_disability = False
 		
 		if self.seekRate / 2 == self.seekRate // 2:
-			self.uiSeekSlower.setEnabled(True)
+			self.uiSeekSlower.fake_disability = False
 		else:
-			self.uiSeekSlower.setEnabled(False)
+			self.uiSeekSlower.fake_disability = True
+			self.uiSeekSlower.setFocus()
 		
 		self.uiSeekSlider.setPageStep(self.seekRate * 5) #Multiplier: Compensate for key repeat delay.
-		self.uiSeekRateDisplay.setText(self.uiSeekRateDisplay.formatString % self.seekRate)
+		self.uiSeekRate.setValue(self.seekRate)
 	
 	
 	def markStart(self):
@@ -317,7 +317,7 @@ class PlayAndSave(QtWidgets.QDialog):
 				+ self.uiEditMarkedRegions.touchMargins()['right'] 
 				+ (10*2) #padding
 				+ (1*2) #border?
-				+ 1, #magic
+				+ 1, #magic.
 			self.uiEditMarkedRegions.height(),
 		)
 		
