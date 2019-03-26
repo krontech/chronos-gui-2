@@ -101,5 +101,4 @@ class Button(QPushButton, TouchMarginPlugin, FocusablePlugin):
 	@fake_disability.setter
 	def fake_disability(self, disabled: bool):
 		self._fake_disability = disabled
-		print('setting disabled', disabled)
 		self.refreshStyle()

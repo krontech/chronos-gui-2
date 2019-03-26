@@ -458,6 +458,22 @@ Save Start</string>
      </rect>
     </property>
    </widget>
+   <widget class="Backdrop" name="backdrop">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>0</y>
+      <width>241</width>
+      <height>421</height>
+     </rect>
+    </property>
+    <property name="customStyleSheet" stdset="0">
+     <string>Backdrop { border: 1px solid black }</string>
+    </property>
+   </widget>
+   <zorder>backdrop</zorder>
+   <zorder>header</zorder>
+   <zorder>uiMarkedRegions</zorder>
   </widget>
   <widget class="Button" name="uiEditMarkedRegions">
    <property name="geometry">
@@ -617,12 +633,12 @@ Save Start</string>
   <zorder>uiSeekFaster</zorder>
   <zorder>uiDone</zorder>
   <zorder>comment_2</zorder>
-  <zorder>uiMarkedRegionsPanel</zorder>
   <zorder>uiEditMarkedRegions</zorder>
   <zorder>uiBatteryReadout</zorder>
   <zorder>uiSeekSlower</zorder>
   <zorder>uiSeekRate</zorder>
   <zorder>uiCurrentFrame</zorder>
+  <zorder>uiMarkedRegionsPanel</zorder>
  </widget>
  <customwidgets>
   <customwidget>

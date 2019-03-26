@@ -9,6 +9,7 @@ from debugger import *; dbg
 
 import api
 from api import silenceCallbacks
+from animate import MenuToggle
 
 
 class PlayAndSave(QtWidgets.QDialog):
@@ -60,9 +61,9 @@ class PlayAndSave(QtWidgets.QDialog):
 		self.uiCurrentFrame.suffixFormatString = self.uiCurrentFrame.suffix()
 		self.uiCurrentFrame.valueChanged.connect(lambda f: api.set({'playbackFrame': f}))
 		
+		
 		self.seekRate = 60
 		self.uiSeekRate.setValue(self.seekRate)
-		
 		
 		self.seekForwardTimer = QtCore.QTimer()
 		self.seekForwardTimer.timeout.connect(self.updateBattery)
@@ -75,6 +76,7 @@ class PlayAndSave(QtWidgets.QDialog):
 		
 		self.uiSeekFaster.clicked.connect(self.seekFaster)
 		self.uiSeekSlower.clicked.connect(self.seekSlower)
+		
 		
 		self.uiMarkStart.clicked.connect(self.markStart)
 		self.uiMarkEnd.clicked.connect(self.markEnd)
@@ -118,7 +120,12 @@ class PlayAndSave(QtWidgets.QDialog):
 		self.uiMarkedRegionVisualization.paintEvent = self.paintMarkedRegions
 		self.updateMarkedRegions()
 		
-		
+		MenuToggle(
+			menu = self.uiMarkedRegionsPanel,
+			button = self.uiEditMarkedRegions,
+			xRange = (-self.uiMarkedRegionsPanel.width(), 0),
+			duration = 40,
+		)
 		
 	def onShow(self):
 		#Don't update the labels while hidden. But do show with accurate info when we start.
