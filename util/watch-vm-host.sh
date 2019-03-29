@@ -9,7 +9,7 @@ while true; do
 		if [[ \$(cat git_description) != \$(git describe --tags --always) ]]; then #Only update when description changes, results in some thrashing otherwise.
 			git describe --tags --always > git_description
 		fi
-		rsync -ir . chronos-vm:~/chronos-gui \
+		rsync -ir . ${VM_ADDRESS:-chronos-vm}:~/chronos-gui \
 			--delete --links --times --inplace \
 			--exclude \"__pycache__\" --exclude \"/.git\" \
 			--exclude \"util/stats_reported\" \

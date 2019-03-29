@@ -319,13 +319,17 @@ class GlobalFilter(QtCore.QObject):
 		
 		#Input events, usually not important, we are after the effects.
 		e.TouchBegin, e.TouchCancel, e.TouchEnd, e.TouchUpdate,
-		e.SockAct, e.Leave, e.Enter, #SockAct is triggered by mouse movement.
+		e.SockAct, e.Leave, e.Enter, e.HoverEnter, e.HoverMove, e.HoverLeave, #SockAct is triggered by mouse movement.
 		e.FocusAboutToChange, e.FocusIn, e.FocusOut,
 		e.KeyPress, e.KeyRelease, e.ShortcutOverride, e.InputMethodQuery,
 		e.ScrollPrepare, e.Scroll, e.Gesture, e.GestureOverride, #Related to PyQt5.QWidgets.QScroller.
 		
 		#Screen transition events
 		e.PlatformSurface, e.WinIdChange, e.WindowIconChange, e.WindowDeactivate, e.WindowActivate, e.Resize, e.Show,
+		
+		e.WindowStateChange, #Window manager event in VM.
+		
+		e.Wheel, #Mouse wheel.
 	])
 	
 	
