@@ -1,6 +1,6 @@
 # -*- coding: future_fstrings -*-
 
-import random
+from random import shuffle, randint
 
 from PyQt5 import uic, QtWidgets, QtCore
 from PyQt5.QtCore import pyqtSlot
@@ -16,13 +16,13 @@ def randomCharacters(count: int):
 	"""Return a random string without lookalike characters, 1/l, 0/O, etc."""
 	
 	#No random.choices yet.
-	#return ''.join(random.choices(
+	#return ''.join(choices(
 	#	'0123456789abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ!@#$%&',
 	#	k=count ))
 	
 	#OK, try this:
 	letters = list('0123456789abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ!@#$%&')
-	random.shuffle(letters)
+	shuffle(letters)
 	return ''.join(letters[:count])
 	
 	#Perhaps a random phrase would be better? If we install a dictionary...
@@ -52,7 +52,11 @@ class RemoteAccess(QtWidgets.QWidget):
 		self.uiEnableLocalSSH.stateChanged.connect(self.updateNetworkInterfaceInformation)
 		self.uiEnableRemoteSSH.stateChanged.connect(self.updateNetworkInterfaceInformation)
 		self.uiHTTPPort.valueChanged.connect(self.updateNetworkInterfaceInformation)
+		self.uiRandomiseHTTPPort.clicked.connect(lambda:
+			self.uiHTTPPort.setValue(randint(49152, 65535)))
 		self.uiSSHPort.valueChanged.connect(self.updateNetworkInterfaceInformation)
+		self.uiRandomiseSSHPort.clicked.connect(lambda:
+			self.uiSSHPort.setValue(randint(49152, 65535)))
 		
 		api.observe('networkInterfaces', self.updateNetworkInterfaces)
 		self.uiNetworkInterface.currentIndexChanged.connect(self.showNetworkInterface)
@@ -77,7 +81,7 @@ class RemoteAccess(QtWidgets.QWidget):
 		elif visible == None:
 			echoMode = QtWidgets.QLineEdit.Normal if self.uiPassword.echoMode() != QtWidgets.QLineEdit.Normal else QtWidgets.QLineEdit.Password
 		else:
-			raise ValueError(f'Unknown visibility value "${visible}".')
+			raise ValueError(f'Unknown visibility value "{visible}".')
 		
 		self.uiPassword.setEchoMode(echoMode)
 		settings.setValue('show network password', 'true' if echoMode == QtWidgets.QLineEdit.Normal else "false")
