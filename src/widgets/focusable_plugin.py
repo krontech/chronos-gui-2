@@ -40,7 +40,7 @@ class FocusablePlugin():
 	#Specify the widget property "units", on numeric inputs, to provide a list of units to choose from. It is recommended to stick to 4, since that's how many unit buttons are on the numeric keyboard. Units can be scrolled with the jog wheel.
 	unitList = ['y', 'z', 'a', 'f', 'p', 'n', 'µ', 'm', '', 'k', 'M', 'G', 'T', 'P', 'E', 'Z', 'Y']
 	knownUnits = { #Map of units to their multipliers. eg, k = kilo = ×1000. Or µs = microseconds = ×0.000001. Usually queried with unit[:1], because something like mV or ms both have the same common numerical multiplier. [0] is not used because it fails on "".
-		suffix: 10**(index-8)*3 for index, suffix in enumerate(unitList) #Position 8 is neutral, 'no unit'.
+		suffix: 10**((index-8)*3) for index, suffix in enumerate(unitList) #Position 8 is neutral, 'no unit'.
 	}
 	knownUnits['s'] = 1 #seconds
 	knownUnits['V'] = 1 #volts
@@ -259,10 +259,10 @@ class FocusablePlugin():
 		
 		units = sorted(
 			[s.strip() for s in units.split(',')], #Strip to accept space in definition.
-			key=lambda unit: knownUnits.get(unit[:1]) ) #Use get, which returns None on miss, so it doesn't fail before our nice assert.
+			key=lambda unit: self.knownUnits.get(unit[:1]) ) #Use get, which returns None on miss, so it doesn't fail before our nice assert.
 		
 		for unit in units: #See above for list of known units.
-			assert unit[:1] in knownUnits, f'{self.window().objectName()}.{self.objectName()}: Unit "{unit}" not found in {units}.'
+			assert unit[:1] in self.knownUnits, f'{self.window().objectName()}.{self.objectName()}: Unit "{unit}" not found in {units}.'
 			
 		self.availableUnits = lambda _: units #Cache results. We should never have to change units.
 		return units
@@ -274,7 +274,7 @@ class FocusablePlugin():
 	def realValue(self) -> float:
 		#Get real value of input, taking into account units such as 'k' or 'µs'.
 		return (
-			self.value() * knownUnits[self.suffix()[:1]]
+			self.value() * self.knownUnits[self.suffix()[:1]]
 			if hasattr(self, 'units') else 
 			self.value() 
 		)
