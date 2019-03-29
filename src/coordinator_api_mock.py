@@ -1078,8 +1078,9 @@ class ControlAPIMock(QObject):
 	
 	
 	@action('set')
+	@pyqtSlot(result="QVariantMap")
 	@pyqtSlot("QVariantMap", result="QVariantMap")
-	def testNetworkStorageCredentials(self, config):
+	def testNetworkStorageCredentials(self, config={}):
 		"""Check the remote file share works.
 			
 			Returns an error message upon failure, or an empty string
@@ -1096,7 +1097,7 @@ class ControlAPIMock(QObject):
 		print("MOCK: Checking network storage…", end='', flush=True)
 		sleep(3)
 		print(" ok.")
-		return Result('')
+		return Reply('')
 
 
 

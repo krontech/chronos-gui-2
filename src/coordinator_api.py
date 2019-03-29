@@ -1034,6 +1034,7 @@ class ControlAPI(QObject):
 	
 	
 	@action('set')
+	@pyqtSlot(result="QVariantMap")
 	@pyqtSlot("QVariantMap", result="QVariantMap")
 	def testNetworkStorageCredentials(self, config):
 		"""Check the remote file share works.

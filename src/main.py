@@ -329,7 +329,8 @@ class GlobalFilter(QtCore.QObject):
 		
 		e.WindowStateChange, #Window manager event in VM.
 		
-		e.Wheel, #Mouse wheel.
+		e.Wheel, 98, e.ContextMenu, #Mouse wheel, some event relating to a button press.
+		
 	])
 	
 	
