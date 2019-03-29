@@ -74,7 +74,17 @@ class DBusException(Exception):
 
 class APIException(Exception):
 	"""Raised when something goes wrong with dbus. Message comes from dbus' msg.error().message()."""
-	pass
+	
+	def __init__(self, name, message):
+		super().__init__(name)
+		
+		assert name, "assertion name missing"
+		assert type(name) is str, f"name not str, got {name}"
+		self.name = name
+		
+		assert message, "assertion message missing"
+		assert type(message) is str, f"message not str, got {message}"
+		self.message = message
 
 class ControlReply():
 	def __init__(self, value=None, errorName=None, message=None):
@@ -84,7 +94,7 @@ class ControlReply():
 	
 	def unwrap(self):
 		if self.errorName:
-			raise APIException(self.errorName + ': ' + self.message)
+			raise APIException(self.errorName, self.message)
 		else:
 			return self.value
 
