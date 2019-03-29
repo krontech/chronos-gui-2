@@ -4,12 +4,14 @@ from PyQt5.QtCore import pyqtProperty, pyqtSlot
 
 #Importing API may fail in Qt Designer, since we may not have it set up on the designing machine.
 try:
-	import api_mock as api
+	import api
 except Exception as e:
-	#We don't want the lack of an API to fail us in Qt Designer.
+	#We don't want the lack of an API to fail us in Qt Designer. However, do warn.
+	from sys import stderr
+	print('Warning: Unable to import api, DirectAPILinkPlugin disabled.', file=stderr)
 	api = None
 
-from debugger import dbg, brk; dbg, brk
+from debugger import *; dbg
 
 
 class DirectAPILinkPlugin():
