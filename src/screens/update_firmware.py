@@ -6,7 +6,7 @@ from PyQt5.QtCore import pyqtSlot
 from debugger import *; dbg
 
 import api
-from api import silenceCallbacks
+from api import silenceCallbacks, APIException
 
 
 class UpdateFirmware(QtWidgets.QDialog):
@@ -46,27 +46,27 @@ class UpdateFirmware(QtWidgets.QDialog):
 	
 	
 	def onSaveCalibrationData(self):
-		error = api.control('saveCalibrationData', self.uiMediaSelect.currentData())
-		if error:
-			self.uiSaveCalDataError.showError(f'Could not save calibration data: {error["message"]}')
-			self.uiLoadCalDataError.hide() #This message overlaps our message. Clear it.
-		else:
+		try:
+			api.control('saveCalibrationData', self.uiMediaSelect.currentData())
 			self.uiSaveCalDataError.showMessage(f'Saved calibration to external storage.')
 			self.uiLoadCalDataError.hide()
+		except APIException as error:
+			self.uiSaveCalDataError.showError(f'Could not save calibration data: {error.message}')
+			self.uiLoadCalDataError.hide() #This message overlaps our message. Clear it.
 	
 	def onLoadCalibrationData(self):
-		error = api.control('loadCalibrationData', self.uiMediaSelect.currentData())
-		if error:
-			self.uiLoadCalDataError.showError(f'Could not load calibration data: {error["message"]}')
-			self.uiSaveCalDataError.hide()
-		else:
+		try:
+			api.control('loadCalibrationData', self.uiMediaSelect.currentData())
 			self.uiLoadCalDataError.showMessage(f'Loaded previous calibration.')
+			self.uiSaveCalDataError.hide()
+		except APIException as error:
+			self.uiLoadCalDataError.showError(f'Could not load calibration data: {error.message}')
 			self.uiSaveCalDataError.hide()
 			
 	def onApplySoftwareUpdate(self):
-		error = api.control('applySoftwareUpdate', self.uiMediaSelect.currentData())
-		if error:
-			self.uiApplyUpdateError.showError(f'Could not apply software update: {error["message"]}')
-		else:
+		try:
+			api.control('applySoftwareUpdate', self.uiMediaSelect.currentData())
 			self.uiApplyUpdateError.hide()
+		except APIException as error:
+			self.uiApplyUpdateError.showError(f'Could not apply software update: {error.message}')
 	
