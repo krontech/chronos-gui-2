@@ -331,6 +331,7 @@ class GlobalFilter(QtCore.QObject):
 		
 		e.Wheel, 98, e.ContextMenu, #Mouse wheel, some event relating to a button press.
 		
+		103, 104, #Somehow related to QtWidgets.QMessageBox.question.
 	])
 	
 	

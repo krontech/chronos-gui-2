@@ -166,7 +166,7 @@ Unsaved Video in RAM</string>
     </rect>
    </property>
    <property name="text">
-    <string>User Settings</string>
+    <string>Camera Settings</string>
    </property>
    <property name="clickMarginTop" stdset="0">
     <enum>Button::none</enum>
@@ -375,7 +375,7 @@ Unsaved Video in RAM</string>
     </rect>
    </property>
    <property name="text">
-    <string>Configure Storage</string>
+    <string>Storage</string>
    </property>
    <property name="clickMarginTop" stdset="0">
     <enum>Button::none</enum>

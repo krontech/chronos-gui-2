@@ -33,7 +33,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>User Settings</string>
+    <string>Camera Settings</string>
    </property>
   </widget>
   <widget class="Label" name="label">
@@ -56,13 +56,13 @@
    <property name="geometry">
     <rect>
      <x>0</x>
-     <y>130</y>
-     <width>201</width>
+     <y>140</y>
+     <width>231</width>
      <height>81</height>
     </rect>
    </property>
    <property name="text">
-    <string>Save User Settings</string>
+    <string>Save Camera Settings</string>
    </property>
    <property name="clickMarginRight" stdset="0">
     <enum>Button::half</enum>
@@ -71,14 +71,14 @@
   <widget class="Button" name="uiLoadSettings">
    <property name="geometry">
     <rect>
-     <x>200</x>
-     <y>130</y>
-     <width>201</width>
+     <x>230</x>
+     <y>140</y>
+     <width>231</width>
      <height>81</height>
     </rect>
    </property>
    <property name="text">
-    <string>Load User Settings</string>
+    <string>Load Camera Settings</string>
    </property>
    <property name="clickMarginLeft" stdset="0">
     <enum>Button::half</enum>
@@ -87,9 +87,9 @@
   <widget class="Button" name="uiFactoryReset">
    <property name="geometry">
     <rect>
-     <x>480</x>
-     <y>130</y>
-     <width>211</width>
+     <x>460</x>
+     <y>140</y>
+     <width>241</width>
      <height>81</height>
     </rect>
    </property>
@@ -101,7 +101,7 @@
    <property name="geometry">
     <rect>
      <x>20</x>
-     <y>210</y>
+     <y>220</y>
      <width>141</width>
      <height>21</height>
     </rect>
@@ -114,8 +114,8 @@
    <property name="geometry">
     <rect>
      <x>0</x>
-     <y>220</y>
-     <width>371</width>
+     <y>240</y>
+     <width>301</width>
      <height>81</height>
     </rect>
    </property>
@@ -123,8 +123,8 @@
   <widget class="Button" name="button_4">
    <property name="geometry">
     <rect>
-     <x>370</x>
-     <y>220</y>
+     <x>300</x>
+     <y>240</y>
      <width>161</width>
      <height>81</height>
     </rect>
@@ -149,6 +149,26 @@
     <string>Done</string>
    </property>
   </widget>
+  <widget class="FeedbackLabel" name="uiLoadCalDataError">
+   <property name="geometry">
+    <rect>
+     <x>240</x>
+     <y>200</y>
+     <width>551</width>
+     <height>21</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="FeedbackLabel" name="uiSaveCalDataError">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>200</y>
+     <width>771</width>
+     <height>21</height>
+    </rect>
+   </property>
+  </widget>
  </widget>
  <customwidgets>
   <customwidget>
@@ -165,6 +185,11 @@
    <class>ComboBox</class>
    <extends>QComboBox</extends>
    <header>combo_box</header>
+  </customwidget>
+  <customwidget>
+   <class>FeedbackLabel</class>
+   <extends>QLabel</extends>
+   <header>feedback_label</header>
   </customwidget>
   <customwidget>
    <class>HeaderLabel</class>

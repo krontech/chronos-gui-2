@@ -22,14 +22,11 @@ class UpdateFirmware(QtWidgets.QDialog):
 		api.observe('externalStorage', self.updateExternalStorageDevices)
 		
 		# Button binding.
-		self.uiSaveCalData.clicked.connect(self.onSaveCalibrationData)
 		#No callbacks for changing storage location, it's used to call save cal data with.
 		#No callback for safely removing button, we never are in a state where it's unsafe to remove since we always flush the filesystem as part of saving cal data. Kept in because it's comforting… perhaps we should add an affirmative animation, though? 🤔
-		
-		self.uiApplyUpdate.clicked.connect(self.onApplySoftwareUpdate)
-		
-		self.uiLoadCalData.clicked.connect(self.onLoadCalibrationData)
-		
+		self.uiSaveCalData.clicked.connect(self.saveCameraSettings)
+		self.uiLoadCalData.clicked.connect(self.loadCameraSettings)
+		self.uiApplyUpdate.clicked.connect(self.applySoftwareUpdate)
 		self.uiDone.clicked.connect(window.back)
 	
 	
@@ -45,25 +42,25 @@ class UpdateFirmware(QtWidgets.QDialog):
 				p["path"] )
 	
 	
-	def onSaveCalibrationData(self):
+	def saveCameraSettings(self):
 		try:
-			api.control('saveCalibrationData', self.uiMediaSelect.currentData())
+			api.control('saveCameraSettings', self.uiMediaSelect.currentData())
 			self.uiSaveCalDataError.showMessage(f'Saved calibration to external storage.')
 			self.uiLoadCalDataError.hide()
 		except APIException as error:
 			self.uiSaveCalDataError.showError(f'Could not save calibration data: {error.message}')
 			self.uiLoadCalDataError.hide() #This message overlaps our message. Clear it.
 	
-	def onLoadCalibrationData(self):
+	def loadCameraSettings(self):
 		try:
-			api.control('loadCalibrationData', self.uiMediaSelect.currentData())
+			api.control('loadCameraSettings', self.uiMediaSelect.currentData())
 			self.uiLoadCalDataError.showMessage(f'Loaded previous calibration.')
 			self.uiSaveCalDataError.hide()
 		except APIException as error:
 			self.uiLoadCalDataError.showError(f'Could not load calibration data: {error.message}')
 			self.uiSaveCalDataError.hide()
 			
-	def onApplySoftwareUpdate(self):
+	def applySoftwareUpdate(self):
 		try:
 			api.control('applySoftwareUpdate', self.uiMediaSelect.currentData())
 			self.uiApplyUpdateError.hide()

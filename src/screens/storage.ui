@@ -337,7 +337,7 @@ mmcblk0     179:0    0   7.4G  0 disk
     </rect>
    </property>
    <property name="text">
-    <string>File Saving</string>
+    <string>Video Saving</string>
    </property>
    <property name="clickMarginRight" stdset="0">
     <enum>Button::half</enum>

@@ -46,7 +46,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>2: Back up your settings to the external storage device. (optional)</string>
+    <string>2: Back up your configuration to the external storage device. (optional)</string>
    </property>
   </widget>
   <widget class="Button" name="uiSaveCalData">
@@ -54,12 +54,12 @@
     <rect>
      <x>10</x>
      <y>170</y>
-     <width>311</width>
+     <width>261</width>
      <height>81</height>
     </rect>
    </property>
    <property name="text">
-    <string>Back Up Camera Configuration</string>
+    <string>Save Camera Settings</string>
    </property>
    <property name="clickMarginRight" stdset="0">
     <enum>Button::half</enum>
@@ -99,7 +99,7 @@
     <rect>
      <x>10</x>
      <y>270</y>
-     <width>321</width>
+     <width>271</width>
      <height>81</height>
     </rect>
    </property>
@@ -110,14 +110,14 @@
   <widget class="Button" name="uiLoadCalData">
    <property name="geometry">
     <rect>
-     <x>320</x>
+     <x>270</x>
      <y>170</y>
-     <width>311</width>
+     <width>261</width>
      <height>81</height>
     </rect>
    </property>
    <property name="text">
-    <string>Restore Camera Configuration</string>
+    <string>Load Camera Settings</string>
    </property>
    <property name="clickMarginLeft" stdset="0">
     <enum>Button::half</enum>
@@ -159,9 +159,9 @@
   <widget class="FeedbackLabel" name="uiLoadCalDataError">
    <property name="geometry">
     <rect>
-     <x>330</x>
+     <x>280</x>
      <y>230</y>
-     <width>471</width>
+     <width>521</width>
      <height>21</height>
     </rect>
    </property>

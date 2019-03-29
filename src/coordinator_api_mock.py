@@ -922,7 +922,7 @@ class ControlAPIMock(QObject):
 	
 	@action('set')
 	@pyqtSlot(str, result='QVariantMap')
-	def saveCalibrationData(self, toFolder: str) -> Union[Dict[str, str], None]:
+	def saveCameraSettings(self, toFolder: str) -> Union[Dict[str, str], None]:
 		print(f'MOCK: Save calibration data to {toFolder}.')
 		return (
 			Reply("out of space", "Out of space on sda.") 
@@ -932,8 +932,14 @@ class ControlAPIMock(QObject):
 	
 	@action('set')
 	@pyqtSlot(str, result='QVariantMap')
-	def loadCalibrationData(self, fromFolder: str):
+	def loadCameraSettings(self, fromFolder: str):
 		print(f'MOCK: Load calibration data.')
+		return None
+	
+	@action('set')
+	@pyqtSlot(str, result='QVariantMap')
+	def resetCameraSettings(self, fromFolder: str):
+		print(f'MOCK: Reset calibration data.')
 		return None
 	
 	@action('set')
