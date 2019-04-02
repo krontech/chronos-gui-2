@@ -435,12 +435,12 @@ Save Start</string>
      <height>421</height>
     </rect>
    </property>
-   <widget class="Subheader" name="header">
+   <widget class="Subheader" name="uiMarkedRegionsPanelHeader">
     <property name="geometry">
      <rect>
       <x>10</x>
       <y>10</y>
-      <width>221</width>
+      <width>191</width>
       <height>21</height>
      </rect>
     </property>
@@ -457,6 +457,18 @@ Save Start</string>
       <height>381</height>
      </rect>
     </property>
+    <property name="editTriggers">
+     <set>QAbstractItemView::EditKeyPressed|QAbstractItemView::SelectedClicked</set>
+    </property>
+    <property name="tabKeyNavigation">
+     <bool>true</bool>
+    </property>
+    <property name="layoutMode">
+     <enum>QListView::Batched</enum>
+    </property>
+    <property name="batchSize">
+     <number>10</number>
+    </property>
    </widget>
    <widget class="Backdrop" name="backdrop">
     <property name="geometry">
@@ -471,9 +483,62 @@ Save Start</string>
      <string>Backdrop { border: 1px solid black }</string>
     </property>
    </widget>
+   <widget class="Button" name="uiMarkedRegionPanelClose">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>0</y>
+      <width>241</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="clickMarginLeft" stdset="0">
+     <enum>Button::none</enum>
+    </property>
+    <property name="clickMarginRight" stdset="0">
+     <enum>Button::none</enum>
+    </property>
+    <property name="clickMarginTop" stdset="0">
+     <enum>Button::none</enum>
+    </property>
+    <property name="clickMarginBottom" stdset="0">
+     <enum>Button::none</enum>
+    </property>
+    <property name="customStyleSheet" stdset="0">
+     <string>Button { background: none; border-width: 0; }</string>
+    </property>
+   </widget>
+   <widget class="Subheader" name="uiMarkedRegionsPanelHeaderX">
+    <property name="geometry">
+     <rect>
+      <x>210</x>
+      <y>9</y>
+      <width>21</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">
+			font-size: 17px; /*Effectively 16pt bold. 🙄 15.5pt is better, but renders really small in Qt Designer.*/
+			background: transparent; /*Don't mess with this, it affects font width.*/
+			color: darkred;
+</string>
+    </property>
+    <property name="text">
+     <string>×</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
+    </property>
+   </widget>
    <zorder>backdrop</zorder>
-   <zorder>header</zorder>
+   <zorder>uiMarkedRegionPanelClose</zorder>
+   <zorder>uiMarkedRegionsPanelHeader</zorder>
    <zorder>uiMarkedRegions</zorder>
+   <zorder>uiMarkedRegionsPanelHeaderX</zorder>
   </widget>
   <widget class="Button" name="uiEditMarkedRegions">
    <property name="geometry">
@@ -615,6 +680,8 @@ Save Start</string>
     <string>SpinBox { border-color: transparent }</string>
    </property>
   </widget>
+  <zorder>uiEditMarkedRegions</zorder>
+  <zorder>uiMarkedRegionsPanel</zorder>
   <zorder>backdrop_6</zorder>
   <zorder>backdrop_3</zorder>
   <zorder>backdrop_4</zorder>
@@ -633,12 +700,10 @@ Save Start</string>
   <zorder>uiSeekFaster</zorder>
   <zorder>uiDone</zorder>
   <zorder>comment_2</zorder>
-  <zorder>uiEditMarkedRegions</zorder>
   <zorder>uiBatteryReadout</zorder>
   <zorder>uiSeekSlower</zorder>
   <zorder>uiSeekRate</zorder>
   <zorder>uiCurrentFrame</zorder>
-  <zorder>uiMarkedRegionsPanel</zorder>
  </widget>
  <customwidgets>
   <customwidget>

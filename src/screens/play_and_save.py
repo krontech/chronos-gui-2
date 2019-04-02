@@ -3,13 +3,13 @@ from random import sample
 
 from PyQt5 import uic, QtWidgets, QtCore
 from PyQt5.QtCore import pyqtSlot, QByteArray
-from PyQt5.QtGui import QImage, QTransform, QPainter, QColor, QPainterPath, QBrush
+from PyQt5.QtGui import QImage, QTransform, QPainter, QColor, QPainterPath, QBrush, QStandardItemModel, QStandardItem
 
 from debugger import *; dbg
 
 import api
 from api import silenceCallbacks
-from animate import MenuToggle
+from animate import MenuToggle, delay
 
 
 class PlayAndSave(QtWidgets.QDialog):
@@ -27,21 +27,21 @@ class PlayAndSave(QtWidgets.QDialog):
 		self.totalRecordedFrames = 0
 		
 		#Use get and set marked regions, they redraw.
-		self.markedRegions = [] #{mark start, mark end, segment ids, segment name}
+		self.markedRegions = [] #{mark start, mark end, segment ids, region name}
 		self.markedRegions = [
-			{'hue': 240, 'mark end': 19900, 'mark start': 13002, 'saved': 0.0, 'segment ids': ['KxIjG09V'], 'segment name': 'Clip 1'},
-			{'hue': 300, 'mark end': 41797, 'mark start': 40597, 'saved': 0.0, 'segment ids': ['KxIjG09V'], 'segment name': 'Clip 2'},
-			{'hue': 420, 'mark end': 43897, 'mark start': 41797, 'saved': 0.0, 'segment ids': ['KxIjG09V'], 'segment name': 'Clip 3'},
-			{'hue': 180, 'mark end': 53599, 'mark start': 52699, 'saved': 0.0, 'segment ids': ['KxIjG09V'], 'segment name': 'Clip 4'},
-			{'hue': 360, 'mark end': 52699, 'mark start': 51799, 'saved': 0.0, 'segment ids': ['KxIjG09V'], 'segment name': 'Clip 5'},
-			{'hue': 210, 'mark end': 80000, 'mark start': 35290, 'saved': 0.0, 'segment ids': ['KxIjG09V'], 'segment name': 'Clip 6'},
-			{'hue': 390, 'mark end': 42587, 'mark start': 16716, 'saved': 0.0, 'segment ids': ['KxIjG09V'], 'segment name': 'Clip 7'},
-			{'hue': 270, 'mark end': 25075, 'mark start': 17016, 'saved': 0.0, 'segment ids': ['KxIjG09V'], 'segment name': 'Clip 8'},
-			{'hue': 330, 'mark end': 36617, 'mark start': 28259, 'saved': 0.0, 'segment ids': ['KxIjG09V'], 'segment name': 'Clip 9'},
-			{'hue': 240, 'mark end': 39005, 'mark start': 32637, 'saved': 0.0, 'segment ids': ['KxIjG09V'], 'segment name': 'Clip 10'},
-			{'hue': 300, 'mark end': 39668, 'mark start': 36219, 'saved': 0.0, 'segment ids': ['KxIjG09V'], 'segment name': 'Clip 11'},
-			{'hue': 420, 'mark end': 39068, 'mark start': 37868, 'saved': 0.0, 'segment ids': ['KxIjG09V'], 'segment name': 'Clip 12'},
-			{'hue': 180, 'mark end': 13930, 'mark start': 0, 'saved': 0.0, 'segment ids': ['ldPxTT5R', 'KxIjG09V'], 'segment name': 'Clip 13'},
+			{'hue': 240, 'mark end': 19900, 'mark start': 13002, 'saved': 0.0, 'highlight': 0, 'segment ids': ['KxIjG09V'], 'region name': 'Clip 1'},
+			{'hue': 300, 'mark end': 41797, 'mark start': 40597, 'saved': 0.0, 'highlight': 0, 'segment ids': ['KxIjG09V'], 'region name': 'Clip 2'},
+			{'hue': 420, 'mark end': 43897, 'mark start': 41797, 'saved': 0.0, 'highlight': 0, 'segment ids': ['KxIjG09V'], 'region name': 'Clip 3'},
+			{'hue': 180, 'mark end': 53599, 'mark start': 52699, 'saved': 0.0, 'highlight': 0, 'segment ids': ['KxIjG09V'], 'region name': 'Clip 4'},
+			{'hue': 360, 'mark end': 52699, 'mark start': 51799, 'saved': 0.0, 'highlight': 0, 'segment ids': ['KxIjG09V'], 'region name': 'Clip 5'},
+			{'hue': 210, 'mark end': 80000, 'mark start': 35290, 'saved': 0.0, 'highlight': 0, 'segment ids': ['KxIjG09V'], 'region name': 'Clip 6'},
+			{'hue': 390, 'mark end': 42587, 'mark start': 16716, 'saved': 0.0, 'highlight': 0, 'segment ids': ['KxIjG09V'], 'region name': 'Clip 7'},
+			{'hue': 270, 'mark end': 25075, 'mark start': 17016, 'saved': 0.0, 'highlight': 0, 'segment ids': ['KxIjG09V'], 'region name': 'Clip 8'},
+			{'hue': 330, 'mark end': 36617, 'mark start': 28259, 'saved': 0.0, 'highlight': 0, 'segment ids': ['KxIjG09V'], 'region name': 'Clip 9'},
+			{'hue': 240, 'mark end': 39005, 'mark start': 32637, 'saved': 0.0, 'highlight': 0, 'segment ids': ['KxIjG09V'], 'region name': 'Clip 10'},
+			{'hue': 300, 'mark end': 39668, 'mark start': 36219, 'saved': 0.0, 'highlight': 0, 'segment ids': ['KxIjG09V'], 'region name': 'Clip 11'},
+			{'hue': 420, 'mark end': 39068, 'mark start': 37868, 'saved': 0.0, 'highlight': 0, 'segment ids': ['KxIjG09V'], 'region name': 'Clip 12'},
+			{'hue': 180, 'mark end': 13930, 'mark start': 0,     'saved': 0.0, 'highlight': 0, 'segment ids': ['ldPxTT5R', 'KxIjG09V'], 'region name': 'Clip 13'},
 		]
 		self.markedStart = None #Note: Mark start/end are reversed if start is after end.
 		self.markedEnd = None
@@ -86,8 +86,8 @@ class PlayAndSave(QtWidgets.QDialog):
 			"end": region['mark end'],
 			"path": '/dev/sda', #TODO: Retrieve this from saved file settings screen, via local settings.
 			"format": {'fps': 30, 'encoding': 'h264'},
-			"filename": r'普通棕色蝙蝠_%DATE%_劃分_%SEGMENT NAME%-%START FRAME%-%END FRAME%.mp4'
-				.replace(r'%SEGMENT NAME%', region['segment name']),
+			"filename": r'普通棕色蝙蝠_%DATE%_劃分_%REGION NAME%-%START FRAME%-%END FRAME%.mp4'
+				.replace(r'%REGION NAME%', region['region name']),
 		} for region in self.markedRegions]))
 		
 		self.uiSavedFileSettings.clicked.connect(lambda: window.show('file_settings'))
@@ -118,14 +118,21 @@ class PlayAndSave(QtWidgets.QDialog):
 		self.uiEditMarkedRegions.formatString = self.uiEditMarkedRegions.text()
 		self.uiMarkedRegionVisualization.setAttribute(QtCore.Qt.WA_TransparentForMouseEvents, True)
 		self.uiMarkedRegionVisualization.paintEvent = self.paintMarkedRegions
+		self.uiMarkedRegions.setModel(QStandardItemModel(parent=self.uiMarkedRegions))
 		self.updateMarkedRegions()
 		
-		MenuToggle(
+		self.markedRegionMenu = MenuToggle(
 			menu = self.uiMarkedRegionsPanel,
 			button = self.uiEditMarkedRegions,
-			xRange = (-self.uiMarkedRegionsPanel.width(), 0),
-			duration = 40,
+			xRange = (-self.uiMarkedRegionsPanel.width(), -1),
+			duration = 30,
 		)
+		delay(self, 1, self.markedRegionMenu.toggle) #mmm, just like a crappy javascript app - work around a mysterious black bar appearing on the right-hand side of the window.
+		
+		self.uiMarkedRegionsPanelHeader.setAttribute(QtCore.Qt.WA_TransparentForMouseEvents)
+		self.uiMarkedRegionsPanelHeaderX.setAttribute(QtCore.Qt.WA_TransparentForMouseEvents)
+		self.uiMarkedRegionPanelClose.clicked.connect(self.markedRegionMenu.forceHide)
+		self.uiMarkedRegions.clicked.connect(self.selectMarkedRegion)
 		
 	def onShow(self):
 		#Don't update the labels while hidden. But do show with accurate info when we start.
@@ -311,8 +318,9 @@ class PlayAndSave(QtWidgets.QDialog):
 				for segment in api.get('recordedSegments') 
 				if not (segment['start'] >= self.markedEnd or segment['end'] < self.markedStart)
 			],
-			"segment name": f'Clip {len(self.markedRegions)+1}',
+			"region name": f'Clip {len(self.markedRegions)+1}',
 			"saved": 0., #ratio between 0 and 1
+			"highlight": 0, #-1 for black, 0 for none, 1 for white
 			"hue": self.saveRegionHues[len(self.markedRegions) % len(self.saveRegionHues)],
 		}]
 		
@@ -326,7 +334,7 @@ class PlayAndSave(QtWidgets.QDialog):
 	def updateMarkedRegions(self):
 		"""Recalculate marked regions and mark in/out marker."""
 		
-		#First thing, update the marked region count.
+		#Update the marked region count.
 		self.uiEditMarkedRegions.setText(
 			self.uiEditMarkedRegions.formatString % len(self.markedRegions) )
 		
@@ -339,6 +347,13 @@ class PlayAndSave(QtWidgets.QDialog):
 			self.uiEditMarkedRegions.height(),
 		)
 		
+		#Set up entries in the marked regions panel.
+		model = self.uiMarkedRegions.model()
+		model.clear()
+		for region in self.markedRegions:
+			model.appendRow(QStandardItem(region["region name"]))
+		
+		#Update the marked region visualisation, under the frame slider.
 		#We'll assign each marked region a track. Regions can't overlap on the
 		#same track. They should always use the lowest track available.
 		tracks = []
@@ -403,8 +418,17 @@ class PlayAndSave(QtWidgets.QDialog):
 		trackOffset = -1
 		for track in reversed(self._tracks):
 			for region in track:
-				p.setPen(hsva(region['hue'], 230, 190))
-				p.setBrush(QBrush(hsva(region['hue'], 153, 230)))
+				p.setPen(hsva(
+					region['hue'],
+					{-1:150, 0:230, 1:255}[region['highlight']],
+					{-1:160, 0:190, 1:100}[region['highlight']],
+				))
+				p.setBrush(QBrush(hsva(
+					region['hue'], 
+					{-1:0, 0:153, 1:255}[region['highlight']], 
+					{-1:0, 0:230, 1:255}[region['highlight']],
+				)))
+				#
 				
 				p.drawRect(
 					f2px(region['mark start']),
@@ -425,4 +449,31 @@ class PlayAndSave(QtWidgets.QDialog):
 				for segment in self.recordedSegments
 			])
 		])
+		
 		self.updateMarkedRegions()
+	
+	
+	def selectMarkedRegion(self, pos: QtCore.QModelIndex):
+		def assign(self, index, status):
+			"""Hack to work around not being able to assign in a lambda."""
+			self.markedRegions[index]['highlight'] = status
+			self.uiMarkedRegionVisualization.update()
+		
+		def assignCatpureIndex(self, index, status):
+			"""Hack to capture the value of index in a closure.
+				
+				Index which will otherwise get changed by the time we use it, if it is used in a lambda."""
+			return lambda: assign(self, index, status)
+		
+		for index in range(len(self.markedRegions)):
+			if index == pos.row():
+				duration = 400
+				self.markedRegions[index]['highlight'] = -1
+				delay(self, 1/3 * duration, assignCatpureIndex(self, index, 1))
+				delay(self, 2/3 * duration, assignCatpureIndex(self, index, -1))
+				delay(self, 3/3 * duration, assignCatpureIndex(self, index, 1))
+			else:
+				self.markedRegions[index]['highlight'] = 0
+		
+		self.uiMarkedRegionVisualization.update()
+		
