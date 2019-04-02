@@ -6,6 +6,7 @@ from PyQt5.QtWidgets import QListView, QScroller
 from debugger import *; dbg
 from focusable_plugin import FocusablePlugin
 
+
 class ScrollList(QListView, FocusablePlugin):
 	"""A scrollable list of items. Used alone or as the dropdown for a ComboBox.
 		
@@ -45,52 +46,50 @@ class ScrollList(QListView, FocusablePlugin):
 		properties.setScrollMetric(properties.OvershootScrollTime, 0.5) #default: 0.7
 		scroller.setScrollerProperties(properties)
 		
+		self.refreshStyle()
+		
 	def refreshStyle(self):
 		self.setStyleSheet(f"""
-			ComboBox:on {{
-				/*when dropdown exists*/
-			}}
-
-			ComboBox QAbstractItemView {{ /*This is the drop-down menu.*/
+			QAbstractItemView {{ /*This is the drop-down menu.*/
 				border: 1px solid black;
 				color: black;
 				selection-background-color: grey;
 			}}
-			ComboBox QAbstractItemView::item {{
+			QAbstractItemView::item {{
 				padding: 15px;
 				background: white; /*Must explicitly set background colour to anything other than auto for padding to affect text position. 😠. Whyyyy.*/
 				font-size: 6px; /*Doesn't work.*/
 			}}
-			ComboBox QAbstractItemView::item::selected {{
+			QAbstractItemView::item::selected {{
 				background: #888;
 			}}
-			ComboBox QScrollBar {{
+			QScrollBar {{
 				background: white;
 				width: 8px;
 				border: 1px solid white;
 			}}
-			ComboBox QScrollBar::handle {{
+			QScrollBar::handle {{
 				background: #666;
 				border-radius: 3px; /*QScrollBar width - border-left - border-right / 2*/
 			}}
-			ComboBox QScrollBar::add-line,
-			ComboBox QScrollBar::sub-line {{
+			QScrollBar::add-line,
+			QScrollBar::sub-line {{
 				border: none;
 				background: none;
 			}}
 
-			ComboBox::drop-down {{
+			ScrollList::drop-down {{
 				subcontrol-origin: content;
 				width: 40px;
 				border: 0px solid black;
 				border-left-width: 1px;
 				color: black;
 			}}
-			ComboBox::drop-down:on {{
+			ScrollList::drop-down:on {{
 				/*Stupid hack because the dropdown scrollbar *can't* be increased in width. It's off the width of the drop-down button by -1px. We can't just decrease the width of the drop-down button, because every other button we own is 40px instead of 39px. So. What we do is adjust the button size down when the drop-down is open, because that's the only time the off-by-one with QScrollBar is noticable, and you're distracted by the scrollbar then.*/
 				padding-left: -1px;
 			}}
-			ComboBox::down-arrow {{
+			ScrollList::down-arrow {{
 				image: url(assets/images/wedge-down-enabled.png);
 			}}
 		""" + self.originalStyleSheet())
