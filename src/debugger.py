@@ -84,3 +84,6 @@ def pp(*args, **kwargs):
 		width=int(popen('stty size').read().split()[1]), #Width of console.
 		compact=True,
 	).pprint(*args, **kwargs)
+
+def pd(*args):
+	pp(*[dir(arg) for arg in args])
