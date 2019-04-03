@@ -34,7 +34,15 @@ sys.excepthook = eh
 def brk():
 	"""Start an interactive debugger at the callsite."""
 	
-	QtCore.pyqtRemoveInputHook() #Prevent pyqt5 from printing a lot of errors when we take control away from it with pdb. Unfortunately, this means the app stops responding to things.
+	#Prevent pyqt5 from printing a lot of errors when we take control away from it with pdb. Unfortunately, this also means the app stops responding to things.
+	QtCore.pyqtRemoveInputHook()
+	
+	#Fix system not echoing keystrokes after first auto restart.
+	try:
+		system('stty sane')
+	except Exception as e:
+		pass
+	
 	pdb.set_trace()
 	# QtCore.pyqtRestoreInputHook() #Hm, can't restore input here - since we hid this frame, I think execution continues until the end of the function. Perhaps we can subclass and call setup()? Just run it manually for now.
 
@@ -85,5 +93,6 @@ def pp(*args, **kwargs):
 		compact=True,
 	).pprint(*args, **kwargs)
 
+#This doesn't really work. Running pp(dir(x)) here vs on the debug console produces different results.
 def pd(*args):
 	pp(*[dir(arg) for arg in args])

@@ -2,7 +2,7 @@
 from random import sample
 
 from PyQt5 import uic, QtWidgets, QtCore
-from PyQt5.QtCore import pyqtSlot, QByteArray
+from PyQt5.QtCore import pyqtSlot, pyqtSignal, QByteArray
 from PyQt5.QtGui import QImage, QTransform, QPainter, QColor, QPainterPath, QBrush, QStandardItemModel, QStandardItem
 
 from debugger import *; dbg
@@ -10,6 +10,8 @@ from debugger import *; dbg
 import api
 from api import silenceCallbacks
 from animate import MenuToggle, delay
+from widgets.line_edit import LineEdit
+from widgets.button import Button
 
 
 class PlayAndSave(QtWidgets.QDialog):
@@ -132,6 +134,7 @@ class PlayAndSave(QtWidgets.QDialog):
 		self.uiMarkedRegionsPanelHeader.setAttribute(QtCore.Qt.WA_TransparentForMouseEvents)
 		self.uiMarkedRegionsPanelHeaderX.setAttribute(QtCore.Qt.WA_TransparentForMouseEvents)
 		self.uiMarkedRegionPanelClose.clicked.connect(self.markedRegionMenu.forceHide)
+		self.uiMarkedRegions.setItemDelegate(EditMarkedRegionsItemDelegate())
 		self.uiMarkedRegions.clicked.connect(self.selectMarkedRegion)
 		
 	def onShow(self):
@@ -476,4 +479,65 @@ class PlayAndSave(QtWidgets.QDialog):
 				self.markedRegions[index]['highlight'] = 0
 		
 		self.uiMarkedRegionVisualization.update()
+
+class EditMarkedRegionsItemDelegate(QtWidgets.QStyledItemDelegate):
+	class EditorAndDeleterFactory(QtWidgets.QItemEditorFactory):
+		def createEditor(self, userType: int, parent: QtWidgets.QWidget):
+			editor = QtWidgets.QWidget(parent)
+			
+			lineEdit = LineEdit(editor)
+			editor.lineEdit = lineEdit #Because lineEdit.setObjectName('lineEdit') and editor.findChild(QtCore.QObject, 'lineEdit') don't work together to return anything other than None.
+			lineEdit.setCustomStyleSheet('''
+				/*Hide touch-margin styles.*/
+				LineEdit {
+					border-width: 0;
+					margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0;
+				}
+			''')
+			
+			delete = Button(editor)
+			editor.delete = delete
+			delete.setText('×')
+			delete.sizeHint = lambda: QtCore.QSize(delete.parent().height(), delete.parent().height())
+			delete.setCustomStyleSheet('''
+				Button { 
+					color: darkred;
+					border-width: 0;
+					margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0;
+				}
+			''')
+			
+			layout = QtWidgets.QHBoxLayout(editor)
+			layout.addWidget(lineEdit)
+			layout.addWidget(delete)
+			layout.setStretch(1,0)
+			layout.setSpacing(0)
+			layout.setContentsMargins(0,0,0,0)
+			
+			return editor
+	
+	
+	def __init__(self):
+		super().__init__()
+			
+		self.setItemEditorFactory(
+			EditMarkedRegionsItemDelegate.EditorAndDeleterFactory() )
+	
+	
+	def setEditorData(self, editor: EditorAndDeleterFactory, index: QtCore.QModelIndex):
+		editor.lineEdit.setText(index.data())
 		
+		def deleteRow(self):
+			editor.parent().parent().setFocus() #Return focus to the list.
+			editor.setParent(None) #If we remove the editor parent, we segfault.
+			index.model().removeRow(index.row())
+		editor.delete.clicked.connect(deleteRow)
+	
+	
+	def setModelData(self, editor: EditorAndDeleterFactory, model: QtCore.QModelIndex, index: QtCore.QModelIndex):
+		model.setData(index, editor.lineEdit.text(), QtCore.Qt.EditRole)
+	
+	def updateEditorGeometry(self, editor: QtWidgets.QWidget, option: QtWidgets.QStyleOptionViewItem, index: QtCore.QModelIndex):
+		itemRect = option.rect
+		itemRect.moveTop(itemRect.height() * index.row()) #all rows same size 😅
+		editor.setGeometry(itemRect)

@@ -127,3 +127,7 @@ class TouchMarginPlugin(MarginWidth):
 	def customStyleSheet(self, styleSheet):
 		self._customStyleSheet = styleSheet
 		self.refreshStyle()
+	
+	#Make this look like the rest of QT, with .attr() and .setAttr().
+	def setCustomStyleSheet(self, styleSheet):
+		self.customStyleSheet = styleSheet

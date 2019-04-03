@@ -2,6 +2,7 @@
 
 from PyQt5.QtWidgets import QLabel
 from PyQt5.QtCore import Qt, QPoint, QSize, QRect
+from sip import isdeleted
 
 from debugger import *; dbg
 
@@ -41,8 +42,10 @@ class FocusRing(QLabel):
 	def focusOn(self, widget):
 		"""Move focus to a widget."""
 		
+		assert not isdeleted(widget), f"{widget} was deleted and can't be focussed on."
 		
 		self._focussedOn = widget
+		
 		
 		#Allow combobox dropdown menus to not be ringed, since they have the highlight which fulfills the purpose.
 		if getattr(widget, 'hideFocusRingFocus', False):
