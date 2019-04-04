@@ -3,7 +3,7 @@ from random import sample
 
 from PyQt5 import uic, QtWidgets, QtCore
 from PyQt5.QtCore import pyqtSlot, pyqtSignal, QByteArray
-from PyQt5.QtGui import QImage, QTransform, QPainter, QColor, QPainterPath, QBrush, QStandardItemModel, QStandardItem
+from PyQt5.QtGui import QImage, QTransform, QPainter, QColor, QPainterPath, QBrush, QStandardItemModel, QStandardItem, QIcon, QIconEngine
 
 from debugger import *; dbg
 
@@ -12,6 +12,16 @@ from api import silenceCallbacks
 from animate import MenuToggle, delay
 from widgets.line_edit import LineEdit
 from widgets.button import Button
+
+
+
+def hsva(h,s,v,a=255):
+	"""Convenience function normalising QColor.fromHsv weirdness.
+		
+		QT interperets hsv saturation and value inverse of the rest of the world.
+		Flip these values, and wrap hue because we use non-zero-indexed arcs."""
+	return QColor.fromHsv(h % 360, s, v, a)
+
 
 
 class PlayAndSave(QtWidgets.QDialog):
@@ -120,7 +130,10 @@ class PlayAndSave(QtWidgets.QDialog):
 		self.uiEditMarkedRegions.formatString = self.uiEditMarkedRegions.text()
 		self.uiMarkedRegionVisualization.setAttribute(QtCore.Qt.WA_TransparentForMouseEvents, True)
 		self.uiMarkedRegionVisualization.paintEvent = self.paintMarkedRegions
-		self.uiMarkedRegions.setModel(QStandardItemModel(parent=self.uiMarkedRegions))
+		self.regionsListModel = QStandardItemModel(parent=self.uiMarkedRegions)
+		self.uiMarkedRegions.setModel(self.regionsListModel)
+		self.regionsListModel.rowsRemoved.connect(self.regionListElementDeleted)
+		self.regionsListModel.dataChanged.connect(self.regionListElementChanged)
 		self.updateMarkedRegions()
 		
 		self.markedRegionMenu = MenuToggle(
@@ -135,6 +148,7 @@ class PlayAndSave(QtWidgets.QDialog):
 		self.uiMarkedRegionsPanelHeaderX.setAttribute(QtCore.Qt.WA_TransparentForMouseEvents)
 		self.uiMarkedRegionPanelClose.clicked.connect(self.markedRegionMenu.forceHide)
 		self.uiMarkedRegions.setItemDelegate(EditMarkedRegionsItemDelegate())
+		self.lastSelectedRegion = None
 		self.uiMarkedRegions.clicked.connect(self.selectMarkedRegion)
 		
 	def onShow(self):
@@ -354,7 +368,10 @@ class PlayAndSave(QtWidgets.QDialog):
 		model = self.uiMarkedRegions.model()
 		model.clear()
 		for region in self.markedRegions:
-			model.appendRow(QStandardItem(region["region name"]))
+			model.appendRow(QStandardItem(
+				QIcon(RegionIconEngine(region)), 
+				region["region name"],
+			))
 		
 		#Update the marked region visualisation, under the frame slider.
 		#We'll assign each marked region a track. Regions can't overlap on the
@@ -398,13 +415,6 @@ class PlayAndSave(QtWidgets.QDialog):
 		def f2px(frameNumber):
 			"""Convert frame number to pixel coordinates."""
 			return round(frameNumber / self.totalRecordedFrames * (self.uiMarkedRegionVisualization.width()-1))
-		
-		def hsva(h,s,v,a=255):
-			"""Convenience function normalising QColor.fromHsv weirdness.
-				
-				QT interperets hsv saturation and value inverse of the rest of the world.
-				Flip these values, and wrap hue because we use non-zero-indexed arcs."""
-			return QColor.fromHsv(h % 360, s, v, a)
 		
 		p = QPainter(self.uiMarkedRegionVisualization)
 		
@@ -457,6 +467,11 @@ class PlayAndSave(QtWidgets.QDialog):
 	
 	
 	def selectMarkedRegion(self, pos: QtCore.QModelIndex):
+		if self.lastSelectedRegion == pos.row():
+			return
+		else:
+			self.lastSelectedRegion = pos.row()
+		
 		def assign(self, index, status):
 			"""Hack to work around not being able to assign in a lambda."""
 			self.markedRegions[index]['highlight'] = status
@@ -478,7 +493,18 @@ class PlayAndSave(QtWidgets.QDialog):
 			else:
 				self.markedRegions[index]['highlight'] = 0
 		
-		self.uiMarkedRegionVisualization.update()
+		
+	def regionListElementDeleted(self, parent, first, last):
+		"""Sync the python-side region list with the qt-side region list."""
+		self.markedRegions = self.markedRegions[:first] + self.markedRegions[last+1:]
+		self.updateMarkedRegions() #Cached indexes have changed.
+		
+	def regionListElementChanged(self, topLeft, bottomRight, _roles):
+		"""Sync the python-side region list with the qt-side region list."""
+		assert topLeft.column() == 0 and bottomRight.column() == 0, "Only list data supported."
+		assert topLeft.row() == bottomRight.row(), "Multi-row editing not supported."
+		index = topLeft.row()
+		self.markedRegions[index]['region name'] = self.regionsListModel.item(index).text()
 
 class EditMarkedRegionsItemDelegate(QtWidgets.QStyledItemDelegate):
 	class EditorAndDeleterFactory(QtWidgets.QItemEditorFactory):
@@ -491,7 +517,7 @@ class EditMarkedRegionsItemDelegate(QtWidgets.QStyledItemDelegate):
 				/*Hide touch-margin styles.*/
 				LineEdit {
 					border-width: 0;
-					margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0;
+					margin-left: 15px; margin-right: 0; margin-top: 0; margin-bottom: 0;
 				}
 			''')
 			
@@ -538,6 +564,39 @@ class EditMarkedRegionsItemDelegate(QtWidgets.QStyledItemDelegate):
 		model.setData(index, editor.lineEdit.text(), QtCore.Qt.EditRole)
 	
 	def updateEditorGeometry(self, editor: QtWidgets.QWidget, option: QtWidgets.QStyleOptionViewItem, index: QtCore.QModelIndex):
-		itemRect = option.rect
-		itemRect.moveTop(itemRect.height() * index.row()) #all rows same size 😅
-		editor.setGeometry(itemRect)
+		"""Set the editor to be the full size of the row.
+			
+			By default, the editor takes up the content size of the row. But the
+			editor needs to have it's own padding, since otherwise you're just
+			clicking on the row behind the editor."""
+		
+		editor.setGeometry(option.rect)
+
+
+class RegionIconEngine(QIconEngine):
+	size = QtCore.QSize(10,45)
+	
+	def __init__(self, region):
+		super().__init__()
+		self.region = region
+	
+	def actualSize(self, size: QtCore.QSize, _mode, _state) -> QtCore.QSize:
+		#This is the size of the rect passed to self.paint().
+		return self.size
+	
+	def availableSizes(self, _mode, _state) -> list:
+		#Should be called to query available icon sizes; isn't.
+		return [self.size]
+	
+	def key(self):
+		#Identify this icon engine.
+		return str(self.region['hue'])
+	
+	def paint(self, p: QPainter, rect: QtCore.QRect, _mode, _state):
+		"""Draw an icon the colour of the rect.
+			
+			Used by the edit marked regions panel."""
+		
+		p.setPen(hsva(self.region['hue'], 230, 190))
+		p.setBrush(QBrush(hsva(self.region['hue'], 153, 230)))
+		p.drawRect(rect)

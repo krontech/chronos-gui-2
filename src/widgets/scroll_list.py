@@ -50,7 +50,7 @@ class ScrollList(QListView, FocusablePlugin):
 		
 	def refreshStyle(self):
 		self.setStyleSheet(f"""
-			QAbstractItemView {{ /*This is the drop-down menu.*/
+			QAbstractItemView {{
 				border: 1px solid black;
 				color: black;
 				selection-background-color: grey;
@@ -63,6 +63,7 @@ class ScrollList(QListView, FocusablePlugin):
 			QAbstractItemView::item::selected {{
 				background: #888;
 			}}
+			
 			QScrollBar {{
 				background: white;
 				width: 8px;

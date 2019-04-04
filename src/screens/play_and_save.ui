@@ -458,7 +458,7 @@ Save Start</string>
      </rect>
     </property>
     <property name="editTriggers">
-     <set>QAbstractItemView::EditKeyPressed|QAbstractItemView::SelectedClicked</set>
+     <set>QAbstractItemView::AnyKeyPressed|QAbstractItemView::DoubleClicked|QAbstractItemView::EditKeyPressed|QAbstractItemView::SelectedClicked</set>
     </property>
     <property name="tabKeyNavigation">
      <bool>true</bool>
@@ -468,6 +468,19 @@ Save Start</string>
     </property>
     <property name="batchSize">
      <number>10</number>
+    </property>
+    <property name="customStyleSheet" stdset="0">
+     <string>
+       QListView::icon {
+        top: -1px; /*This perfectly vertically centers the RegionIconEngine's 45px-tall icon.*/
+        left: -6px; /*negative padding-left below, less 1.*/
+       }
+       
+       QAbstractItemView::item {
+        /*Move the text a little closer to the icon.*/
+        padding-left: 5px;
+       }
+     </string>
     </property>
    </widget>
    <widget class="Backdrop" name="backdrop">
