@@ -20,7 +20,7 @@ from os import environ
 from PyQt5.QtCore import pyqtSlot, QObject
 from PyQt5.QtDBus import QDBusConnection, QDBusInterface, QDBusReply
 from typing import Callable, Any
-
+from collections import defaultdict
 
 USE_MOCK = environ.get('USE_CHRONOS_API_MOCK') in ('always', 'gui')
 if USE_MOCK:
@@ -184,6 +184,34 @@ class APIValues(QObject):
 				self.__newKeyValue,
 			)
 			self._callbacks[key] = []
+		
+		
+		
+		QDBusConnection.systemBus().connect(
+			f"com.krontech.chronos.{'control_mock' if USE_MOCK else 'control'}", 
+			f"/com/krontech/chronos/{'control_mock' if USE_MOCK else 'control'}",
+			f"",
+			'xvideoState', 
+			self.__pvs,
+		)
+		QDBusConnection.systemBus().connect(
+			f"com.krontech.chronos.{'control_mock' if USE_MOCK else 'control'}", 
+			f"/com/krontech/chronos/{'control_mock' if USE_MOCK else 'control'}",
+			f"",
+			'xregionSaving', 
+			self.__prs,
+		)
+		
+	@pyqtSlot('QDBusMessage')
+	def __pvs(self, msg):
+		"""Update _camState and invoke any  registered observers."""
+		print('got videoState', msg.member(), *msg.arguments())
+	
+	@pyqtSlot('QDBusMessage')
+	def __prs(self, msg):
+		"""Update _camState and invoke any  registered observers."""
+		print('got regionSaving', msg.member(), *msg.arguments())
+		
 	
 	def observe(self, key, callback):
 		"""Add a function to get called when a value is updated."""
@@ -202,6 +230,41 @@ class APIValues(QObject):
 	
 	def get(self, key):
 		return _camState[key]
+	
+	
+	#This doesn't really belong here but QTDbus is hella-finnicky and I can't be
+	#bothered to figure out how to make it work elsewhere. See the __init__
+	#function for details.
+	signalHandlers = defaultdict(list)
+	
+	def connectSignal(self, signal: str, handler: Callable[[Any], None]) -> None:
+		"""Wrapper class for subscribing to API signals, in the chronos API.
+			
+			Use observe() for api value update. Use connectSignal for
+			other signals. Observe is cached, and will not pass through
+			arbitrary signals.
+			
+			Basically, what this does is proxy each signal handler through
+			the current object, which for god knows what reason (fixed in
+			5.11) is the only QObject that doesn't deadlock because it's
+			registered with the hack in __init__."""
+		
+		if not self.signalHandlers[signal]:
+			QDBusConnection.systemBus().connect(
+				f"com.krontech.chronos.{'control_mock' if USE_MOCK else 'control'}", 
+				f"/com/krontech/chronos/{'control_mock' if USE_MOCK else 'control'}",
+				f"",
+				signal, 
+				self.__connectSignalHandler,
+			)
+		
+		self.signalHandlers[signal].append(handler)
+	
+	@pyqtSlot('QDBusMessage')
+	def __connectSignalHandler(self, msg):
+		"""Update _camState and invoke any  registered observers."""
+		for handler in self.signalHandlers[msg.member()]:
+			handler(*msg.arguments())
 
 apiValues = APIValues()
 
@@ -313,6 +376,9 @@ def silenceCallbacks(*elements):
 		return silencedCallback
 	return silenceCallbacksOf
 
+
+def connectSignal(*args):
+	apiValues.connectSignal(*args)
 
 
 #Test this component if launched on it's own.

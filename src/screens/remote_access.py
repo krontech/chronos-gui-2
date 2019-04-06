@@ -21,7 +21,7 @@ def randomCharacters(count: int):
 	#	k=count ))
 	
 	#OK, try this:
-	letters = list('0123456789abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ!@#$%&')
+	letters = list('123456789abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ!@#$%&')
 	shuffle(letters)
 	return ''.join(letters[:count])
 	

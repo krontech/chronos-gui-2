@@ -23,6 +23,11 @@ def hsva(h,s,v,a=255):
 	return QColor.fromHsv(h % 360, s, v, a)
 
 
+def randomCharacters(count: int):
+	"""Return a random string without lookalike characters, 1/l, 0/O, etc."""
+	return ''.join(sample('0123456789abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ', count))
+
+
 
 class PlayAndSave(QtWidgets.QDialog):
 	saveRegionMarkerHeight = 12
@@ -41,19 +46,19 @@ class PlayAndSave(QtWidgets.QDialog):
 		#Use get and set marked regions, they redraw.
 		self.markedRegions = [] #{mark start, mark end, segment ids, region name}
 		self.markedRegions = [
-			{'hue': 240, 'mark end': 19900, 'mark start': 13002, 'saved': 0.0, 'highlight': 0, 'segment ids': ['KxIjG09V'], 'region name': 'Clip 1'},
-			{'hue': 300, 'mark end': 41797, 'mark start': 40597, 'saved': 0.0, 'highlight': 0, 'segment ids': ['KxIjG09V'], 'region name': 'Clip 2'},
-			{'hue': 420, 'mark end': 43897, 'mark start': 41797, 'saved': 0.0, 'highlight': 0, 'segment ids': ['KxIjG09V'], 'region name': 'Clip 3'},
-			{'hue': 180, 'mark end': 53599, 'mark start': 52699, 'saved': 0.0, 'highlight': 0, 'segment ids': ['KxIjG09V'], 'region name': 'Clip 4'},
-			{'hue': 360, 'mark end': 52699, 'mark start': 51799, 'saved': 0.0, 'highlight': 0, 'segment ids': ['KxIjG09V'], 'region name': 'Clip 5'},
-			{'hue': 210, 'mark end': 80000, 'mark start': 35290, 'saved': 0.0, 'highlight': 0, 'segment ids': ['KxIjG09V'], 'region name': 'Clip 6'},
-			{'hue': 390, 'mark end': 42587, 'mark start': 16716, 'saved': 0.0, 'highlight': 0, 'segment ids': ['KxIjG09V'], 'region name': 'Clip 7'},
-			{'hue': 270, 'mark end': 25075, 'mark start': 17016, 'saved': 0.0, 'highlight': 0, 'segment ids': ['KxIjG09V'], 'region name': 'Clip 8'},
-			{'hue': 330, 'mark end': 36617, 'mark start': 28259, 'saved': 0.0, 'highlight': 0, 'segment ids': ['KxIjG09V'], 'region name': 'Clip 9'},
-			{'hue': 240, 'mark end': 39005, 'mark start': 32637, 'saved': 0.0, 'highlight': 0, 'segment ids': ['KxIjG09V'], 'region name': 'Clip 10'},
-			{'hue': 300, 'mark end': 39668, 'mark start': 36219, 'saved': 0.0, 'highlight': 0, 'segment ids': ['KxIjG09V'], 'region name': 'Clip 11'},
-			{'hue': 420, 'mark end': 39068, 'mark start': 37868, 'saved': 0.0, 'highlight': 0, 'segment ids': ['KxIjG09V'], 'region name': 'Clip 12'},
-			{'hue': 180, 'mark end': 13930, 'mark start': 0,     'saved': 0.0, 'highlight': 0, 'segment ids': ['ldPxTT5R', 'KxIjG09V'], 'region name': 'Clip 13'},
+			{'region id': 'aaaaaaaa', 'hue': 240, 'mark end': 19900, 'mark start': 13002, 'saved': 0.0, 'highlight': 0, 'segment ids': ['KxIjG09V'], 'region name': 'Clip 1'},
+			{'region id': 'aaaaaaab', 'hue': 300, 'mark end': 41797, 'mark start': 40597, 'saved': 0.0, 'highlight': 0, 'segment ids': ['KxIjG09V'], 'region name': 'Clip 2'},
+			{'region id': 'aaaaaaac', 'hue': 420, 'mark end': 43897, 'mark start': 41797, 'saved': 0.0, 'highlight': 0, 'segment ids': ['KxIjG09V'], 'region name': 'Clip 3'},
+			{'region id': 'aaaaaaad', 'hue': 180, 'mark end': 53599, 'mark start': 52699, 'saved': 0.0, 'highlight': 0, 'segment ids': ['KxIjG09V'], 'region name': 'Clip 4'},
+			{'region id': 'aaaaaaae', 'hue': 360, 'mark end': 52699, 'mark start': 51799, 'saved': 0.0, 'highlight': 0, 'segment ids': ['KxIjG09V'], 'region name': 'Clip 5'},
+			{'region id': 'aaaaaaaf', 'hue': 210, 'mark end': 80000, 'mark start': 35290, 'saved': 0.0, 'highlight': 0, 'segment ids': ['KxIjG09V'], 'region name': 'Clip 6'},
+			{'region id': 'aaaaaaag', 'hue': 390, 'mark end': 42587, 'mark start': 16716, 'saved': 0.0, 'highlight': 0, 'segment ids': ['KxIjG09V'], 'region name': 'Clip 7'},
+			{'region id': 'aaaaaaah', 'hue': 270, 'mark end': 25075, 'mark start': 17016, 'saved': 0.0, 'highlight': 0, 'segment ids': ['KxIjG09V'], 'region name': 'Clip 8'},
+			{'region id': 'aaaaaaai', 'hue': 330, 'mark end': 36617, 'mark start': 28259, 'saved': 0.0, 'highlight': 0, 'segment ids': ['KxIjG09V'], 'region name': 'Clip 9'},
+			{'region id': 'aaaaaaaj', 'hue': 240, 'mark end': 39005, 'mark start': 32637, 'saved': 0.0, 'highlight': 0, 'segment ids': ['KxIjG09V'], 'region name': 'Clip 10'},
+			{'region id': 'aaaaaaak', 'hue': 300, 'mark end': 39668, 'mark start': 36219, 'saved': 0.0, 'highlight': 0, 'segment ids': ['KxIjG09V'], 'region name': 'Clip 11'},
+			{'region id': 'aaaaaaal', 'hue': 420, 'mark end': 39068, 'mark start': 37868, 'saved': 0.0, 'highlight': 0, 'segment ids': ['KxIjG09V'], 'region name': 'Clip 12'},
+			{'region id': 'aaaaaaam', 'hue': 180, 'mark end': 13930, 'mark start': 0,     'saved': 0.0, 'highlight': 0, 'segment ids': ['ldPxTT5R', 'KxIjG09V'], 'region name': 'Clip 13'},
 		]
 		self.markedStart = None #Note: Mark start/end are reversed if start is after end.
 		self.markedEnd = None
@@ -94,6 +99,7 @@ class PlayAndSave(QtWidgets.QDialog):
 		self.uiMarkEnd.clicked.connect(self.markEnd)
 		
 		self.uiSave.clicked.connect(lambda: api.control('saveRegions', [{
+			"id": region['region id'],
 			"start": region['mark start'],
 			"end": region['mark end'],
 			"path": '/dev/sda', #TODO: Retrieve this from saved file settings screen, via local settings.
@@ -142,7 +148,7 @@ class PlayAndSave(QtWidgets.QDialog):
 			xRange = (-self.uiMarkedRegionsPanel.width(), -1),
 			duration = 30,
 		)
-		delay(self, 1, self.markedRegionMenu.toggle) #mmm, just like a crappy javascript app - work around a mysterious black bar appearing on the right-hand side of the window.
+		#delay(self, 1, self.markedRegionMenu.toggle) #mmm, just like a crappy javascript app - work around a mysterious black bar appearing on the right-hand side of the window.
 		
 		self.uiMarkedRegionsPanelHeader.setAttribute(QtCore.Qt.WA_TransparentForMouseEvents)
 		self.uiMarkedRegionsPanelHeaderX.setAttribute(QtCore.Qt.WA_TransparentForMouseEvents)
@@ -150,6 +156,8 @@ class PlayAndSave(QtWidgets.QDialog):
 		self.uiMarkedRegions.setItemDelegate(EditMarkedRegionsItemDelegate())
 		self.lastSelectedRegion = None
 		self.uiMarkedRegions.clicked.connect(self.selectMarkedRegion)
+		
+		api.connectSignal('regionSaving', self.onRegionSaving)
 		
 	def onShow(self):
 		#Don't update the labels while hidden. But do show with accurate info when we start.
@@ -328,6 +336,7 @@ class PlayAndSave(QtWidgets.QDialog):
 			self.markedEnd, self.markedStart = self.markedStart, self.markedEnd
 		
 		self.markedRegions += [{
+			"region id": randomCharacters(8),
 			"mark start": self.markedStart,
 			"mark end": self.markedEnd,
 			"segment ids": [
@@ -431,17 +440,28 @@ class PlayAndSave(QtWidgets.QDialog):
 		trackOffset = -1
 		for track in reversed(self._tracks):
 			for region in track:
-				p.setPen(hsva(
-					region['hue'],
-					{-1:150, 0:230, 1:255}[region['highlight']],
-					{-1:160, 0:190, 1:100}[region['highlight']],
-				))
-				p.setBrush(QBrush(hsva(
-					region['hue'], 
-					{-1:0, 0:153, 1:255}[region['highlight']], 
-					{-1:0, 0:230, 1:255}[region['highlight']],
-				)))
-				#
+				if region['saved'] < 1.0:
+					p.setPen(hsva(
+						region['hue'],
+						{-1:150, 0:230, 1:255}[region['highlight']],
+						{-1:160, 0:190, 1:100}[region['highlight']],
+					))
+					p.setBrush(QBrush(hsva(
+						region['hue'], 
+						{-1:0, 0:153, 1:255}[region['highlight']], 
+						{-1:0, 0:230, 1:255}[region['highlight']],
+					)))
+				else: #TODO: Draw progress. (This will involve drawing both colours of rect and clipping.)
+					p.setPen(hsva(
+						120, #green
+						{-1:150, 0:230, 1:255}[region['highlight']],
+						{-1:160, 0:190, 1:100}[region['highlight']],
+					))
+					p.setBrush(QBrush(hsva(
+						120, 
+						{-1:0, 0:153, 1:255}[region['highlight']], 
+						{-1:0, 0:230, 1:255}[region['highlight']],
+					)))
 				
 				p.drawRect(
 					f2px(region['mark start']),
@@ -505,7 +525,13 @@ class PlayAndSave(QtWidgets.QDialog):
 		assert topLeft.row() == bottomRight.row(), "Multi-row editing not supported."
 		index = topLeft.row()
 		self.markedRegions[index]['region name'] = self.regionsListModel.item(index).text()
-
+	
+	
+	@pyqtSlot(str, float, name="onRegionSaving")
+	def onRegionSaving(self, regionId, ratioSaved):
+		[r for r in self.markedRegions if r['region id'] == regionId][0]['saved'] = ratioSaved
+		
+	
 class EditMarkedRegionsItemDelegate(QtWidgets.QStyledItemDelegate):
 	class EditorAndDeleterFactory(QtWidgets.QItemEditorFactory):
 		def createEditor(self, userType: int, parent: QtWidgets.QWidget):

@@ -30,12 +30,14 @@ import sys
 import random
 from typing import *
 from time import sleep
+from pathlib import Path
 
 from PyQt5.QtCore import pyqtSlot, QObject, QTimer, Qt, QByteArray
 from PyQt5.QtDBus import QDBusConnection, QDBusMessage, QDBusError
 
 
 from debugger import *; dbg
+from animate import delay
 
 # Set up d-bus interface. Connect to mock system buses. Check everything's working.
 if not QDBusConnection.systemBus().isConnected():
@@ -810,7 +812,13 @@ class ControlAPIMock(QObject):
 		self._timer4.timeout.connect(test4)
 		self._timer4.setSingleShot(True)
 		self._timer4.start(1000) #ms
-
+	
+	def emitSignal(self, signalName: str, *args) -> None:
+		"""Emit an arbitrary signal. (Use emitControlSignal for API values.)"""
+		signal = QDBusMessage.createSignal('/com/krontech/chronos/control_mock', 'com.krontech.chronos.control_mock', signalName)
+		for arg in args:
+			signal << arg
+		QDBusConnection.systemBus().send(signal)
 	
 	def emitControlSignal(self, name: str, value=None) -> None:
 		"""Emit an update signal, usually for indicating a value has changed."""
@@ -842,7 +850,7 @@ class ControlAPIMock(QObject):
 	
 	@action('set')
 	@pyqtSlot('QVariantMap', result='QVariantMap')
-	def set(self, data: Reply) -> Reply:
+	def set(self, data: dict) -> Reply:
 		# Check all errors first to avoid partially applying an update.
 		for key, value in data.items():
 			if key[0] is '_' or not hasattr(state, key):  # Don't allow setting of private variables.
@@ -999,8 +1007,8 @@ class ControlAPIMock(QObject):
 	
 	
 	@action('set')
-	@pyqtSlot('QVariantList', result='QVariantMap')
-	def saveRegions(self, regions: List[Dict[str, Union[int, str, Dict[str, int]]]]) -> List[Dict[str, Union[bool, str]]]:
+	@pyqtSlot('QVariantList')
+	def saveRegions(self, regions: List[Dict[str, Union[int, str, Dict[str, int]]]]) -> None:
 		"""Save video clips to disk or network.
 			
 			Accepts a list of regions, returns a list of statuses.
@@ -1021,24 +1029,93 @@ class ControlAPIMock(QObject):
 						"h264Level": str if encoding = 'h264',
 					},
 				}]
+			
+			Emitted Signals:
+				"regionSaving", region id: str, progress: float
+					Saving progress for each region. Will always emit
+					with at least 0.0 at the start and 1.0 at the end.
+				"regionSavingError", region id: str, error: str
+					Emitted when a region can't be saved. 😞
+				"regionSavingError", error: str
+					Emitted when the regions can't be saved.
+				"regionSavingCancelled"
+					Emitted when the save is cancelled.
+				"allRegionsSaved"
+					Emitted when all regions have been saved or
+					have errored out. Not emitted if cancelled.
+			
+			Behaviour Notes:
+				Camera state will be set to 'saving' and restored upon
+				completion. To cancel the save, set the camera state
+				to anything other than 'saving'.
+				The API remains responsive during the save duration.
+			
+			Design Notes:
+				This function has no return value because the API
+				cannot defer returning from a function while still
+				processing other function calls, such as 'cancel
+				saving'. To get around this, this function returns
+				events as emitted signals.
 		"""
 		
-		print('saving:')
-		pp(regions)
+		def setPlaybackFrame(frame):
+			"""Dumb hack to assign inside a lambda. No := yet."""
+			state.playbackFrame = frame
 		
-		#For each region:
-		# .replace(r'%START FRAME%', '{:07d}'.format(region['mark start']))
-		# .replace(r'%END FRAME%', '{:07d}'.format(region['mark end']))
+		if state.videoState == 'saving':
+			#What should we do if video is already saving? Emit an error?
+			#Add the new files to the list of files to be saved?
+			self.emitSignal("regionSavingError", "already saving regions")
+			return
 		
-		return Reply([{ #Each entry in this list a segment of recorded video. Although currently resolution/framerate is always the same having it in this data will make it easier to fix this in the future if we do.
-			"id": "ldPxTT5R",
-			"success": True,
-			"error": "",
-		},{
-			"id": "KxIjG09V",
-			"success": False,
-			"error": "Network error.",
-		}])
+		print(f'saving {len(regions)} region(s)')
+		
+		self.previousVideoState = state.videoState
+		state.videoState = 'saving'
+		self.emitControlSignal('videoState')
+		
+		time = 0
+		savedRegions = 0
+		for region in regions:
+			if region['start'] >= region['end']:
+				self.emitSignal('regionSavingError', region['id'],
+					f"Region to save must start before it ends. (start={region['start']} >= end={region['end']})" )
+				continue
+			
+			name = ( #Sub in data.
+				region['filename']
+				.replace(r'%START FRAME%', '{:07d}'.format(region['start']))
+				.replace(r'%END FRAME%', '{:07d}'.format(region['end']))
+			)
+			filename = Path(region['path']) / name
+			
+			delay(self, time, lambda filename=filename: 
+				print('saving', filename)
+			)
+			
+			regionLength = region['end'] - region['start']
+			framerate = 30 #virtual
+			saveRate = 2000//framerate #fps value
+			for frame in range(0, regionLength, saveRate):
+				delay(self, time, lambda region=region, frame=frame, regionLength=regionLength: (
+					self.emitSignal("regionSaving", region['id'], frame/regionLength),
+					setPlaybackFrame(region['start'] + frame),
+					self.emitControlSignal('playbackFrame'),
+				))
+				time += 1000//framerate #emit update once per 16-ms frame
+			delay(self, time, lambda region=region: 
+				self.emitSignal("regionSaving", region['id'], 1.0)
+			)
+			
+			savedRegions += 1
+		
+		delay(self, time, lambda: 
+			self.emitSignal("allRegionsSaved")
+		)
+		
+		state.videoState = self.previousVideoState
+		self.emitControlSignal('videoState')
+		
 	
 	@action('set')
 	@pyqtSlot(str)
