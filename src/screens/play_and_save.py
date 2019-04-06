@@ -106,7 +106,7 @@ class PlayAndSave(QtWidgets.QDialog):
 			"format": {'fps': 30, 'encoding': 'h264'},
 			"filename": r'普通棕色蝙蝠_%DATE%_劃分_%REGION NAME%-%START FRAME%-%END FRAME%.mp4'
 				.replace(r'%REGION NAME%', region['region name']),
-		} for region in self.markedRegions]))
+		} for region in self.markedRegions if not region['saved']]))
 		
 		self.uiSavedFileSettings.clicked.connect(lambda: window.show('file_settings'))
 		self.uiDone.clicked.connect(window.back)
