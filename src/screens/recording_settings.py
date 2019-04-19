@@ -316,8 +316,8 @@ class RecordingSettings(QtWidgets.QDialog):
 	_sensorHeight = api.get('sensorVMax')
 	
 	def updatePassepartout(self):
-		previewTop = 0
-		previewLeft = 0
+		previewTop = 1
+		previewLeft = 1
 		previewWidth = self.uiPreviewPanel.geometry().right() - self.uiPreviewPanel.geometry().left()
 		previewHeight = self.uiPreviewPanel.geometry().bottom() - self.uiPreviewPanel.geometry().top()
 		
@@ -332,30 +332,30 @@ class RecordingSettings(QtWidgets.QDialog):
 		passepartoutHeight = round((recordingBottom - recordingTop) / self._sensorHeight * previewHeight)
 		
 		self.uiPassepartoutTop.setGeometry(
-			previewLeft+1,
-			previewTop+1,
-			previewWidth-1,
-			passepartoutTop-2 )
+			previewLeft,
+			previewTop,
+			previewWidth - 1,
+			passepartoutTop )
 		self.uiPassepartoutLeft.setGeometry(
-			previewLeft+1,
-			passepartoutTop-1,
-			passepartoutLeft-2,
-			passepartoutHeight+2 )
+			previewLeft,
+			passepartoutTop + 1,
+			passepartoutLeft - 1,
+			passepartoutHeight - 1 )
 		self.uiPassepartoutRight.setGeometry(
 			passepartoutLeft + passepartoutWidth + 1,
-			passepartoutTop-1,
+			passepartoutTop + 1,
 			previewWidth - passepartoutLeft - passepartoutWidth - 1,
-			passepartoutHeight+2 )
+			passepartoutHeight - 1 )
 		self.uiPassepartoutBottom.setGeometry(
-			previewLeft+1,
-			passepartoutTop + passepartoutHeight + 1,
-			previewWidth-1,
-			previewHeight - passepartoutTop - passepartoutHeight - 1 )
+			previewLeft,
+			passepartoutTop + passepartoutHeight,
+			previewWidth - 1,
+			previewHeight - passepartoutTop - passepartoutHeight )
 		self.uiPassepartoutInnerBorder.setGeometry(
-			passepartoutLeft-1,
-			passepartoutTop-1,
-			passepartoutWidth+2,
-			passepartoutHeight+2 )
+			passepartoutLeft,
+			passepartoutTop,
+			passepartoutWidth + 1,
+			passepartoutHeight + 1 )
 	
 	
 	@pyqtSlot(float, name="updateFps")

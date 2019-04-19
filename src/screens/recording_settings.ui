@@ -277,7 +277,7 @@
    <property name="geometry">
     <rect>
      <x>620</x>
-     <y>250</y>
+     <y>240</y>
      <width>181</width>
      <height>81</height>
     </rect>
@@ -290,9 +290,9 @@
    <property name="geometry">
     <rect>
      <x>550</x>
-     <y>250</y>
+     <y>240</y>
      <width>251</width>
-     <height>231</height>
+     <height>241</height>
     </rect>
    </property>
   </widget>
@@ -302,7 +302,7 @@
      <x>550</x>
      <y>0</y>
      <width>251</width>
-     <height>71</height>
+     <height>61</height>
     </rect>
    </property>
   </widget>
@@ -320,7 +320,7 @@
    <property name="geometry">
     <rect>
      <x>550</x>
-     <y>70</y>
+     <y>60</y>
      <width>231</width>
      <height>181</height>
     </rect>
@@ -338,7 +338,7 @@
      </rect>
     </property>
     <property name="styleSheet">
-     <string notr="true">border: none; background: rgba(255,255,255,128)</string>
+     <string notr="true">border: none; background: rgba(255,255,255,150);</string>
     </property>
    </widget>
    <widget class="QWidget" name="uiPassepartoutBottom" native="true">
@@ -351,7 +351,7 @@
      </rect>
     </property>
     <property name="styleSheet">
-     <string notr="true">border: none; background: rgba(255,255,255,128)</string>
+     <string notr="true">border: none; background: rgba(255,255,255,150);</string>
     </property>
    </widget>
    <widget class="QWidget" name="uiPassepartoutLeft" native="true">
@@ -364,7 +364,7 @@
      </rect>
     </property>
     <property name="styleSheet">
-     <string notr="true">border: none; background: rgba(255,255,255,128)</string>
+     <string notr="true">border: none; background: rgba(255,255,255,150);</string>
     </property>
    </widget>
    <widget class="QWidget" name="uiPassepartoutRight" native="true">
@@ -377,7 +377,7 @@
      </rect>
     </property>
     <property name="styleSheet">
-     <string notr="true">border: none; background: rgba(255,255,255,128)</string>
+     <string notr="true">border: none; background: rgba(255,255,255,150);</string>
     </property>
    </widget>
    <widget class="QWidget" name="uiPassepartoutInnerBorder" native="true">
@@ -570,6 +570,27 @@
     <string>Button { color: maroon }</string>
    </property>
   </widget>
+  <widget class="Backdrop" name="uiPreviewVideoModeTooSlowOnThisCameraSoJustCoverItUpAndPretendItNeverExisted">
+   <property name="geometry">
+    <rect>
+     <x>550</x>
+     <y>60</y>
+     <width>231</width>
+     <height>181</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">
+				background: rgba(255,255,255,128);
+				border: 4px solid white;
+				border-image: url(../../assets/images/picture-small.jpg); border-image: url(assets/images/picture-small.jpg);
+			</string>
+   </property>
+   <property name="customStyleSheet" stdset="0">
+    <string>border-image: url(../../assets/images/picture-small.jpg); border-image: url(assets/images/picture-small.jpg);</string>
+   </property>
+  </widget>
+  <zorder>uiPreviewVideoModeTooSlowOnThisCameraSoJustCoverItUpAndPretendItNeverExisted</zorder>
   <zorder>backdrop</zorder>
   <zorder>label_3</zorder>
   <zorder>label_4</zorder>
