@@ -815,14 +815,14 @@ class ControlAPIMock(QObject):
 	
 	def emitSignal(self, signalName: str, *args) -> None:
 		"""Emit an arbitrary signal. (Use emitControlSignal for API values.)"""
-		signal = QDBusMessage.createSignal('/com/krontech/chronos/control_mock', 'com.krontech.chronos.control_mock', signalName)
+		signal = QDBusMessage.createSignal('/com/krontech/chronos/coordinator_mock', 'com.krontech.chronos.coordinator_mock', signalName)
 		for arg in args:
 			signal << arg
 		QDBusConnection.systemBus().send(signal)
 	
 	def emitControlSignal(self, name: str, value=None) -> None:
 		"""Emit an update signal, usually for indicating a value has changed."""
-		signal = QDBusMessage.createSignal('/com/krontech/chronos/control_mock', 'com.krontech.chronos.control_mock', name)
+		signal = QDBusMessage.createSignal('/com/krontech/chronos/coordinator_mock', 'com.krontech.chronos.coordinator_mock', name)
 		signal << getattr(state, name) if value is None else value
 		QDBusConnection.systemBus().send(signal)
 	
@@ -1185,12 +1185,12 @@ class ControlAPIMock(QObject):
 
 
 
-if not QDBusConnection.systemBus().registerService('com.krontech.chronos.control_mock'):
+if not QDBusConnection.systemBus().registerService('com.krontech.chronos.coordinator_mock'):
 	sys.stderr.write(f"Could not register control service: {QDBusConnection.systemBus().lastError().message() or '(no message)'}\n")
 	raise Exception("D-Bus Setup Error")
 
 controlAPI = ControlAPIMock() #This absolutely, positively can't be inlined or it throws error "No such object path ...". Possibly, this is because a live reference must be kept so GC doesn't eat it?
-QDBusConnection.systemBus().registerObject('/com/krontech/chronos/control_mock', controlAPI, QDBusConnection.ExportAllSlots)
+QDBusConnection.systemBus().registerObject('/com/krontech/chronos/coordinator_mock', controlAPI, QDBusConnection.ExportAllSlots)
 
 
 #Launch the API if not imported as a library.
@@ -1203,5 +1203,5 @@ if __name__ == '__main__':
 	#Quit on ctrl-c.
 	signal.signal(signal.SIGINT, signal.SIG_DFL)
 	
-	print("Running control api mock.")
+	print("Running coordinator api mock.")
 	sys.exit(app.exec_())

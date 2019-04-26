@@ -766,7 +766,7 @@ class ControlAPI(QObject):
 	
 	def emitControlSignal(self, name: str, value=None) -> None:
 		"""Emit an update signal, usually for indicating a value has changed."""
-		signal = QDBusMessage.createSignal('/com/krontech/chronos/control', 'com.krontech.chronos.control', name)
+		signal = QDBusMessage.createSignal('/com/krontech/chronos/coordinator', 'com.krontech.chronos.coordinator', name)
 		signal << getattr(state, name) if value is None else value
 		QDBusConnection.systemBus().send(signal)
 	
@@ -1088,12 +1088,12 @@ class ControlAPI(QObject):
 
 
 
-if not QDBusConnection.systemBus().registerService('com.krontech.chronos.control'):
+if not QDBusConnection.systemBus().registerService('com.krontech.chronos.coordinator'):
 	sys.stderr.write(f"Could not register control service: {QDBusConnection.systemBus().lastError().message() or '(no message)'}\n")
 	raise Exception("D-Bus Setup Error")
 
 controlAPI = ControlAPI() #This absolutely, positively can't be inlined or it throws error "No such object path ...". Possibly, this is because a live reference must be kept so GC doesn't eat it?
-QDBusConnection.systemBus().registerObject('/com/krontech/chronos/control', controlAPI, QDBusConnection.ExportAllSlots)
+QDBusConnection.systemBus().registerObject('/com/krontech/chronos/coordinator', controlAPI, QDBusConnection.ExportAllSlots)
 
 
 #Launch the API if not imported as a library.
