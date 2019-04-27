@@ -489,7 +489,7 @@ if __name__ == '__main__':
 			connectHardwareEvents(app, hardware)
 		except Exception as e:
 			#We're probably in the VM, just print a message.
-			print('Could not initialize camera hardware.')
+			print('GUI2: Could not initialize camera hardware for input.')
 	
 	
 	report("start_up_time", {"seconds": time.perf_counter() - perf_start_time})

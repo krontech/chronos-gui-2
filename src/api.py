@@ -38,8 +38,8 @@ if not QDBusConnection.systemBus().isConnected():
 	raise Exception("D-Bus Setup Error")
 
 cameraControlAPI = QDBusInterface(
-	f"com.krontech.chronos.{'control_mock' if USE_MOCK else 'control'}", #Service
-	f"/com/krontech/chronos/{'control_mock' if USE_MOCK else 'control'}", #Path
+	f"com.krontech.chronos.{'coordinator_mock' if USE_MOCK else 'coordinator'}", #Service
+	f"/com/krontech/chronos/{'coordinator_mock' if USE_MOCK else 'coordinator'}", #Path
 	f"", #Interface
 	QDBusConnection.systemBus() )
 cameraVideoAPI = QDBusInterface(
@@ -177,8 +177,8 @@ class APIValues(QObject):
 		
 		for key in _camState.keys():
 			QDBusConnection.systemBus().connect(
-				f"com.krontech.chronos.{'control_mock' if USE_MOCK else 'control'}", 
-				f"/com/krontech/chronos/{'control_mock' if USE_MOCK else 'control'}",
+				f"com.krontech.chronos.{'coordinator_mock' if USE_MOCK else 'coordinator'}", 
+				f"/com/krontech/chronos/{'coordinator_mock' if USE_MOCK else 'coordinator'}",
 				f"",
 				key, 
 				self.__newKeyValue,
@@ -188,15 +188,15 @@ class APIValues(QObject):
 		
 		
 		QDBusConnection.systemBus().connect(
-			f"com.krontech.chronos.{'control_mock' if USE_MOCK else 'control'}", 
-			f"/com/krontech/chronos/{'control_mock' if USE_MOCK else 'control'}",
+			f"com.krontech.chronos.{'coordinator_mock' if USE_MOCK else 'coordinator'}", 
+			f"/com/krontech/chronos/{'coordinator_mock' if USE_MOCK else 'coordinator'}",
 			f"",
 			'xvideoState', 
 			self.__pvs,
 		)
 		QDBusConnection.systemBus().connect(
-			f"com.krontech.chronos.{'control_mock' if USE_MOCK else 'control'}", 
-			f"/com/krontech/chronos/{'control_mock' if USE_MOCK else 'control'}",
+			f"com.krontech.chronos.{'coordinator_mock' if USE_MOCK else 'coordinator'}", 
+			f"/com/krontech/chronos/{'coordinator_mock' if USE_MOCK else 'coordinator'}",
 			f"",
 			'xregionSaving', 
 			self.__prs,
@@ -251,8 +251,8 @@ class APIValues(QObject):
 		
 		if not self.signalHandlers[signal]:
 			QDBusConnection.systemBus().connect(
-				f"com.krontech.chronos.{'control_mock' if USE_MOCK else 'control'}", 
-				f"/com/krontech/chronos/{'control_mock' if USE_MOCK else 'control'}",
+				f"com.krontech.chronos.{'coordinator_mock' if USE_MOCK else 'coordinator'}", 
+				f"/com/krontech/chronos/{'coordinator_mock' if USE_MOCK else 'coordinator'}",
 				f"",
 				signal, 
 				self.__connectSignalHandler,
