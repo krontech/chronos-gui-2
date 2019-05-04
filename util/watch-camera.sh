@@ -11,7 +11,7 @@ trap "{ stty sane; echo; kill 0; }" EXIT #Kill all children when we die. (This c
 bash <<< "#sh doesn't do the equality test for 143, must use bash
 	QSG_RENDER_LOOP=basic
 	QT_QUICK_BACKEND=software
-	QT_QPA_PLATFORM=linuxfb:fb=/dev/fb1 #Tell qt to use use framebuffer vs X. (Video is displayed to fb0.)
+	QT_QPA_PLATFORM=linuxfb:fb=/dev/fb0 #Tell qt to use use framebuffer vs X. (Video is displayed to fb0.)
 	XDG_RUNTIME_DIR=/tmp/runtime-root #quiet a qt warning
 	
 	while true; do
