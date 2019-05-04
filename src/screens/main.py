@@ -10,6 +10,7 @@ from termcolor import cprint
 from debugger import *; dbg
 
 import api
+import api2
 
 import settings
 from widgets.button import Button
