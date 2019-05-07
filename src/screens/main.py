@@ -124,12 +124,14 @@ class Main(QWidget):
 			self.uiWhiteBalance1.clicked.connect(self.closeCalibrationMenu)
 			self.uiWhiteBalance1.clicked.connect(self.closeShotAssistMenu)
 			self.uiWhiteBalance1.clicked.connect(self.closeRecordingAndTriggersMenu)
-			self.uiWhiteBalance1.clicked.connect(lambda: api.control('takeStillReferenceForMotionTriggering'))
+			self.uiWhiteBalance1.clicked.connect(lambda: api2.control('startAutoWhiteBalance', {}))
 			
 			self.uiBlackCal0.clicked.connect(self.closeCalibrationMenu)
-			self.uiBlackCal0.clicked.connect(lambda: api.control('doBlackCalibration'))
+			self.uiBlackCal0.clicked.connect(lambda: 
+				api2.control('startCalibration', {'blackCal': True}) ) #may time out if already in progress - check state is 'idle' before issuing call!
 			self.uiBlackCal1.clicked.connect(self.closeCalibrationMenu)
-			self.uiBlackCal1.clicked.connect(lambda: api.control('doBlackCalibration'))
+			self.uiBlackCal1.clicked.connect(lambda: 
+				api2.control('startCalibration', {'blackCal': True}) )
 			
 			api.observe('triggerConfiguration', self.updateBaWTriggers)
 		else:
@@ -144,20 +146,19 @@ class Main(QWidget):
 				self.uiCalibration2, 
 				self.uiCalibrationMenuWithMotion )
 			
-			
 			#Calibration either opens the uiCalibrationMenu or the uiCalibrationMenuWithMotion [trigger button].
 			self.uiWhiteBalance1.clicked.connect(self.closeCalibrationMenu1)
 			self.uiWhiteBalance1.clicked.connect(self.closeCalibrationMenu2)
-			self.uiWhiteBalance1.clicked.connect(lambda: api.control('setWhiteBalance'))
+			self.uiWhiteBalance1.clicked.connect(lambda: api2.control('startAutoWhiteBalance', {}))
 			self.uiWhiteBalance2.clicked.connect(self.closeCalibrationMenu1)
 			self.uiWhiteBalance2.clicked.connect(self.closeCalibrationMenu2)
-			self.uiWhiteBalance2.clicked.connect(lambda: api.control('setWhiteBalance'))
+			self.uiWhiteBalance2.clicked.connect(lambda: api2.control('startAutoWhiteBalance', {}))
 			self.uiBlackCal1.clicked.connect(self.closeCalibrationMenu1)
 			self.uiBlackCal1.clicked.connect(self.closeCalibrationMenu2)
-			self.uiBlackCal1.clicked.connect(lambda: api.control('doBlackCalibration'))
+			self.uiBlackCal1.clicked.connect(lambda: api2.control('startCalibration', {'blackCal': True}))
 			self.uiBlackCal2.clicked.connect(self.closeCalibrationMenu1)
 			self.uiBlackCal2.clicked.connect(self.closeCalibrationMenu2)
-			self.uiBlackCal2.clicked.connect(lambda: api.control('doBlackCalibration'))
+			self.uiBlackCal2.clicked.connect(lambda: api2.control('startCalibration', {'blackCal': True}))
 			self.uiRecalibrateMotionTrigger.clicked.connect(self.closeCalibrationMenu1)
 			self.uiRecalibrateMotionTrigger.clicked.connect(self.closeCalibrationMenu2)
 			self.uiRecalibrateMotionTrigger.clicked.connect(lambda: api.control('takeStillReferenceForMotionTriggering'))
