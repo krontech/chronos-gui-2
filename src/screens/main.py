@@ -451,6 +451,7 @@ class Main(QWidget):
 		dest.clickMarginRight = src.clickMarginRight
 		dest.setGeometry(src.geometry())
 		dest.customStyleSheet = src.customStyleSheet
+		QWidget.setTabOrder(src, dest)
 	
 	def makeFailingCall(self):
 		print(api.control('makeFailingCall', 1))
