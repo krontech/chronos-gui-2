@@ -61,6 +61,11 @@ class Main(QWidget):
 		
 		self.uiShotAssist.clicked.connect(closeRecordingAndTriggersMenu)
 		
+		self.uiShowWhiteClipping.stateChanged.connect(
+			lambda state: api2.set(
+				{'zebraLevel': state/2} ) )
+		api2.observe('zebraLevel', self.updateWhiteClipping)
+		
 		api2.observe('focusPeakingLevel', self.updateFocusPeakingIntensity)
 		
 		self.uiFocusPeakingIntensity.currentIndexChanged.connect(
@@ -293,6 +298,13 @@ class Main(QWidget):
 		self.closeCalibrationMenu2()
 		
 	
+	@pyqtSlot(float, name="updateWhiteClipping")
+	@api.silenceCallbacks('uiShowWhiteClipping')
+	def updateWhiteClipping(self, focusPeakingIntensity: float):
+		self.uiShowWhiteClipping.setCheckState(
+			0 if not focusPeakingIntensity else 2)
+	
+	
 	@pyqtSlot(str, name="updateFocusPeakingIntensity")
 	@api.silenceCallbacks('uiFocusPeakingIntensity')
 	def updateFocusPeakingIntensity(self, focusPeakingIntensity: str):
@@ -304,6 +316,7 @@ class Main(QWidget):
 			self.uiFocusPeakingIntensity.setCurrentIndex(snapPoint)
 		else:
 			self.uiFocusPeakingIntensity.setCurrentText(f"{focusPeakingIntensity*100:.0f}%")
+	
 	
 	@pyqtSlot(str, name="updateFocusPeakingColor")
 	@api.silenceCallbacks() #Causes pyqtSlot to overwrite earlier function.
