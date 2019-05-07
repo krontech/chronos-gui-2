@@ -15,16 +15,6 @@ import api2
 import settings
 from widgets.button import Button
 
-focusPeakingIntensities = ['off', 'low', 'medium', 'high']
-focusPeakingColors = {
-	"blue": 0x0000FF,
-	"pink": 0xFF00FF,
-	"red": 0xFF0000,
-	"yellow": 0xFFFF00,
-	"green": 0x00FF00,
-	"cyan": 0x00FFFF,
-}
-
 
 class Main(QWidget):
 	def __init__(self, window):
@@ -42,7 +32,7 @@ class Main(QWidget):
 		self.uiDebugA.clicked.connect(self.makeFailingCall)
 		self.uiDebugB.clicked.connect(lambda: window.show('test'))
 		self.uiDebugC.setFocusPolicy(QtCore.Qt.NoFocus) #Break into debugger without loosing focus, so you can debug focus issues.
-		self.uiDebugC.clicked.connect(lambda: self and dbg()) #"self" is needed here, won't be available otherwise.
+		self.uiDebugC.clicked.connect(lambda: self and window and dbg()) #"self" is needed here, won't be available otherwise.
 		self.uiClose.clicked.connect(QApplication.closeAllWindows)
 		
 		#Only show the debug controls if enabled in factory settings.
@@ -71,32 +61,33 @@ class Main(QWidget):
 		
 		self.uiShotAssist.clicked.connect(closeRecordingAndTriggersMenu)
 		
-		if(self.uiFocusPeakingIntensity.count() != len(focusPeakingIntensities)):
-			raise Exception("Main screen: Focus peaking dropdown has different number of options than expected.")
-		
-		api.observe('focusPeakingIntensity', self.updateFocusPeakingIntensity)
+		api2.observe('focusPeakingLevel', self.updateFocusPeakingIntensity)
 		
 		self.uiFocusPeakingIntensity.currentIndexChanged.connect(
-			lambda index: api.set(
-				{'focusPeakingIntensity': focusPeakingIntensities[index]} ) )
+			lambda index: api2.set(
+				{'focusPeakingLevel': index/(self.uiFocusPeakingIntensity.count()-1) } ) )
 		
 		self.uiFocusPeakingIntensity.currentIndexChanged.connect(
 			self.uiShotAssistMenu.setFocus )
 		
-		api.observe('focusPeakingColor', self.updateFocusPeakingColor, saftyCheckForSilencedWidgets=False)
+		api2.observe('focusPeakingColor', self.updateFocusPeakingColor)
 		
-		self.uiBlueFocusPeaking.clicked.connect(lambda: api.set(
-			{'focusPeakingColor': focusPeakingColors['blue']} ) )
-		self.uiPinkFocusPeaking.clicked.connect(lambda: api.set(
-			{'focusPeakingColor': focusPeakingColors['pink']} ) )
-		self.uiRedFocusPeaking.clicked.connect(lambda: api.set(
-			{'focusPeakingColor': focusPeakingColors['red']} ) )
-		self.uiYellowFocusPeaking.clicked.connect(lambda: api.set(
-			{'focusPeakingColor': focusPeakingColors['yellow']} ) )
-		self.uiGreenFocusPeaking.clicked.connect(lambda: api.set(
-			{'focusPeakingColor': focusPeakingColors['green']} ) )
-		self.uiCyanFocusPeaking.clicked.connect(lambda: api.set(
-			{'focusPeakingColor': focusPeakingColors['cyan']} ) )
+		self.uiBlueFocusPeaking.clicked.connect(lambda:
+			api2.set({'focusPeakingColor': 'blue'} ) )
+		self.uiPinkFocusPeaking.clicked.connect(lambda:
+			api2.set({'focusPeakingColor': 'magenta'} ) )
+		self.uiRedFocusPeaking.clicked.connect(lambda:
+			api2.set({'focusPeakingColor': 'red'} ) )
+		self.uiYellowFocusPeaking.clicked.connect(lambda:
+			api2.set({'focusPeakingColor': 'yellow'} ) )
+		self.uiGreenFocusPeaking.clicked.connect(lambda:
+			api2.set({'focusPeakingColor': 'green'} ) )
+		self.uiCyanFocusPeaking.clicked.connect(lambda:
+			api2.set({'focusPeakingColor': 'cyan'} ) )
+		self.uiBlackFocusPeaking.clicked.connect(lambda:
+			api2.set({'focusPeakingColor': 'black'} ) )
+		self.uiWhiteFocusPeaking.clicked.connect(lambda:
+			api2.set({'focusPeakingColor': 'white'} ) )
 		
 		self.uiBlueFocusPeaking.clicked.connect(self.uiShotAssistMenu.setFocus)
 		self.uiPinkFocusPeaking.clicked.connect(self.uiShotAssistMenu.setFocus)
@@ -215,7 +206,6 @@ class Main(QWidget):
 		
 		#Oh god this is gonna mess up scroll wheel selection so badly. 😭
 		self.uiShowWhiteClipping.stateChanged.connect(self.uiShotAssistMenu.setFocus)
-		self.uiShowBlackClipping.stateChanged.connect(self.uiShotAssistMenu.setFocus)
 	
 	def onShow(self):
 		videoState = api.get('videoState')
@@ -306,10 +296,16 @@ class Main(QWidget):
 	@pyqtSlot(str, name="updateFocusPeakingIntensity")
 	@api.silenceCallbacks('uiFocusPeakingIntensity')
 	def updateFocusPeakingIntensity(self, focusPeakingIntensity: str):
-		self.uiFocusPeakingIntensity.setCurrentIndex(
-			focusPeakingIntensities.index(focusPeakingIntensity) )
+		snapPoints = self.uiFocusPeakingIntensity.count() - 1 #zero-indexed
+		threshold = 0.02
+		snapPoint = round(focusPeakingIntensity*snapPoints)
+		diff = abs(snapPoint - (focusPeakingIntensity*snapPoints))/snapPoints
+		if diff < threshold:
+			self.uiFocusPeakingIntensity.setCurrentIndex(snapPoint)
+		else:
+			self.uiFocusPeakingIntensity.setCurrentText(f"{focusPeakingIntensity*100:.0f}%")
 	
-	@pyqtSlot(int, name="updateFocusPeakingColor")
+	@pyqtSlot(str, name="updateFocusPeakingColor")
 	@api.silenceCallbacks() #Causes pyqtSlot to overwrite earlier function.
 	def updateFocusPeakingColor(self, color: int):
 		QPoint = QtCore.QPoint
@@ -320,23 +316,29 @@ class Main(QWidget):
 			box.geometry().height() )
 		
 		
-		if color == focusPeakingColors["blue"]:
+		if color == 'blue':
 			origin = self.uiBlueFocusPeaking.geometry().bottomRight()
 			box.move(origin - boxSize + QPoint(1,1))
-		elif color == focusPeakingColors["pink"]:
+		elif color == 'magenta':
 			origin = self.uiPinkFocusPeaking.geometry().bottomLeft()
 			box.move(origin - QPoint(0, boxSize.y()-1))
-		elif color == focusPeakingColors["red"]:
+		elif color == 'red':
 			origin = self.uiRedFocusPeaking.geometry().bottomRight()
 			box.move(origin - boxSize + QPoint(1,1))
-		elif color == focusPeakingColors["yellow"]:
+		elif color == 'yellow':
 			origin = self.uiYellowFocusPeaking.geometry().topLeft()
 			box.move(origin)
-		elif color == focusPeakingColors["green"]:
+		elif color == 'green':
 			origin = self.uiGreenFocusPeaking.geometry().topRight()
-			box.move(origin - QPoint(boxSize.x()-1, 0))
-		elif color == focusPeakingColors["cyan"]:
+			box.move(origin - boxSize + QPoint(1,1))
+		elif color == 'cyan':
 			origin = self.uiCyanFocusPeaking.geometry().topLeft()
+			box.move(origin)
+		elif color == 'white':
+			origin = self.uiWhiteFocusPeaking.geometry().topRight()
+			box.move(origin - QPoint(boxSize.x()-1, 0))
+		elif color == 'black':
+			origin = self.uiBlackFocusPeaking.geometry().topLeft()
 			box.move(origin)
 		else:
 			print('unknown focus peaking color', color)

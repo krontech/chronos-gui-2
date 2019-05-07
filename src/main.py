@@ -136,6 +136,9 @@ class Window(QtCore.QObject):
 		
 		self._ensureInstantiated(self.currentScreen)
 		
+		#for screen in self._availableScreens:
+		#	self._ensureInstantiated(screen)
+		
 		if hasattr(self._screens[self.currentScreen], 'onShow'):
 			self._screens[self.currentScreen].onShow()
 		self._screens[self.currentScreen].show()
@@ -145,7 +148,8 @@ class Window(QtCore.QObject):
 		#Cache all screens, cached screens load about 150-200ms faster I think.
 		self._lazyLoadTimer = QtCore.QTimer()
 		self._lazyLoadTimer.timeout.connect(self._loadAScreen)
-		PRECACHE_ALL_SCREENS and self._lazyLoadTimer.start(250) #ms
+		self._lazyLoadTimer.setSingleShot(True)
+		PRECACHE_ALL_SCREENS and self._lazyLoadTimer.start(0) #ms
 		
 		
 		from input_panels.keyboard_numeric import KeyboardNumericWithUnits, KeyboardNumericWithoutUnits
@@ -164,11 +168,17 @@ class Window(QtCore.QObject):
 		if screenName in self._screens:
 			return
 		
+		
 		if screenName not in self._availableScreens:
 			raise ValueError(f"Unknown screen {screenName}.\nAvailable screens are: {self._availableScreens.keys()}")
 		
+		print('loading', screenName, end=', ')
+		perf_start_time = time.perf_counter()
+		
 		screen = self._screens[screenName] = self._availableScreens[screenName](self)
 		screen.app = self.app
+		
+		print(time.perf_counter() - perf_start_time, end=', ')
 		
 		# So, we want alpha blending, so we can have a drop-shadow for our
 		# keyboard. Great. Since we're not using a compositing window manager,
@@ -190,6 +200,8 @@ class Window(QtCore.QObject):
 		# Finally, add the screen's focus ring.
 		screen.focusRing = FocusRing(self._screens[screenName])
 		
+		print(time.perf_counter() - perf_start_time)
+		
 	def _uninstantiatedScreens(self):
 		"""Return (generator for) non-cached screens. (Those not in self._screens.)"""
 		return (screen for screen in self._availableScreens.keys() if screen not in self._screens.keys())
@@ -197,11 +209,11 @@ class Window(QtCore.QObject):
 	def _loadAScreen(self):
 		screen = next(self._uninstantiatedScreens(), None)
 		if not screen:
-			self._lazyLoadTimer.stop()
-			self._lazyLoadTimer.deleteLater()
+			self._lazyLoadTimer = None
 			report("screen_cache_time", {"seconds": time.perf_counter() - perf_start_time})
 		else:
 			self._ensureInstantiated(screen)
+			self._lazyLoadTimer.start(200)
 	
 	def show(self, screen):
 		"""Switch between the screens of the back-of-camera interface.

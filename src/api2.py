@@ -147,7 +147,8 @@ class APIValues(QObject):
 			self,
 		)
 		
-		self._callbacks = {}
+		self._callbacks = {value: [] for value in _camState}
+		self._callbacks['notify'] = [] #meta, watch everything
 		
 		QDBusConnection.systemBus().connect(
 			f"com.krontech.chronos.{'control_mock' if USE_MOCK else 'control'}", 
@@ -156,7 +157,6 @@ class APIValues(QObject):
 			'notify', 
 			self.__newKeyValue,
 		)
-		self._callbacks['notify'] = []
 	
 	def observe(self, key, callback):
 		"""Add a function to get called when a value is updated."""
@@ -179,8 +179,75 @@ class APIValues(QObject):
 apiValues = APIValues()
 
 
-def observe(name: str, callback: Callable[[Any], None]) -> None:
+class CallbackNotSilenced(Exception):
+	"""Raised when the API is passed an unsilenced callback for an event.
+	
+		It's important to silence events (with `@silenceCallbacks`) on Qt elements
+		because they'll update the API with their changes otherwise. If more than
+		one value is being processed by the API at the same time, it can cause an
+		infinite loop where each value changes the element and the element emits
+		another change event.
+		
+		This is explicitly checked because having an unsilenced element emit an
+		update will usually work. The update will (asychronously) wind its way
+		through the system, and when it gets back to updating the emitting element
+		the element will have the same value and will not emit another update.
+		However, if the element has a different value, then it will change back.
+		The update for the change will be in flight by this time, and the two will
+		enter an infinite loop of updating the element as they fight. Any further
+		changes made to the element will now emit more update events which will
+		themselves loop. Since this is very hard to detect reliably in testing,
+		we force at least the consideration of silencing elements on the callback,
+		since it makes it much easier to track down an issue by reading the
+		callback and making sure it silences the elements it changes. We can't
+		reasonably test if it silences the right elements unfortunately. This
+		could be solved by not emitting events to the client which initiated them,
+		but while fairly trivial with the socket.io websocket library, it seems
+		very difficult or impossible with d-bus.
+		
+		Note: It is helpful to have events propagate back to the python UI
+		however. It means we can ignore updating other elements when changing
+		one element, since - as either element could be updated at any time
+		from (say) a web ui, it doesn't really matter where the update originates
+		from. All that matters is that it does update.
+	"""
+
+
+def observe(name: str, callback: Callable[[Any], None], saftyCheckForSilencedWidgets=True) -> None:
+	"""Observe changes in a state value.
+	
+		Args:
+			name: ID of the state variable. "exposure", "focusPeakingColor", etc.
+			callback: Function called when the state updates and upon subscription.
+				Called with one parameter, the new value. Called when registered
+				and when the value updates.
+			saftyCheckForSilencedWidgets=True: Indicates no API requests will be made from
+				this function. This is usually false, because most callbacks *do*
+				cause updates to the API, and it's really hard to detect this. A
+				silenced callback does not update anything, since it should silence
+				all the affected fields via the @silenceCallbacks(…) decorator.
+		
+		Note: Some frequently updated values (> 10/sec) are only available via
+			polling due to flooding concerns. They can not be observed, as they're
+			assumed to *always* be changed. See the API docs for more details.
+		
+		
+		Rationale:
+		It is convenient and less error-prone if we only have one callback that
+		handles the initialization and update of values. The API provides separate
+		initialization and update methods, so we'll store the initialization and
+		use it to perform the initial call to the observe() callback.
+		
+		In addition, this means we only have to query the initial state once,
+		retrieving a blob of all the data available, rather than retrieving each
+		key one syscall at a time as we instantiate each Qt control.
+	"""
+	
+	if not hasattr(callback, '_isSilencedCallback') and saftyCheckForSilencedWidgets:
+		raise CallbackNotSilenced(f"{callback} must consider silencing. Decorate with @silenceCallbacks(callback_name, …).")
+	
 	apiValues.observe(name, callback)
+	callback(apiValues.get(name))
 	
 
 

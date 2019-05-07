@@ -641,7 +641,7 @@ Calibration</string>
      </rect>
     </property>
     <property name="text">
-     <string>Show White
+     <string>Highlight
 Clipping</string>
     </property>
     <property name="clickMarginRight" stdset="0">
@@ -654,69 +654,23 @@ Clipping</string>
      <string>showWhiteClippingZebraStripes</string>
     </property>
    </widget>
-   <widget class="CheckBox" name="uiShowBlackClipping">
-    <property name="geometry">
-     <rect>
-      <x>0</x>
-      <y>90</y>
-      <width>171</width>
-      <height>71</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Show Black
-Clipping</string>
-    </property>
-    <property name="clickMarginRight" stdset="0">
-     <enum>CheckBox::half</enum>
-    </property>
-    <property name="clickMarginTop" stdset="0">
-     <enum>CheckBox::none</enum>
-    </property>
-    <property name="clickMarginBottom" stdset="0">
-     <enum>CheckBox::full</enum>
-    </property>
-    <property name="linkedValueName" stdset="0">
-     <string>showBlackClippingZebraStripes</string>
-    </property>
-   </widget>
-   <widget class="HeaderLabel" name="headerlabel">
-    <property name="geometry">
-     <rect>
-      <x>20</x>
-      <y>10</y>
-      <width>141</width>
-      <height>31</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Zebra Stripes</string>
-    </property>
-   </widget>
-   <widget class="HeaderLabel" name="headerlabel_2">
-    <property name="geometry">
-     <rect>
-      <x>20</x>
-      <y>160</y>
-      <width>141</width>
-      <height>31</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Peaking</string>
-    </property>
-   </widget>
    <widget class="ComboBox" name="uiFocusPeakingIntensity">
     <property name="geometry">
      <rect>
       <x>0</x>
-      <y>180</y>
+      <y>110</y>
       <width>181</width>
-      <height>61</height>
+      <height>71</height>
      </rect>
     </property>
+    <property name="editable">
+     <bool>false</bool>
+    </property>
+    <property name="clickMarginTop" stdset="0">
+     <enum>ComboBox::full</enum>
+    </property>
     <property name="clickMarginBottom" stdset="0">
-     <enum>ComboBox::none</enum>
+     <enum>ComboBox::half</enum>
     </property>
     <item>
      <property name="text">
@@ -743,7 +697,7 @@ Clipping</string>
     <property name="geometry">
      <rect>
       <x>0</x>
-      <y>240</y>
+      <y>180</y>
       <width>91</width>
       <height>81</height>
      </rect>
@@ -756,10 +710,10 @@ Clipping</string>
 					background: rgba(255,255,255,127); /* The background is drawn under the button borders, so they are opaque if the background is opaque. */
 					
 					/* use borders instead of margins so we can see what we're doing */
-					border-left:   21px solid rgba(11, 0, 254, 86);
-					border-right:  1px solid rgba(11, 0, 254, 86);
-					border-top:    11px solid rgba(11, 0, 254, 86);
-					border-bottom: 1px solid rgba(11, 0, 254, 86);
+					border-left:   21px solid rgba(17, 3, 184, 73);
+					border-right:  1px solid rgba(17, 3, 184, 73);
+					border-top:    11px solid rgba(17, 3, 184, 73);
+					border-bottom: 1px solid rgba(17, 3, 184, 73);
 				}
 			Button { background: #7a70f7 }</string>
     </property>
@@ -783,7 +737,7 @@ Clipping</string>
     <property name="geometry">
      <rect>
       <x>90</x>
-      <y>240</y>
+      <y>180</y>
       <width>81</width>
       <height>81</height>
      </rect>
@@ -811,7 +765,7 @@ Clipping</string>
     <property name="geometry">
      <rect>
       <x>90</x>
-      <y>320</y>
+      <y>260</y>
       <width>81</width>
       <height>71</height>
      </rect>
@@ -839,7 +793,7 @@ Clipping</string>
     <property name="geometry">
      <rect>
       <x>0</x>
-      <y>320</y>
+      <y>260</y>
       <width>91</width>
       <height>71</height>
      </rect>
@@ -867,9 +821,9 @@ Clipping</string>
     <property name="geometry">
      <rect>
       <x>0</x>
-      <y>390</y>
+      <y>330</y>
       <width>91</width>
-      <height>91</height>
+      <height>71</height>
      </rect>
     </property>
     <property name="text">
@@ -884,6 +838,9 @@ Clipping</string>
     <property name="clickMarginTop" stdset="0">
      <enum>Button::none</enum>
     </property>
+    <property name="clickMarginBottom" stdset="0">
+     <enum>Button::none</enum>
+    </property>
     <property name="customStyleSheet" stdset="0">
      <string>Button { background: #7ef770 }</string>
     </property>
@@ -892,9 +849,9 @@ Clipping</string>
     <property name="geometry">
      <rect>
       <x>90</x>
-      <y>390</y>
+      <y>330</y>
       <width>81</width>
-      <height>91</height>
+      <height>71</height>
      </rect>
     </property>
     <property name="text">
@@ -907,6 +864,9 @@ Clipping</string>
      <enum>Button::half</enum>
     </property>
     <property name="clickMarginTop" stdset="0">
+     <enum>Button::none</enum>
+    </property>
+    <property name="clickMarginBottom" stdset="0">
      <enum>Button::none</enum>
     </property>
     <property name="customStyleSheet" stdset="0">
@@ -930,7 +890,7 @@ Clipping</string>
     <property name="geometry">
      <rect>
       <x>20</x>
-      <y>250</y>
+      <y>190</y>
       <width>71</width>
       <height>71</height>
      </rect>
@@ -939,11 +899,90 @@ Clipping</string>
      <string notr="true">border: 4px solid black</string>
     </property>
    </widget>
+   <widget class="Subheader" name="subheader">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>10</y>
+      <width>141</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Zebra Stripes</string>
+    </property>
+   </widget>
+   <widget class="Subheader" name="subheader_2">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>100</y>
+      <width>141</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Focus Peaking</string>
+    </property>
+   </widget>
+   <widget class="Button" name="uiWhiteFocusPeaking">
+    <property name="geometry">
+     <rect>
+      <x>90</x>
+      <y>400</y>
+      <width>81</width>
+      <height>81</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="clickMarginLeft" stdset="0">
+     <enum>Button::none</enum>
+    </property>
+    <property name="clickMarginRight" stdset="0">
+     <enum>Button::half</enum>
+    </property>
+    <property name="clickMarginTop" stdset="0">
+     <enum>Button::none</enum>
+    </property>
+    <property name="clickMarginBottom" stdset="0">
+     <enum>Button::half</enum>
+    </property>
+    <property name="customStyleSheet" stdset="0">
+     <string>Button { background: #f7f7f7 }</string>
+    </property>
+   </widget>
+   <widget class="Button" name="uiBlackFocusPeaking">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>400</y>
+      <width>91</width>
+      <height>81</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="clickMarginLeft" stdset="0">
+     <enum>Button::full</enum>
+    </property>
+    <property name="clickMarginRight" stdset="0">
+     <enum>Button::none</enum>
+    </property>
+    <property name="clickMarginTop" stdset="0">
+     <enum>Button::none</enum>
+    </property>
+    <property name="clickMarginBottom" stdset="0">
+     <enum>Button::half</enum>
+    </property>
+    <property name="customStyleSheet" stdset="0">
+     <string>Button { background: #707070 }</string>
+    </property>
+   </widget>
    <zorder>backdrop</zorder>
-   <zorder>uiShowBlackClipping</zorder>
-   <zorder>headerlabel</zorder>
    <zorder>uiShowWhiteClipping</zorder>
-   <zorder>headerlabel_2</zorder>
    <zorder>uiFocusPeakingIntensity</zorder>
    <zorder>uiBlueFocusPeaking</zorder>
    <zorder>uiPinkFocusPeaking</zorder>
@@ -951,7 +990,11 @@ Clipping</string>
    <zorder>uiRedFocusPeaking</zorder>
    <zorder>uiGreenFocusPeaking</zorder>
    <zorder>uiCyanFocusPeaking</zorder>
+   <zorder>subheader</zorder>
+   <zorder>subheader_2</zorder>
    <zorder>uiFocusPeakingColorSelectionIndicator</zorder>
+   <zorder>uiWhiteFocusPeaking</zorder>
+   <zorder>uiBlackFocusPeaking</zorder>
   </widget>
   <widget class="Backdrop" name="uiPinchToZoomGestureInterceptionPanel">
    <property name="geometry">
@@ -1068,6 +1111,19 @@ Calibration</string>
     <string>Add overlay image for alignment here?</string>
    </property>
   </widget>
+  <widget class="Comment" name="comment_3">
+   <property name="geometry">
+    <rect>
+     <x>1360</x>
+     <y>40</y>
+     <width>131</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Add &quot;Show Black Clipping&quot; when available.</string>
+   </property>
+  </widget>
   <zorder>uiPinchToZoomGestureInterceptionPanel</zorder>
   <zorder>uiExposureOverlay</zorder>
   <zorder>backdrop_2</zorder>
@@ -1092,6 +1148,7 @@ Calibration</string>
   <zorder>uiRecord</zorder>
   <zorder>comment</zorder>
   <zorder>comment_2</zorder>
+  <zorder>comment_3</zorder>
  </widget>
  <customwidgets>
   <customwidget>
@@ -1120,11 +1177,6 @@ Calibration</string>
    <header>comment</header>
   </customwidget>
   <customwidget>
-   <class>HeaderLabel</class>
-   <extends>QLabel</extends>
-   <header>header_label</header>
-  </customwidget>
-  <customwidget>
    <class>Label</class>
    <extends>QLabel</extends>
    <header>label</header>
@@ -1133,6 +1185,11 @@ Calibration</string>
    <class>Slider</class>
    <extends>QSlider</extends>
    <header>slider</header>
+  </customwidget>
+  <customwidget>
+   <class>Subheader</class>
+   <extends>QLabel</extends>
+   <header>subheader</header>
   </customwidget>
  </customwidgets>
  <tabstops>
@@ -1151,7 +1208,6 @@ Calibration</string>
   <tabstop>uiTriggerDelay</tabstop>
   <tabstop>uiShotAssist</tabstop>
   <tabstop>uiShowWhiteClipping</tabstop>
-  <tabstop>uiShowBlackClipping</tabstop>
   <tabstop>uiFocusPeakingIntensity</tabstop>
   <tabstop>uiBlueFocusPeaking</tabstop>
   <tabstop>uiPinkFocusPeaking</tabstop>
