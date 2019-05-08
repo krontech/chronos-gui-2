@@ -169,9 +169,12 @@ class APIValues(QObject):
 	@pyqtSlot('QDBusMessage')
 	def __newKeyValue(self, msg):
 		"""Update _camState and invoke any  registered observers."""
-		_camState[msg.member()] = msg.arguments()[0]
-		for callback in self._callbacks[msg.member()]:
-			callback(msg.arguments()[0])
+		newItems = msg.arguments()[0].items()
+		for key, value in newItems:
+			print(f'note: {key} is now {value}.')
+			_camState[key] = value
+			for callback in self._callbacks[key]:
+				callback(value)
 	
 	def get(self, key):
 		return _camState[key]
@@ -248,7 +251,45 @@ def observe(name: str, callback: Callable[[Any], None], saftyCheckForSilencedWid
 	
 	apiValues.observe(name, callback)
 	callback(apiValues.get(name))
+
+
+def observe_future_only(name: str, callback: Callable[[Any], None], saftyCheckForSilencedWidgets=True) -> None:
+	"""Like `observe`, but without the initial callback when observing.
 	
+		Useful when `observe`ing a derived value, which observe can't deal with yet.
+	"""
+	
+	if not hasattr(callback, '_isSilencedCallback') and saftyCheckForSilencedWidgets:
+		raise CallbackNotSilenced(f"{callback} must consider silencing. Decorate with @silenceCallbacks(callback_name, …).")
+	
+	apiValues.observe(name, callback)
+
+
+def silenceCallbacks(*elements):
+	"""Silence events for the duration of a callback.
+	
+		This allows an API element to be updated without triggering the API again.
+		If the API was triggered, it might update the element which would cause an
+		infinite loop.
+	"""
+	
+	def silenceCallbacksOf(callback):
+		def silencedCallback(self, *args, **kwargs):
+			for element in elements:
+				getattr(self, element).blockSignals(True)
+			
+			callback(self, *args, **kwargs)
+			
+			for element in elements:
+				getattr(self, element).blockSignals(False)
+		
+		silencedCallback._isSilencedCallback = True #Checked by the API, which only takes silenced callbacks to avoid loops.
+		return silencedCallback
+	return silenceCallbacksOf
+
+
+def connectSignal(*args):
+	apiValues.connectSignal(*args)
 
 
 
@@ -262,8 +303,8 @@ if __name__ == '__main__':
 	#Quit on ctrl-c.
 	signal.signal(signal.SIGINT, signal.SIG_DFL)
 	
-	print("Self-test: Retrieve battery charge.")
-	print(f"Battery charge: {get('batteryCharge')}")
-	print("Control API self-test passed.")
+	print("Self-test: Retrieve exposure period.")
+	print(f"Exposure is {get('exposurePeriod')}ns.")
+	print("Control API self-test passed. Goodbye!")
 	
 	sys.exit(0)

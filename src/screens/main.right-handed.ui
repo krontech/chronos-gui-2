@@ -268,10 +268,17 @@ Save</string>
      <height>20</height>
     </rect>
    </property>
+   <property name="font">
+    <font>
+     <pointsize>-1</pointsize>
+     <stylestrategy>NoAntialias</stylestrategy>
+    </font>
+   </property>
    <property name="styleSheet">
     <string notr="true">
 			font-size: 16px;
-			background: rgba(255,255,255, 128);
+			color: white;
+			background: rgba(0,0,0, 64);
 		</string>
    </property>
    <property name="text">
@@ -287,10 +294,17 @@ Save</string>
      <height>20</height>
     </rect>
    </property>
+   <property name="font">
+    <font>
+     <pointsize>-1</pointsize>
+     <stylestrategy>NoAntialias</stylestrategy>
+    </font>
+   </property>
    <property name="styleSheet">
     <string notr="true">
 			font-size: 16px;
-			background: rgba(255,255,255, 128);
+			color: white;
+			background: rgba(0,0,0, 64);
 		</string>
    </property>
    <property name="text">
@@ -306,10 +320,17 @@ Save</string>
      <height>20</height>
     </rect>
    </property>
+   <property name="font">
+    <font>
+     <pointsize>-1</pointsize>
+     <stylestrategy>NoAntialias</stylestrategy>
+    </font>
+   </property>
    <property name="styleSheet">
     <string notr="true">
 			font-size: 16px;
-			background: rgba(255,255,255, 128);
+			color: white;
+			background: rgba(0,0,0, 64);
 		</string>
    </property>
    <property name="text">
@@ -710,10 +731,10 @@ Clipping</string>
 					background: rgba(255,255,255,127); /* The background is drawn under the button borders, so they are opaque if the background is opaque. */
 					
 					/* use borders instead of margins so we can see what we're doing */
-					border-left:   21px solid rgba(17, 3, 184, 73);
-					border-right:  1px solid rgba(17, 3, 184, 73);
-					border-top:    11px solid rgba(17, 3, 184, 73);
-					border-bottom: 1px solid rgba(17, 3, 184, 73);
+					border-left:   21px solid rgba(25, 18, 235, 46);
+					border-right:  1px solid rgba(25, 18, 235, 46);
+					border-top:    11px solid rgba(25, 18, 235, 46);
+					border-bottom: 1px solid rgba(25, 18, 235, 46);
 				}
 			Button { background: #7a70f7 }</string>
     </property>
@@ -1124,6 +1145,19 @@ Calibration</string>
     <string>Add &quot;Show Black Clipping&quot; when available.</string>
    </property>
   </widget>
+  <widget class="Comment" name="comment_4">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>60</y>
+     <width>271</width>
+     <height>51</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>No AA; QT botches blending on alpha backgrounds.</string>
+   </property>
+  </widget>
   <zorder>uiPinchToZoomGestureInterceptionPanel</zorder>
   <zorder>uiExposureOverlay</zorder>
   <zorder>backdrop_2</zorder>
@@ -1149,6 +1183,7 @@ Calibration</string>
   <zorder>comment</zorder>
   <zorder>comment_2</zorder>
   <zorder>comment_3</zorder>
+  <zorder>comment_4</zorder>
  </widget>
  <customwidgets>
   <customwidget>

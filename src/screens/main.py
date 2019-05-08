@@ -4,7 +4,7 @@ from PyQt5 import uic, QtCore
 from PyQt5.QtCore import pyqtSlot, QPropertyAnimation, QPoint
 from PyQt5.QtWidgets import QWidget, QApplication
 
-import time
+import time, math
 from termcolor import cprint
 
 from debugger import *; dbg
@@ -198,14 +198,18 @@ class Main(QWidget):
 		
 		#Set up exposure slider.
 		# This slider is significantly more responsive to mouse than to touch. 🤔
-		api.observe('recordingExposureNs', self.updateExposureNs)
-		self.uiExposureSlider.setMaximum(api.get('sensorMaxExposureNs')) #TODO: This is incorrect, should use update not update_future_only since we're drawing from the wrong value -_-
-		self.uiExposureSlider.setMinimum(api.get('sensorMinExposureNs'))
-		api.observe_future_only('sensorMaxExposureNs', self.updateExposureMax)
-		api.observe_future_only('sensorMinExposureNs', self.updateExposureMin)
+		api2.observe('exposurePeriod', self.updateExposureNs)
+		self.uiExposureSlider.setMaximum(api2.get('exposureMax')) #TODO: This is incorrect, should use update not update_future_only since we're drawing from the wrong value -_-
+		self.uiExposureSlider.setMinimum(api2.get('exposureMin'))
+		api2.observe_future_only('exposureMax', self.updateExposureMax)
+		api2.observe_future_only('exposureMin', self.updateExposureMin)
 		#[TODO DDR 2018-09-13] This valueChanged event is really quite slow, for some reason.
 		self.uiExposureSlider.valueChanged.connect(
-			lambda: api.control('set', {'recordingExposureNs': self.uiExposureSlider.value()}) )
+			lambda: api2.control('set', dump('set', {
+				'exposurePercent': 100 - 100*math.sqrt(
+					1 - self.uiExposureSlider.value()/self.uiExposureSlider.maximum() )
+			}))
+		)
 		self.uiExposureSlider.touchMargins = lambda: {
 			"top": 10, "left": 30, "bottom": 10, "right": 30
 		}
@@ -236,21 +240,24 @@ class Main(QWidget):
 		self.uiBattery.setText(charged)
 		
 	@pyqtSlot(int, name="updateExposureNs")
-	@api.silenceCallbacks('uiExposureSlider')
+	@api2.silenceCallbacks('uiExposureSlider')
 	def updateExposureNs(self, newExposureNs):
-		self.uiExposureSlider.setValue(newExposureNs) #hack in the limit from the API, replace with a proper queried constant when we have state
+		print('updating exposure slider to', newExposureNs, 'with blocked', self.uiExposureSlider.signalsBlocked())
+		self.uiExposureSlider.blockSignals(True)
+		self.uiExposureSlider.setValue(newExposureNs)
 		self.updateExposureDependancies()
+		self.uiExposureSlider.blockSignals(False)
 	
 	@pyqtSlot(int, name="updateExposureMax")
-	@api.silenceCallbacks('uiExposureSlider')
+	@api2.silenceCallbacks('uiExposureSlider')
 	def updateExposureMax(self, newExposureNs):
-		self.uiExposureSlider.setMaximum(newExposureNs) #hack in the limit from the API, replace with a proper queried constant when we have state
+		self.uiExposureSlider.setMaximum(newExposureNs)
 		self.updateExposureDependancies()
 	
 	@pyqtSlot(int, name="updateExposureMin")
-	@api.silenceCallbacks('uiExposureSlider')
+	@api2.silenceCallbacks('uiExposureSlider')
 	def updateExposureMin(self, newExposureNs):
-		self.uiExposureSlider.setValue(newExposureNs) #hack in the limit from the API, replace with a proper queried constant when we have state
+		self.uiExposureSlider.setMinimum(newExposureNs)
 		self.updateExposureDependancies()
 	
 	def updateExposureDependancies(self):
@@ -264,7 +271,7 @@ class Main(QWidget):
 	
 	
 	@pyqtSlot('QVariantMap', name="updateBaWTriggers")
-	@api.silenceCallbacks()
+	@api2.silenceCallbacks()
 	def updateBaWTriggers(self, triggers):
 		#	VAR IF no mocal
 		#		show black cal button
@@ -281,7 +288,7 @@ class Main(QWidget):
 		self.closeCalibrationMenu()
 	
 	@pyqtSlot('QVariantMap', name="updateColorTriggers")
-	@api.silenceCallbacks()
+	@api2.silenceCallbacks()
 	def updateColorTriggers(self, triggers):
 		#	VAR IF no mocal
 		#		show cal menu button → wb/bc menu
@@ -300,14 +307,14 @@ class Main(QWidget):
 		
 	
 	@pyqtSlot(float, name="updateWhiteClipping")
-	@api.silenceCallbacks('uiShowWhiteClipping')
+	@api2.silenceCallbacks('uiShowWhiteClipping')
 	def updateWhiteClipping(self, focusPeakingIntensity: float):
 		self.uiShowWhiteClipping.setCheckState(
 			0 if not focusPeakingIntensity else 2)
 	
 	
 	@pyqtSlot(str, name="updateFocusPeakingIntensity")
-	@api.silenceCallbacks('uiFocusPeakingIntensity')
+	@api2.silenceCallbacks('uiFocusPeakingIntensity')
 	def updateFocusPeakingIntensity(self, focusPeakingIntensity: str):
 		snapPoints = self.uiFocusPeakingIntensity.count() - 1 #zero-indexed
 		threshold = 0.02
@@ -320,7 +327,7 @@ class Main(QWidget):
 	
 	
 	@pyqtSlot(str, name="updateFocusPeakingColor")
-	@api.silenceCallbacks() #Causes pyqtSlot to overwrite earlier function.
+	@api2.silenceCallbacks() #Causes pyqtSlot to overwrite earlier function.
 	def updateFocusPeakingColor(self, color: int):
 		QPoint = QtCore.QPoint
 		
