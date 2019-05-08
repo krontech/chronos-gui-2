@@ -1,11 +1,13 @@
 # -*- coding: future_fstrings -*-
 
-from PyQt5 import uic, QtWidgets, QtCore, QtGui
-# from PyQt5.QtCore import pyqtSlot
-from PyQt5.QtSvg import QSvgWidget
+from PyQt5 import uic, QtWidgets, QtCore
+from PyQt5.QtCore import pyqtSlot
 
 from debugger import *; dbg
-# import api as api
+import api2
+
+
+silenceCallbacks = api2.silenceCallbacks
 
 
 class Test(QtWidgets.QWidget):
@@ -23,20 +25,25 @@ class Test(QtWidgets.QWidget):
 		#self.uiDebug.clicked.connect(lambda: self.decimalspinbox_3.availableUnits()) #"self" is needed here, won't be available otherwise.
 		self.uiBack.clicked.connect(window.back)
 		
-		#QSvgWidget('assets/images/rotating-triangle.svg')
-		self.animWidget = QSvgWidget('assets/images/rotating-triangle.svg', self)
-		self.animWidget.move(200,300)
-		self.anim = self.animWidget.children()[0]
-		self.animTimer = self.anim.children()[0]
+		self.uiSlider.setMaximum(api2.get('exposureMax'))
+		self.uiSlider.setMinimum(api2.get('exposureMin'))
 		
-		self.spinbox_2.setFocus()
-		
-		#self.uiAnimateTriangle.clicked.connect(self.animateTriangle)
+		self.uiSlider.valueChanged.connect(self.onExposureChanged)
+		api2.observe('exposurePeriod', self.updateExposureNs, saftyCheckForSilencedWidgets=False)
 	
-	def animateTriangle(self):
-		#self.animTimer.stop()
-		print('cf', self.anim.currentFrame())
-		self.anim.setCurrentFrame(0)
-		print('nf', self.anim.currentFrame())
-		#self.anim.repaintNeeded.emit()
-		dbg()
+	
+	@pyqtSlot(int, name="updateExposureNs")
+	def updateExposureNs(self, newExposureNs):
+		self.uiSlider.blockSignals(True)
+		print(f'updating slider to {newExposureNs} (blocked {self.uiSlider.signalsBlocked()})')
+		self.uiSlider.setValue(newExposureNs)
+		self.uiSlider.blockSignals(False)
+	
+	def onExposureChanged(self, newExposureNs):
+		self.uiSlider.blockSignals(True)
+		self.uiSlider.setValue(
+			api2.control('set', dump(f'set (blocked {self.uiSlider.signalsBlocked()})', {
+				'exposurePeriod': newExposureNs//2,
+			}))['exposurePeriod']
+		)
+		self.uiSlider.blockSignals(False)

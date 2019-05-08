@@ -140,7 +140,7 @@
     <string>A Radio Bu&amp;tton</string>
    </property>
   </widget>
-  <widget class="Slider" name="slider">
+  <widget class="Slider" name="uiSlider">
    <property name="geometry">
     <rect>
      <x>690</x>
@@ -148,6 +148,27 @@
      <width>81</width>
      <height>201</height>
     </rect>
+   </property>
+   <property name="minimum">
+    <number>1000</number>
+   </property>
+   <property name="maximum">
+    <number>1000000</number>
+   </property>
+   <property name="singleStep">
+    <number>1000</number>
+   </property>
+   <property name="pageStep">
+    <number>100000</number>
+   </property>
+   <property name="value">
+    <number>500000</number>
+   </property>
+   <property name="sliderPosition">
+    <number>500000</number>
+   </property>
+   <property name="tracking">
+    <bool>true</bool>
    </property>
   </widget>
   <widget class="Label" name="label_2">
@@ -1304,7 +1325,7 @@
   <zorder>label_2</zorder>
   <zorder>label_4</zorder>
   <zorder>uiAnimateTriangle</zorder>
-  <zorder>slider</zorder>
+  <zorder>uiSlider</zorder>
   <zorder>uiBack</zorder>
   <zorder>uiDebug</zorder>
   <zorder>uiTriangle</zorder>
@@ -1384,7 +1405,7 @@
   <tabstop>decimalspinbox</tabstop>
   <tabstop>spinbox</tabstop>
   <tabstop>lineedit</tabstop>
-  <tabstop>slider</tabstop>
+  <tabstop>uiSlider</tabstop>
   <tabstop>decimalspinbox_2</tabstop>
   <tabstop>spinbox_2</tabstop>
   <tabstop>combobox</tabstop>
