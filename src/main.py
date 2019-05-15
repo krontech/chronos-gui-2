@@ -7,7 +7,7 @@ See readme.md for more details.
 """
 
 # General imports
-import sys, time
+import sys, os, time
 from debugger import *; dbg
 
 # QT-specific imports
@@ -29,6 +29,8 @@ sys.path.append('src/lowpy')
 
 QtWidgets.QApplication.setAttribute(QtCore.Qt.AA_EnableHighDpiScaling, True)
 
+#Make the UI run smoother by taking more resources.
+os.system(f'renice -n -19 -p {os.getpid()}')
 
 
 class Window(QtCore.QObject):

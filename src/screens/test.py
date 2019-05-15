@@ -28,22 +28,19 @@ class Test(QtWidgets.QWidget):
 		self.uiSlider.setMaximum(api2.get('exposureMax'))
 		self.uiSlider.setMinimum(api2.get('exposureMin'))
 		
-		self.uiSlider.valueChanged.connect(self.onExposureChanged)
+		self.uiSlider.debounce.sliderMoved.connect(self.onExposureChanged)
 		api2.observe('exposurePeriod', self.updateExposureNs, saftyCheckForSilencedWidgets=False)
 	
 	
 	@pyqtSlot(int, name="updateExposureNs")
 	def updateExposureNs(self, newExposureNs):
-		self.uiSlider.blockSignals(True)
-		print(f'updating slider to {newExposureNs} (blocked {self.uiSlider.signalsBlocked()})')
+		print(f'updating slider to {newExposureNs}')
 		self.uiSlider.setValue(newExposureNs)
-		self.uiSlider.blockSignals(False)
 	
 	def onExposureChanged(self, newExposureNs):
-		self.uiSlider.blockSignals(True)
+		print(f'slider moved to {newExposureNs}')
 		self.uiSlider.setValue(
-			api2.control('set', dump(f'set (blocked {self.uiSlider.signalsBlocked()})', {
-				'exposurePeriod': newExposureNs//2,
-			}))['exposurePeriod']
+			api2.control('set', {
+				'exposurePeriod': newExposureNs,
+			})['exposurePeriod']
 		)
-		self.uiSlider.blockSignals(False)

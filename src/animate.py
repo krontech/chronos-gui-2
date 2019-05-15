@@ -164,8 +164,10 @@ def delay(parent, timeout: int, callback: Callable[[], None], paused: bool = Fal
 			The underlying QTimer object."""
 	
 	timer = QTimer()
-	setattr(parent, f'timer{randint(0,99999999)}', timer)  #keep minimal reference without explicitly parenting
+	timerId = f'__delayTimer{hex(randint(0,99999999))}'
+	setattr(parent, timerId, timer)  #keep minimal reference without explicitly parenting
 	timer.timeout.connect(callback)
+	timer.timeout.connect(lambda: delattr(parent, timerId))
 	timer.setInterval(timeout) #ms
 	timer.setSingleShot(True)
 	paused or timer.start()

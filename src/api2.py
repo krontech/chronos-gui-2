@@ -2,13 +2,13 @@
 
 """Interface for the control api d-bus service."""
 
-import sys
+import sys, time
 from debugger import *; dbg
 
 from os import environ
 
 from PyQt5.QtCore import pyqtSlot, QObject
-from PyQt5.QtDBus import QDBusConnection, QDBusInterface, QDBusReply
+from PyQt5.QtDBus import QDBusConnection, QDBusInterface, QDBusReply, QDBusPendingCallWatcher, QDBusPendingReply
 from typing import Callable, Any
 
 
@@ -88,21 +88,160 @@ def video(*args, **kwargs):
 	return msg.value()
 
 
-def control(*args, **kwargs):
-	"""Call the camera control DBus API. First arg is the function name.
-	
-		See http://doc.qt.io/qt-5/qdbusabstractinterface.html#call for details about calling.
-		See https://github.com/krontech/chronos-cli/tree/master/src/api for implementation details about the API being called.
-		See README.md at https://github.com/krontech/chronos-cli/tree/master/src/daemon for API documentation.
+
+class control():
+	"""Call the D-Bus control API, asychronously.
+		
+		Methods:
+			- call(function[, arg1[ ,arg2[, ...]]])
+				Call the remote function.
+			- get([value[, ...]])
+				Get the named values from the API.
+			- set({key: value[, ...]}])
+				Set the named values in the API.
+		
+		All methods return an A* promise-like, in that you use
+		`.then(cb(value))` and `.catch(cb(error))` to get the results
+		of calling the function.
 	"""
 	
-	#Unwrap D-Bus errors from message.
-	msg = QDBusReply(cameraControlAPI.call(*args, **kwargs))
-	if not msg.isValid():
-		raise DBusException("%s: %s" % (msg.error().name(), msg.error().message()))
+	_controlEnqueuedCalls = []
+	_controlCallInProgress = False
+	_activeCall = None
 	
-	#Unwrap API errors from message.
-	return msg.value()
+	@staticmethod
+	def _enqueueCallback(pendingCall, coalesce: bool=True): #pendingCall is control.call
+		"""Enqueue callback. Squash calls to set for efficiency."""
+		if coalesce and [pendingCall] == control._controlEnqueuedCalls[:1]:
+			control._controlEnqueuedCalls[-1] = pendingCall
+			print('coalesced callbacks')
+		else:
+			control._controlEnqueuedCalls += [pendingCall]
+	
+	@staticmethod
+	def _startNextCallback():
+		"""Check for pending callbacks.
+			
+			If none are found, simply stop.
+			
+			Note: Needs to be manually pumped.
+		"""
+		
+		if control._controlEnqueuedCalls:
+			control._controlCallInProgress = True
+			control._controlEnqueuedCalls.pop(0)._startAsyncCall()
+		else:
+			control._controlCallInProgress = False
+	
+	
+	#api2.control.call('get', ['sensorColorPattern']).then(lambda v: print('val', v))
+	#api2.control.call('set', {'zebraLevel': 0.2}).then(lambda v: print('val1', v))
+	#api2.control.call('set', {'zebraLevel': 0.4}).then(lambda v: print('val1', v))
+	#api2.control.call('set', {'zebraLevel': 0.6}).then(lambda v: print('val2', v))
+	class call(QObject):
+		"""Call the camera control DBus API. First arg is the function name. Returns a promise.
+		
+			See http://doc.qt.io/qt-5/qdbusabstractinterface.html#call for details about calling.
+			See https://github.com/krontech/chronos-cli/tree/master/src/api for implementation details about the API being called.
+			See README.md at https://github.com/krontech/chronos-cli/tree/master/src/daemon for API documentation.
+		"""
+		
+		def __init__(self, *args, immediate=True):
+			assert args, "Missing call name."
+			
+			super().__init__()
+			
+			self._args = args
+			self._thens = []
+			self._catchs = []
+			self._done = False
+			self._watcherHolder = None
+			
+			control._enqueueCallback(self)
+			if not control._controlCallInProgress:
+				#Don't start multiple callbacks at once, the most recent one will block.
+				control._startNextCallback()
+				print('starting async chain')
+			else:
+				print('appending to async chain')
+		
+		def __eq__(self, other):
+			# If a control call sets the same keys as another
+			# control call, then it is equal to itself and can
+			# be deduplicated as all sets of the same values
+			# have the same side effects. (ie, Slider no go
+			# fast if me no drop redundant call.)
+			#   –DDR 2019-05-14
+			return (
+				'set' == self._args[0] == other._args[0]
+				and self._args[1].keys() == other._args[1].keys()
+			)
+			
+		
+		def _startAsyncCall(self):
+			print('started async call')
+			self._watcherHolder = QDBusPendingCallWatcher(
+				cameraControlAPI.asyncCallWithArgumentList(self._args[0], self._args[1:])
+			)
+			self._watcherHolder.finished.connect(self._asyncCallFinished)
+			control._activeCall = self
+			
+		
+		def _asyncCallFinished(self, watcher):
+			print('finished async call')
+			self._done = True
+			
+			reply = QDBusPendingReply(watcher)
+			try:
+				if reply.isError():
+					if self._catchs:
+						for catch in self._catchs:
+							catch(reply.error())
+					else:
+						#This won't do much, but (I'm assuming) most calls simply won't ever fail.
+						raise DBusException("%s: %s" % (reply.error().name(), reply.error().message()))
+				else:
+					for then in self._thens:
+						then(reply.value())
+			except Exception as e:
+				raise e
+			finally:
+				control._startNextCallback()
+		
+		def then(self, callback):
+			assert callable(callback), "control().then() only accepts a single, callable function."
+			assert not self._done, "Can't register new then() callback, call has already been resolved."
+			self._thens += [callback]
+			return self
+		
+		def catch(self, callback):
+			assert callable(callback), "control().then() only accepts a single, callable function."
+			assert not self._done, "Can't register new then() callback, call has already been resolved."
+			self._catchs += [callback]
+			return self
+	
+	def callSync(*args, **kwargs):
+		"""Call the camera control DBus API. First arg is the function name.
+			
+			This is the synchronous version of the call() method. It
+			is much slower to call synchronously than asynchronously!
+		
+			See http://doc.qt.io/qt-5/qdbusabstractinterface.html#call for details about calling.
+			See https://github.com/krontech/chronos-cli/tree/master/src/api for implementation details about the API being called.
+			See README.md at https://github.com/krontech/chronos-cli/tree/master/src/daemon for API documentation.
+		"""
+		
+		#Unwrap D-Bus errors from message.
+		msg = QDBusReply(cameraControlAPI.call(*args, **kwargs))
+		
+		if msg.isValid():
+			return msg.value()
+		else:
+			raise DBusException("%s: %s" % (msg.error().name(), msg.error().message()))
+
+
+
+	
 
 
 def get(keyOrKeys):
@@ -117,21 +256,34 @@ def get(keyOrKeys):
 		See control's `availableKeys` for a list of valid inputs.
 	"""
 	
-	valueList = control('get', 
+	valueList = control.callSync('get', 
 		[keyOrKeys] if isinstance(keyOrKeys, str) else keyOrKeys )
 	return valueList[keyOrKeys] if isinstance(keyOrKeys, str) else valueList
 
 
-def set(values):
-	"""Call the camera control DBus set method. Accepts {str: value}."""
-	control('set', values)
+def set(*args):
+	"""Call the camera control DBus set method.
+		
+		Accepts {str: value, ...} or a key and a value.
+		Returns either a map of set values or the set
+			value, if the second form was used.
+	"""
+	
+	if len(args) == 1:
+		return control.callSync('set', *args)
+	elif len(args) == 2:
+		return control.callSync('set', {args[0]:args[1]})[args[0]]
+	
+	raise valueError('bad args')
 
 
 
 
 
 # State cache for observe(), so it doesn't have to query the status of a variable on each subscription.
-_camState = control('get', [k for k in control('availableKeys') if k not in {'dateTime'}])
+# Since this often crashes during development, the following line can be run to try getting each variable independently.
+#     for key in [k for k in control.callSync('availableKeys') if k not in {'dateTime', 'externalStorage'}]: print('getting', key); control.callSync('get', [key])
+_camState = control.callSync('get', [k for k in control.callSync('availableKeys') if k not in {'dateTime', 'externalStorage'}])
 if(not _camState):
 	raise Exception("Cache failed to populate. This indicates the get call is not working.")
 
@@ -171,7 +323,7 @@ class APIValues(QObject):
 		"""Update _camState and invoke any  registered observers."""
 		newItems = msg.arguments()[0].items()
 		for key, value in newItems:
-			print(f'note: {key} is now {value}.')
+			print(f'🆕{key} {value}')
 			_camState[key] = value
 			for callback in self._callbacks[key]:
 				callback(value)

@@ -198,18 +198,13 @@ class Main(QWidget):
 		
 		#Set up exposure slider.
 		# This slider is significantly more responsive to mouse than to touch. 🤔
-		api2.observe('exposurePeriod', self.updateExposureNs)
+		#api2.observe('exposurePeriod', self.updateExposureNs)
 		self.uiExposureSlider.setMaximum(api2.get('exposureMax')) #TODO: This is incorrect, should use update not update_future_only since we're drawing from the wrong value -_-
 		self.uiExposureSlider.setMinimum(api2.get('exposureMin'))
 		api2.observe_future_only('exposureMax', self.updateExposureMax)
 		api2.observe_future_only('exposureMin', self.updateExposureMin)
 		#[TODO DDR 2018-09-13] This valueChanged event is really quite slow, for some reason.
-		self.uiExposureSlider.valueChanged.connect(
-			lambda: api2.control('set', dump('set', {
-				'exposurePercent': 100 - 100*math.sqrt(
-					1 - self.uiExposureSlider.value()/self.uiExposureSlider.maximum() )
-			}))
-		)
+		self.uiExposureSlider.debounce.sliderMoved.connect(self.onExposureSliderMoved)
 		self.uiExposureSlider.touchMargins = lambda: {
 			"top": 10, "left": 30, "bottom": 10, "right": 30
 		}
@@ -238,15 +233,21 @@ class Main(QWidget):
 	def updateBatteryCharge(self):
 		charged = f"{round(api.control('get', ['batteryCharge'])['batteryCharge']*100)}%"
 		self.uiBattery.setText(charged)
-		
+	
+	def onExposureSliderMoved(self, newExposureNs):
+		linearRatio = (newExposureNs-self.uiExposureSlider.minimum()) / (self.uiExposureSlider.maximum()-self.uiExposureSlider.minimum())
+		return api2.control.call('set', {'exposurePercent': math.pow(linearRatio, 2)*100})
+		actual = api2.control.call('set', {'exposurePercent': math.pow(linearRatio, 2)*100})/100
+		exponentialRatio = math.sqrt(actual)
+		self.uiExposureSlider.setValue(exponentialRatio * (self.uiExposureSlider.maximum()-self.uiExposureSlider.minimum()) + self.uiExposureSlider.minimum())
+	
 	@pyqtSlot(int, name="updateExposureNs")
-	@api2.silenceCallbacks('uiExposureSlider')
+	@api2.silenceCallbacks()
 	def updateExposureNs(self, newExposureNs):
-		print('updating exposure slider to', newExposureNs, 'with blocked', self.uiExposureSlider.signalsBlocked())
-		self.uiExposureSlider.blockSignals(True)
-		self.uiExposureSlider.setValue(newExposureNs)
+		linearRatio = (newExposureNs-self.uiExposureSlider.minimum()) / (self.uiExposureSlider.maximum()-self.uiExposureSlider.minimum())
+		exponentialRatio = math.sqrt(linearRatio)
+		self.uiExposureSlider.setValue(exponentialRatio * (self.uiExposureSlider.maximum()-self.uiExposureSlider.minimum()) + self.uiExposureSlider.minimum())
 		self.updateExposureDependancies()
-		self.uiExposureSlider.blockSignals(False)
 	
 	@pyqtSlot(int, name="updateExposureMax")
 	@api2.silenceCallbacks('uiExposureSlider')
@@ -262,8 +263,8 @@ class Main(QWidget):
 	
 	def updateExposureDependancies(self):
 		"""Update exposure text to match exposure slider, and sets the slider step so clicking the gutter always moves 1%."""
-		percent = round((self.uiExposureSlider.value()-self.uiExposureSlider.minimum()) / (self.uiExposureSlider.maximum()-self.uiExposureSlider.minimum()) * 99 + 1)
-		self.uiExposureOverlay.setText(f"{round(self.uiExposureSlider.value()/1000, 2)}µs ({percent}%)")
+		percent = api2.get('exposurePercent')
+		self.uiExposureOverlay.setText(f"{round(self.uiExposureSlider.value()/1000, 2)}µs ({percent:.0f}%)")
 		
 		step1percent = (self.uiExposureSlider.minimum() + self.uiExposureSlider.maximum()) // 100
 		self.uiExposureSlider.setSingleStep(step1percent)

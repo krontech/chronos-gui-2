@@ -2,7 +2,7 @@
 
 from random import randint
 
-from PyQt5.QtCore import QSize, Qt, pyqtSignal
+from PyQt5.QtCore import QSize, Qt, pyqtSignal, QObject
 from PyQt5.QtWidgets import QSlider
 
 from debugger import *; dbg
@@ -13,10 +13,20 @@ class Slider(QSlider, FocusablePlugin):
 	"""Styled, focussable QSlider. Contains fixed valueChanged event.
 		
 		When overriding self.paintEvent, always make sure to call
-		self.checkForVisualChange."""
+		self.checkForVisualChange.
+		
+		Use debounce.valueChanged and debounce.sliderMoved signals 
+		instead of their unpostfixed versions. The unpostfixed versions
+		fire too often."""
 	
-	#Less frequent version of parent valueChanged. Only fires on visual changes.
-	valueChanged = pyqtSignal(int)
+	class Debounce(QObject):
+		"""Less frequent version of parent valueChanged and sliderMoved.
+		
+			Only fired once per frame, not "12 times between frames" as
+			per the default."""
+		
+		valueChanged = pyqtSignal(int)
+		sliderMoved = pyqtSignal(int) #Naming this "sliderMoved" stops QSliderTap from working for some reason. We cannot possibly to the parent signal if we subclass it.
 	
 	def __init__(self, parent=None, showHitRects=False):
 		super().__init__(parent)
@@ -31,7 +41,13 @@ class Slider(QSlider, FocusablePlugin):
 			not pressed and self.selectWidget(delta) )
 		self.jogWheelClick.connect(lambda: self.injectKeystrokes(Qt.Key_Space))
 		
-		#Synthesize an update signal which does not fire much faster than repaint, as valueChanged does.
+		self.debounce = Slider.Debounce()
+		
+		self._userGeneratedEvent = False #Set to true when sliderMoved happens.
+		def updateUserGeneratedEvent():
+			self._userGeneratedEvent = True
+		self.sliderMoved.connect(updateUserGeneratedEvent)
+		
 		self.__lastValue = self.value()
 		self.paintEvent = self.checkForVisualChange
 
@@ -95,4 +111,7 @@ class Slider(QSlider, FocusablePlugin):
 		val = self.value()
 		if val != self.__lastValue:
 			self.__lastValue = val
-			self.valueChanged.emit(val)
+			self.debounce.valueChanged.emit(val)
+			if self._userGeneratedEvent:
+				self._userGeneratedEvent = False
+				self.debounce.sliderMoved.emit(val)
