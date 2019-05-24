@@ -235,8 +235,10 @@ class Main(QWidget):
 		self.uiBattery.setText(charged)
 	
 	def onExposureSliderMoved(self, newExposureNs):
+		#startTime = time.perf_counter()
 		linearRatio = (newExposureNs-self.uiExposureSlider.minimum()) / (self.uiExposureSlider.maximum()-self.uiExposureSlider.minimum())
-		return api2.control.call('set', {'exposurePercent': math.pow(linearRatio, 2)*100})
+		settingExposure = api2.control.call('set', {'exposurePercent': math.pow(linearRatio, 2)*100})
+		return
 		actual = api2.control.call('set', {'exposurePercent': math.pow(linearRatio, 2)*100})/100
 		exponentialRatio = math.sqrt(actual)
 		self.uiExposureSlider.setValue(exponentialRatio * (self.uiExposureSlider.maximum()-self.uiExposureSlider.minimum()) + self.uiExposureSlider.minimum())

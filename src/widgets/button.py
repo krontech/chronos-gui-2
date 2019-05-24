@@ -6,11 +6,12 @@ from PyQt5.QtCore import Q_ENUMS, QSize, Qt
 from PyQt5.QtWidgets import QPushButton
 
 from debugger import *; dbg
+from show_paint_rect_plugin import ShowPaintRectsPlugin
 from touch_margin_plugin import TouchMarginPlugin, MarginWidth
 from focusable_plugin import FocusablePlugin
 
 
-class Button(QPushButton, TouchMarginPlugin, FocusablePlugin):
+class Button(ShowPaintRectsPlugin, TouchMarginPlugin, FocusablePlugin, QPushButton):
 	Q_ENUMS(MarginWidth) #This is needed here. I don't know why the definition in the TouchMarginPlugin doesn't work.
 	jogWheelRotationCancelsClick = False #Widget doesn't use rotation. Ignore it.
 	

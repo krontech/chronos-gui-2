@@ -204,10 +204,10 @@ Save</string>
   <widget class="Slider" name="uiExposureSlider">
    <property name="geometry">
     <rect>
-     <x>570</x>
-     <y>19</y>
-     <width>121</width>
-     <height>461</height>
+     <x>600</x>
+     <y>20</y>
+     <width>60</width>
+     <height>460</height>
     </rect>
    </property>
    <property name="minimum">
@@ -271,7 +271,6 @@ Save</string>
    <property name="font">
     <font>
      <pointsize>-1</pointsize>
-     <stylestrategy>NoAntialias</stylestrategy>
     </font>
    </property>
    <property name="styleSheet">
@@ -297,7 +296,6 @@ Save</string>
    <property name="font">
     <font>
      <pointsize>-1</pointsize>
-     <stylestrategy>NoAntialias</stylestrategy>
     </font>
    </property>
    <property name="styleSheet">
@@ -323,7 +321,6 @@ Save</string>
    <property name="font">
     <font>
      <pointsize>-1</pointsize>
-     <stylestrategy>NoAntialias</stylestrategy>
     </font>
    </property>
    <property name="styleSheet">
@@ -346,14 +343,20 @@ Save</string>
      <height>21</height>
     </rect>
    </property>
+   <property name="font">
+    <font>
+     <pointsize>-1</pointsize>
+    </font>
+   </property>
    <property name="autoFillBackground">
     <bool>false</bool>
    </property>
    <property name="styleSheet">
     <string notr="true">
-			font-size: 16px;
-			background: rgba(255,255,255, 128);
-		</string>
+      font-size: 16px;
+      color: white;
+      background: rgba(0,0,0, 64);
+    </string>
    </property>
    <property name="text">
     <string>1280×1024 @ 1057fps</string>
@@ -368,11 +371,17 @@ Save</string>
      <height>21</height>
     </rect>
    </property>
+   <property name="font">
+    <font>
+     <pointsize>-1</pointsize>
+    </font>
+   </property>
    <property name="styleSheet">
     <string notr="true">
-			font-size: 16px;
-			background: rgba(255,255,255, 128);
-		</string>
+      font-size: 16px;
+      color: white;
+      background: rgba(0,0,0, 64);
+    </string>
    </property>
    <property name="text">
     <string>Exposure: 713.1µs (75%)</string>
@@ -731,10 +740,10 @@ Clipping</string>
 					background: rgba(255,255,255,127); /* The background is drawn under the button borders, so they are opaque if the background is opaque. */
 					
 					/* use borders instead of margins so we can see what we're doing */
-					border-left:   21px solid rgba(25, 18, 235, 46);
-					border-right:  1px solid rgba(25, 18, 235, 46);
-					border-top:    11px solid rgba(25, 18, 235, 46);
-					border-bottom: 1px solid rgba(25, 18, 235, 46);
+					border-left:   21px solid rgba(28, 15, 130, 70);
+					border-right:  1px solid rgba(28, 15, 130, 70);
+					border-top:    11px solid rgba(28, 15, 130, 70);
+					border-bottom: 1px solid rgba(28, 15, 130, 70);
 				}
 			Button { background: #7a70f7 }</string>
     </property>

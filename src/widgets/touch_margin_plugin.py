@@ -60,6 +60,7 @@ class TouchMarginPlugin(MarginWidth):
 		return self._customStyleSheet
 	
 	
+	#Different than contentsMargins. This one is clickable!
 	def touchMargins(self):
 		return {
 			"top": self._clickMarginTop * 10,

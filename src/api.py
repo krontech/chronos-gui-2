@@ -38,13 +38,13 @@ if not QDBusConnection.systemBus().isConnected():
 	raise Exception("D-Bus Setup Error")
 
 cameraControlAPI = QDBusInterface(
-	f"com.krontech.chronos.{'coordinator_mock' if USE_MOCK else 'coordinator'}", #Service
-	f"/com/krontech/chronos/{'coordinator_mock' if USE_MOCK else 'coordinator'}", #Path
+	f"ca.krontech.chronos.{'coordinator_mock' if USE_MOCK else 'coordinator'}", #Service
+	f"/ca/krontech/chronos/{'coordinator_mock' if USE_MOCK else 'coordinator'}", #Path
 	f"", #Interface
 	QDBusConnection.systemBus() )
 cameraVideoAPI = QDBusInterface(
-	f"com.krontech.chronos.{'video_mock' if USE_MOCK else 'video_mock'}", #Service
-	f"/com/krontech/chronos/{'video_mock' if USE_MOCK else 'video_mock'}", #Path
+	f"ca.krontech.chronos.{'video_mock' if USE_MOCK else 'video_mock'}", #Service
+	f"/ca/krontech/chronos/{'video_mock' if USE_MOCK else 'video_mock'}", #Path
 	f"", #Interface
 	QDBusConnection.systemBus() )
 
@@ -169,7 +169,7 @@ class APIValues(QObject):
 		
 		#The .connect call freezes if we don't do this, or if we do this twice.
 		QDBusConnection.systemBus().registerObject(
-			f"/com/krontech/chronos/{'control_mock_hack' if USE_MOCK else 'control_hack'}", 
+			f"/ca/krontech/chronos/{'control_mock_hack' if USE_MOCK else 'control_hack'}", 
 			self,
 		)
 		
@@ -177,8 +177,8 @@ class APIValues(QObject):
 		
 		for key in _camState.keys():
 			QDBusConnection.systemBus().connect(
-				f"com.krontech.chronos.{'coordinator_mock' if USE_MOCK else 'coordinator'}", 
-				f"/com/krontech/chronos/{'coordinator_mock' if USE_MOCK else 'coordinator'}",
+				f"ca.krontech.chronos.{'coordinator_mock' if USE_MOCK else 'coordinator'}", 
+				f"/ca/krontech/chronos/{'coordinator_mock' if USE_MOCK else 'coordinator'}",
 				f"",
 				key, 
 				self.__newKeyValue,
@@ -188,15 +188,15 @@ class APIValues(QObject):
 		
 		
 		QDBusConnection.systemBus().connect(
-			f"com.krontech.chronos.{'coordinator_mock' if USE_MOCK else 'coordinator'}", 
-			f"/com/krontech/chronos/{'coordinator_mock' if USE_MOCK else 'coordinator'}",
+			f"ca.krontech.chronos.{'coordinator_mock' if USE_MOCK else 'coordinator'}", 
+			f"/ca/krontech/chronos/{'coordinator_mock' if USE_MOCK else 'coordinator'}",
 			f"",
 			'xvideoState', 
 			self.__pvs,
 		)
 		QDBusConnection.systemBus().connect(
-			f"com.krontech.chronos.{'coordinator_mock' if USE_MOCK else 'coordinator'}", 
-			f"/com/krontech/chronos/{'coordinator_mock' if USE_MOCK else 'coordinator'}",
+			f"ca.krontech.chronos.{'coordinator_mock' if USE_MOCK else 'coordinator'}", 
+			f"/ca/krontech/chronos/{'coordinator_mock' if USE_MOCK else 'coordinator'}",
 			f"",
 			'xregionSaving', 
 			self.__prs,
@@ -251,8 +251,8 @@ class APIValues(QObject):
 		
 		if not self.signalHandlers[signal]:
 			QDBusConnection.systemBus().connect(
-				f"com.krontech.chronos.{'coordinator_mock' if USE_MOCK else 'coordinator'}", 
-				f"/com/krontech/chronos/{'coordinator_mock' if USE_MOCK else 'coordinator'}",
+				f"ca.krontech.chronos.{'coordinator_mock' if USE_MOCK else 'coordinator'}", 
+				f"/ca/krontech/chronos/{'coordinator_mock' if USE_MOCK else 'coordinator'}",
 				f"",
 				signal, 
 				self.__connectSignalHandler,

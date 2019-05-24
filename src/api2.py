@@ -3,14 +3,16 @@
 """Interface for the control api d-bus service."""
 
 import sys, time
-from debugger import *; dbg
+from typing import Callable, Any
 
 from os import environ
+from subprocess import Popen, PIPE
 
 from PyQt5.QtCore import pyqtSlot, QObject
 from PyQt5.QtDBus import QDBusConnection, QDBusInterface, QDBusReply, QDBusPendingCallWatcher, QDBusPendingReply
-from typing import Callable, Any
 
+from debugger import *; dbg
+from animate import delay
 
 #Mock out the old API; use production for this one so we can switch over piecemeal.
 USE_MOCK = False #environ.get('USE_CHRONOS_API_MOCK') in ('always', 'web')
@@ -157,13 +159,16 @@ class control():
 			self._done = False
 			self._watcherHolder = None
 			
+			#Popen(
+			#	['true'],#['gdbus', 'call', '--system', '--dest', 'ca.krontech.chronos.control', '--object-path', '/ca/krontech/chronos/control', '--method', 'ca.krontech.chronos.control.set', f"{{'exposurePercent': <{self._args[1]['exposurePercent']}>}}"],
+			#	stdout=PIPE
+			#)
+			#return
+			
 			control._enqueueCallback(self)
 			if not control._controlCallInProgress:
 				#Don't start multiple callbacks at once, the most recent one will block.
 				control._startNextCallback()
-				print('starting async chain')
-			else:
-				print('appending to async chain')
 		
 		def __eq__(self, other):
 			# If a control call sets the same keys as another
@@ -179,8 +184,9 @@ class control():
 			
 		
 		def _startAsyncCall(self):
-			print('started async call')
+			# return
 			self._watcherHolder = QDBusPendingCallWatcher(
+				# cameraControlAPI.asyncCallWithArgumentList('dummy', [])
 				cameraControlAPI.asyncCallWithArgumentList(self._args[0], self._args[1:])
 			)
 			self._watcherHolder.finished.connect(self._asyncCallFinished)
@@ -188,9 +194,7 @@ class control():
 			
 		
 		def _asyncCallFinished(self, watcher):
-			print('finished async call')
 			self._done = True
-			
 			reply = QDBusPendingReply(watcher)
 			try:
 				if reply.isError():
@@ -206,7 +210,12 @@ class control():
 			except Exception as e:
 				raise e
 			finally:
-				control._startNextCallback()
+				#Wait a little while before starting on the next callback.
+				#This makes the UI run much smoother, and usually the lag
+				#is covered by the UI updating another few times anyway.
+				#Note that because each call still lags a little, this
+				#causes a few dropped frames every time the API is called.
+				delay(self, 64, control._startNextCallback)
 		
 		def then(self, callback):
 			assert callable(callback), "control().then() only accepts a single, callable function."

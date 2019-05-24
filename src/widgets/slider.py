@@ -1,15 +1,18 @@
 # -*- coding: future_fstrings -*-
 
 from random import randint
+import time
 
-from PyQt5.QtCore import QSize, Qt, pyqtSignal, QObject
+from PyQt5.QtCore import QSize, Qt, pyqtSignal, QObject, QRect
 from PyQt5.QtWidgets import QSlider
+from PyQt5.QtGui import QRegion, QPaintEvent
 
 from debugger import *; dbg
 from focusable_plugin import FocusablePlugin
+from show_paint_rect_plugin import ShowPaintRectsPlugin
 
 
-class Slider(QSlider, FocusablePlugin):
+class Slider(ShowPaintRectsPlugin, FocusablePlugin, QSlider): #Must be in this order, because QSlider doesn't propagate a super() chain.
 	"""Styled, focussable QSlider. Contains fixed valueChanged event.
 		
 		When overriding self.paintEvent, always make sure to call
@@ -31,6 +34,8 @@ class Slider(QSlider, FocusablePlugin):
 	def __init__(self, parent=None, showHitRects=False):
 		super().__init__(parent)
 		
+		self.setAttribute(Qt.WA_OpaquePaintEvent, True)
+		
 		self.showHitRects = showHitRects
 		
 		self.clickMarginColorSlider = f"rgba({randint(0, 32)}, {randint(128, 255)}, {randint(0, 32)}, {randint(32,96)})"
@@ -49,7 +54,9 @@ class Slider(QSlider, FocusablePlugin):
 		self.sliderMoved.connect(updateUserGeneratedEvent)
 		
 		self.__lastValue = self.value()
-		self.paintEvent = self.checkForVisualChange
+		self._fpsMonitorLastFrame = time.perf_counter()
+		
+		self.setContentsMargins(30, 10, 30, 10) #rough guess, good enough?
 
 	def sizeHint(self):
 		return QSize(81, 201)
@@ -95,18 +102,43 @@ class Slider(QSlider, FocusablePlugin):
 	def touchMargins(self):
 		return {
 			"top": 10, #cool that looks about right
-			"left": 20,
+			"left": 30,
 			"bottom": 10,
-			"right": 20,
+			"right": 30,
 		}
 	
-	def checkForVisualChange(self, evt):
+	def visibleRegion(self):
+		print('recalculating visible region')
+		return QRegion(
+			self.getContentsMargins()[0],
+			self.getContentsMargins()[1],
+			self.width() - self.getContentsMargins()[0] - self.getContentsMargins()[2],
+			self.height() - self.getContentsMargins()[1] - self.getContentsMargins()[3],
+		)
+	
+	#Neither of these seem to be overridable, they never get called. If they
+	#were called, we could use update() to not cause the main menu buttons to
+	#repaint because they're above the slider touch margin.
+	#def rect(self):
+	#	print('update rect')
+	#	return QRect(30, 10, self.width()-30, self.height-10)
+	#
+	#def update(arg):
+	#	print('update event', arg)
+	#	return 
+	
+	def paintEvent(self, evt):
 		"""Change event which only fires when visual change happens.
 			
 			This fixes the normal valueChanged event firing 3-8 times
 			per frame, when dragging the slider."""
 		
-		super().paintEvent(evt)
+		
+		print('frame draw time', time.perf_counter()-self._fpsMonitorLastFrame, 'sec')
+		self._fpsMonitorLastFrame = time.perf_counter()
+		
+		clippedEvt = QPaintEvent(self.visibleRegion())
+		super().paintEvent(clippedEvt)
 		
 		val = self.value()
 		if val != self.__lastValue:

@@ -4,9 +4,10 @@ from PyQt5.QtWidgets import QLabel
 from PyQt5.QtCore import QSize
 
 from debugger import *; dbg
+from show_paint_rect_plugin import ShowPaintRectsPlugin
 
 
-class Label(QLabel):
+class Label(ShowPaintRectsPlugin, QLabel):
 	def __init__(self, parent=None, showHitRects=False):
 		super().__init__(parent)
 		
