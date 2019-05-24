@@ -137,7 +137,7 @@ I hope it works.
 		> make -j4
 		- Output is in ~src/. See the cam-mock binary especially.ls
 	- Install the dbus policies (nothing will be allowed to connect otherwise)
-		> sudo cp ~/chronos-cli/src/api/com.krontech.chronos.conf /etc/dbus-1/system.d
+		> sudo cp ~/chronos-cli/src/api/ca.krontech.chronos.conf /etc/dbus-1/system.d
 		- Change <policy user="root"> to <policy user="david"> (in my case), or just run with sudo.
 	- Run the mock, in ~/chronos-cli/src, with ./cam-mock.
 

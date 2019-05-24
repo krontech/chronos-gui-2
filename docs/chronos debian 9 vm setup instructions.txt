@@ -62,7 +62,7 @@ apt install ntpdate ca-certificates cowsay vim python3-pyqt5 python3-pyqt5.qtsvg
 read -sp "Copy chronos-gui-2 over to /opt/camera/chronos-gui-2. Press enter when done. (You can use util/watch-vm-host.sh for this, or do it manually - in my case, I copy-pasted the folder chronos-gui-2 folder from `git checkout && xdg-open .` to fish://root@192.168.0.1:9608 in my file manager, Dolphin. Your setup will probably be different, but as long as you have ~/chronos-gui-2/ with the .py files and a src/ folder in it you should be good.)"
 
 #Allow GUI2 to start D-Bus.
-read -sp "Copy ~util/com.krontech.chronos.conf to the camera as noted in it, then press enter."
+read -sp "Copy ~util/ca.krontech.chronos.conf to the camera as noted in it, then press enter."
 
 
 

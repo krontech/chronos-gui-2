@@ -87,7 +87,7 @@ class VideoAPIMock(QObject):
 
 	def emitControlSignal(self, name, value=None):
 		"""Emit an update signal, usually for indicating a value has changed."""
-		signal = QDBusMessage.createSignal('/com/krontech/chronos/video_mock', 'com.krontech.chronos.video_mock', name)
+		signal = QDBusMessage.createSignal('/ca/krontech/chronos/video_mock', 'ca.krontech.chronos.video_mock', name)
 		signal << getattr(state, name) if value is None else value
 		QDBusConnection.systemBus().send(signal)
 	
@@ -136,9 +136,9 @@ class VideoAPIMock(QObject):
 
 
 
-if not QDBusConnection.systemBus().registerService('com.krontech.chronos.video_mock'):
+if not QDBusConnection.systemBus().registerService('ca.krontech.chronos.video_mock'):
 	sys.stderr.write(f"Could not register video service: {QDBusConnection.systemBus().lastError().message() or '(no message)'}\n")
 	raise Exception("D-Bus Setup Error")
 
 videoAPI = VideoAPIMock() #This absolutely, positively can't be inlined or it throws error "No such object path ...". Possibly, this is because a live reference must be kept so GC doesn't eat it?
-QDBusConnection.systemBus().registerObject('/com/krontech/chronos/video_mock', videoAPI, QDBusConnection.ExportAllSlots)
+QDBusConnection.systemBus().registerObject('/ca/krontech/chronos/video_mock', videoAPI, QDBusConnection.ExportAllSlots)

@@ -9,7 +9,7 @@ Note: ~ denotes "in the root folder of" this project. So, this file is ~util/rea
 	
 	- chronos-designer-template.ui: Start new screens with this template. It's an empty shell with a few convenient things already filled in, such as a white background and a window title for the VM.
 	
-	- com.krontech.chronos.conf: Configuration file for D-Bus, to allow the service to start. See it for installation instructions.
+	- ca.krontech.chronos.conf: Configuration file for D-Bus, to allow the service to start. See it for installation instructions.
 	
 	- designer.sh: Launch Qt Designer via this script, to set the correct env var so you get the custom widgets the UI uses.
 	

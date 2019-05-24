@@ -22,13 +22,13 @@ if not QDBusConnection.systemBus().isConnected():
 	raise Exception("D-Bus Setup Error")
 
 cameraControlAPI = QDBusInterface(
-	f"com.krontech.chronos.{'control_mock' if USE_MOCK else 'control'}", #Service
-	f"/com/krontech/chronos/{'control_mock' if USE_MOCK else 'control'}", #Path
+	f"ca.krontech.chronos.{'control_mock' if USE_MOCK else 'control'}", #Service
+	f"/ca/krontech/chronos/{'control_mock' if USE_MOCK else 'control'}", #Path
 	f"", #Interface
 	QDBusConnection.systemBus() )
 cameraVideoAPI = QDBusInterface(
-	f"com.krontech.chronos.{'video_mock' if USE_MOCK else 'video'}", #Service
-	f"/com/krontech/chronos/{'video_mock' if USE_MOCK else 'video'}", #Path
+	f"ca.krontech.chronos.{'video_mock' if USE_MOCK else 'video'}", #Service
+	f"/ca/krontech/chronos/{'video_mock' if USE_MOCK else 'video'}", #Path
 	f"", #Interface
 	QDBusConnection.systemBus() )
 
@@ -295,7 +295,7 @@ class APIValues(QObject):
 		
 		#The .connect call freezes if we don't do this, or if we do this twice.
 		QDBusConnection.systemBus().registerObject(
-			f"/com/krontech/chronos/{'control_mock_hack' if USE_MOCK else 'control_hack'}", 
+			f"/ca/krontech/chronos/{'control_mock_hack' if USE_MOCK else 'control_hack'}", 
 			self,
 		)
 		
@@ -303,8 +303,8 @@ class APIValues(QObject):
 		self._callbacks['notify'] = [] #meta, watch everything
 		
 		QDBusConnection.systemBus().connect(
-			f"com.krontech.chronos.{'control_mock' if USE_MOCK else 'control'}", 
-			f"/com/krontech/chronos/{'control_mock' if USE_MOCK else 'control'}",
+			f"ca.krontech.chronos.{'control_mock' if USE_MOCK else 'control'}", 
+			f"/ca/krontech/chronos/{'control_mock' if USE_MOCK else 'control'}",
 			f"",
 			'notify', 
 			self.__newKeyValue,

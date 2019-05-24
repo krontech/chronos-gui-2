@@ -153,8 +153,8 @@ src/widgets/touch_margin_plugin.py
 util/Anaconda.sublime-settings
 util/chronos debian setup instructions.txt
 util/chronos-designer-template.ui
-util/com.krontech.chronos.conf
-util/com.krontech.chronos.conf (for ddr's non-root vm)
+util/ca.krontech.chronos.conf
+util/ca.krontech.chronos.conf (for ddr's non-root vm)
 util/designer.sh
 util/fbdev.py
 util/readme.txt

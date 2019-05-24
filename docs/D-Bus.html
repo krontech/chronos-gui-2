@@ -198,13 +198,13 @@
 			from PyQt5.QtDBus import QDBusInterface, QDBusConnection
 			
 			cameraControlAPI = QDBusInterface(
-				"com.krontech.chronos.control", #Service
-				"/com/krontech/chronos/control", #Path
+				"ca.krontech.chronos.control", #Service
+				"/ca/krontech/chronos/control", #Path
 				"", #Interface
 				QDBusConnection.systemBus() )
 		</code>
 		
-		<p>To use the mock interface, to avoid misconfiguring the camera during development, connect to the <code>com.krontech.chronos.control<strong>.mock</strong></code> service instead of <code>com.krontech.chronos.control</code>.</p>
+		<p>To use the mock interface, to avoid misconfiguring the camera during development, connect to the <code>ca.krontech.chronos.control<strong>.mock</strong></code> service instead of <code>ca.krontech.chronos.control</code>.</p>
 		
 		<h3>Methods</h3>
 		
@@ -298,7 +298,7 @@
 			<li><code><strong>testNetworkStorageCredentials</strong>({[networkStorageAddress: str], [networkStorageUsername: str], [networkStoragePassword: str]}) → str error</code> — Check if a remote file share is available. Returns either a string containing the error message if the share is not connectable-to, or an empty string if the credentials were valid. networkStorageAddress, networkStorageUsername, and networkStoragePassword may be provided to override the API values of the same names.</li>
 		</ul>
 		
-		<p>In addition, when a camera setting is changed, a signal named the key is emitted on the D-Bus interface. It can be intercepted with <code>QDBusConnection.systemBus().connect('com.krontech.chronos.control.mock', '/', '', NAME_OF_KEY, CALLBACK)</code>.
+		<p>In addition, when a camera setting is changed, a signal named the key is emitted on the D-Bus interface. It can be intercepted with <code>QDBusConnection.systemBus().connect('ca.krontech.chronos.control.mock', '/', '', NAME_OF_KEY, CALLBACK)</code>.
 		
 		
 		<h3><a name="values">Values</a></h3>
