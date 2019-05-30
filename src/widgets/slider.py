@@ -108,7 +108,7 @@ class Slider(ShowPaintRectsPlugin, FocusablePlugin, QSlider): #Must be in this o
 		}
 	
 	def visibleRegion(self):
-		print('recalculating visible region')
+		#print('recalculating visible region')
 		return QRegion(
 			self.getContentsMargins()[0],
 			self.getContentsMargins()[1],
@@ -134,7 +134,7 @@ class Slider(ShowPaintRectsPlugin, FocusablePlugin, QSlider): #Must be in this o
 			per frame, when dragging the slider."""
 		
 		
-		print('frame draw time', time.perf_counter()-self._fpsMonitorLastFrame, 'sec')
+		#print('frame draw time', time.perf_counter()-self._fpsMonitorLastFrame, 'sec')
 		self._fpsMonitorLastFrame = time.perf_counter()
 		
 		clippedEvt = QPaintEvent(self.visibleRegion())

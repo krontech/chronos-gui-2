@@ -2,40 +2,40 @@
 
 from urllib.request import urlopen
 import json
+from debugger import log
 
-serial_number = -1
+serialNumber = -1
 try:
 	with open('/opt/camera/serial_number', 'r') as sn_file:
-		serial_number = sn_file.read().strip()
+		serialNumber = sn_file.read().strip()
 except Exception:
 	#OK, can't read that file. Fall back to MAC address.
 	with open('/proc/net/arp') as arp_file:
 		import re
-		serial_number = re.search('(?:[\\d\\w:]{2,3}){6}', arp_file.read())[0]
+		serialNumber = re.search('(?:[\\d\\w:]{2,3}){6}', arp_file.read())[0]
 
 
-app_version = 'unknown'
+appVersion = 'unknown'
 try:
 	with open('git_description', 'r') as gd_file:
-		app_version = gd_file.read().strip()
+		appVersion = gd_file.read().strip()
 except Exception:
 	pass
 
+
+report_url = 'http://192.168.1.55:19861'
 def report(tag: str, data: dict):
 	"""Report program statistics to an internal server, stats.node.js."""
-	
 	assert tag
+	assert "tag" not in data
+	assert "serial_number" not in data
 		
 	data["tag"] = tag
-	data["serial_number"] = serial_number #Always append this (hopefully) unique identifier.
+	data["serial_number"] = serialNumber #Always append this (hopefully) unique identifier.
 	try:
-		urlopen(
-			'http://192.168.1.55:19861', 
-			bytes(json.dumps(data), 'utf-8'),
-			0.1,
-		)
+		urlopen(report_url, bytes(json.dumps(data), 'utf-8'), 0.1)
 	except Exception:
-		print('Could not contact local stats server.')
+		log.warn(f'Could not contact the stats server at {report_url}.')
 		pass
 	
 def report_mock(tag: str, data: dict):

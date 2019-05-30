@@ -116,7 +116,6 @@ class control():
 		"""Enqueue callback. Squash calls to set for efficiency."""
 		if coalesce and [pendingCall] == control._controlEnqueuedCalls[:1]:
 			control._controlEnqueuedCalls[-1] = pendingCall
-			print('coalesced callbacks')
 		else:
 			control._controlEnqueuedCalls += [pendingCall]
 	
@@ -332,7 +331,7 @@ class APIValues(QObject):
 		"""Update _camState and invoke any  registered observers."""
 		newItems = msg.arguments()[0].items()
 		for key, value in newItems:
-			print(f'🆕{key} {value}')
+			log.info(f'🆕{key} {value}')
 			_camState[key] = value
 			for callback in self._callbacks[key]:
 				callback(value)

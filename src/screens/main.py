@@ -211,6 +211,13 @@ class Main(QWidget):
 		
 		#Oh god this is gonna mess up scroll wheel selection so badly. 😭
 		self.uiShowWhiteClipping.stateChanged.connect(self.uiShotAssistMenu.setFocus)
+		
+		#Set the kerning to false because it looks way better.
+		#Doesn't seem to be working? --DDR 2019-05-29
+		font = self.uiResolutionOverlay.font()
+		font.setKerning(False)
+		self.uiResolutionOverlay.setFont(font)
+		self.uiExposureOverlay.setFont(font)
 	
 	def onShow(self):
 		videoState = api.get('videoState')
@@ -237,10 +244,13 @@ class Main(QWidget):
 	def onExposureSliderMoved(self, newExposureNs):
 		#startTime = time.perf_counter()
 		linearRatio = (newExposureNs-self.uiExposureSlider.minimum()) / (self.uiExposureSlider.maximum()-self.uiExposureSlider.minimum())
-		settingExposure = api2.control.call('set', {'exposurePercent': math.pow(linearRatio, 2)*100})
-		return
-		actual = api2.control.call('set', {'exposurePercent': math.pow(linearRatio, 2)*100})/100
-		exponentialRatio = math.sqrt(actual)
+		log.print(f'lr {linearRatio}')
+		api2.control.call('set', {
+			'exposurePercent': math.pow(linearRatio, 2)*100,
+		}).then(self.onExposureSliderMovedOk)
+	def onExposureSliderMovedOk(self, response):
+		log.print(f'resp {response}')
+		exponentialRatio = math.sqrt(response['exposurePercent']/100)
 		self.uiExposureSlider.setValue(exponentialRatio * (self.uiExposureSlider.maximum()-self.uiExposureSlider.minimum()) + self.uiExposureSlider.minimum())
 	
 	@pyqtSlot(int, name="updateExposureNs")

@@ -179,13 +179,13 @@ class Window(QtCore.QObject):
 		if screenName not in self._availableScreens:
 			raise ValueError(f"Unknown screen {screenName}.\nAvailable screens are: {self._availableScreens.keys()}")
 		
-		print('loading', screenName, end=', ')
+		log.info(f'Loading {screenName} screen.')
 		perf_start_time = time.perf_counter()
 		
 		screen = self._screens[screenName] = self._availableScreens[screenName](self)
 		screen.app = self.app
 		
-		print(time.perf_counter() - perf_start_time, end=', ')
+		log.perf(f'screen load duration, {screenName}, {time.perf_counter() - perf_start_time}')
 		
 		# So, we want alpha blending, so we can have a drop-shadow for our
 		# keyboard. Great. Since we're not using a compositing window manager,
@@ -207,7 +207,7 @@ class Window(QtCore.QObject):
 		# Finally, add the screen's focus ring.
 		screen.focusRing = FocusRing(self._screens[screenName])
 		
-		print(time.perf_counter() - perf_start_time)
+		log.perf(f'screen ready duration, {screenName}, {time.perf_counter() - perf_start_time}')
 		
 	def _uninstantiatedScreens(self):
 		"""Return (generator for) non-cached screens. (Those not in self._screens.)"""

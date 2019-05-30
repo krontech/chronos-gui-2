@@ -7,7 +7,7 @@ from PyQt5.QtWidgets import QScroller
 from debugger import *; dbg
 
 import api
-from stats import app_version
+from stats import appVersion
 
 
 class AboutCamera(QtWidgets.QDialog):
@@ -25,7 +25,7 @@ class AboutCamera(QtWidgets.QDialog):
 			self.uiText.text()
 			.replace('{MODEL}', f"{api.get('cameraModel')}, {api.get('cameraMemoryGB')}, {'color' if api.get('sensorRecordsColor') else 'mono'}")
 			.replace('{SERIAL_NUMBER}', api.get('cameraSerial'))
-			.replace('{UI_VERSION}', app_version)
+			.replace('{UI_VERSION}', appVersion)
 			.replace('{API_VERSION}', api.get('cameraApiVersion'))
 			.replace('{FPGA_VERSION}', api.get('cameraFpgaVersion'))
 		)

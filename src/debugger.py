@@ -1,9 +1,30 @@
 # -*- coding: future_fstrings -*-
 
-"""Simple, short debugging methods.
+"""Simple, short debugging methods and configuration.
 
-Both the provided dbg() and brk() calls are the same, calling up an interactive
-command line.
+	This module assists debugging. It configures Python to
+start debugging when an error is hit, and prints out an
+error in case of a segfault. It provides several functions
+to print data out and enter an interactive debugger, in
+addition to configuring a common logger for use in the app.
+
+Members:
+	logging: Configured instance of
+		https://docs.python.org/3.4/library/logging.html.
+		Doesn't print time to save space, and time is
+		captured by systemd logging anyway.
+	brk: Drop into an interactive debugger. See also 
+		breakIf.
+	dbg: See brk.
+	dump: Print and return the arg passed. Useful for
+		debugging in a non-statement context, such as a
+		function call. Optionally takes a string tag as the
+		first arg, in addition to the dumped arg. Also
+		known as "tap" or "tee".
+	breakIf: Drop into an interactive debugger, but only if
+		a modifier key is held on an attached keyboard.
+	pp: Pretty-print a value.
+	pd: Pretty-dump. Like dump but pretty-prints the value.
 
 Example:
 	from debugger import *; dbg
@@ -14,6 +35,8 @@ import sys, pdb, pprint
 from os import system, popen
 from faulthandler import enable; enable() #Enable segfault backtraces, usually from C libs. (exit code 139)
 from PyQt5 import QtCore
+import logging as logging
+
 
 
 # Start our interactive debugger when an error happens.
@@ -29,6 +52,54 @@ def eh(t,v,tb):
 	pdb.traceback.print_exception(t, v, tb)
 	pdb.post_mortem(t=tb)
 sys.excepthook = eh
+del eh #Don't export.
+
+
+def setupLogging():
+	"""Configure logging for GUI2.
+	
+		Log levels are:
+			CRITICAL 50
+			ERROR    40
+			WARNING  30
+			PRINT    25 For println-style debugging.
+			INFO     20
+			PERF     15 For performance information. 
+			DEBUG    10
+			NOTSET   00
+	"""
+	
+	PRINT_LEVEL = 25
+	logging.addLevelName(PRINT_LEVEL, "PRINT")
+	def print_(self, message, *args, **kws):
+		if self.isEnabledFor(PRINT_LEVEL):
+			self._log(PRINT_LEVEL, message, args, **kws) 
+	logging.Logger.print = print_
+	
+	PERF_LEVEL = 15
+	logging.addLevelName(PERF_LEVEL, "PERF")
+	def perf(self, message, *args, **kws):
+		if self.isEnabledFor(PERF_LEVEL):
+			self._log(PERF_LEVEL, message, args, **kws) 
+	logging.Logger.perf = perf
+	
+	
+	logging.basicConfig(
+		datefmt='',
+		format='%(levelname)8s %(name)s [%(funcName)s]: %(message)s',
+		level=logging.INFO,
+	)
+	
+	# pyqt5 uic prints a looooot of DEBUG messages.
+	logging.getLogger('PyQt5.uic.uiparser').setLevel(logging.INFO)
+	logging.getLogger('PyQt5.uic.properties').setLevel(logging.INFO)
+	
+	#logging.disable(PERF_LEVEL) #Don't need this until it starts acting up.
+	
+	return logging.getLogger('gui2')
+log = setupLogging()
+del setupLogging #Don't export.
+
 
 
 def brk():
@@ -60,9 +131,9 @@ def dump(*args):
 		1-arity: dump(val: any)
 			print val and return it.
 		2-arity: dump(label, val)"""
-	if not args:
-		raise ValueError('No args specified to dump!')
-	print(*args)
+	
+	assert 1 <= len(args) <= 2, f"Incorrect number of args. Expected 1 or 2, got {len(args)}."
+	log.debug(*args)
 	return args[0] if len(args) == 1 else args[1]
 	
 
@@ -88,11 +159,14 @@ if hasattr(pdb, 'hideframe'):
 
 
 def pp(*args, **kwargs):
+	"""Pretty-print the data passed in."""
 	pprint.PrettyPrinter(
 		width=int(popen('stty size').read().split()[1]), #Width of console.
 		compact=True,
 	).pprint(*args, **kwargs)
 
+
 #This doesn't really work. Running pp(dir(x)) here vs on the debug console produces different results.
 def pd(*args):
+	"""Pretty print and return the data passed in."""
 	pp(*[dir(arg) for arg in args])
