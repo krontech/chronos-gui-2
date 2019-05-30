@@ -2,17 +2,17 @@
 
 """Interface for the control api d-bus service."""
 
-import sys, time
+import sys
 from typing import Callable, Any
 
 from os import environ
-from subprocess import Popen, PIPE
 
 from PyQt5.QtCore import pyqtSlot, QObject
 from PyQt5.QtDBus import QDBusConnection, QDBusInterface, QDBusReply, QDBusPendingCallWatcher, QDBusPendingReply
 
 from debugger import *; dbg
 from animate import delay
+import logging; log = logging.getLogger('Chronos.api')
 
 #Mock out the old API; use production for this one so we can switch over piecemeal.
 USE_MOCK = False #environ.get('USE_CHRONOS_API_MOCK') in ('always', 'web')
@@ -183,9 +183,7 @@ class control():
 			
 		
 		def _startAsyncCall(self):
-			# return
 			self._watcherHolder = QDBusPendingCallWatcher(
-				# cameraControlAPI.asyncCallWithArgumentList('dummy', [])
 				cameraControlAPI.asyncCallWithArgumentList(self._args[0], self._args[1:])
 			)
 			self._watcherHolder.finished.connect(self._asyncCallFinished)

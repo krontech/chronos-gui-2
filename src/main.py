@@ -9,18 +9,24 @@ See readme.md for more details.
 # General imports
 import sys, os, subprocess
 import time
-from debugger import *; dbg
 
 # QT-specific imports
 from PyQt5 import QtWidgets, QtCore, QtGui
 from stats import report
 
+import set_up_logging; set_up_logging #imported for the side-effects, ignore "unused" warning
+from debugger import *; dbg #imported for occasional use debugging, ignore "unused" warning
 import settings
 from hardware import Hardware
 from widgets.focus_ring import FocusRing
+import logging
 
-#Our settings
-PRECACHE_ALL_SCREENS = False
+
+#App performance settings
+PRECACHE_ALL_SCREENS = False #Precached screens are faster to open the first time, but impact UI performance for a few seconds on startup. Since during development I usually want the only screen I'm working on -now-, I added this option to turn it off. --DDR 2019-05-30
+
+guiLog = logging.getLogger('Chronos.gui')
+perfLog = logging.getLogger('Chronos.perf')
 
 #Script setup
 perf_start_time = time.perf_counter()
@@ -36,6 +42,7 @@ with open(os.devnull, 'w') as null:
 		['renice', '-n', '-19', '-p', str(os.getpid())],
 		stdout=null,
 	)
+
 
 
 class Window(QtCore.QObject):
@@ -179,13 +186,13 @@ class Window(QtCore.QObject):
 		if screenName not in self._availableScreens:
 			raise ValueError(f"Unknown screen {screenName}.\nAvailable screens are: {self._availableScreens.keys()}")
 		
-		log.info(f'Loading {screenName} screen.')
+		guiLog.info(f'Loading {screenName} screen.')
 		perf_start_time = time.perf_counter()
 		
 		screen = self._screens[screenName] = self._availableScreens[screenName](self)
 		screen.app = self.app
 		
-		log.perf(f'screen load duration, {screenName}, {time.perf_counter() - perf_start_time}')
+		perfLog.info(f'screen load duration, {screenName}, {time.perf_counter() - perf_start_time}')
 		
 		# So, we want alpha blending, so we can have a drop-shadow for our
 		# keyboard. Great. Since we're not using a compositing window manager,
@@ -207,7 +214,7 @@ class Window(QtCore.QObject):
 		# Finally, add the screen's focus ring.
 		screen.focusRing = FocusRing(self._screens[screenName])
 		
-		log.perf(f'screen ready duration, {screenName}, {time.perf_counter() - perf_start_time}')
+		perfLog.info(f'screen ready duration, {screenName}, {time.perf_counter() - perf_start_time}')
 		
 	def _uninstantiatedScreens(self):
 		"""Return (generator for) non-cached screens. (Those not in self._screens.)"""

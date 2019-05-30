@@ -14,6 +14,7 @@ import api2
 
 import settings
 from widgets.button import Button
+import logging; log = logging.getLogger('Chronos.gui')
 
 
 class Main(QWidget):

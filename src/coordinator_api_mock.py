@@ -35,13 +35,13 @@ from pathlib import Path
 from PyQt5.QtCore import pyqtSlot, QObject, QTimer, Qt, QByteArray
 from PyQt5.QtDBus import QDBusConnection, QDBusMessage, QDBusError
 
-
 from debugger import *; dbg
 from animate import delay
+import logging; log = logging.getLogger('Chronos.api')
 
 # Set up d-bus interface. Connect to mock system buses. Check everything's working.
 if not QDBusConnection.systemBus().isConnected():
-	print("Error: Can not connect to D-Bus. Is D-Bus itself running?", file=sys.stderr)
+	log.critical("Error: Can not connect to D-Bus. Is D-Bus itself running?", file=sys.stderr)
 	sys.exit(-1)
 
 
@@ -142,7 +142,7 @@ def resolutionIsValid(hOffset: int, vOffset: int, hRes: int, vRes: int):
 
 def framerateForResolution(hRes: int, vRes: int) -> int:
 	if type(hRes) is not int or type(vRes) is not int:
-		return print("D-BUS ERROR", QDBusError.InvalidArgs, f"framerate must be of type <class 'int'>, <class 'int'>. Got type {type(hRes)}, {type(vRes)}.")
+		return log.error("D-BUS ERROR", QDBusError.InvalidArgs, f"framerate must be of type <class 'int'>, <class 'int'>. Got type {type(hRes)}, {type(vRes)}.")
 			
 	return 60*4e7/(hRes*vRes+1e6) #Mock. Total BS but feels about right at the higher resolutions.
 
@@ -165,13 +165,13 @@ pendingCallbacks = set()
 
 def changeRecordingResolution(state):
 	if state.videoState == 'preview':
-		print(f"Mock: changing recording resolution to xywh {state.previewHOffset} {state.previewVOffset} {state.previewHRes} {state.previewVRes}.")
+		log.info(f"Mock: changing recording resolution to xywh {state.previewHOffset} {state.previewVOffset} {state.previewHRes} {state.previewVRes}.")
 	else:
-		print(f"Mock: changing recording resolution to xywh {state.recordingHOffset} {state.recordingVOffset} {state.recordingHRes} {state.recordingVRes}.")
+		log.info(f"Mock: changing recording resolution to xywh {state.recordingHOffset} {state.recordingVOffset} {state.recordingHRes} {state.recordingVRes}.")
 
 
 def notifyExposureChange(state):
-	print('Mock: Exposure change callback.')
+	log.info('Mock: Exposure change callback.')
 	#self.emitControlSignal('maxExposureNs', 7e8) # Example.
 	#self.emitControlSignal('minExposureNs', 3e2)
 
@@ -402,7 +402,7 @@ class State():
 	def sensorMilliframerate(self, value):
 		newMaxRecordingPeriod = int(1e9/(value/1000))
 		if newMaxRecordingPeriod < self.recordingPeriod:
-			print('notification: new max recording period less than recording period')
+			log.info('notification: new max recording period less than recording period')
 			#Perhaps we want to bump the recording period down? I think it would make
 			#sense for these numbers to generally "trail" each other. Or should it be
 			#a proportional thing? Like exposure is always n% of the frame? I think
@@ -864,7 +864,7 @@ class ControlAPIMock(QObject):
 			if getattr(state, key) != value:
 				setattr(state, key, value)
 				self.emitControlSignal(key)
-				print(f"MOCK: updated {key} to {value}")
+				log.info(f"MOCK: updated {key} to {value}")
 				
 		
 		#Call each callback set. Good for multi-arg tasks such as recording resolution and trigger state.
@@ -900,8 +900,8 @@ class ControlAPIMock(QObject):
 	@action('set')
 	@pyqtSlot()
 	def powerDown(self) -> None:
-		print('powering down camera…')
-		print('aborted, mock will not shut down machine')
+		log.info('powering down camera…')
+		log.info('aborted, mock will not shut down machine')
 		
 	
 	@action('get')
@@ -918,20 +918,20 @@ class ControlAPIMock(QObject):
 	@action('set')
 	@pyqtSlot("QVariantMap", result="QVariantMap")
 	def calibrate(self, what) -> None:
-		print(f'Mock: not calibrating {", ".join([t for t, b in what.items() if b])}.')
+		log.info(f'Mock: not calibrating {", ".join([t for t, b in what.items() if b])}.')
 		return Reply()
 	
 	
 	@action('set')
 	@pyqtSlot()
 	def takeStillReferenceForMotionTriggering(self) -> None:
-		print('MOCK: train stillness for motion triggering')
+		log.info('MOCK: train stillness for motion triggering')
 	
 	
 	@action('set')
 	@pyqtSlot(str, result='QVariantMap')
 	def saveCameraSettings(self, toFolder: str) -> Union[Dict[str, str], None]:
-		print(f'MOCK: Save calibration data to {toFolder}.')
+		log.info(f'MOCK: Save calibration data to {toFolder}.')
 		return (
 			Reply("out of space", "Out of space on sda.") 
 			if 'sda' in toFolder else 
@@ -941,19 +941,19 @@ class ControlAPIMock(QObject):
 	@action('set')
 	@pyqtSlot(str, result='QVariantMap')
 	def loadCameraSettings(self, fromFolder: str):
-		print(f'MOCK: Load calibration data.')
+		log.info(f'MOCK: Load calibration data.')
 		return None
 	
 	@action('set')
 	@pyqtSlot(str, result='QVariantMap')
 	def resetCameraSettings(self, fromFolder: str):
-		print(f'MOCK: Reset calibration data.')
+		log.info(f'MOCK: Reset calibration data.')
 		return None
 	
 	@action('set')
 	@pyqtSlot(str)
 	def applySoftwareUpdate(self, fromFolder: str):
-		print(f'MOCK: Apply software update.')
+		log.info(f'MOCK: Apply software update.')
 		return None
 	
 	@action('get')
@@ -1068,7 +1068,7 @@ class ControlAPIMock(QObject):
 			self.emitSignal("regionSavingError", "already saving regions")
 			return
 		
-		print(f'saving {len(regions)} region(s)')
+		log.info(f'saving {len(regions)} region(s)')
 		
 		self.previousVideoState = state.videoState
 		state.videoState = 'saving'
@@ -1090,7 +1090,7 @@ class ControlAPIMock(QObject):
 			filename = Path(region['path']) / name
 			
 			delay(self, time, lambda filename=filename: 
-				print('saving', filename)
+				log.info('saving', filename)
 			)
 			
 			regionLength = region['end'] - region['start']
@@ -1127,9 +1127,9 @@ class ControlAPIMock(QObject):
 			device associated with it. Formatting the device will
 			coalesce and erase all existing partitions and files."""
 		
-		print(f"MOCK: Formatting device {device}…", end='', flush=True)
+		log.info(f"MOCK: Formatting device {device}…")
 		sleep(2)
-		print(" done.")
+		log.info("MOCK: Formatting finished.")
 	
 	@action('set')
 	@pyqtSlot(str)
@@ -1141,7 +1141,7 @@ class ControlAPIMock(QObject):
 			either reinsert it or SSH into the camera and use the
 			mount command. (See "man mount" for more details.)"""
 		
-		print(f"MOCK: Unmounting {path}.")
+		log.info(f"MOCK: Unmounting {path}.")
 	
 	@action('get')
 	@pyqtSlot(result="QVariantMap")
@@ -1177,9 +1177,9 @@ class ControlAPIMock(QObject):
 			
 		
 		
-		print("MOCK: Checking network storage…", end='', flush=True)
+		log.info("MOCK: Checking network storage…")
 		sleep(3)
-		print(" ok.")
+		log.info("MOCK: Network storage ok.")
 		return Reply('')
 
 
@@ -1203,5 +1203,5 @@ if __name__ == '__main__':
 	#Quit on ctrl-c.
 	signal.signal(signal.SIGINT, signal.SIG_DFL)
 	
-	print("Running coordinator api mock.")
+	log.info("Running coordinator api mock.")
 	sys.exit(app.exec_())

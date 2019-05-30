@@ -2,7 +2,7 @@
 
 from urllib.request import urlopen
 import json
-from debugger import log
+import logging; log = logging.getLogger('Chronos.perf')
 
 serialNumber = -1
 try:

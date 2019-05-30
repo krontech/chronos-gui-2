@@ -9,10 +9,6 @@ to print data out and enter an interactive debugger, in
 addition to configuring a common logger for use in the app.
 
 Members:
-	logging: Configured instance of
-		https://docs.python.org/3.4/library/logging.html.
-		Doesn't print time to save space, and time is
-		captured by systemd logging anyway.
 	brk: Drop into an interactive debugger. See also 
 		breakIf.
 	dbg: See brk.
@@ -34,9 +30,10 @@ Example:
 import sys, pdb, pprint
 from os import system, popen
 from faulthandler import enable; enable() #Enable segfault backtraces, usually from C libs. (exit code 139)
-from PyQt5 import QtCore
-import logging as logging
 
+from PyQt5 import QtCore
+
+import logging; log = logging.getLogger('Chronos.gui')
 
 
 # Start our interactive debugger when an error happens.
@@ -53,52 +50,6 @@ def eh(t,v,tb):
 	pdb.post_mortem(t=tb)
 sys.excepthook = eh
 del eh #Don't export.
-
-
-def setupLogging():
-	"""Configure logging for GUI2.
-	
-		Log levels are:
-			CRITICAL 50
-			ERROR    40
-			WARNING  30
-			PRINT    25 For println-style debugging.
-			INFO     20
-			PERF     15 For performance information. 
-			DEBUG    10
-			NOTSET   00
-	"""
-	
-	PRINT_LEVEL = 25
-	logging.addLevelName(PRINT_LEVEL, "PRINT")
-	def print_(self, message, *args, **kws):
-		if self.isEnabledFor(PRINT_LEVEL):
-			self._log(PRINT_LEVEL, message, args, **kws) 
-	logging.Logger.print = print_
-	
-	PERF_LEVEL = 15
-	logging.addLevelName(PERF_LEVEL, "PERF")
-	def perf(self, message, *args, **kws):
-		if self.isEnabledFor(PERF_LEVEL):
-			self._log(PERF_LEVEL, message, args, **kws) 
-	logging.Logger.perf = perf
-	
-	
-	logging.basicConfig(
-		datefmt='',
-		format='%(levelname)8s %(name)s [%(funcName)s]: %(message)s',
-		level=logging.INFO,
-	)
-	
-	# pyqt5 uic prints a looooot of DEBUG messages.
-	logging.getLogger('PyQt5.uic.uiparser').setLevel(logging.INFO)
-	logging.getLogger('PyQt5.uic.properties').setLevel(logging.INFO)
-	
-	#logging.disable(PERF_LEVEL) #Don't need this until it starts acting up.
-	
-	return logging.getLogger('gui2')
-log = setupLogging()
-del setupLogging #Don't export.
 
 
 

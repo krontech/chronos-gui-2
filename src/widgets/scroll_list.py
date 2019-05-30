@@ -33,7 +33,13 @@ class ScrollList(QListView, FocusablePlugin):
 			self.injectKeystrokes(
 				Qt.Key_Up if delta < 0 else Qt.Key_Down, count=abs(delta) ) )
 		
-		self.jogWheelClick.connect(lambda: self.injectKeystrokes(Qt.Key_Enter))
+		#Only works in Qt ≥ v5.10.
+		#self.jogWheelClick.connect(lambda: self.injectKeystrokes(Qt.Key_Enter))
+		def selectAndClose():
+			for child in self.children():
+				if hasattr(child, 'injectKeystrokes'):
+					child.injectKeystrokes(Qt.Key_Enter)
+		self.jogWheelClick.connect(selectAndClose)
 		
 		#Add drag-to-scroll to dropdown menus.
 		QScroller.grabGesture(self.viewport(), QScroller.LeftMouseButtonGesture) #DDR 2019-01-15: Defaults to TouchGesture - which should work, according to WA_AcceptTouchEvents, but doesn't.
