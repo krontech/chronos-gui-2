@@ -84,7 +84,7 @@ def dump(*args):
 		2-arity: dump(label, val)"""
 	
 	assert 1 <= len(args) <= 2, f"Incorrect number of args. Expected 1 or 2, got {len(args)}."
-	log.debug(*args)
+	log.debug(': '.join([str(a) for a in args]))
 	return args[0] if len(args) == 1 else args[1]
 	
 
