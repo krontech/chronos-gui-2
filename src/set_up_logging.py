@@ -24,7 +24,7 @@ def setUpLogging():
 	
 	logging.basicConfig(
 		datefmt='',
-		format='%(levelname)8s %(name)12s [%(funcName)s]: %(message)s',
+		format='%(levelname)8s %(name)12s [%(funcName)s] %(message)s',
 		level=logging.INFO,
 	)
 	

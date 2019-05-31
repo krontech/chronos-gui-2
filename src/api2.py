@@ -113,7 +113,25 @@ class control():
 	
 	@staticmethod
 	def _enqueueCallback(pendingCall, coalesce: bool=True): #pendingCall is control.call
-		"""Enqueue callback. Squash calls to set for efficiency."""
+		"""Enqueue callback. Squash and elide calls to set for efficiency."""
+		
+		#Step 1: Will this call actually do anything? Elide it if not.
+		if coalesce and pendingCall._args[0] == 'set':
+			#Elide this call if it would not change known state.
+			hasNewInformation = False
+			newItems = pendingCall._args[1].items()
+			for key, value in newItems:
+				if _camState[key] != value:
+					#log.info(f'Anticipating {key} → {value}.')
+					#Update known cam state in advance of state transition.
+					#_camState[key] = value
+					hasNewInformation = True
+					#for callback in apiValues._callbacks[key]:
+					#	callback(value)
+			if not hasNewInformation:
+				return
+		
+		#Step 2: Is there already a set call pending? (Note that non-set calls act as set barriers; two sets won't get coalesced if a non-set call is between them.)
 		if coalesce and [pendingCall] == control._controlEnqueuedCalls[:1]:
 			control._controlEnqueuedCalls[-1] = pendingCall
 		else:
@@ -135,10 +153,6 @@ class control():
 			control._controlCallInProgress = False
 	
 	
-	#api2.control.call('get', ['sensorColorPattern']).then(lambda v: print('val', v))
-	#api2.control.call('set', {'zebraLevel': 0.2}).then(lambda v: print('val1', v))
-	#api2.control.call('set', {'zebraLevel': 0.4}).then(lambda v: print('val1', v))
-	#api2.control.call('set', {'zebraLevel': 0.6}).then(lambda v: print('val2', v))
 	class call(QObject):
 		"""Call the camera control DBus API. First arg is the function name. Returns a promise.
 		
@@ -157,12 +171,6 @@ class control():
 			self._catchs = []
 			self._done = False
 			self._watcherHolder = None
-			
-			#Popen(
-			#	['true'],#['gdbus', 'call', '--system', '--dest', 'ca.krontech.chronos.control', '--object-path', '/ca/krontech/chronos/control', '--method', 'ca.krontech.chronos.control.set', f"{{'exposurePercent': <{self._args[1]['exposurePercent']}>}}"],
-			#	stdout=PIPE
-			#)
-			#return
 			
 			control._enqueueCallback(self)
 			if not control._controlCallInProgress:
@@ -324,15 +332,26 @@ class APIValues(QObject):
 		"""Stop a function from getting called when a value is updated."""
 		raise Exception('unimplimented')
 	
+	def __newValueIsEnqueued(self, key):
+		return True in [
+			dump(f'{key} in {call._args[1]}', key in call._args[1])
+			for call in control._controlEnqueuedCalls
+			if call._args[0] == 'set'
+		]
+	
 	@pyqtSlot('QDBusMessage')
 	def __newKeyValue(self, msg):
 		"""Update _camState and invoke any  registered observers."""
 		newItems = msg.arguments()[0].items()
 		for key, value in newItems:
-			log.info(f'🆕{key} {value}')
-			_camState[key] = value
-			for callback in self._callbacks[key]:
-				callback(value)
+			if _camState[key] != value and not dump('enqueued', self.__newValueIsEnqueued(key)):
+				log.info(f'Informing {key} → {value}.')
+				_camState[key] = value
+				for callback in self._callbacks[key]:
+					callback(value)
+			else:
+				log.info(f'Ignoring {key} → {value}, stale.')
+
 	
 	def get(self, key):
 		return _camState[key]

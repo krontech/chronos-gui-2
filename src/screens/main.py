@@ -199,7 +199,7 @@ class Main(QWidget):
 		
 		#Set up exposure slider.
 		# This slider is significantly more responsive to mouse than to touch. 🤔
-		#api2.observe('exposurePeriod', self.updateExposureNs)
+		api2.observe('exposurePeriod', self.updateExposureNs)
 		self.uiExposureSlider.setMaximum(api2.get('exposureMax')) #TODO: This is incorrect, should use update not update_future_only since we're drawing from the wrong value -_-
 		self.uiExposureSlider.setMinimum(api2.get('exposureMin'))
 		api2.observe_future_only('exposureMax', self.updateExposureMax)
@@ -242,23 +242,30 @@ class Main(QWidget):
 		charged = f"{round(api.control('get', ['batteryCharge'])['batteryCharge']*100)}%"
 		self.uiBattery.setText(charged)
 	
+	#@api2.silenceCallbacks('uiExposureSlider')
 	def onExposureSliderMoved(self, newExposureNs):
 		#startTime = time.perf_counter()
 		linearRatio = (newExposureNs-self.uiExposureSlider.minimum()) / (self.uiExposureSlider.maximum()-self.uiExposureSlider.minimum())
 		log.print(f'lr {linearRatio}')
 		api2.control.call('set', {
-			'exposurePercent': math.pow(linearRatio, 2)*100,
-		}).then(self.onExposureSliderMovedOk)
+			'exposurePeriod': math.pow(linearRatio, 2) * self.uiExposureSlider.maximum(),
+		})#.then(self.onExposureSliderMovedOk)
+	
+	#@api2.silenceCallbacks('uiExposureSlider')
 	def onExposureSliderMovedOk(self, response):
 		log.print(f'resp {response}')
-		exponentialRatio = math.sqrt(response['exposurePercent']/100)
+		exponentialRatio = math.sqrt(response['exposurePeriod'] / self.uiExposureSlider.maximum())
 		self.uiExposureSlider.setValue(exponentialRatio * (self.uiExposureSlider.maximum()-self.uiExposureSlider.minimum()) + self.uiExposureSlider.minimum())
 	
 	@pyqtSlot(int, name="updateExposureNs")
 	@api2.silenceCallbacks()
 	def updateExposureNs(self, newExposureNs):
+		log.print(f'nens {newExposureNs}')
 		linearRatio = (newExposureNs-self.uiExposureSlider.minimum()) / (self.uiExposureSlider.maximum()-self.uiExposureSlider.minimum())
-		exponentialRatio = math.sqrt(linearRatio)
+		try:
+			exponentialRatio = math.sqrt(linearRatio)
+		except ValueError:
+			exponentialRatio = 0
 		self.uiExposureSlider.setValue(exponentialRatio * (self.uiExposureSlider.maximum()-self.uiExposureSlider.minimum()) + self.uiExposureSlider.minimum())
 		self.updateExposureDependancies()
 	
