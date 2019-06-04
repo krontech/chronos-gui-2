@@ -199,11 +199,9 @@ class Main(QWidget):
 		
 		#Set up exposure slider.
 		# This slider is significantly more responsive to mouse than to touch. 🤔
+		api2.observe('exposureMax', self.updateExposureMax)
+		api2.observe('exposureMin', self.updateExposureMin)
 		api2.observe('exposurePeriod', self.updateExposureNs)
-		self.uiExposureSlider.setMaximum(api2.get('exposureMax')) #TODO: This is incorrect, should use update not update_future_only since we're drawing from the wrong value -_-
-		self.uiExposureSlider.setMinimum(api2.get('exposureMin'))
-		api2.observe_future_only('exposureMax', self.updateExposureMax)
-		api2.observe_future_only('exposureMin', self.updateExposureMin)
 		#[TODO DDR 2018-09-13] This valueChanged event is really quite slow, for some reason.
 		self.uiExposureSlider.debounce.sliderMoved.connect(self.onExposureSliderMoved)
 		self.uiExposureSlider.touchMargins = lambda: {
@@ -249,24 +247,18 @@ class Main(QWidget):
 		log.print(f'lr {linearRatio}')
 		api2.control.call('set', {
 			'exposurePeriod': math.pow(linearRatio, 2) * self.uiExposureSlider.maximum(),
-		})#.then(self.onExposureSliderMovedOk)
-	
-	#@api2.silenceCallbacks('uiExposureSlider')
-	def onExposureSliderMovedOk(self, response):
-		log.print(f'resp {response}')
-		exponentialRatio = math.sqrt(response['exposurePeriod'] / self.uiExposureSlider.maximum())
-		self.uiExposureSlider.setValue(exponentialRatio * (self.uiExposureSlider.maximum()-self.uiExposureSlider.minimum()) + self.uiExposureSlider.minimum())
+		})
 	
 	@pyqtSlot(int, name="updateExposureNs")
 	@api2.silenceCallbacks()
 	def updateExposureNs(self, newExposureNs):
-		log.print(f'nens {newExposureNs}')
 		linearRatio = (newExposureNs-self.uiExposureSlider.minimum()) / (self.uiExposureSlider.maximum()-self.uiExposureSlider.minimum())
 		try:
 			exponentialRatio = math.sqrt(linearRatio)
 		except ValueError:
 			exponentialRatio = 0
-		self.uiExposureSlider.setValue(exponentialRatio * (self.uiExposureSlider.maximum()-self.uiExposureSlider.minimum()) + self.uiExposureSlider.minimum())
+		if not self.uiExposureSlider.beingHeld:
+			self.uiExposureSlider.setValue(exponentialRatio * (self.uiExposureSlider.maximum()-self.uiExposureSlider.minimum()) + self.uiExposureSlider.minimum())
 		self.updateExposureDependancies()
 	
 	@pyqtSlot(int, name="updateExposureMax")

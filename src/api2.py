@@ -116,18 +116,21 @@ class control():
 		"""Enqueue callback. Squash and elide calls to set for efficiency."""
 		
 		#Step 1: Will this call actually do anything? Elide it if not.
+		anticipitoryUpdates = False #Emit update signals before sending the update to the API. Results in faster UI updates but poorer framerate.
 		if coalesce and pendingCall._args[0] == 'set':
 			#Elide this call if it would not change known state.
 			hasNewInformation = False
 			newItems = pendingCall._args[1].items()
 			for key, value in newItems:
 				if _camState[key] != value:
-					#log.info(f'Anticipating {key} → {value}.')
-					#Update known cam state in advance of state transition.
-					#_camState[key] = value
 					hasNewInformation = True
-					#for callback in apiValues._callbacks[key]:
-					#	callback(value)
+					if not anticipitoryUpdates:
+						break
+					#Update known cam state in advance of state transition.
+					log.info(f'Anticipating {key} → {value}.')
+					_camState[key] = value
+					for callback in apiValues._callbacks[key]:
+						callback(value)
 			if not hasNewInformation:
 				return
 		
@@ -168,7 +171,7 @@ class control():
 			
 			self._args = args
 			self._thens = []
-			self._catchs = []
+			self._catches = []
 			self._done = False
 			self._watcherHolder = None
 			
@@ -188,6 +191,9 @@ class control():
 				'set' == self._args[0] == other._args[0]
 				and self._args[1].keys() == other._args[1].keys()
 			)
+		
+		def __repr__(self):
+			return f'''call({', '.join([repr(x) for x in self._args])})'''
 			
 		
 		def _startAsyncCall(self):
@@ -199,12 +205,14 @@ class control():
 			
 		
 		def _asyncCallFinished(self, watcher):
+			
 			self._done = True
+			
 			reply = QDBusPendingReply(watcher)
 			try:
 				if reply.isError():
-					if self._catchs:
-						for catch in self._catchs:
+					if self._catches:
+						for catch in self._catches:
 							catch(reply.error())
 					else:
 						#This won't do much, but (I'm assuming) most calls simply won't ever fail.
@@ -231,7 +239,7 @@ class control():
 		def catch(self, callback):
 			assert callable(callback), "control().then() only accepts a single, callable function."
 			assert not self._done, "Can't register new then() callback, call has already been resolved."
-			self._catchs += [callback]
+			self._catches += [callback]
 			return self
 	
 	def callSync(*args, **kwargs):
@@ -300,6 +308,7 @@ def set(*args):
 _camState = control.callSync('get', [k for k in control.callSync('availableKeys') if k not in {'dateTime', 'externalStorage'}])
 if(not _camState):
 	raise Exception("Cache failed to populate. This indicates the get call is not working.")
+_camStateAge = {k:0 for k,v in _camState.items()}
 
 class APIValues(QObject):
 	"""Wrapper class for subscribing to API values in the chronos API."""
@@ -344,14 +353,14 @@ class APIValues(QObject):
 		"""Update _camState and invoke any  registered observers."""
 		newItems = msg.arguments()[0].items()
 		for key, value in newItems:
-			if _camState[key] != value and not dump('enqueued', self.__newValueIsEnqueued(key)):
+			if _camState[key] != value and not dump(f'enqueued in {control._controlEnqueuedCalls}:', self.__newValueIsEnqueued(key)):
 				log.info(f'Informing {key} → {value}.')
 				_camState[key] = value
+				_camStateAge[key] += 1
 				for callback in self._callbacks[key]:
 					callback(value)
 			else:
 				log.info(f'Ignoring {key} → {value}, stale.')
-
 	
 	def get(self, key):
 		return _camState[key]

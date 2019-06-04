@@ -53,6 +53,14 @@ class Slider(ShowPaintRectsPlugin, FocusablePlugin, QSlider): #Must be in this o
 			self._userGeneratedEvent = True
 		self.sliderMoved.connect(updateUserGeneratedEvent)
 		
+		self.beingHeld = False #Set to true when sliderMoved happens.
+		def tapPressed():
+			self.beingHeld = True
+		self.sliderPressed.connect(tapPressed)
+		def tapReleased():
+			self.beingHeld = False
+		self.sliderReleased.connect(tapReleased)
+		
 		self.__lastValue = self.value()
 		self._fpsMonitorLastFrame = time.perf_counter()
 		
@@ -61,6 +69,13 @@ class Slider(ShowPaintRectsPlugin, FocusablePlugin, QSlider): #Must be in this o
 	def sizeHint(self):
 		return QSize(81, 201)
 	
+	def keyPressEvent(self, evt):
+		self._userGeneratedEvent = True
+		return super().keyPressEvent(evt)
+		
+	def wheelEvent(self, evt):
+		self._userGeneratedEvent = True
+		return super().wheelEvent(evt)
 	
 	def refreshStyle(self):
 		drawDebugArea = False
