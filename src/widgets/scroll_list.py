@@ -36,9 +36,23 @@ class ScrollList(QListView, FocusablePlugin):
 		#Only works in Qt ≥ v5.10.
 		#self.jogWheelClick.connect(lambda: self.injectKeystrokes(Qt.Key_Enter))
 		def selectAndClose():
+			injected = False
 			for child in self.children():
 				if hasattr(child, 'injectKeystrokes'):
-					child.injectKeystrokes(Qt.Key_Enter)
+					child.injectKeystrokes(Qt.Key_Space)
+					injected = True
+			
+			if not injected:
+				try:
+					comboBoxParent = self.parent().parent()
+					comboBoxParent.setCurrentIndex(self.currentIndex().row())
+					comboBoxParent.hidePopup()
+					injected = True
+				except Exception:
+					pass
+			
+			if not injected:
+				raise Exception('Couldn\'t accept combobox.')
 		self.jogWheelClick.connect(selectAndClose)
 		
 		#Add drag-to-scroll to dropdown menus.
