@@ -7,7 +7,7 @@ from PyQt5 import uic, QtWidgets, QtCore, QtGui
 
 from debugger import *; dbg
 
-import api
+import api2
 
 from functools import partial
 
@@ -66,6 +66,7 @@ class Power(QtWidgets.QDialog):
 		
 		self.uiChart.paintEvent = self.paintChart
 		
+		#Avoid the chart redrawing just a little early, and not catching a changed power-down level. 
 		self.uiSafelyPowerDown.stateChanged.connect(self.uiChart.update)
 		
 		#Store the original levels for updatePowerDownThreshold to use if it has to regenerate the list.
@@ -77,23 +78,23 @@ class Power(QtWidgets.QDialog):
 		self.uiVoltageLabel.formatString = self.uiVoltageLabel.text()
 		self.uiChargeLabel.formatString = self.uiChargeLabel.text()
 		
-		api.observe("saveAndPowerDownLowBatteryLevel", self.updatePowerDownThreshold)
-		self.uiPowerDownThreshold.currentTextChanged.connect(
-			lambda val: api.set({"saveAndPowerDownLowBatteryLevel":
-				pct2dec(val) }) )
+		api2.observe("saveAndPowerDownLowBatteryLevelNormalized", self.updatePowerDownThreshold)
+		self.uiPowerDownThreshold.currentTextChanged.connect(lambda val:
+			api2.set("saveAndPowerDownLowBatteryLevelNormalized", pct2dec(val)) )
+		self.uiPowerDownThreshold.currentTextChanged.connect(self.uiChart.update)
 		
 		self.uiDone.clicked.connect(window.back)
 	
 	def onShow(self):
 		#Don't update the labels while hidden. But do show with accurate info when we start.
 		self.updateLabels()
-		self.labelUpdateTimer.start()
+		#self.labelUpdateTimer.start()
 		
 	def onHide(self):
 		self.labelUpdateTimer.stop()
 	
 	@QtCore.pyqtSlot(float, name="updatePowerDownThreshold")
-	@api.silenceCallbacks('uiPowerDownThreshold')
+	@api2.silenceCallbacks('uiPowerDownThreshold')
 	def updatePowerDownThreshold(self, threshold: float):
 		targetText = dec2pct(threshold)
 		textIndex = self.uiPowerDownThreshold.findText(targetText)
@@ -116,15 +117,15 @@ class Power(QtWidgets.QDialog):
 	def updateLabels(self):
 		self.uiChargeLabel.setText(
 			self.uiChargeLabel.formatString.format(
-				api.get('batteryCharge')*100 ) )
+				api2.getSync('batteryChargeNormalized')*100 ) )
 		self.uiVoltageLabel.setText(
 			self.uiVoltageLabel.formatString.format(
-				api.get('batteryVoltage') ) )
+				api2.getSync('batteryVoltage') ) )
 		
 	def updateChartData(self):
 		"""Always update the chart data, even when hidden, so we can look at it later."""
-		charge = api.get('batteryCharge')
-		voltage = api.get('batteryVoltage')
+		cv = api2.getSync(['batteryChargeNormalized', 'batteryVoltage'])
+		charge, voltage = cv['batteryChargeNormalized'], cv['batteryVoltage']
 		
 		if charge < 0 or voltage < 0:
 			return #Charge/voltage haven't initialized yet, don't record anything.

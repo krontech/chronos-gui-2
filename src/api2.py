@@ -175,6 +175,7 @@ class control():
 			self._done = False
 			self._watcherHolder = None
 			
+			log.debug(f'enquing {self._args[0]}({self._args[1:]})')
 			control._enqueueCallback(self)
 			if not control._controlCallInProgress:
 				#Don't start multiple callbacks at once, the most recent one will block.
@@ -197,6 +198,7 @@ class control():
 			
 		
 		def _startAsyncCall(self):
+			log.debug(f'starting async call: {self._args[0]}({self._args[1:]})')
 			self._watcherHolder = QDBusPendingCallWatcher(
 				cameraControlAPI.asyncCallWithArgumentList(self._args[0], self._args[1:])
 			)
@@ -205,7 +207,7 @@ class control():
 			
 		
 		def _asyncCallFinished(self, watcher):
-			
+			log.debug(f'finished async call: {self._args[0]}({self._args[1:]})')
 			self._done = True
 			
 			reply = QDBusPendingReply(watcher)
@@ -218,8 +220,9 @@ class control():
 						#This won't do much, but (I'm assuming) most calls simply won't ever fail.
 						raise DBusException("%s: %s" % (reply.error().name(), reply.error().message()))
 				else:
+					value = reply.value()
 					for then in self._thens:
-						then(reply.value())
+						value = then(value)
 			except Exception as e:
 				raise e
 			finally:
@@ -254,6 +257,7 @@ class control():
 		"""
 		
 		#Unwrap D-Bus errors from message.
+		log.debug(f'sync call: {args[0]}({args[1:]})')
 		msg = QDBusReply(cameraControlAPI.call(*args, **kwargs))
 		
 		if msg.isValid():
@@ -266,7 +270,7 @@ class control():
 	
 
 
-def get(keyOrKeys):
+def getSync(keyOrKeys):
 	"""Call the camera control DBus get method.
 	
 		Convenience method for `control('get', [value])[0]`.
@@ -282,8 +286,25 @@ def get(keyOrKeys):
 		[keyOrKeys] if isinstance(keyOrKeys, str) else keyOrKeys )
 	return valueList[keyOrKeys] if isinstance(keyOrKeys, str) else valueList
 
+def get(keyOrKeys):
+	"""Call the camera control DBus get method.
+	
+		Convenience method for `control('get', [value])[0]`.
+		
+		Accepts key or [key, …], where keys are strings.
+		
+		Returns value or {key:value, …}, respectively.
+		
+		See control's `availableKeys` for a list of valid inputs.
+	"""
+	
+	return control.call(
+		'get', [keyOrKeys] if isinstance(keyOrKeys, str) else keyOrKeys
+	).then(lambda valueList:
+		valueList[keyOrKeys] if isinstance(keyOrKeys, str) else valueList
+	)
 
-def set(*args):
+def setSync(*args):
 	"""Call the camera control DBus set method.
 		
 		Accepts {str: value, ...} or a key and a value.
@@ -295,8 +316,30 @@ def set(*args):
 		return control.callSync('set', *args)
 	elif len(args) == 2:
 		return control.callSync('set', {args[0]:args[1]})[args[0]]
+	else:
+		raise valueError('bad args')
+
+
+
+def set(*args):
+	"""Call the camera control DBus set method.
+		
+		Accepts {str: value, ...} or a key and a value.
+		Returns either a map of set values or the set
+			value, if the second form was used.
+	"""
 	
-	raise valueError('bad args')
+	log.debug(f'simple set call: {args}')
+	if len(args) == 1:
+		return control.call('set', *args)
+	elif len(args) == 2:
+		return control.call(
+			'set', {args[0]:args[1]}
+		).then(lambda valueDict: 
+			valueDict[args[0]]
+		)
+	else:
+		raise valueError('bad args')
 
 
 
@@ -343,7 +386,7 @@ class APIValues(QObject):
 	
 	def __newValueIsEnqueued(self, key):
 		return True in [
-			dump(f'{key} in {call._args[1]}', key in call._args[1])
+			key in call._args[1]
 			for call in control._controlEnqueuedCalls
 			if call._args[0] == 'set'
 		]
@@ -352,8 +395,9 @@ class APIValues(QObject):
 	def __newKeyValue(self, msg):
 		"""Update _camState and invoke any  registered observers."""
 		newItems = msg.arguments()[0].items()
+		log.info(f'Recieved new information. {msg.arguments()[0]}')
 		for key, value in newItems:
-			if _camState[key] != value and not dump(f'enqueued in {control._controlEnqueuedCalls}:', self.__newValueIsEnqueued(key)):
+			if _camState[key] != value and not self.__newValueIsEnqueued(key):
 				log.info(f'Informing {key} → {value}.')
 				_camState[key] = value
 				_camStateAge[key] += 1

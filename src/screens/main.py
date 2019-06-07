@@ -237,8 +237,13 @@ class Main(QWidget):
 		print("Analog gain is %ix." % api.get("recordingAnalogGainMultiplier"))
 	
 	def updateBatteryCharge(self):
-		charged = f"{round(api.control('get', ['batteryCharge'])['batteryCharge']*100)}%"
-		self.uiBattery.setText(charged)
+		api2.control.call(
+			'get', ['batteryChargePercent']
+		).then(lambda data:
+			self.uiBattery.setText(
+				f"{round(data['batteryChargePercent'])}%"
+			)
+		)
 	
 	#@api2.silenceCallbacks('uiExposureSlider')
 	def onExposureSliderMoved(self, newExposureNs):
@@ -275,7 +280,7 @@ class Main(QWidget):
 	
 	def updateExposureDependancies(self):
 		"""Update exposure text to match exposure slider, and sets the slider step so clicking the gutter always moves 1%."""
-		percent = api2.get('exposurePercent')
+		percent = api2.getSync('exposurePercent')
 		self.uiExposureOverlay.setText(f"{round(self.uiExposureSlider.value()/1000, 2)}µs ({percent:.0f}%)")
 		
 		step1percent = (self.uiExposureSlider.minimum() + self.uiExposureSlider.maximum()) // 100
@@ -474,7 +479,13 @@ class Main(QWidget):
 		QWidget.setTabOrder(src, dest)
 	
 	def makeFailingCall(self):
-		print(api.control('makeFailingCall', 1))
+		api2.control.call(
+			'get', ['batteryChargePercentage']
+		).then(lambda data:
+			log.print(f'Test failed: Data ({data}) was returned.')
+		).catch(lambda err:
+			log.print(f'Test passed: Error ({err}) was returned.')
+		)
 
 	lastTime = -1
 	def debounceRecord(self):
