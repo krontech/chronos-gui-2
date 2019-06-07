@@ -88,7 +88,7 @@ class Power(QtWidgets.QDialog):
 	def onShow(self):
 		#Don't update the labels while hidden. But do show with accurate info when we start.
 		self.updateLabels()
-		#self.labelUpdateTimer.start()
+		self.labelUpdateTimer.start()
 		
 	def onHide(self):
 		self.labelUpdateTimer.stop()
