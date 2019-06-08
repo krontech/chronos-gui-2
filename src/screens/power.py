@@ -2,14 +2,14 @@
 
 from collections import deque
 from math import copysign
+from functools import partial
 
 from PyQt5 import uic, QtWidgets, QtCore, QtGui
 
+import settings
 from debugger import *; dbg
-
 import api2
 
-from functools import partial
 
 
 chartDuration = 90 #minutes
@@ -68,6 +68,9 @@ class Power(QtWidgets.QDialog):
 		
 		#Avoid the chart redrawing just a little early, and not catching a changed power-down level. 
 		self.uiSafelyPowerDown.stateChanged.connect(self.uiChart.update)
+		
+		self.uiDimScreen.stateChanged.connect(lambda checked:
+			settings.setValue('dimScreenWhenNotInUse', bool(checked)) )
 		
 		#Store the original levels for updatePowerDownThreshold to use if it has to regenerate the list.
 		self.originalBatteryThresholdLevels = [

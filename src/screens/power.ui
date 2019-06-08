@@ -113,9 +113,6 @@
    <property name="clickMarginBottom" stdset="0">
     <enum>CheckBox::half</enum>
    </property>
-   <property name="linkedValueName" stdset="0">
-    <string>dimScreenWhenNotInUse</string>
-   </property>
   </widget>
   <widget class="CheckBox" name="uiSafelyPowerDown">
    <property name="geometry">

@@ -6,6 +6,8 @@ from PyQt5.QtCore import Q_ENUMS, QSize, Qt
 from PyQt5.QtWidgets import QCheckBox
 
 from debugger import *; dbg
+import logging; log = logging.getLogger('Chronos.gui')
+
 from touch_margin_plugin import TouchMarginPlugin, MarginWidth
 from direct_api_link_plugin import DirectAPILinkPlugin
 from focusable_plugin import FocusablePlugin
