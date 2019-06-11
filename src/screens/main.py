@@ -219,18 +219,12 @@ class Main(QWidget):
 		self.uiExposureOverlay.setFont(font)
 	
 	def onShow(self):
-		videoState = api.get('videoState')
-		api.set({
-			'videoState':
-				videoState 
-				if videoState in ['pre-recording', 'recording'] else 
-				'pre-recording',
-			'videoDisplayDevice': 'camera',
-			'videoDisplayX': self.x(),
-			'videoDisplayY': self.y(),
-			'videoDisplayWidth': self.width() - 200, #-200 for the sidebar. This needs to be redone a little so it calculates the position on the fly.
-			'videoDisplayHeight': self.height(),
-		})
+		api2.video.call('configure', {
+			'xoff': self.x(),
+			'yoff': self.y(),
+			'hres': self.width() - self.uiSidebarBackdropAlsoUsedForMeasuringWidth.width(),
+			'vres': self.height(),
+		}).then(api2.video.restart)
 	
 	# @pyqtSlot() is not strictly needed - see http://pyqt.sourceforge.net/Docs/PyQt5/signals_slots.html#the-pyqtslot-decorator for details. (import with `from PyQt5.QtCore import pyqtSlot`)
 	def printAnalogGain(self):

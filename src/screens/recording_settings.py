@@ -6,8 +6,8 @@ from PyQt5.QtCore import pyqtSlot
 from debugger import *; dbg
 import settings
 
-import api
-from api import silenceCallbacks
+import api, api2
+from api2 import silenceCallbacks
 
 
 class RecordingSettings(QtWidgets.QDialog):
@@ -108,19 +108,20 @@ class RecordingSettings(QtWidgets.QDialog):
 	presets = api.get('commonlySupportedResolutions')
 	allRecordingGeometrySettings = ['uiHRes', 'uiVRes', 'uiHOffset', 'uiVOffset', 'uiFps', 'uiFrameDuration']
 	
-	def onShow(self):
-		api.set({
-			'videoState': 'preview',
-			'videoDisplayDevice': 'camera',
-			'videoDisplayX': self.uiPreviewPanel.x(),
-			'videoDisplayY': self.uiPreviewPanel.y(),
-			'videoDisplayWidth': self.uiPreviewPanel.width(),
-			'videoDisplayHeight': self.uiPreviewPanel.height(),
-			'previewHRes': self.uiHRes.maximum(),
-			'previewVRes': self.uiVRes.maximum(),
-			'previewHOffset': self.uiHOffset.minimum(),
-			'previewVOffset': self.uiVOffset.minimum(),
-		})
+	#The following usually crashes the HDVPSS core, which is responsible for
+	#back-of-camera video. (Specifically, in this case, the core crashes if told
+	#to render video smaller than 96px tall.) This function was intended to put
+	#the recorded image inside the passepartout, to show you what you've got and
+	#what you'll be getting.
+	def __disabled__onShow(self):
+		pos = self.uiPassepartoutInnerBorder.mapToGlobal(
+			self.uiPassepartoutInnerBorder.pos() )
+		api2.video.call('configure', dump('configure', {
+			'xoff': pos.x(),
+			'yoff': pos.y(),
+			'hres': self.uiPassepartoutInnerBorder.width(),
+			'vres': self.uiPassepartoutInnerBorder.height(),
+		})).then(api2.video.restart)
 	
 	
 	
