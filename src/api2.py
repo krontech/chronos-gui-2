@@ -2,10 +2,8 @@
 
 """Interface for the control api d-bus service."""
 
-import sys
+import sys, os
 from typing import Callable, Any
-
-from os import environ
 
 from PyQt5.QtCore import pyqtSlot, QObject
 from PyQt5.QtDBus import QDBusConnection, QDBusInterface, QDBusReply, QDBusPendingCallWatcher, QDBusPendingReply
@@ -15,7 +13,7 @@ from animate import delay
 import logging; log = logging.getLogger('Chronos.api')
 
 #Mock out the old API; use production for this one so we can switch over piecemeal.
-USE_MOCK = False #environ.get('USE_CHRONOS_API_MOCK') in ('always', 'web')
+USE_MOCK = False #os.environ.get('USE_CHRONOS_API_MOCK') in ('always', 'web')
 
 
 # Set up d-bus interface. Connect to mock system buses. Check everything's working.
@@ -34,8 +32,8 @@ cameraVideoAPI = QDBusInterface(
 	f"", #Interface
 	QDBusConnection.systemBus() )
 
-cameraControlAPI.setTimeout(256) #Default is -1, which means 25000ms. 25 seconds is too long to go without some sort of feedback, and the only real long-running operation we have - saving - can take upwards of 5 minutes. Instead of setting the timeout to half an hour, we should probably use events which are emitted as the event progresses. One frame (at 60fps) should be plenty of time for the API to respond, and also quick enough that we'll notice any slowness. The mock *generally* replies to messages in under 1ms, so I'm not too worried here. The API occasionally times out after 32ms, add more time. Ugh.
-cameraVideoAPI.setTimeout(256)
+cameraControlAPI.setTimeout(1000) #Default is -1, which means 25000ms. 25 seconds is too long to go without some sort of feedback, and the only real long-running operation we have - saving - can take upwards of 5 minutes. Instead of setting the timeout to half an hour, we should probably use events which are emitted as the event progresses. One frame (at 60fps) should be plenty of time for the API to respond, and also quick enough that we'll notice any slowness. The mock *generally* replies to messages in under 1ms, so I'm not too worried here. The API occasionally times out after 32ms, add more time. Ugh.
+cameraVideoAPI.setTimeout(1000) #This is lowered later on, after we've populated our variable cache. It takes Pychronos a moment to get everything together.
 
 if not cameraControlAPI.isValid():
 	print("Error: Can not connect to control D-Bus API at %s. (%s: %s)" % (
@@ -75,20 +73,188 @@ class ControlReply():
 			return self.value
 
 
-def video(*args, **kwargs):
-	"""Call the camera video DBus API. First arg is the function name.
-	
-		See http://doc.qt.io/qt-5/qdbusabstractinterface.html#call for details about calling.
-		See https://github.com/krontech/chronos-cli/tree/master/src/api for implementation details about the API being called.
-		See README.md at https://github.com/krontech/chronos-cli/tree/master/src/daemon for API documentation.
+class video():
+	"""Call the D-Bus video API, asychronously.
+		
+		Methods:
+			- call(function[, arg1[ ,arg2[, ...]]])
+				Call the remote function.
+			- get([value[, ...]])
+				Get the named values from the API.
+			- set({key: value[, ...]}])
+				Set the named values in the API.
+		
+		All methods return an A* promise-like, in that you use
+		`.then(cb(value))` and `.catch(cb(error))` to get the results
+		of calling the function.
 	"""
 	
-	msg = QDBusReply(cameraVideoAPI.call(*args, **kwargs))
-	if not msg.isValid():
-		raise DBusException("%s: %s" % (msg.error().name(), msg.error().message()))
+	_videoEnqueuedCalls = []
+	_videoCallInProgress = False
+	_activeCall = None
 	
-	return msg.value()
-
+	@staticmethod
+	def _enqueueCallback(pendingCall, coalesce: bool=True): #pendingCall is video.call
+		"""Enqueue callback. Squash and elide calls to set for efficiency."""
+		
+		#Step 1: Will this call actually do anything? Elide it if not.
+		anticipitoryUpdates = False #Emit update signals before sending the update to the API. Results in faster UI updates but poorer framerate.
+		if coalesce and pendingCall._args[0] == 'set':
+			#Elide this call if it would not change known state.
+			hasNewInformation = False
+			newItems = pendingCall._args[1].items()
+			for key, value in newItems:
+				if _camState[key] != value:
+					hasNewInformation = True
+					if not anticipitoryUpdates:
+						break
+					#Update known cam state in advance of state transition.
+					log.info(f'Anticipating {key} → {value}.')
+					_camState[key] = value
+					for callback in apiValues._callbacks[key]:
+						callback(value)
+			if not hasNewInformation:
+				return
+		
+		#Step 2: Is there already a set call pending? (Note that non-set calls act as set barriers; two sets won't get coalesced if a non-set call is between them.)
+		if coalesce and [pendingCall] == video._videoEnqueuedCalls[:1]:
+			video._videoEnqueuedCalls[-1] = pendingCall
+		else:
+			video._videoEnqueuedCalls += [pendingCall]
+	
+	@staticmethod
+	def _startNextCallback():
+		"""Check for pending callbacks.
+			
+			If none are found, simply stop.
+			
+			Note: Needs to be manually pumped.
+		"""
+		
+		if video._videoEnqueuedCalls:
+			video._videoCallInProgress = True
+			video._videoEnqueuedCalls.pop(0)._startAsyncCall()
+		else:
+			video._videoCallInProgress = False
+	
+	
+	class call(QObject):
+		"""Call the camera video DBus API. First arg is the function name. Returns a promise.
+		
+			See http://doc.qt.io/qt-5/qdbusabstractinterface.html#call for details about calling.
+			See https://github.com/krontech/chronos-cli/tree/master/src/api for implementation details about the API being called.
+			See README.md at https://github.com/krontech/chronos-cli/tree/master/src/daemon for API documentation.
+		"""
+		
+		def __init__(self, *args, immediate=True):
+			assert args, "Missing call name."
+			
+			super().__init__()
+			
+			self._args = args
+			self._thens = []
+			self._catches = []
+			self._done = False
+			self._watcherHolder = None
+			
+			log.debug(f'enquing {self._args[0]}({self._args[1:]})')
+			video._enqueueCallback(self)
+			if not video._videoCallInProgress:
+				#Don't start multiple callbacks at once, the most recent one will block.
+				video._startNextCallback()
+		
+		def __eq__(self, other):
+			# If a video call sets the same keys as another
+			# video call, then it is equal to itself and can
+			# be deduplicated as all sets of the same values
+			# have the same side effects. (ie, Slider no go
+			# fast if me no drop redundant call.)
+			#   –DDR 2019-05-14
+			return (
+				'set' == self._args[0] == other._args[0]
+				and self._args[1].keys() == other._args[1].keys()
+			)
+		
+		def __repr__(self):
+			return f'''call({', '.join([repr(x) for x in self._args])})'''
+			
+		
+		def _startAsyncCall(self):
+			log.debug(f'starting async call: {self._args[0]}({self._args[1:]})')
+			self._watcherHolder = QDBusPendingCallWatcher(
+				cameraVideoAPI.asyncCallWithArgumentList(self._args[0], self._args[1:])
+			)
+			self._watcherHolder.finished.connect(self._asyncCallFinished)
+			video._activeCall = self
+			
+		
+		def _asyncCallFinished(self, watcher):
+			log.debug(f'finished async call: {self._args[0]}({self._args[1:]})')
+			self._done = True
+			
+			reply = QDBusPendingReply(watcher)
+			try:
+				if reply.isError():
+					if self._catches:
+						for catch in self._catches:
+							catch(reply.error())
+					else:
+						#This won't do much, but (I'm assuming) most calls simply won't ever fail.
+						raise DBusException("%s: %s" % (reply.error().name(), reply.error().message()))
+				else:
+					value = reply.value()
+					for then in self._thens:
+						value = then(value)
+			except Exception as e:
+				raise e
+			finally:
+				#Wait a little while before starting on the next callback.
+				#This makes the UI run much smoother, and usually the lag
+				#is covered by the UI updating another few times anyway.
+				#Note that because each call still lags a little, this
+				#causes a few dropped frames every time the API is called.
+				delay(self, 64, video._startNextCallback)
+		
+		def then(self, callback):
+			assert callable(callback), "video().then() only accepts a single, callable function."
+			assert not self._done, "Can't register new then() callback, call has already been resolved."
+			self._thens += [callback]
+			return self
+		
+		def catch(self, callback):
+			assert callable(callback), "video().then() only accepts a single, callable function."
+			assert not self._done, "Can't register new then() callback, call has already been resolved."
+			self._catches += [callback]
+			return self
+	
+	def callSync(*args, **kwargs):
+		"""Call the camera video DBus API. First arg is the function name.
+			
+			This is the synchronous version of the call() method. It
+			is much slower to call synchronously than asynchronously!
+		
+			See http://doc.qt.io/qt-5/qdbusabstractinterface.html#call for details about calling.
+			See https://github.com/krontech/chronos-cli/tree/master/src/api for implementation details about the API being called.
+			See README.md at https://github.com/krontech/chronos-cli/tree/master/src/daemon for API documentation.
+		"""
+		
+		#Unwrap D-Bus errors from message.
+		log.debug(f'sync call: {args[0]}({args[1:]})')
+		msg = QDBusReply(cameraVideoAPI.call(*args, **kwargs))
+		
+		if msg.isValid():
+			return msg.value()
+		else:
+			raise DBusException("%s: %s" % (msg.error().name(), msg.error().message()))
+	
+	def restart(*_):
+		"""Helper method to reboot the video pipeline.
+			
+			Sometimes calls do not apply until you restart the daemon, although they should.
+			Literally every use of this function is a bug.
+		"""
+		
+		os.system('killall -HUP cam-pipeline')
 
 
 class control():
@@ -265,8 +431,6 @@ class control():
 		else:
 			raise DBusException("%s: %s" % (msg.error().name(), msg.error().message()))
 
-
-
 	
 
 
@@ -352,6 +516,8 @@ _camState = control.callSync('get', [k for k in control.callSync('availableKeys'
 if(not _camState):
 	raise Exception("Cache failed to populate. This indicates the get call is not working.")
 _camStateAge = {k:0 for k,v in _camState.items()}
+cameraControlAPI.setTimeout(250) #Lower the timeout, now that we've placed the Big Call to get everything.
+cameraVideoAPI.setTimeout(250)
 
 class APIValues(QObject):
 	"""Wrapper class for subscribing to API values in the chronos API."""
