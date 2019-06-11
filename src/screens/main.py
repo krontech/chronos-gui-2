@@ -193,9 +193,10 @@ class Main(QWidget):
 		
 		# Polling-based updates.
 		self.updateBatteryCharge()
-		self._timer = QtCore.QTimer()
-		self._timer.timeout.connect(self.updateBatteryCharge)
-		self._timer.start(4000) #ms
+		self._batteryChargeUpdateTimer = QtCore.QTimer()
+		self._batteryChargeUpdateTimer.timeout.connect(self.updateBatteryCharge)
+		self._batteryChargeUpdateTimer.setTimerType(QtCore.Qt.VeryCoarseTimer)
+		self._batteryChargeUpdateTimer.setInterval(3600) #We display percentages. We update in tenth-percentage increments.
 		
 		#Set up exposure slider.
 		# This slider is significantly more responsive to mouse than to touch. 🤔
@@ -225,6 +226,11 @@ class Main(QWidget):
 			'hres': self.width() - self.uiSidebarBackdropAlsoUsedForMeasuringWidth.width(),
 			'vres': self.height(),
 		}).then(api2.video.restart)
+		self._batteryChargeUpdateTimer.start() #ms
+	
+	def onHide(self):
+		self._batteryChargeUpdateTimer.stop() #ms
+	
 	
 	# @pyqtSlot() is not strictly needed - see http://pyqt.sourceforge.net/Docs/PyQt5/signals_slots.html#the-pyqtslot-decorator for details. (import with `from PyQt5.QtCore import pyqtSlot`)
 	def printAnalogGain(self):
