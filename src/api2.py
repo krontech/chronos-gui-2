@@ -512,7 +512,12 @@ def set(*args):
 # State cache for observe(), so it doesn't have to query the status of a variable on each subscription.
 # Since this often crashes during development, the following line can be run to try getting each variable independently.
 #     for key in [k for k in control.callSync('availableKeys') if k not in {'dateTime', 'externalStorage'}]: print('getting', key); control.callSync('get', [key])
-_camState = control.callSync('get', [k for k in control.callSync('availableKeys') if k not in {'dateTime', 'externalStorage'}])
+__badKeys = {'externalStorage'}
+_camState = control.callSync('get', [
+	key
+	for key in control.callSync('availableKeys')
+	if key not in __badKeys
+])
 if(not _camState):
 	raise Exception("Cache failed to populate. This indicates the get call is not working.")
 _camStateAge = {k:0 for k,v in _camState.items()}
