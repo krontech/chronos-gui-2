@@ -37,7 +37,7 @@ class Main(QWidget):
 		self.uiClose.clicked.connect(QApplication.closeAllWindows)
 		
 		#Only show the debug controls if enabled in factory settings.
-		settings.observe('debug controls enabled', lambda show='False':
+		settings.observe('debug controls enabled', False, lambda show:
 			self.uiDebugControls.hide() if show == 'False' else self.uiDebugControls.show() )
 		
 		

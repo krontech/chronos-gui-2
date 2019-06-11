@@ -59,7 +59,7 @@ class ServiceScreenUnlocked(QtWidgets.QDialog):
 		self.uiWhiteRef.clicked.connect(lambda: api.control('whiteRefCal', 'correct horse battery staple'))
 		self.uiCloseApp.clicked.connect(QtWidgets.QApplication.closeAllWindows)
 		
-		settings.observe('debug controls enabled', lambda x='False':
+		settings.observe('debug controls enabled', False, lambda x:
 			self.uiShowDebugControls.setChecked(x == 'True') )
 		self.uiShowDebugControls.stateChanged.connect(lambda x:
 			settings.setValue('debug controls enabled', str(bool(x))) )

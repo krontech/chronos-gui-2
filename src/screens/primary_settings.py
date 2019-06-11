@@ -27,21 +27,21 @@ class PrimarySettings(QtWidgets.QDialog):
 		
 		#Side and rotated are not quite correct, as askBeforeDiscarding is, but they are correct enough for now. Having the final result come from two values confused things a bit.
 		self.uiInterfaceSide.setCurrentIndex(
-			int(settings.value('interface handedness') == 'left'))
+			int(settings.value('interface handedness', None) == 'left'))
 		self.uiInterfaceSide.currentIndexChanged.connect(lambda index:
 			settings.setValue('interface handedness', 'left' if index else 'right') )
-		settings.observe('interface handedness', self.updateInterfaceSide)
+		settings.observe('interface handedness', None, self.updateInterfaceSide)
 		
 		self.uiInterfaceRotated.setCurrentIndex(
-			int(settings.value('interface rotation') == '180'))
+			int(settings.value('interface rotation', None) == '180'))
 		self.uiInterfaceRotated.currentIndexChanged.connect(lambda index:
 			settings.setValue('interface rotation', '180' if index else '0') )
-		settings.observe('interface rotation', self.updateInterfaceSide)
+		settings.observe('interface rotation', None, self.updateInterfaceSide)
 		
 		#Note the operations attached here:
 		#	- We must observe a silenced callback to update the state. This prevents an infinite loop.
 		#	- We update the state from a callback attached to the widget.
-		settings.observe('ask before discarding', self.updateAskBeforeDiscarding)
+		settings.observe('ask before discarding', 'if not reviewed', self.updateAskBeforeDiscarding)
 		self.uiAskBeforeDiscarding.currentIndexChanged.connect(lambda index:
 			settings.setValue('ask before discarding',
 				["always", "if not reviewed", "never"][index] ) )
@@ -80,7 +80,7 @@ class PrimarySettings(QtWidgets.QDialog):
 		# ).transformed(rotation))
 	
 	@silenceCallbacks('uiAskBeforeDiscarding')
-	def updateAskBeforeDiscarding(self, answer: str="if not reviewed"):
+	def updateAskBeforeDiscarding(self, answer):
 		self.uiAskBeforeDiscarding.setCurrentIndex(
 			["always", "if not reviewed", "never"].index(answer))
 	

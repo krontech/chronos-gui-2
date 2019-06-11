@@ -11,10 +11,11 @@ import json
 
 from PyQt5.QtCore import QSettings
 
+_restore = True #Turn to "false" to disable loading settings from file.
 _settings = QSettings('Krontech', 'back-of-camera interface') #in ~/.config/Krontech/back-of-camera interface.conf
 _callbacks = defaultdict(list)
 
-def observe(key: str, callback: Callable[[Optional[str]], None]) -> None:
+def observe(key: str, default: any, callback: Callable[[Optional[str]], None]) -> None:
 	"""Watch key for changes, calling callback when set. As with api.observe,
 	this is called once when registered, to account for the transition
 	from "unknown" to whatever the value is. (This is really convenient
@@ -26,14 +27,14 @@ def observe(key: str, callback: Callable[[Optional[str]], None]) -> None:
 	Callbacks must accept zero or one arguments.
 	
 	Example:
-		settings.observe('debugControlsEnabled', lambda debugControlsEnabled="False":
+		settings.observe('debugControlsEnabled', False, lambda debugControlsEnabled:
 			print('debug on' if debugControlsEnabled != "False" else 'debug off') )
 	"""
 	
-	if _settings.contains(key):
+	if _settings.contains(key) and _restore:
 		callback(json.loads(_settings.value(key)))
 	else:
-		callback()
+		callback(default)
 	
 	_callbacks[key].append(callback)
 
@@ -51,6 +52,6 @@ def setValue(key: str, value: any) -> None:
 	_settings.setValue(key, json.dumps(value))
 
 
-def value(key: str, default: any = '') -> any:
+def value(key: str, default: any) -> any:
 	"""See http://doc.qt.io/qt-5/qsettings.html#value"""
-	return json.loads(_settings.value(key, json.dumps(default)))
+	return json.loads(_settings.value(key, json.dumps(default))) if _restore else default

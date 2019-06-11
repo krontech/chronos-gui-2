@@ -231,7 +231,7 @@ class RecordingSettings(QtWidgets.QDialog):
 	def deletePreset(self, *_):
 		settings.setValue('customRecordingPresets', [
 			setting
-			for setting in settings.value('customRecordingPresets')
+			for setting in settings.value('customRecordingPresets', [])
 			if setting != self.uiPresets.currentData()
 		])
 		self.uiPresets.removeItem(self.uiPresets.currentIndex())
