@@ -1,20 +1,18 @@
 # -*- coding: future_fstrings -*-
 
+import time, math
+import logging; log = logging.getLogger('Chronos.gui')
+
 from PyQt5 import uic, QtCore
 from PyQt5.QtCore import pyqtSlot, QPropertyAnimation, QPoint
 from PyQt5.QtWidgets import QWidget, QApplication
 
-import time, math
 from termcolor import cprint
 
 from debugger import *; dbg
-
-import api
-import api2
-
-import settings
 from widgets.button import Button
-import logging; log = logging.getLogger('Chronos.gui')
+import settings
+import api, api2
 
 
 class Main(QWidget):

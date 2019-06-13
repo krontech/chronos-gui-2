@@ -1,12 +1,15 @@
 # -*- coding: future_fstrings -*-
 
+from collections import defaultdict
+import logging; log = logging.getLogger('Chronos.gui')
+from math import floor
+
 from PyQt5 import uic, QtWidgets, QtCore
 from PyQt5.QtCore import pyqtSlot
 
 from debugger import *; dbg
 import settings
-
-import api, api2
+import api2
 from api2 import silenceCallbacks
 
 
@@ -32,52 +35,49 @@ class RecordingSettings(QtWidgets.QDialog):
 		self.uiPresets.currentIndexChanged.connect(self.applyPreset)
 		
 		#Resolution & resolution preview
-		self.uiHRes.setMinimum(api.get('sensorHMin'))
-		self.uiVRes.setMinimum(api.get('sensorVMin'))
-		self.uiHRes.setMaximum(api.get('sensorHMax'))
-		self.uiVRes.setMaximum(api.get('sensorVMax'))
-		self.uiHRes.setSingleStep(api.get('sensorHIncrement'))
-		self.uiVRes.setSingleStep(api.get('sensorVIncrement'))
+		invariants = api2.getSync([
+			'sensorVMax', 'sensorVMin', 'sensorVIncrement',
+			'sensorHMax', 'sensorHMin', 'sensorHIncrement',
+		])
+		self.uiHRes.setMinimum(invariants['sensorHMin'])
+		self.uiVRes.setMinimum(invariants['sensorVMin'])
+		self.uiHRes.setMaximum(invariants['sensorHMax'])
+		self.uiVRes.setMaximum(invariants['sensorVMax'])
+		self.uiHRes.setSingleStep(invariants['sensorHIncrement'])
+		self.uiVRes.setSingleStep(invariants['sensorVIncrement'])
 		
 		self.uiHRes.valueChanged.connect(self.updateForSensorHRes)
 		self.uiVRes.valueChanged.connect(self.updateForSensorVRes)
-		api.observe('recordingHRes', self.updateUiHRes) #DDR 2018-08-28: This screen mostly only updates on "done", since it's using the values it sets to do the preview. Gain being the exception at the moment.
-		api.observe('recordingHRes', self.updateForSensorHRes)
-		api.observe('recordingVRes', self.updateUiVRes)
-		api.observe('recordingVRes', self.updateForSensorVRes)
-		
 		self.uiHOffset.valueChanged.connect(self.updateForSensorHOffset) #Offset min implicit, max set by resolution. Offset set after res because 0 is a good default to set up res at.
 		self.uiVOffset.valueChanged.connect(self.updateForSensorVOffset)
-		api.observe('recordingHOffset', self.updateUiHOffset) #Originally, this triggered valueChanged which triggered updateForSensorHOffset. However, if h and v were 0, then the change event would never happen since the fields initialize to 0. To fix this, we silence the change events, and bind the passepartout updater functions directly. It's more straightforward, so this isn't necessarily a bad thing.
-		api.observe('recordingHOffset', self.updateForSensorHOffset)
-		api.observe('recordingVOffset', self.updateUiVOffset)
-		api.observe('recordingVOffset', self.updateForSensorVOffset)
+		
+		self._lastResolution = defaultdict(lambda: None) #Set up for dispatchResolutionUpdate.
+		api2.observe('resolution', self.dispatchResolutionUpdate)
+		
+
 		
 		#Frame rate fps/µs binding
-		self.uiFps.setMinimum(1e6/api.get('timingMaxExposureNs')) #note: max is min / scale
-		self.uiFps.setMaximum(1e6/api.get('timingMinExposureNs'))
-		self.uiFrameDuration.setMinimum(api.get('timingMinExposureNs')/1000)
-		self.uiFrameDuration.setMaximum(api.get('timingMaxExposureNs')/1000)
+		self.uiFps.setMinimum(0.01)
+		self.uiFrameDuration.setMaximum(999999)
 		
 		self.uiFps.valueChanged.connect(self.updateFps)
-		self.uiFrameDuration.valueChanged.connect(self.updateFrameDurationMicroseconds)
-		api.observe('sensorMilliframerate', self.updateMilliframerate)
+		self.uiFrameDuration.valueChanged.connect(self.updateFrameDuration)
 		
 		#Analog gain
-		self.populateUiAnalogGain()
-		api.observe('recordingAnalogGainMultiplier', self.setAnalogGain)
-		self.uiAnalogGain.currentIndexChanged.connect(self.analogGainChanged)
+		self.populateUiLuxAnalogGain()
+		api2.observe('currentGain', self.setLuxAnalogGain)
+		self.uiAnalogGain.currentIndexChanged.connect(self.luxAnalogGainChanged)
 		
 		# Button binding.
 		self.uiCenterRecording.clicked.connect(self.centerRecording)
 		
 		self.uiDone.clicked.connect(lambda: window.back())
 		
-		api.observe('sensorMinExposureNs', self.setMinExposure)
-		api.observe('sensorMaxExposureNs', self.setMaxExposure)
-		api.observe('recordingExposureNs', self.updateExposure)
+		api2.observe('exposureMin', self.setMinExposure)
+		api2.observe('exposureMax', self.setMaxExposure)
+		api2.observe('exposurePeriod', self.updateExposure)
 		self.uiExposure.valueChanged.connect(
-			lambda val: api.set({'recordingExposureNs': val}) )
+			lambda val: api2.set('exposurePeriod', val) )
 		self.uiMaximizeExposure.clicked.connect(lambda: 
 			self.uiExposure.setValue(self.uiExposure.maximum()) )
 		
@@ -100,13 +100,50 @@ class RecordingSettings(QtWidgets.QDialog):
 			self.uiPresets.removeItem(0)
 		
 		#Set up ui writes after everything is done.
-		self.uiHRes.valueChanged.connect(lambda v: api.set({'recordingHRes': v}))
-		self.uiVRes.valueChanged.connect(lambda v: api.set({'recordingVRes': v}))
-		self.uiHOffset.valueChanged.connect(lambda v: api.set({'recordingHOffset': v}))
-		self.uiVOffset.valueChanged.connect(lambda v: api.set({'recordingVOffset': v}))
+		self._dirty = False
+		def markDirty(*_):
+			self._dirty = True
+		self.uiHRes.valueChanged.connect(markDirty)
+		self.uiVRes.valueChanged.connect(markDirty)
+		self.uiHOffset.valueChanged.connect(markDirty)
+		self.uiVOffset.valueChanged.connect(markDirty)
 	
-	presets = api.get('commonlySupportedResolutions')
+	__potentialPresetGeometries = [
+		[1280, 1024],
+		[1280, 720],
+		[1280, 512],
+		[1280, 360],
+		[1280, 240],
+		[1280, 120],
+		[1280, 96],
+		[1024, 768],
+		[1024, 576],
+		[800, 600],
+		[800, 480],
+		[640, 480],
+		[640, 360],
+		[640, 240],
+		[640, 120],
+		[640, 96],
+		[336, 240],
+		[336, 120],
+		[336, 96],
+	]
+	presets = []
+	for geometry in __potentialPresetGeometries:
+		hRes, vRes = geometry[0], geometry[1]
+		geometryTimingLimits = api2.control.callSync('testResolution', {'hRes':hRes, 'vRes':vRes})
+		if 'error' not in geometryTimingLimits:
+			presets += [{
+				'hRes': hRes, 
+				'vRes': vRes, 
+				'framerate': 1e9/geometryTimingLimits['minFramePeriod'],
+			}]
+		else:
+			log.debug(f'Rejected preset resolution {hRes}×{vRes}.')
+	
 	allRecordingGeometrySettings = ['uiHRes', 'uiVRes', 'uiHOffset', 'uiVOffset', 'uiFps', 'uiFrameDuration']
+	
 	
 	#The following usually crashes the HDVPSS core, which is responsible for
 	#back-of-camera video. (Specifically, in this case, the core crashes if told
@@ -116,13 +153,28 @@ class RecordingSettings(QtWidgets.QDialog):
 	def __disabled__onShow(self):
 		pos = self.uiPassepartoutInnerBorder.mapToGlobal(
 			self.uiPassepartoutInnerBorder.pos() )
-		api2.video.call('configure', dump('configure', {
+		api2.video.call('configure', {
 			'xoff': pos.x(),
 			'yoff': pos.y(),
 			'hres': self.uiPassepartoutInnerBorder.width(),
 			'vres': self.uiPassepartoutInnerBorder.height(),
-		})).then(api2.video.restart)
+		}).then(api2.video.restart)
 	
+	
+	@silenceCallbacks() #Handled by callbacks.
+	def dispatchResolutionUpdate(self, newResolution):
+		for key, callbacks in (
+			('hRes', [self.updateUiHRes, self.updateForSensorHRes]),
+			('vRes', [self.updateUiVRes, self.updateForSensorVRes]),
+			('hOffset', [self.updateUiHOffset, self.updateForSensorHOffset]),
+			('vOffset', [self.updateUiVOffset, self.updateForSensorVOffset]),
+			('minFrameTime', [self.updateFpsFromTime]),
+		):
+			if self._lastResolution[key] == newResolution[key]:
+				continue
+			self._lastResolution[key] = newResolution[key]
+			for callback in callbacks:
+				callback(newResolution[key])
 	
 	
 	@silenceCallbacks('uiPresets')
@@ -302,19 +354,22 @@ class RecordingSettings(QtWidgets.QDialog):
 		self.uiVOffset.setMaximum(self.uiVRes.maximum() - self.uiVRes.value())
 	
 	def updateMaximumFramerate(self):
+		limits = api2.control.callSync('testResolution', { #test acutally gets timing limits 😑
+			'hRes': self.uiHRes.value(),
+			'vRes': self.uiVRes.value(),
+		})
+		
+		if 'error' in limits:
+			return
+		
 		framerateIsMaxed = self.uiFps.value() == self.uiFps.maximum()
-		self.uiFps.setMaximum(
-			api.control(
-				'framerateForResolution', 
-				self.uiHRes.value(),
-				self.uiVRes.value() ) )
-		if framerateIsMaxed:
-			self.uiFps.setValue(self.uiFps.maximum())
+		self.uiFps.setMaximum(1e9 / limits['minFramePeriod'])
+		framerateIsMaxed and self.uiFps.setValue(self.uiFps.maximum())
 	
 	
 	
-	_sensorWidth = api.get('sensorHMax')
-	_sensorHeight = api.get('sensorVMax')
+	_sensorWidth = api2.getSync('sensorHMax')
+	_sensorHeight = api2.getSync('sensorVMax')
 	
 	def updatePassepartout(self):
 		previewTop = 1
@@ -362,25 +417,24 @@ class RecordingSettings(QtWidgets.QDialog):
 	@pyqtSlot(float, name="updateFps")
 	@silenceCallbacks('uiFps', 'uiFrameDuration')
 	def updateFps(self, fps: float):
-		self.uiFps.setValue(fps)
-		self.uiFrameDuration.setValue(1/fps*1000)
+		self.uiFrameDuration.setValue(1e6/fps)
 		self.selectCorrectPreset()
-		api.set({'sensorMilliframerate': int((1/fps*1000)*1e6)})
+		api2.set('resolution', {'frameTime': 1/fps})
 		
 		
-	@pyqtSlot(float, name="updateFrameDurationMicroseconds")
+	@pyqtSlot(float, name="updateFrameDuration")
 	@silenceCallbacks('uiFps', 'uiFrameDuration')
-	def updateFrameDurationMicroseconds(self, µs: float):
-		self.uiFrameDuration.setValue(µs)
-		self.uiFps.setValue(1000/µs)
+	def updateFrameDuration(self, µs: float):
+		self.uiFps.setValue(1e6/µs)
 		self.selectCorrectPreset()
-		api.set({'sensorMilliframerate': int((1000/µs)*1e6)})
+		api2.set('resolution', {'frameTime': µs})
 		
-	@pyqtSlot(float, name="updateMilliframerate")
-	@silenceCallbacks() #Taken care of by Microsecond version.
-	def updateMilliframerate(self, mfps: int):
-		print('mfps', mfps)
-		self.updateFrameDurationMicroseconds(1e6/(mfps/1000))
+	@pyqtSlot(float, name="updateFpsFromTime")
+	@silenceCallbacks('uiFps', 'uiFrameDuration')
+	def updateFpsFromTime(self, frameTime):
+		self.uiFrameDuration.setValue(frameTime*1e6)
+		self.uiFps.setValue(1/frameTime)
+		self.selectCorrectPreset()
 		
 	
 	def centerRecording(self):
@@ -389,30 +443,30 @@ class RecordingSettings(QtWidgets.QDialog):
 		self.selectCorrectPreset()
 		
 	
-	availableRecordingAnalogGains = api.get('availableRecordingAnalogGains')
+	luxRecordingAnalogGains = [{'multiplier':2**i, 'dB':6*i} for i in range(0,5)]
 	
-	def populateUiAnalogGain(self):
+	def populateUiLuxAnalogGain(self):
 		formatString = self.uiAnalogGain.currentText()
 		self.uiAnalogGain.clear()
 		self.uiAnalogGain.insertItems(0, [
-			formatString.format(multiplier=gain["multiplier"], dB=gain["dB"])
-			for gain in self.availableRecordingAnalogGains
+			formatString.format(multiplier=gain['multiplier'], dB=gain['dB'])
+			for gain in self.luxRecordingAnalogGains
 		])
 	
 	
 	@silenceCallbacks('uiAnalogGain')
-	def analogGainChanged(self, index):
+	def luxAnalogGainChanged(self, index):
 		self.uiAnalogGain.setCurrentIndex(index)
-		api.set({'recordingAnalogGainMultiplier': 
-			self.availableRecordingAnalogGains[index]["multiplier"]})
+		api.set({'currentGain': 
+			self.luxRecordingAnalogGains[index]['multiplier']})
 	
-	@pyqtSlot(int, name="setAnalogGain")
+	@pyqtSlot(int, name="setLuxAnalogGain")
 	@silenceCallbacks('uiAnalogGain')
-	def setAnalogGain(self, gainMultiplier):
+	def setLuxAnalogGain(self, gainMultiplier):
 		self.uiAnalogGain.setCurrentIndex(
-			list(map(lambda availableGain: availableGain["multiplier"],
-				self.availableRecordingAnalogGains))
-			.index(gainMultiplier)
+			list(map(lambda availableGain: availableGain['multiplier'],
+				self.luxRecordingAnalogGains))
+			.index(floor(gainMultiplier))
 		)
 	
 	@pyqtSlot(int, name="setMaxExposure")
