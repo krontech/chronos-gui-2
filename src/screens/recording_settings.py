@@ -58,10 +58,10 @@ class RecordingSettings(QtWidgets.QDialog):
 		
 		#Frame rate fps/µs binding
 		self.uiFps.setMinimum(0.01)
-		self.uiFrameDuration.setMaximum(999999)
-		
 		self.uiFps.valueChanged.connect(self.updateFps)
+		self.uiFrameDuration.setMaximum(999999)
 		self.uiFrameDuration.valueChanged.connect(self.updateFrameDuration)
+		api2.observe('frameRate', self.updateFpsFromAPI)
 		
 		#Analog gain
 		self.populateUiLuxAnalogGain()
@@ -71,7 +71,7 @@ class RecordingSettings(QtWidgets.QDialog):
 		# Button binding.
 		self.uiCenterRecording.clicked.connect(self.centerRecording)
 		
-		self.uiDone.clicked.connect(lambda: window.back())
+		self.uiDone.clicked.connect(self.onDone)
 		
 		api2.observe('exposureMin', self.setMinExposure)
 		api2.observe('exposureMax', self.setMaxExposure)
@@ -101,8 +101,10 @@ class RecordingSettings(QtWidgets.QDialog):
 		
 		#Set up ui writes after everything is done.
 		self._dirty = False
+		self.uiUnsavedChangesWarning.hide()
 		def markDirty(*_):
 			self._dirty = True
+			self.uiUnsavedChangesWarning.show()
 		self.uiHRes.valueChanged.connect(markDirty)
 		self.uiVRes.valueChanged.connect(markDirty)
 		self.uiHOffset.valueChanged.connect(markDirty)
@@ -168,7 +170,7 @@ class RecordingSettings(QtWidgets.QDialog):
 			('vRes', [self.updateUiVRes, self.updateForSensorVRes]),
 			('hOffset', [self.updateUiHOffset, self.updateForSensorHOffset]),
 			('vOffset', [self.updateUiVOffset, self.updateForSensorVOffset]),
-			('minFrameTime', [self.updateFpsFromTime]),
+			('minFrameTime', [self.updateMaximumFramerate]),
 		):
 			if self._lastResolution[key] == newResolution[key]:
 				continue
@@ -210,13 +212,19 @@ class RecordingSettings(QtWidgets.QDialog):
 		#Maximums are restored by updateOffsetFromResolution.
 		self.uiHOffset.setMaximum(999999)
 		self.uiVOffset.setMaximum(999999)
+		self.uiFps.setMaximum(999999)
+		self.uiFrameDuration.setMinimum(0)
 		for key, value in preset['values'].items():
 			getattr(self, key).setValue(value)
 		
 		self.updateOffsetFromResolution()
 		preset['custom'] or self.centerRecording() #All non-custom presets are assumed centered.
+		self.updateMaximumFramerate()
 		self.updatePresetDropdownButtons()
 		self.updatePassepartout()
+		
+		self._dirty = True
+		self.uiUnsavedChangesWarning.show()
 		
 	
 	def updatePresetDropdownButtons(self):
@@ -291,7 +299,7 @@ class RecordingSettings(QtWidgets.QDialog):
 	
 	
 	
-	#xywh accessor callbacks, just update the spin box values since these values require a lengthy pipeline rebuild - and because we're using them for the preview window ;)
+	#xywh accessor callbacks, just update the spin box values since these values require a lengthy pipeline rebuild.
 	
 	@pyqtSlot(int, name="updateUiHRes")
 	@silenceCallbacks('uiHRes')
@@ -303,6 +311,7 @@ class RecordingSettings(QtWidgets.QDialog):
 	@silenceCallbacks('uiVRes')
 	def updateUiVRes(self, px: int):
 		self.uiVRes.setValue(px)
+		self.updateMaximumFramerate()
 		
 	
 	@pyqtSlot(int, name="updateUiHOffset")
@@ -353,17 +362,24 @@ class RecordingSettings(QtWidgets.QDialog):
 		self.uiHOffset.setMaximum(self.uiHRes.maximum() - self.uiHRes.value())
 		self.uiVOffset.setMaximum(self.uiVRes.maximum() - self.uiVRes.value())
 	
-	def updateMaximumFramerate(self):
-		limits = api2.control.callSync('testResolution', { #test acutally gets timing limits 😑
-			'hRes': self.uiHRes.value(),
-			'vRes': self.uiVRes.value(),
-		})
+	def updateMaximumFramerate(self, minFrameTime=None):
+		if minFrameTime:
+			limits = {'minFramePeriod': minFrameTime*1e9}
+		else:
+			limits = api2.control.callSync('testResolution', { #TestResolution actually gets timing limits. 😑
+				'hRes': self.uiHRes.value(),
+				'vRes': self.uiVRes.value(),
+			})
+		
+		log.debug(f"Framerate for {self.uiHRes.value()}×{self.uiVRes.value()}: {1e9 / limits['minFramePeriod']}")
 		
 		if 'error' in limits:
+			log.error(f"Error retrieving maximum framerate for {hRes}×{vRes}: {limits['error']}")
 			return
 		
 		framerateIsMaxed = self.uiFps.value() == self.uiFps.maximum()
 		self.uiFps.setMaximum(1e9 / limits['minFramePeriod'])
+		self.uiFrameDuration.setMinimum(1e-3 * limits['minFramePeriod'])
 		framerateIsMaxed and self.uiFps.setValue(self.uiFps.maximum())
 	
 	
@@ -419,7 +435,7 @@ class RecordingSettings(QtWidgets.QDialog):
 	def updateFps(self, fps: float):
 		self.uiFrameDuration.setValue(1e6/fps)
 		self.selectCorrectPreset()
-		api2.set('resolution', {'frameTime': 1/fps})
+		api2.set('frameRate', fps)
 		
 		
 	@pyqtSlot(float, name="updateFrameDuration")
@@ -427,13 +443,13 @@ class RecordingSettings(QtWidgets.QDialog):
 	def updateFrameDuration(self, µs: float):
 		self.uiFps.setValue(1e6/µs)
 		self.selectCorrectPreset()
-		api2.set('resolution', {'frameTime': µs})
+		api2.set('framePeriod', µs*1e3) #ns
 		
-	@pyqtSlot(float, name="updateFpsFromTime")
+	@pyqtSlot(float, name="updateFpsFromAPI")
 	@silenceCallbacks('uiFps', 'uiFrameDuration')
-	def updateFpsFromTime(self, frameTime):
-		self.uiFrameDuration.setValue(frameTime*1e6)
-		self.uiFps.setValue(1/frameTime)
+	def updateFpsFromAPI(self, fps):
+		self.uiFps.setValue(fps)
+		self.uiFrameDuration.setValue(1e6/fps)
 		self.selectCorrectPreset()
 		
 	
@@ -457,7 +473,7 @@ class RecordingSettings(QtWidgets.QDialog):
 	@silenceCallbacks('uiAnalogGain')
 	def luxAnalogGainChanged(self, index):
 		self.uiAnalogGain.setCurrentIndex(index)
-		api.set({'currentGain': 
+		api2.set({'currentGain': 
 			self.luxRecordingAnalogGains[index]['multiplier']})
 	
 	@pyqtSlot(int, name="setLuxAnalogGain")
@@ -483,3 +499,17 @@ class RecordingSettings(QtWidgets.QDialog):
 	@silenceCallbacks('uiExposure')
 	def updateExposure(self, ns):
 		self.uiExposure.setValue(ns)
+	
+	
+	def onDone(self):
+		if self._dirty:
+			self._dirty = False
+			self.uiUnsavedChangesWarning.hide()
+			api2.set('resolution', {
+				#'vDarkRows': 0, #Don't reset what we don't show. That's annoying if you did manually set it.
+				'hRes': self.uiHRes.value(),
+				'vRes': self.uiVRes.value(),
+				'hOffset': self.uiHOffset.value(),
+				'vOffset': self.uiVOffset.value(),
+			})
+		self.window_.back()

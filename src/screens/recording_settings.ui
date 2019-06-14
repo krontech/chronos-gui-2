@@ -215,7 +215,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>Offset</string>
+    <string>Offset*</string>
    </property>
   </widget>
   <widget class="Subheader" name="headerlabel_3">
@@ -438,7 +438,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>Resolution</string>
+    <string>Resolution*</string>
    </property>
   </widget>
   <widget class="DecimalSpinBox" name="uiFrameDuration">
@@ -510,7 +510,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>* Press Done to apply resolution.</string>
+    <string>*Press Done to apply changes.</string>
    </property>
    <property name="alignment">
     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
