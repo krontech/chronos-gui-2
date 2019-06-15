@@ -10,7 +10,6 @@ from PyQt5.QtCore import pyqtSlot
 from debugger import *; dbg
 import settings
 import api2
-from api2 import silenceCallbacks
 
 
 class RecordingSettings(QtWidgets.QDialog):
@@ -71,7 +70,9 @@ class RecordingSettings(QtWidgets.QDialog):
 		# Button binding.
 		self.uiCenterRecording.clicked.connect(self.centerRecording)
 		
-		self.uiDone.clicked.connect(self.onDone)
+		self.uiApply.clicked.connect(self.applySettings)
+		self.uiDone.clicked.connect(self.applySettings)
+		self.uiDone.clicked.connect(lambda: self.window_.back())
 		
 		api2.observe('exposureMin', self.setMinExposure)
 		api2.observe('exposureMax', self.setMaxExposure)
@@ -87,9 +88,6 @@ class RecordingSettings(QtWidgets.QDialog):
 		self.uiSavePreset.clicked.connect(self.savePreset)
 		self.uiDeletePreset.clicked.connect(self.deletePreset)
 		
-		#Finally, sync the presets dropdown with what's displayed.
-		self.selectCorrectPreset()
-		
 		#Hack. Since we set each recording setting individually, we always
 		#wind up with a 'custom' entry on our preset list. Now, this might be
 		#legitimate - if we're still on Custom by this time, that's just the
@@ -102,9 +100,11 @@ class RecordingSettings(QtWidgets.QDialog):
 		#Set up ui writes after everything is done.
 		self._dirty = False
 		self.uiUnsavedChangesWarning.hide()
+		self.uiApply.hide()
 		def markDirty(*_):
 			self._dirty = True
 			self.uiUnsavedChangesWarning.show()
+			self.uiApply.show()
 		self.uiHRes.valueChanged.connect(markDirty)
 		self.uiVRes.valueChanged.connect(markDirty)
 		self.uiHOffset.valueChanged.connect(markDirty)
@@ -144,7 +144,7 @@ class RecordingSettings(QtWidgets.QDialog):
 		else:
 			log.debug(f'Rejected preset resolution {hRes}×{vRes}.')
 	
-	allRecordingGeometrySettings = ['uiHRes', 'uiVRes', 'uiHOffset', 'uiVOffset', 'uiFps', 'uiFrameDuration']
+	allRecordingGeometrySettings = ['uiHRes', 'uiVRes', 'uiHOffset', 'uiVOffset', 'uiFps'] #'uiFrameDuration' and 'uiAnalogGain' are not part of the preset, since they're not geometries.
 	
 	
 	#The following usually crashes the HDVPSS core, which is responsible for
@@ -163,7 +163,6 @@ class RecordingSettings(QtWidgets.QDialog):
 		}).then(api2.video.restart)
 	
 	
-	@silenceCallbacks() #Handled by callbacks.
 	def dispatchResolutionUpdate(self, newResolution):
 		for key, callbacks in (
 			('hRes', [self.updateUiHRes, self.updateForSensorHRes]),
@@ -179,7 +178,6 @@ class RecordingSettings(QtWidgets.QDialog):
 				callback(newResolution[key])
 	
 	
-	@silenceCallbacks('uiPresets')
 	def populatePresets(self):
 		formatString = self.uiPresets.currentText()
 		self.uiPresets.clear()
@@ -204,7 +202,6 @@ class RecordingSettings(QtWidgets.QDialog):
 			)
 	
 	
-	@silenceCallbacks('uiPresets', *allRecordingGeometrySettings)
 	def applyPreset(self, presetNumber: int):
 		preset = self.uiPresets.itemData(presetNumber)
 		
@@ -214,17 +211,25 @@ class RecordingSettings(QtWidgets.QDialog):
 		self.uiVOffset.setMaximum(999999)
 		self.uiFps.setMaximum(999999)
 		self.uiFrameDuration.setMinimum(0)
-		for key, value in preset['values'].items():
-			getattr(self, key).setValue(value)
+		for key, value in preset.get('values', {}).items():
+			elem = getattr(self, key)
+			elem.blockSignals(True) #Don't fire around a bunch of updates as we set values.
+			elem.setValue(value)
+			elem.blockSignals(False)
 		
+		self.updateMaximumFramerate()
 		self.updateOffsetFromResolution()
 		preset['custom'] or self.centerRecording() #All non-custom presets are assumed centered.
-		self.updateMaximumFramerate()
 		self.updatePresetDropdownButtons()
 		self.updatePassepartout()
 		
+		#Update frame duration and exposure from frame rate, which we just updated.
+		self.uiFrameDuration.setValue(1e6/self.uiFps.value())
+		self.updateExposureLimits()
+		
 		self._dirty = True
 		self.uiUnsavedChangesWarning.show()
+		self.uiApply.show()
 		
 	
 	def updatePresetDropdownButtons(self):
@@ -240,40 +245,48 @@ class RecordingSettings(QtWidgets.QDialog):
 			self.uiDeletePreset.hide()
 	
 	
-	@silenceCallbacks('uiPresets', *allRecordingGeometrySettings)
 	def selectCorrectPreset(self):
 		try:
-			self.uiPresets.setCurrentIndex(
-				[False in [int(getattr(self, (key)).value()) == int(value) for key, value in values.items()] #fail fast, don't check every value. Round to nearest integer because framerate API gets quantized to two places by fps input.
-					for values in [ #OK, so problem issss fps is stored different than it's displayed, and with different accuracy.
-						self.uiPresets.itemData(index)['values']
-						for index in 
-						range(self.uiPresets.count())
-					]
-				].index(False) #index of first item to pass all elem.value() == value tests, ie, matching our preset
-			)
-		except ValueError:
-			#OK, not one of the available presets. (This error should be raised by the final .index() failing to find a match.)
+			self.uiPresets.blockSignals(True) #When selecting a preset, don't try to apply it. This causes framerate to not track to maximum.
 			
-			if not self.uiPresets.itemData(0)['temporary']: #Add the "custom" preset if it doesn't exist. This is expected to always be in slot 0.
+			#Select the first available preset.
+			for index in range(self.uiPresets.count()):
+				itemData = self.uiPresets.itemData(index)
+				if itemData['temporary']: #Ignore the fake "Custom" preset.
+					continue
+				
+				#Check preset values equal what's on screen. If anything isn't, this isn't our preset index.
+				if False in [
+					abs(int(getattr(self, key).value()) - int(value)) <= 1
+					for key, value in itemData['values'].items()
+				]: 
+					continue
+				
+				self.uiPresets.setCurrentIndex(index)
+				return
+			
+			#OK, not one of the available presets.
+			#Add the "custom" preset if it doesn't exist. This is expected to always be in slot 0.
+			if not self.uiPresets.itemData(0)['temporary']:
+				log.print('adding temporary')
 				self.uiPresets.insertItem(0, 'Custom', {
 					'custom': True, #Indicates value was saved by user.
 					'temporary': True, #Indicates the "custom", the unsaved, preset.
 				})
 			
 			#Mogrify the custom values to match what is set.
-			values = {}
-			for elem in self.allRecordingGeometrySettings:
-				values[elem] = getattr(self, elem).value()
-			
 			itemData = self.uiPresets.itemData(0) #read modify write, no in-place merging
-			itemData['values'] = values
+			itemData['values'] = {
+				elem: getattr(self, elem).value()
+				for elem in self.allRecordingGeometrySettings
+			}
 			self.uiPresets.setItemData(0, itemData)
 			
+			#Select the custom preset and check for changes to the save/load preset buttons.
 			self.uiPresets.setCurrentIndex(0)
-		
-		#Check for changes to the save/load preset buttons.
-		self.updatePresetDropdownButtons()
+		finally:
+			self.updatePresetDropdownButtons()
+			self.uiPresets.blockSignals(False)
 	
 	
 	def savePreset(self):
@@ -287,7 +300,6 @@ class RecordingSettings(QtWidgets.QDialog):
 		
 		self.updatePresetDropdownButtons()
 	
-	@silenceCallbacks('uiPresets') #Don't emit any update signal, we're not changing anything. (Generally, we shouldn't rely on signals to propagate anyway, since that gets very hard to debug very fast.)
 	def deletePreset(self, *_):
 		settings.setValue('customRecordingPresets', [
 			setting
@@ -302,44 +314,37 @@ class RecordingSettings(QtWidgets.QDialog):
 	#xywh accessor callbacks, just update the spin box values since these values require a lengthy pipeline rebuild.
 	
 	@pyqtSlot(int, name="updateUiHRes")
-	@silenceCallbacks('uiHRes')
 	def updateUiHRes(self, px: int):
 		self.uiHRes.setValue(px)
 		
 	
 	@pyqtSlot(int, name="updateUiVRes")
-	@silenceCallbacks('uiVRes')
 	def updateUiVRes(self, px: int):
 		self.uiVRes.setValue(px)
 		self.updateMaximumFramerate()
 		
 	
 	@pyqtSlot(int, name="updateUiHOffset")
-	@silenceCallbacks('uiHOffset')
 	def updateUiHOffset(self, px: int):
 		self.uiHOffset.setValue(px)
 	
 	@pyqtSlot(int, name="updateUiVOffset")
-	@silenceCallbacks('uiVOffset')
 	def updateUiVOffset(self, px: int):
 		self.uiVOffset.setValue(px)
 	
 	
 	#side-effect callbacks, update everything *but* the spin box values
 	@pyqtSlot(int, name="updateForSensorHOffset")
-	@silenceCallbacks()
 	def updateForSensorHOffset(self, px: int):
 		self.updatePassepartout()
 		self.selectCorrectPreset()
 	
 	@pyqtSlot(int, name="updateForSensorVOffset")
-	@silenceCallbacks()
 	def updateForSensorVOffset(self, px: int):
 		self.updatePassepartout()
 		self.selectCorrectPreset()
 	
 	@pyqtSlot(int, name="updateForSensorHRes")
-	@silenceCallbacks()
 	def updateForSensorHRes(self, px: int):
 		wasCentered = self.uiHOffset.value() == self.uiHOffset.maximum()//2
 		self.uiHOffset.setMaximum(self.uiHRes.maximum() - px) #Can't capture off-sensor.
@@ -349,7 +354,6 @@ class RecordingSettings(QtWidgets.QDialog):
 		self.selectCorrectPreset()
 	
 	@pyqtSlot(int, name="updateForSensorVRes")
-	@silenceCallbacks()
 	def updateForSensorVRes(self, px: int):
 		wasCentered = self.uiVOffset.value() == self.uiVOffset.maximum()//2
 		self.uiVOffset.setMaximum(self.uiVRes.maximum() - px) #Can't capture off-sensor.
@@ -362,31 +366,43 @@ class RecordingSettings(QtWidgets.QDialog):
 		self.uiHOffset.setMaximum(self.uiHRes.maximum() - self.uiHRes.value())
 		self.uiVOffset.setMaximum(self.uiVRes.maximum() - self.uiVRes.value())
 	
+	_lastKnownFramerateOverheadNs = 5000
 	def updateMaximumFramerate(self, minFrameTime=None):
+		log.print('entered updateMaximumFramerate')
+		log.print(f"umf1 max/val {self.uiFps.maximum(), self.uiFps.value()}")
 		if minFrameTime:
+			#Shortcut. We can do this because the exposure values set below by the real call are not required when an API-driven update is fired, since the API-driven update will also update the exposure. I think. 🤞
 			limits = {'minFramePeriod': minFrameTime*1e9}
 		else:
 			limits = api2.control.callSync('testResolution', { #TestResolution actually gets timing limits. 😑
 				'hRes': self.uiHRes.value(),
 				'vRes': self.uiVRes.value(),
 			})
+			
+			if 'error' in limits:
+				log.error(f"Error retrieving maximum framerate for {hRes}×{vRes}: {limits['error']}")
+				return
+			
+			#Note this down for future use by `updateExposureLimits`.
+			self._lastKnownFramerateOverheadNs = limits['minFramePeriod'] - limits['exposureMax']
+			self.uiExposure.setMinimum(limits['exposureMin'])
 		
 		log.debug(f"Framerate for {self.uiHRes.value()}×{self.uiVRes.value()}: {1e9 / limits['minFramePeriod']}")
 		
-		if 'error' in limits:
-			log.error(f"Error retrieving maximum framerate for {hRes}×{vRes}: {limits['error']}")
-			return
-		
-		framerateIsMaxed = self.uiFps.value() == self.uiFps.maximum()
+		log.print(f"umf2 max/val {self.uiFps.maximum(), self.uiFps.value()}")
+		framerateIsMaxed = abs(self.uiFps.maximum() - self.uiFps.value()) <= 1 #There is a bit of uncertainty here, occasionally, of about 0.1 fps.
 		self.uiFps.setMaximum(1e9 / limits['minFramePeriod'])
+		log.print(f"umf3 max/val {self.uiFps.maximum(), self.uiFps.value()}")
 		self.uiFrameDuration.setMinimum(1e-3 * limits['minFramePeriod'])
 		framerateIsMaxed and self.uiFps.setValue(self.uiFps.maximum())
+		framerateIsMaxed and self.uiFrameDuration.setValue(1e6/self.uiFps.maximum())
+		self.updateExposureLimits()
+		log.print(f"umf4 max/val {self.uiFps.maximum(), self.uiFps.value()}")
 	
 	
 	
 	_sensorWidth = api2.getSync('sensorHMax')
 	_sensorHeight = api2.getSync('sensorVMax')
-	
 	def updatePassepartout(self):
 		previewTop = 1
 		previewLeft = 1
@@ -431,26 +447,38 @@ class RecordingSettings(QtWidgets.QDialog):
 	
 	
 	@pyqtSlot(float, name="updateFps")
-	@silenceCallbacks('uiFps', 'uiFrameDuration')
 	def updateFps(self, fps: float):
 		self.uiFrameDuration.setValue(1e6/fps)
 		self.selectCorrectPreset()
-		api2.set('frameRate', fps)
+		self._dirty = True
+		self.uiUnsavedChangesWarning.show()
+		self.uiApply.show()
+		self.updateExposureLimits()
 		
 		
 	@pyqtSlot(float, name="updateFrameDuration")
-	@silenceCallbacks('uiFps', 'uiFrameDuration')
 	def updateFrameDuration(self, µs: float):
 		self.uiFps.setValue(1e6/µs)
 		self.selectCorrectPreset()
-		api2.set('framePeriod', µs*1e3) #ns
+		self._dirty = True
+		self.uiUnsavedChangesWarning.show()
+		self.uiApply.show()
+		self.updateExposureLimits()
 		
 	@pyqtSlot(float, name="updateFpsFromAPI")
-	@silenceCallbacks('uiFps', 'uiFrameDuration')
 	def updateFpsFromAPI(self, fps):
 		self.uiFps.setValue(fps)
 		self.uiFrameDuration.setValue(1e6/fps)
 		self.selectCorrectPreset()
+		self.updateExposureLimits()
+	
+	
+	def updateExposureLimits(self):
+		exposureIsMaxed = self.uiExposure.value() == self.uiExposure.maximum()
+		self.uiExposure.setMaximum(
+			((self.uiFrameDuration.value() * 1e3) - self._lastKnownFramerateOverheadNs)
+		)
+		exposureIsMaxed and self.uiExposure.setValue(self.uiExposure.maximum())
 		
 	
 	def centerRecording(self):
@@ -470,14 +498,12 @@ class RecordingSettings(QtWidgets.QDialog):
 		])
 	
 	
-	@silenceCallbacks('uiAnalogGain')
 	def luxAnalogGainChanged(self, index):
 		self.uiAnalogGain.setCurrentIndex(index)
 		api2.set({'currentGain': 
 			self.luxRecordingAnalogGains[index]['multiplier']})
 	
 	@pyqtSlot(int, name="setLuxAnalogGain")
-	@silenceCallbacks('uiAnalogGain')
 	def setLuxAnalogGain(self, gainMultiplier):
 		self.uiAnalogGain.setCurrentIndex(
 			list(map(lambda availableGain: availableGain['multiplier'],
@@ -486,30 +512,31 @@ class RecordingSettings(QtWidgets.QDialog):
 		)
 	
 	@pyqtSlot(int, name="setMaxExposure")
-	@silenceCallbacks('uiExposure')
 	def setMaxExposure(self, ns):
 		self.uiExposure.setMaximum(ns)
 	
 	@pyqtSlot(int, name="setMinExposure")
-	@silenceCallbacks('uiExposure')
 	def setMinExposure(self, ns):
 		self.uiExposure.setMaximum(ns)
 	
 	@pyqtSlot(int, name="updateExposure")
-	@silenceCallbacks('uiExposure')
 	def updateExposure(self, ns):
 		self.uiExposure.setValue(ns)
 	
 	
-	def onDone(self):
+	def applySettings(self):
 		if self._dirty:
 			self._dirty = False
 			self.uiUnsavedChangesWarning.hide()
-			api2.set('resolution', {
-				#'vDarkRows': 0, #Don't reset what we don't show. That's annoying if you did manually set it.
-				'hRes': self.uiHRes.value(),
-				'vRes': self.uiVRes.value(),
-				'hOffset': self.uiHOffset.value(),
-				'vOffset': self.uiVOffset.value(),
+			self.uiApply.hide()
+			api2.control.call('set', {
+				'resolution': {
+					#'vDarkRows': 0, #Don't reset what we don't show. That's annoying if you did manually set it.
+					'hRes': self.uiHRes.value(),
+					'vRes': self.uiVRes.value(),
+					'hOffset': self.uiHOffset.value(),
+					'vOffset': self.uiVOffset.value(),
+					'minFrameTime': 1/self.uiFps.value(), #This locks the fps in at the lower framerate until you reset it.
+				},
+				'framePeriod': self.uiFrameDuration.value()*1e3,
 			})
-		self.window_.back()

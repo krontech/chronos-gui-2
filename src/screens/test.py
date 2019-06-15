@@ -7,9 +7,6 @@ from debugger import *; dbg
 import api2
 
 
-silenceCallbacks = api2.silenceCallbacks
-
-
 class Test(QtWidgets.QWidget):
 	def __init__(self, window):
 		super().__init__()

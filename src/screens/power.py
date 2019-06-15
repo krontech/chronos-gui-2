@@ -97,8 +97,7 @@ class Power(QtWidgets.QDialog):
 	def onHide(self):
 		self.labelUpdateTimer.stop()
 	
-	@QtCore.pyqtSlot(float, name="updatePowerDownThreshold")
-	@api2.silenceCallbacks('uiPowerDownThreshold')
+	@QtCore.pyqtSlot(float)
 	def updatePowerDownThreshold(self, threshold: float):
 		targetText = dec2pct(threshold)
 		textIndex = self.uiPowerDownThreshold.findText(targetText)

@@ -243,7 +243,6 @@ class Main(QWidget):
 			)
 		)
 	
-	#@api2.silenceCallbacks('uiExposureSlider')
 	def onExposureSliderMoved(self, newExposureNs):
 		#startTime = time.perf_counter()
 		linearRatio = (newExposureNs-self.uiExposureSlider.minimum()) / (self.uiExposureSlider.maximum()-self.uiExposureSlider.minimum())
@@ -253,7 +252,6 @@ class Main(QWidget):
 		})
 	
 	@pyqtSlot(int, name="updateExposureNs")
-	@api2.silenceCallbacks()
 	def updateExposureNs(self, newExposureNs):
 		linearRatio = (newExposureNs-self.uiExposureSlider.minimum()) / (self.uiExposureSlider.maximum()-self.uiExposureSlider.minimum())
 		try:
@@ -265,13 +263,11 @@ class Main(QWidget):
 		self.updateExposureDependancies()
 	
 	@pyqtSlot(int, name="updateExposureMax")
-	@api2.silenceCallbacks('uiExposureSlider')
 	def updateExposureMax(self, newExposureNs):
 		self.uiExposureSlider.setMaximum(newExposureNs)
 		self.updateExposureDependancies()
 	
 	@pyqtSlot(int, name="updateExposureMin")
-	@api2.silenceCallbacks('uiExposureSlider')
 	def updateExposureMin(self, newExposureNs):
 		self.uiExposureSlider.setMinimum(newExposureNs)
 		self.updateExposureDependancies()
@@ -287,7 +283,6 @@ class Main(QWidget):
 	
 	
 	@pyqtSlot('QVariantMap', name="updateBaWTriggers")
-	@api2.silenceCallbacks()
 	def updateBaWTriggers(self, triggers):
 		#	VAR IF no mocal
 		#		show black cal button
@@ -304,7 +299,6 @@ class Main(QWidget):
 		self.closeCalibrationMenu()
 	
 	@pyqtSlot('QVariantMap', name="updateColorTriggers")
-	@api2.silenceCallbacks()
 	def updateColorTriggers(self, triggers):
 		#	VAR IF no mocal
 		#		show cal menu button → wb/bc menu
@@ -323,14 +317,12 @@ class Main(QWidget):
 		
 	
 	@pyqtSlot(float, name="updateWhiteClipping")
-	@api2.silenceCallbacks('uiShowWhiteClipping')
 	def updateWhiteClipping(self, focusPeakingIntensity: float):
 		self.uiShowWhiteClipping.setCheckState(
 			0 if not focusPeakingIntensity else 2)
 	
 	
 	@pyqtSlot(str, name="updateFocusPeakingIntensity")
-	@api2.silenceCallbacks('uiFocusPeakingIntensity')
 	def updateFocusPeakingIntensity(self, focusPeakingIntensity: str):
 		snapPoints = self.uiFocusPeakingIntensity.count() - 1 #zero-indexed
 		threshold = 0.02
@@ -343,7 +335,6 @@ class Main(QWidget):
 	
 	
 	@pyqtSlot(str, name="updateFocusPeakingColor")
-	@api2.silenceCallbacks() #Causes pyqtSlot to overwrite earlier function.
 	def updateFocusPeakingColor(self, color: int):
 		QPoint = QtCore.QPoint
 		

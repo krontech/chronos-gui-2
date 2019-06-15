@@ -272,6 +272,8 @@ apiValues = APIValues()
 
 class CallbackNotSilenced(Exception):
 	"""Raised when the API is passed an unsilenced callback for an event.
+		
+		NOTE: Obsoleted by API2. Ignored now, kept only for backwards compat.
 	
 		It's important to silence events (with `@silenceCallbacks`) on Qt elements
 		because they'll update the API with their changes otherwise. If more than
@@ -312,11 +314,6 @@ def observe(name: str, callback: Callable[[Any], None], saftyCheckForSilencedWid
 			callback: Function called when the state updates and upon subscription.
 				Called with one parameter, the new value. Called when registered
 				and when the value updates.
-			saftyCheckForSilencedWidgets=True: Indicates no API requests will be made from
-				this function. This is usually false, because most callbacks *do*
-				cause updates to the API, and it's really hard to detect this. A
-				silenced callback does not update anything, since it should silence
-				all the affected fields via the @silenceCallbacks(…) decorator.
 		
 		Note: Some frequently updated values (> 10/sec) are only available via
 			polling due to flooding concerns. They can not be observed, as they're
@@ -334,9 +331,6 @@ def observe(name: str, callback: Callable[[Any], None], saftyCheckForSilencedWid
 		key one syscall at a time as we instantiate each Qt control.
 	"""
 	
-	if not hasattr(callback, '_isSilencedCallback') and saftyCheckForSilencedWidgets:
-		raise CallbackNotSilenced(f"{callback} must consider silencing. Decorate with @silenceCallbacks(callback_name, …).")
-	
 	callback(apiValues.get(name))
 	apiValues.observe(name, callback)
 
@@ -346,9 +340,6 @@ def observe_future_only(name: str, callback: Callable[[Any], None], saftyCheckFo
 	
 		Useful when `observe`ing a derived value, which observe can't deal with yet.
 	"""
-	
-	if not hasattr(callback, '_isSilencedCallback') and saftyCheckForSilencedWidgets:
-		raise CallbackNotSilenced(f"{callback} must consider silencing. Decorate with @silenceCallbacks(callback_name, …).")
 	
 	apiValues.observe(name, callback)
 

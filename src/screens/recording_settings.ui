@@ -215,7 +215,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>Offset*</string>
+    <string>Offset</string>
    </property>
   </widget>
   <widget class="Subheader" name="headerlabel_3">
@@ -438,7 +438,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>Resolution*</string>
+    <string>Resolution</string>
    </property>
   </widget>
   <widget class="DecimalSpinBox" name="uiFrameDuration">
@@ -590,6 +590,22 @@
     <string>border-image: url(../../assets/images/picture-small.jpg); border-image: url(assets/images/picture-small.jpg);</string>
    </property>
   </widget>
+  <widget class="Button" name="uiApply">
+   <property name="geometry">
+    <rect>
+     <x>460</x>
+     <y>400</y>
+     <width>171</width>
+     <height>81</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Apply</string>
+   </property>
+   <property name="clickMarginRight" stdset="0">
+    <enum>Button::half</enum>
+   </property>
+  </widget>
   <zorder>uiPreviewVideoModeTooSlowOnThisCameraSoJustCoverItUpAndPretendItNeverExisted</zorder>
   <zorder>backdrop</zorder>
   <zorder>label_3</zorder>
@@ -624,6 +640,7 @@
   <zorder>headerlabel_7</zorder>
   <zorder>uiSavePreset</zorder>
   <zorder>uiDeletePreset</zorder>
+  <zorder>uiApply</zorder>
  </widget>
  <customwidgets>
   <customwidget>

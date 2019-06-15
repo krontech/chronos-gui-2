@@ -583,41 +583,8 @@ class APIValues(QObject):
 apiValues = APIValues()
 
 
-class CallbackNotSilenced(Exception):
-	"""Raised when the API is passed an unsilenced callback for an event.
-	
-		It's important to silence events (with `@silenceCallbacks`) on Qt elements
-		because they'll update the API with their changes otherwise. If more than
-		one value is being processed by the API at the same time, it can cause an
-		infinite loop where each value changes the element and the element emits
-		another change event.
-		
-		This is explicitly checked because having an unsilenced element emit an
-		update will usually work. The update will (asychronously) wind its way
-		through the system, and when it gets back to updating the emitting element
-		the element will have the same value and will not emit another update.
-		However, if the element has a different value, then it will change back.
-		The update for the change will be in flight by this time, and the two will
-		enter an infinite loop of updating the element as they fight. Any further
-		changes made to the element will now emit more update events which will
-		themselves loop. Since this is very hard to detect reliably in testing,
-		we force at least the consideration of silencing elements on the callback,
-		since it makes it much easier to track down an issue by reading the
-		callback and making sure it silences the elements it changes. We can't
-		reasonably test if it silences the right elements unfortunately. This
-		could be solved by not emitting events to the client which initiated them,
-		but while fairly trivial with the socket.io websocket library, it seems
-		very difficult or impossible with d-bus.
-		
-		Note: It is helpful to have events propagate back to the python UI
-		however. It means we can ignore updating other elements when changing
-		one element, since - as either element could be updated at any time
-		from (say) a web ui, it doesn't really matter where the update originates
-		from. All that matters is that it does update.
-	"""
 
-
-def observe(name: str, callback: Callable[[Any], None], saftyCheckForSilencedWidgets=True) -> None:
+def observe(name: str, callback: Callable[[Any], None]) -> None:
 	"""Observe changes in a state value.
 	
 		Args:
@@ -625,13 +592,8 @@ def observe(name: str, callback: Callable[[Any], None], saftyCheckForSilencedWid
 			callback: Function called when the state updates and upon subscription.
 				Called with one parameter, the new value. Called when registered
 				and when the value updates.
-			saftyCheckForSilencedWidgets=True: Indicates no API requests will be made from
-				this function. This is usually false, because most callbacks *do*
-				cause updates to the API, and it's really hard to detect this. A
-				silenced callback does not update anything, since it should silence
-				all the affected fields via the @silenceCallbacks(…) decorator.
 		
-		Note: Some frequently updated values (> 10/sec) are only available via
+		Note: Some frequently updated values (~> 10/sec) are only available via
 			polling due to flooding concerns. They can not be observed, as they're
 			assumed to *always* be changed. See the API docs for more details.
 		
@@ -647,9 +609,6 @@ def observe(name: str, callback: Callable[[Any], None], saftyCheckForSilencedWid
 		key one syscall at a time as we instantiate each Qt control.
 	"""
 	
-	if not hasattr(callback, '_isSilencedCallback') and saftyCheckForSilencedWidgets:
-		raise CallbackNotSilenced(f"{callback} must consider silencing. Decorate with @silenceCallbacks(callback_name, …).")
-	
 	apiValues.observe(name, callback)
 	callback(apiValues.get(name))
 
@@ -660,37 +619,7 @@ def observe_future_only(name: str, callback: Callable[[Any], None], saftyCheckFo
 		Useful when `observe`ing a derived value, which observe can't deal with yet.
 	"""
 	
-	if not hasattr(callback, '_isSilencedCallback') and saftyCheckForSilencedWidgets:
-		raise CallbackNotSilenced(f"{callback} must consider silencing. Decorate with @silenceCallbacks(callback_name, …).")
-	
 	apiValues.observe(name, callback)
-
-
-def silenceCallbacks(*elements):
-	"""Silence events for the duration of a callback.
-	
-		This allows an API element to be updated without triggering the API again.
-		If the API was triggered, it might update the element which would cause an
-		infinite loop.
-	"""
-	
-	def silenceCallbacksOf(callback):
-		def silencedCallback(self, *args, **kwargs):
-			for element in elements:
-				getattr(self, element).blockSignals(True)
-			
-			callback(self, *args, **kwargs)
-			
-			for element in elements:
-				getattr(self, element).blockSignals(False)
-		
-		silencedCallback._isSilencedCallback = True #Checked by the API, which only takes silenced callbacks to avoid loops.
-		return silencedCallback
-	return silenceCallbacksOf
-
-
-def connectSignal(*args):
-	apiValues.connectSignal(*args)
 
 
 
