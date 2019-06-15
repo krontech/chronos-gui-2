@@ -521,9 +521,6 @@ _camState = control.callSync('get', [
 if(not _camState):
 	raise Exception("Cache failed to populate. This indicates the get call is not working.")
 _camStateAge = {k:0 for k,v in _camState.items()}
-cameraControlAPI.setTimeout(250) #Lower the timeout, now that we've placed the Big Call to get everything.
-cameraVideoAPI.setTimeout(250)
-
 class APIValues(QObject):
 	"""Wrapper class for subscribing to API values in the chronos API."""
 	
