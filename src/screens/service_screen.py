@@ -1,12 +1,13 @@
 # -*- coding: future_fstrings -*-
+from datetime import datetime
+import logging; log = logging.getLogger('Chronos.gui')
 
 from PyQt5 import uic, QtWidgets, QtCore
 from PyQt5.QtCore import pyqtSlot
 
 from debugger import *; dbg
 
-import api
-from api import silenceCallbacks
+import api2 as api
 import settings
 
 
@@ -32,7 +33,8 @@ class ServiceScreenLocked(QtWidgets.QDialog):
 		self.uiDone.clicked.connect(window.back)
 
 	def unlock(self, *_):
-		if self.uiPassword.text() == "4242":
+		if self.uiPassword.text() == "4242" or settings.value('skip factory authentication', True):
+			settings.setValue('skip factory authentication', False) #First entry is free. Saves one password for production when they set serial and run cal.
 			self.windowControl.show('service_screen.unlocked')
 	
 	def delayedUnlock(self, *_):
@@ -50,32 +52,39 @@ class ServiceScreenUnlocked(QtWidgets.QDialog):
 		self.move(0, 0)
 		self.setWindowFlags(QtCore.Qt.FramelessWindowHint)
 		self.setAttribute(QtCore.Qt.WA_TranslucentBackground, True)
+		self.uiCalibratedOnTemplate = self.uiCalibratedOn.text()
 		
 		# Button binding.
-		self.uiAutoCal.clicked.connect(lambda: api.control('autoFactoryCal', 'correct horse battery staple'))
-		self.uiAdcOffset.clicked.connect(lambda: api.control('adcOffsetCal', 'correct horse battery staple'))
-		self.uiColumnGain.clicked.connect(lambda: api.control('columnGainCal', 'correct horse battery staple'))
-		self.uiBlackCalAll.clicked.connect(lambda: api.control('blackCalAllStandard', 'correct horse battery staple'))
-		self.uiWhiteRef.clicked.connect(lambda: api.control('whiteRefCal', 'correct horse battery staple'))
-		self.uiCloseApp.clicked.connect(QtWidgets.QApplication.closeAllWindows)
+		api.observe('cameraSerial', self.recieveSerial)
+		self.uiSerialNumber.textChanged.connect(self.sendSerial)
+	
+		self.uiCal.clicked.connect(self.runCal)
+		
+		settings.observe('last factory cal', None, self.recieveFactoryCalDate)
 		
 		settings.observe('debug controls enabled', False, lambda x:
-			self.uiShowDebugControls.setChecked(x == 'True') )
+			self.uiShowDebugControls.setChecked(x) )
 		self.uiShowDebugControls.stateChanged.connect(lambda x:
-			settings.setValue('debug controls enabled', str(bool(x))) )
-		
-		api.observe('cameraSerial', self.updateSerial)
-		self.uiSerialNumber.textChanged.connect(lambda x: 
-			api.set({'cameraSerial': x}))
+			settings.setValue('debug controls enabled', bool(x)) )
 		
 		self.uiDone.clicked.connect(lambda: window.show('primary_settings'))
 	
 	
+	
 	@pyqtSlot(int)
-	@silenceCallbacks('uiSerialNumber')
-	def updateSerial(self, value):
+	def recieveSerial(self, value):
 		self.uiSerialNumber.setText(value)
 	
-	@silenceCallbacks('uiSerialNumber')
-	def updateDebugControlVisibility(self, value):
-		pass
+	def sendSerial(self, value):
+		log.error("There is a command to set this, but it only works on Arago.")
+	
+	def runCal(self):
+		settings.setValue('last factory cal', 
+			datetime.now().strftime(self.uiCalibratedOnTemplate))
+		log.error("We don't have these routines in the API yet.")
+	
+	def recieveFactoryCalDate(self, msg):
+		if not msg:
+			self.uiCalibratedOn.hide()
+		else:
+			self.uiCalibratedOn.setText(msg)

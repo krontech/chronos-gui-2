@@ -49,183 +49,124 @@
     <string>Done</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="uiColumnGain">
+  <widget class="CheckBox" name="uiShowDebugControls">
    <property name="geometry">
     <rect>
-     <x>290</x>
-     <y>190</y>
-     <width>91</width>
-     <height>51</height>
+     <x>370</x>
+     <y>80</y>
+     <width>251</width>
+     <height>81</height>
     </rect>
-   </property>
-   <property name="font">
-    <font>
-     <pointsize>10</pointsize>
-    </font>
-   </property>
-   <property name="text">
-    <string>Column Gain
-Cal</string>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="uiWhiteRef">
-   <property name="geometry">
-    <rect>
-     <x>490</x>
-     <y>190</y>
-     <width>91</width>
-     <height>51</height>
-    </rect>
-   </property>
-   <property name="font">
-    <font>
-     <pointsize>10</pointsize>
-    </font>
-   </property>
-   <property name="text">
-    <string>White Ref</string>
-   </property>
-  </widget>
-  <widget class="QLineEdit" name="uiSerialNumber">
-   <property name="geometry">
-    <rect>
-     <x>290</x>
-     <y>280</y>
-     <width>331</width>
-     <height>31</height>
-    </rect>
-   </property>
-   <property name="font">
-    <font>
-     <pointsize>16</pointsize>
-     <weight>50</weight>
-     <italic>false</italic>
-     <bold>false</bold>
-    </font>
-   </property>
-   <property name="text">
-    <string>SerialNo</string>
-   </property>
-  </widget>
-  <widget class="QCheckBox" name="uiShowDebugControls">
-   <property name="geometry">
-    <rect>
-     <x>170</x>
-     <y>350</y>
-     <width>281</width>
-     <height>41</height>
-    </rect>
-   </property>
-   <property name="font">
-    <font>
-     <pointsize>16</pointsize>
-    </font>
-   </property>
-   <property name="styleSheet">
-    <string notr="true">QCheckBox::indicator {
-     width: 40px;
-     height: 40px;
-}</string>
    </property>
    <property name="text">
     <string>Show Debug Controls</string>
    </property>
-   <property name="tristate">
-    <bool>false</bool>
-   </property>
   </widget>
-  <widget class="QPushButton" name="uiBlackCalAll">
+  <widget class="LineEdit" name="uiSerialNumber">
    <property name="geometry">
     <rect>
-     <x>390</x>
-     <y>190</y>
-     <width>91</width>
-     <height>51</height>
+     <x>0</x>
+     <y>110</y>
+     <width>171</width>
+     <height>81</height>
     </rect>
    </property>
-   <property name="font">
-    <font>
-     <pointsize>10</pointsize>
-    </font>
-   </property>
    <property name="text">
-    <string>Black Cal
-All Std Res</string>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="uiAutoCal">
-   <property name="geometry">
-    <rect>
-     <x>80</x>
-     <y>190</y>
-     <width>91</width>
-     <height>51</height>
-    </rect>
-   </property>
-   <property name="font">
-    <font>
-     <pointsize>10</pointsize>
-    </font>
-   </property>
-   <property name="text">
-    <string>Auto Factory
-Cal</string>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="uiAdcOffset">
-   <property name="geometry">
-    <rect>
-     <x>190</x>
-     <y>190</y>
-     <width>91</width>
-     <height>51</height>
-    </rect>
-   </property>
-   <property name="font">
-    <font>
-     <pointsize>10</pointsize>
-    </font>
-   </property>
-   <property name="text">
-    <string>ADC Offset
-Cal</string>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="uiCloseApp">
-   <property name="geometry">
-    <rect>
-     <x>590</x>
-     <y>190</y>
-     <width>91</width>
-     <height>51</height>
-    </rect>
-   </property>
-   <property name="font">
-    <font>
-     <pointsize>10</pointsize>
-    </font>
-   </property>
-   <property name="text">
-    <string>Close
-Application</string>
+    <string/>
    </property>
   </widget>
   <widget class="Label" name="label">
    <property name="geometry">
     <rect>
-     <x>140</x>
-     <y>280</y>
-     <width>141</width>
-     <height>31</height>
+     <x>20</x>
+     <y>100</y>
+     <width>221</width>
+     <height>21</height>
     </rect>
    </property>
    <property name="text">
-    <string>Serial Number:</string>
-   </property>
-   <property name="alignment">
-    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+    <string>Serial Number</string>
    </property>
   </widget>
+  <widget class="Subheader" name="subheader">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>70</y>
+     <width>241</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Factory Settings</string>
+   </property>
+  </widget>
+  <widget class="Subheader" name="subheader_2">
+   <property name="geometry">
+    <rect>
+     <x>390</x>
+     <y>70</y>
+     <width>241</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Debugging Options</string>
+   </property>
+  </widget>
+  <widget class="Button" name="uiCal">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>200</y>
+     <width>301</width>
+     <height>81</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Run Factory Calibration</string>
+   </property>
+   <property name="customStyleSheet" stdset="0">
+    <string>align: left;</string>
+   </property>
+  </widget>
+  <widget class="Label" name="label_2">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>190</y>
+     <width>331</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>White Balance and Black Cal</string>
+   </property>
+  </widget>
+  <widget class="Label" name="uiCalibratedOn">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>280</y>
+     <width>311</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Calibrated on %Y-%m-%d %I:%M%p</string>
+   </property>
+  </widget>
+  <zorder>backdrop</zorder>
+  <zorder>headerlabel</zorder>
+  <zorder>uiDone</zorder>
+  <zorder>uiShowDebugControls</zorder>
+  <zorder>label</zorder>
+  <zorder>subheader</zorder>
+  <zorder>subheader_2</zorder>
+  <zorder>uiCal</zorder>
+  <zorder>uiSerialNumber</zorder>
+  <zorder>label_2</zorder>
+  <zorder>uiCalibratedOn</zorder>
  </widget>
  <customwidgets>
   <customwidget>
@@ -239,6 +180,11 @@ Application</string>
    <header>button</header>
   </customwidget>
   <customwidget>
+   <class>CheckBox</class>
+   <extends>QCheckBox</extends>
+   <header>check_box</header>
+  </customwidget>
+  <customwidget>
    <class>HeaderLabel</class>
    <extends>QLabel</extends>
    <header>header_label</header>
@@ -247,6 +193,16 @@ Application</string>
    <class>Label</class>
    <extends>QLabel</extends>
    <header>label</header>
+  </customwidget>
+  <customwidget>
+   <class>LineEdit</class>
+   <extends>QLineEdit</extends>
+   <header>line_edit</header>
+  </customwidget>
+  <customwidget>
+   <class>Subheader</class>
+   <extends>QLabel</extends>
+   <header>subheader</header>
   </customwidget>
  </customwidgets>
  <resources/>

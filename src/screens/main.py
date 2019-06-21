@@ -36,7 +36,7 @@ class Main(QWidget):
 		
 		#Only show the debug controls if enabled in factory settings.
 		settings.observe('debug controls enabled', False, lambda show:
-			self.uiDebugControls.hide() if show == 'False' else self.uiDebugControls.show() )
+			self.uiDebugControls.show() if show else self.uiDebugControls.hide() )
 		
 		
 		self.uiBattery.clicked.connect(lambda: window.show('power'))
@@ -223,7 +223,7 @@ class Main(QWidget):
 			'yoff': self.y(),
 			'hres': self.width() - self.uiSidebarBackdropAlsoUsedForMeasuringWidth.width(),
 			'vres': self.height(),
-		}).then(api2.video.restart)
+		})
 		self._batteryChargeUpdateTimer.start() #ms
 	
 	def onHide(self):

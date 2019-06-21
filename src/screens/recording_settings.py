@@ -160,7 +160,7 @@ class RecordingSettings(QtWidgets.QDialog):
 			'yoff': pos.y(),
 			'hres': self.uiPassepartoutInnerBorder.width(),
 			'vres': self.uiPassepartoutInnerBorder.height(),
-		}).then(api2.video.restart)
+		})
 	
 	
 	def dispatchResolutionUpdate(self, newResolution):
