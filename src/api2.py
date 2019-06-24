@@ -32,8 +32,8 @@ cameraVideoAPI = QDBusInterface(
 	f"", #Interface
 	QDBusConnection.systemBus() )
 
-cameraControlAPI.setTimeout(1000) #Default is -1, which means 25000ms. 25 seconds is too long to go without some sort of feedback, and the only real long-running operation we have - saving - can take upwards of 5 minutes. Instead of setting the timeout to half an hour, we should probably use events which are emitted as the event progresses. One frame (at 60fps) should be plenty of time for the API to respond, and also quick enough that we'll notice any slowness. The mock *generally* replies to messages in under 1ms, so I'm not too worried here. The API occasionally times out after 32ms, add more time. Ugh.
-cameraVideoAPI.setTimeout(1000) #This is lowered later on, after we've populated our variable cache. It takes Pychronos a moment to get everything together.
+cameraControlAPI.setTimeout(1000) #Default is -1, which means 25000ms. 25 seconds is too long to go without some sort of feedback, and the only real long-running operation we have - saving - can take upwards of 5 minutes. Instead of setting the timeout to half an hour, we use events which are emitted as the task progresses. One frame (at 15fps) should be plenty of time for the API to respond, and also quick enough that we'll notice any slowness.
+cameraVideoAPI.setTimeout(1000)
 
 if not cameraControlAPI.isValid():
 	print("Error: Can not connect to control D-Bus API at %s. (%s: %s)" % (
@@ -42,6 +42,7 @@ if not cameraControlAPI.isValid():
 		cameraControlAPI.lastError().message(),
 	), file=sys.stderr)
 	raise Exception("D-Bus Setup Error")
+
 if not cameraVideoAPI.isValid():
 	print("Error: Can not connect to video D-Bus API at %s. (%s: %s)" % (
 		cameraVideoAPI.service(), 
@@ -74,7 +75,7 @@ class ControlReply():
 
 
 class video():
-	"""Call the D-Bus video API, asychronously.
+	"""Call the D-Bus video API, asynchronously.
 		
 		Methods:
 			- call(function[, arg1[ ,arg2[, ...]]])
@@ -512,7 +513,7 @@ def set(*args):
 # State cache for observe(), so it doesn't have to query the status of a variable on each subscription.
 # Since this often crashes during development, the following line can be run to try getting each variable independently.
 #     for key in [k for k in control.callSync('availableKeys') if k not in {'dateTime', 'externalStorage'}]: print('getting', key); control.callSync('get', [key])
-__badKeys = {'externalStorage'}
+__badKeys = {'externalStorage'} #blacklist
 _camState = control.callSync('get', [
 	key
 	for key in control.callSync('availableKeys')
@@ -550,7 +551,7 @@ class APIValues(QObject):
 	
 	def unobserve(self, key, callback):
 		"""Stop a function from getting called when a value is updated."""
-		raise Exception('unimplimented')
+		raise NotImplmentedError()
 	
 	def __newValueIsEnqueued(self, key):
 		return True in [
@@ -563,7 +564,7 @@ class APIValues(QObject):
 	def __newKeyValue(self, msg):
 		"""Update _camState and invoke any  registered observers."""
 		newItems = msg.arguments()[0].items()
-		log.info(f'Recieved new information. {msg.arguments()[0]}')
+		log.info(f'Received new information. {msg.arguments()[0]}')
 		for key, value in newItems:
 			if _camState[key] != value and not self.__newValueIsEnqueued(key):
 				log.info(f'Informing {key} → {value}.')
@@ -578,7 +579,7 @@ class APIValues(QObject):
 		return _camState[key]
 
 apiValues = APIValues()
-
+del APIValues
 
 
 def observe(name: str, callback: Callable[[Any], None]) -> None:
@@ -620,7 +621,127 @@ def observe_future_only(name: str, callback: Callable[[Any], None], saftyCheckFo
 
 
 
-#Test this component if launched on it's own.
+
+##############################
+#   Non-Chronos D-Bus APIs   #
+##############################
+
+class ExternalPartitions(QObject):
+	def __init__(self):
+		super(ExternalPartitions, self).__init__()
+		
+		# _partitions is a list of high-level concepts of a thing you can save to
+		# {
+		# 	"name": "Testdisk",
+		# 	"device": "mmcblk0p1",
+		# 	"uuid": "a14d610d-b524-4af2-9a1a-fa3dd1184258",
+		# 	"path": "/dev/sda",
+		# 	"size": 1294839100, #bytes, 64-bit positive integer
+		# 	"interface": "usb", #"usb" or "sd"
+		# }
+		self._partitions = []
+		
+		#observers collection
+		self._callbacks = []
+		self.uDisks2ObjectManager = QDBusInterface(
+			f"org.freedesktop.UDisks2", #Service
+			f"/org/freedesktop/UDisks2", #Path
+			f"org.freedesktop.DBus.ObjectManager", #Interface
+			QDBusConnection.systemBus(),
+		)
+		self.uDisks2ObjectManager.setTimeout(1000)
+		
+		if not self.uDisks2ObjectManager.isValid():
+			log.critical(f"Error: Can not connect to udisks2 at {self.uDisks2ObjectManager.service()}. ({self.uDisks2ObjectManager.lastError().name()}: {self.uDisks2ObjectManager.lastError().message()}) Try running `apt install udisks2`?")
+			raise Exception("D-Bus Setup Error")
+		
+		
+		#The .connect call freezes if we don't do this, or if we do this twice.
+		#This bug was fixed by Qt 5.11.
+		QDBusConnection.systemBus().registerObject(
+			f"/org/freedesktop/UDisks2", 
+			self,
+		)
+		
+		QDBusConnection.systemBus().connect(
+			f"org.freedesktop.UDisks2", #Service
+			f"/org/freedesktop/UDisks2", #Path
+			f"org.freedesktop.DBus.ObjectManager", #Interface
+			'InterfacesAdded', #Signal
+			self.__interfacesAddedEvent,
+		)
+		
+		QDBusConnection.systemBus().connect(
+			f"org.freedesktop.UDisks2", #Service
+			f"/org/freedesktop/UDisks2", #Path
+			f"org.freedesktop.DBus.ObjectManager", #Interface
+			'InterfacesRemoved', #Signal
+			self.__interfacesRemovedEvent,
+		)	
+		
+		for name, data in QDBusReply(self.uDisks2ObjectManager.call('GetManagedObjects')).value().items():
+			self.__interfacesAdded(name, data)
+	
+	def __getitem__(self, i):
+		return self._callbacks[i]
+	
+	def observe(self, key, callback):
+		"""Add a function to get called when a value is updated."""
+		self._callbacks[key] += [callback]
+	
+	def unobserve(self, key, callback):
+		"""Stop a function from getting called when a value is updated."""
+		raise NotImplmentedError()
+	
+	
+	@pyqtSlot('QDBusMessage')
+	def __interfacesAddedEvent(self, msg):
+		self.__interfacesAdded(*msg.arguments())
+	
+	def __interfacesAdded(self, name, data):
+		if 'org.freedesktop.UDisks2.Filesystem' in data:
+			#"Now, for each file system which just got mounted, …"
+			
+			#Filter root, which is mounted on / and /media/mmcblk0p2.
+			if len(data['org.freedesktop.UDisks2.Filesystem']['MountPoints']) != 1:
+				return
+			
+			#Filter out whatever gets mounted to /boot.
+			if not bytes(data['org.freedesktop.UDisks2.Filesystem']['MountPoints'][0]).startswith(b'/media/'):
+				return
+			
+			log.info(f"Partition mounted at {bytes(data['org.freedesktop.UDisks2.Filesystem']['MountPoints'][0]).decode('utf-8')}.") #toStdString() doesn't seem to exist, perhaps because we don't have std strings.
+			
+			self._partitions += [{
+				"name": data['org.freedesktop.UDisks2.Block']['IdLabel'],
+				"device": name,
+				"uuid": data['org.freedesktop.UDisks2.Block']['IdUUID'], #Found at `/dev/disk/by-uuid/`.
+				"path": bytes(data['org.freedesktop.UDisks2.Filesystem']['MountPoints'][0]), #bytes because file paths can be weirder than strs. Not that ours are, but good practise and all.
+				"size": data['org.freedesktop.UDisks2.Block']['Size'], #number of bytes, 64-bit positive integer
+				"interface": "usb" if True in [b"usb" in symlink for symlink in data['org.freedesktop.UDisks2.Block']['Symlinks']] else "other", #This data comes in one message earlier, but it would be enough complexity to link the two that it makes more sense to just string match here.
+			}]
+			for callback in self._callbacks:
+				callback(self._partitions)
+	
+	
+	@pyqtSlot('QDBusMessage')
+	def __interfacesRemovedEvent(self, msg):
+		self.__interfacesRemoved(*msg.arguments())
+	
+	def __interfacesRemoved(self, name, data):
+		if 'org.freedesktop.UDisks2.Partition' == data[0]:
+			#"Now, for each file system which just got removed, …"
+			self._partitions = list(filter(
+				lambda partition: partition["device"] != name, 
+				self._partitions ) )
+			for callback in self._callbacks:
+				callback(self._partitions)
+
+externalPartitions = ExternalPartitions()
+del ExternalPartitions
+
+
+#Perform self-test if launched as a standalone.
 if __name__ == '__main__':
 	from PyQt5.QtCore import QCoreApplication
 	import signal
