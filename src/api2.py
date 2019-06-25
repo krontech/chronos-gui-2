@@ -2,8 +2,9 @@
 
 """Interface for the control api d-bus service."""
 
-import sys, os
 from typing import Callable, Any
+import sys, os
+import subprocess
 
 from PyQt5.QtCore import pyqtSlot, QObject
 from PyQt5.QtDBus import QDBusConnection, QDBusInterface, QDBusReply, QDBusPendingCallWatcher, QDBusPendingReply
@@ -710,15 +711,15 @@ class ExternalPartitions(QObject):
 			if not bytes(data['org.freedesktop.UDisks2.Filesystem']['MountPoints'][0]).startswith(b'/media/'):
 				return
 			
-			log.info(f"Partition mounted at {bytes(data['org.freedesktop.UDisks2.Filesystem']['MountPoints'][0]).decode('utf-8')}.") #toStdString() doesn't seem to exist, perhaps because we don't have std strings.
+			log.debug(f"Partition mounted at {bytes(data['org.freedesktop.UDisks2.Filesystem']['MountPoints'][0]).decode('utf-8')}.") #toStdString() doesn't seem to exist, perhaps because we don't have std strings.
 			
 			self._partitions += [{
-				"name": data['org.freedesktop.UDisks2.Block']['IdLabel'],
-				"device": name,
-				"uuid": data['org.freedesktop.UDisks2.Block']['IdUUID'], #Found at `/dev/disk/by-uuid/`.
-				"path": bytes(data['org.freedesktop.UDisks2.Filesystem']['MountPoints'][0]), #bytes because file paths can be weirder than strs. Not that ours are, but good practise and all.
-				"size": data['org.freedesktop.UDisks2.Block']['Size'], #number of bytes, 64-bit positive integer
-				"interface": "usb" if True in [b"usb" in symlink for symlink in data['org.freedesktop.UDisks2.Block']['Symlinks']] else "other", #This data comes in one message earlier, but it would be enough complexity to link the two that it makes more sense to just string match here.
+				'name': data['org.freedesktop.UDisks2.Block']['IdLabel'],
+				'device': name,
+				'uuid': data['org.freedesktop.UDisks2.Block']['IdUUID'], #Found at `/dev/disk/by-uuid/`.
+				'path': bytes(data['org.freedesktop.UDisks2.Filesystem']['MountPoints'][0]), #bytes because file paths can be weirder than strs. Not that ours are, but good practise and all.
+				'size': data['org.freedesktop.UDisks2.Block']['Size'], #number of bytes, 64-bit positive integer
+				'interface': 'usb' if True in [b'usb' in symlink for symlink in data['org.freedesktop.UDisks2.Block']['Symlinks']] else 'other', #This data comes in one message earlier, but it would be enough complexity to link the two that it makes more sense to just string match here.
 			}]
 			for callback in self._callbacks:
 				callback(self._partitions)
@@ -736,6 +737,17 @@ class ExternalPartitions(QObject):
 				self._partitions ) )
 			for callback in self._callbacks:
 				callback(self._partitions)
+	
+	
+	def list(self):
+		return self._partitions
+	
+	def usageFor(self, device: str):
+		for partition in self._partitions:
+			if partition['device'] == device:
+				info = subprocess.Popen(['df', partition['path'][:-1]], stdout=subprocess.PIPE).communicate()[0].split(b'\n')[1].split()
+				return {'used':int(info[2]), 'available':int(info[3])}
+	
 
 externalPartitions = ExternalPartitions()
 del ExternalPartitions
