@@ -2,7 +2,7 @@
 
 """Interface for the control api d-bus service."""
 
-from typing import Callable, Any
+from typing import Callable, Any, Dict
 import sys, os
 import subprocess
 
@@ -629,7 +629,7 @@ def observe_future_only(name: str, callback: Callable[[Any], None], saftyCheckFo
 
 class ExternalPartitions(QObject):
 	def __init__(self):
-		super(ExternalPartitions, self).__init__()
+		super().__init__()
 		
 		# _partitions is a list of high-level concepts of a thing you can save to
 		# {
@@ -684,15 +684,24 @@ class ExternalPartitions(QObject):
 			self.__interfacesAdded(name, data)
 	
 	def __getitem__(self, i):
-		return self._callbacks[i]
+		return self._partitions[i]
 	
-	def observe(self, key, callback):
-		"""Add a function to get called when a value is updated."""
-		self._callbacks[key] += [callback]
+	def __repr__(self):
+		#pdb uses repr instad of str (which imo is more appropriate for an interactive debugging session)
+		return f'{type(self)} ({self._partitions})'
 	
-	def unobserve(self, key, callback):
-		"""Stop a function from getting called when a value is updated."""
-		raise NotImplmentedError()
+	def observe(self, callback):
+		"""Add a function to get called when a volume is mounted or unmounted.
+			
+			The added function is immediately invoked."""
+		self._callbacks += [callback]
+		callback(self._partitions)
+	
+	def unobserve(self, callback):
+		"""Stop a function from getting called when a volume is mounted or unmounted."""
+		self._callbacks = list(filter(
+			lambda existingCallback: existingCallback != callback, 
+			self._callbacks ) )
 	
 	
 	@pyqtSlot('QDBusMessage')
@@ -717,7 +726,7 @@ class ExternalPartitions(QObject):
 				'name': data['org.freedesktop.UDisks2.Block']['IdLabel'],
 				'device': name,
 				'uuid': data['org.freedesktop.UDisks2.Block']['IdUUID'], #Found at `/dev/disk/by-uuid/`.
-				'path': bytes(data['org.freedesktop.UDisks2.Filesystem']['MountPoints'][0]), #bytes because file paths can be weirder than strs. Not that ours are, but good practise and all.
+				'path': bytes(data['org.freedesktop.UDisks2.Filesystem']['MountPoints'][0])[:-1], #bytes because file paths can be weirder than strs. Not that ours are, but good practise and all. Also trim off a null byte at the end, we don't need it in python-land.
 				'size': data['org.freedesktop.UDisks2.Block']['Size'], #number of bytes, 64-bit positive integer
 				'interface': 'usb' if True in [b'usb' in symlink for symlink in data['org.freedesktop.UDisks2.Block']['Symlinks']] else 'other', #This data comes in one message earlier, but it would be enough complexity to link the two that it makes more sense to just string match here.
 			}]
@@ -742,11 +751,34 @@ class ExternalPartitions(QObject):
 	def list(self):
 		return self._partitions
 	
-	def usageFor(self, device: str):
+	def usageFor(self, device: str, callback: Callable[[], Dict[str,int]]):
 		for partition in self._partitions:
 			if partition['device'] == device:
-				info = subprocess.Popen(['df', partition['path'][:-1]], stdout=subprocess.PIPE).communicate()[0].split(b'\n')[1].split()
-				return {'used':int(info[2]), 'available':int(info[3])}
+				try:
+					info = (
+						subprocess.Popen(
+							['df', partition['path'], '--output=avail,used'], #used+avail != 1k-blocks
+							stdout=subprocess.PIPE,
+							stderr=subprocess.DEVNULL )
+						.communicate()[0]
+						.split(b'\n')[1]
+						.split()
+					)
+					
+					delay(self, 1, lambda: #TODO: This should an async call, because df takes a while. The interface is such that it should be a drop-in replacement. It would probably be a good idea to combine redundant calls here - eg., if two calls to df /dev/sda1 are called before df calculates the data, df should only run once.
+						callback({'available':int(info[0])+int(info[1]), 'used':int(info[1])}) )
+					return
+				
+				except IndexError:
+					#When a storage device with multiple partitions is removed,
+					#the observer fires once for each partition. This means
+					#that, for one partition, the client will issue a spurious
+					#call to this function with the stale partition's device.
+					log.debug('Tried to find usage of unknown device.')
+					return
+		
+		#If no partition was the partition we wanted, panic.
+		raise ValueError(f'Unknown device {device}.\nKnown devices are {[p["device"] for p in self._partitions]}.')
 	
 
 externalPartitions = ExternalPartitions()

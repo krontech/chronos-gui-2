@@ -65,7 +65,7 @@
     <enum>Button::half</enum>
    </property>
   </widget>
-  <widget class="Button" name="button_2">
+  <widget class="Button" name="uiSafelyRemove">
    <property name="geometry">
     <rect>
      <x>360</x>
@@ -192,7 +192,21 @@
     <string>3: Apply the camera firmware upgrade. The camera will restart when complete.</string>
    </property>
   </widget>
+  <widget class="FeedbackLabel" name="uiConfirmRemove">
+   <property name="geometry">
+    <rect>
+     <x>30</x>
+     <y>130</y>
+     <width>771</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>The device can be safely removed.</string>
+   </property>
+  </widget>
   <zorder>backdrop</zorder>
+  <zorder>uiConfirmRemove</zorder>
   <zorder>headerlabel</zorder>
   <zorder>uiDone</zorder>
   <zorder>uiApplyUpdateError</zorder>
@@ -203,7 +217,7 @@
   <zorder>label_2</zorder>
   <zorder>uiSaveCalData</zorder>
   <zorder>uiMediaSelect</zorder>
-  <zorder>button_2</zorder>
+  <zorder>uiSafelyRemove</zorder>
   <zorder>uiLoadCalData</zorder>
   <zorder>uiApplyUpdate</zorder>
  </widget>
@@ -242,7 +256,7 @@
  <tabstops>
   <tabstop>uiDone</tabstop>
   <tabstop>uiMediaSelect</tabstop>
-  <tabstop>button_2</tabstop>
+  <tabstop>uiSafelyRemove</tabstop>
   <tabstop>uiSaveCalData</tabstop>
   <tabstop>uiLoadCalData</tabstop>
   <tabstop>uiApplyUpdate</tabstop>
