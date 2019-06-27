@@ -596,7 +596,7 @@ class ControlAPIMock(QObject):
 	
 	@action('set')
 	@pyqtSlot('QVariantMap', result='QVariantMap')
-	def testResolution(self, opts) -> None:
+	def getResolutionTimingLimits(self, opts) -> None:
 		state._currentState = 'recording'
 		self.emitControlSignal('currentState')
 		return {

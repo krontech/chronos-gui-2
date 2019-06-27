@@ -134,7 +134,7 @@ class RecordingSettings(QtWidgets.QDialog):
 	presets = []
 	for geometry in __potentialPresetGeometries:
 		hRes, vRes = geometry[0], geometry[1]
-		geometryTimingLimits = api2.control.callSync('testResolution', {'hRes':hRes, 'vRes':vRes})
+		geometryTimingLimits = api2.control.callSync('getResolutionTimingLimits', {'hRes':hRes, 'vRes':vRes})
 		if 'error' not in geometryTimingLimits:
 			presets += [{
 				'hRes': hRes, 
@@ -374,7 +374,7 @@ class RecordingSettings(QtWidgets.QDialog):
 			#Shortcut. We can do this because the exposure values set below by the real call are not required when an API-driven update is fired, since the API-driven update will also update the exposure. I think. 🤞
 			limits = {'minFramePeriod': minFrameTime*1e9}
 		else:
-			limits = api2.control.callSync('testResolution', { #TestResolution actually gets timing limits. 😑
+			limits = api2.control.callSync('getResolutionTimingLimits', {
 				'hRes': self.uiHRes.value(),
 				'vRes': self.uiVRes.value(),
 			})
