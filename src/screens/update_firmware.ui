@@ -81,19 +81,6 @@
     <enum>Button::half</enum>
    </property>
   </widget>
-  <widget class="ComboBox" name="uiMediaSelect">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>70</y>
-     <width>351</width>
-     <height>81</height>
-    </rect>
-   </property>
-   <property name="clickMarginRight" stdset="0">
-    <enum>ComboBox::half</enum>
-   </property>
-  </widget>
   <widget class="Button" name="uiApplyUpdate">
    <property name="geometry">
     <rect>
@@ -205,6 +192,19 @@
     <string>The device can be safely removed.</string>
    </property>
   </widget>
+  <widget class="StorageMediaSelect" name="uiMediaSelect">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>70</y>
+     <width>351</width>
+     <height>81</height>
+    </rect>
+   </property>
+   <property name="clickMarginRight" stdset="0">
+    <enum>ComboBox::half</enum>
+   </property>
+  </widget>
   <zorder>backdrop</zorder>
   <zorder>uiConfirmRemove</zorder>
   <zorder>headerlabel</zorder>
@@ -216,10 +216,10 @@
   <zorder>label</zorder>
   <zorder>label_2</zorder>
   <zorder>uiSaveCalData</zorder>
-  <zorder>uiMediaSelect</zorder>
   <zorder>uiSafelyRemove</zorder>
   <zorder>uiLoadCalData</zorder>
   <zorder>uiApplyUpdate</zorder>
+  <zorder>uiMediaSelect</zorder>
  </widget>
  <customwidgets>
   <customwidget>
@@ -252,10 +252,14 @@
    <extends>QLabel</extends>
    <header>label</header>
   </customwidget>
+  <customwidget>
+   <class>StorageMediaSelect</class>
+   <extends>ComboBox</extends>
+   <header>storage_media_select</header>
+  </customwidget>
  </customwidgets>
  <tabstops>
   <tabstop>uiDone</tabstop>
-  <tabstop>uiMediaSelect</tabstop>
   <tabstop>uiSafelyRemove</tabstop>
   <tabstop>uiSaveCalData</tabstop>
   <tabstop>uiLoadCalData</tabstop>

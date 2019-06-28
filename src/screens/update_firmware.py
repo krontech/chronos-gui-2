@@ -4,12 +4,9 @@ import subprocess
 from time import sleep
 
 from PyQt5 import uic, QtWidgets, QtCore
-from PyQt5.QtCore import pyqtSlot
 import logging; log = logging.getLogger('Chronos.gui')
 
 from debugger import *; dbg
-
-import api2 as api
 
 
 class UpdateFirmware(QtWidgets.QDialog):
@@ -33,42 +30,6 @@ class UpdateFirmware(QtWidgets.QDialog):
 		self.uiLoadCalData.clicked.connect(self.loadCameraSettings)
 		self.uiApplyUpdate.clicked.connect(self.applySoftwareUpdate)
 		self.uiDone.clicked.connect(window.back)
-	
-	def onShow(self):
-		api.externalPartitions.observe(self.updateExternalStorageDevices)
-	
-	def onHide(self):
-		api.externalPartitions.unobserve(self.updateExternalStorageDevices)
-		
-	
-	@pyqtSlot('QVariantMap', name="updateExternalStorageDevices")
-	def updateExternalStorageDevices(self, partitionList):
-		"""Refresh the external storage drop-down list.
-			
-			Since we know the partition name immediately, that is
-			updated first, and then we run the (theoretically, at
-			time of writing) async usageFor() query to fill the %
-			display."""
-			
-		self.uiMediaSelect.clear()
-		
-		if not partitionList:
-			self.uiMediaSelect.setEnabled(False)
-			self.uiMediaSelect.addItem(self.tr("no storage found"))
-			return
-		self.uiMediaSelect.setEnabled(True)
-		
-		def capturePartitionIndex(i: int): 
-			def updateTextWith(space: dict):
-				if self.uiMediaSelect.itemData(i):
-					if self.uiMediaSelect.itemData(i)["path"] == partitionList[i]["path"]: #Check we're still current after async call.
-						self.uiMediaSelect.setItemText(i,
-							f"{partitionList[i]['name']} ({round(space['used']/space['available']*100):1.0f}% full)" )
-			return updateTextWith
-		
-		for i in range(len(partitionList)):
-			self.uiMediaSelect.addItem(f"{partitionList[i]['name']} (scanning…)", partitionList[i]),
-			api.externalPartitions.usageFor(partitionList[i]['device'], capturePartitionIndex(i))
 	
 	
 	def saveCameraSettings(self):
