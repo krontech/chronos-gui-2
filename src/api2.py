@@ -650,11 +650,23 @@ class ExternalPartitions(QObject):
 			f"org.freedesktop.DBus.ObjectManager", #Interface
 			QDBusConnection.systemBus(),
 		)
-		self.uDisks2ObjectManager.setTimeout(5000) #Lowered to 1000 after startup period.
+		self.uDisks2ObjectManager.setTimeout(10) #Set to 1000 after startup period.
 		
+		#Retry. This doesn't connect the first time, no matter what the time limit is. I don't know why, probably something in the start-on-demand logic.
 		if not self.uDisks2ObjectManager.isValid():
-			log.critical(f"Error: Can not connect to udisks2 at {self.uDisks2ObjectManager.service()}. ({self.uDisks2ObjectManager.lastError().name()}: {self.uDisks2ObjectManager.lastError().message()}) Try running `apt install udisks2`?")
-			raise Exception("D-Bus Setup Error")
+			self.uDisks2ObjectManager = QDBusInterface(
+				f"org.freedesktop.UDisks2", #Service
+				f"/org/freedesktop/UDisks2", #Path
+				f"org.freedesktop.DBus.ObjectManager", #Interface
+				QDBusConnection.systemBus(),
+			)
+			self.uDisks2ObjectManager.setTimeout(10)
+			
+			if not self.uDisks2ObjectManager.isValid():
+				log.critical(f"Error: Can not connect to udisks2 at {self.uDisks2ObjectManager.service()}. ({self.uDisks2ObjectManager.lastError().name()}: {self.uDisks2ObjectManager.lastError().message()}) Try running `apt install udisks2`?")
+				raise Exception("D-Bus Setup Error")
+		
+		self.uDisks2ObjectManager.setTimeout(1000)
 		
 		
 		#The .connect call freezes if we don't do this, or if we do this twice.
@@ -682,8 +694,6 @@ class ExternalPartitions(QObject):
 		
 		for name, data in QDBusReply(self.uDisks2ObjectManager.call('GetManagedObjects')).value().items():
 			self.__interfacesAdded(name, data)
-		
-		self.uDisks2ObjectManager.setTimeout(1000)
 	
 	def __getitem__(self, i):
 		return self._partitions[i]
