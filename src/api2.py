@@ -650,7 +650,7 @@ class ExternalPartitions(QObject):
 			f"org.freedesktop.DBus.ObjectManager", #Interface
 			QDBusConnection.systemBus(),
 		)
-		self.uDisks2ObjectManager.setTimeout(1000)
+		self.uDisks2ObjectManager.setTimeout(5000) #Lowered to 1000 after startup period.
 		
 		if not self.uDisks2ObjectManager.isValid():
 			log.critical(f"Error: Can not connect to udisks2 at {self.uDisks2ObjectManager.service()}. ({self.uDisks2ObjectManager.lastError().name()}: {self.uDisks2ObjectManager.lastError().message()}) Try running `apt install udisks2`?")
@@ -682,6 +682,8 @@ class ExternalPartitions(QObject):
 		
 		for name, data in QDBusReply(self.uDisks2ObjectManager.call('GetManagedObjects')).value().items():
 			self.__interfacesAdded(name, data)
+		
+		self.uDisks2ObjectManager.setTimeout(1000)
 	
 	def __getitem__(self, i):
 		return self._partitions[i]
