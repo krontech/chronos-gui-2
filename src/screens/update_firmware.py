@@ -1,6 +1,7 @@
 # -*- coding: future_fstrings -*-
 import os
 import subprocess
+from time import sleep
 
 from PyQt5 import uic, QtWidgets, QtCore
 from PyQt5.QtCore import pyqtSlot
@@ -53,7 +54,7 @@ class UpdateFirmware(QtWidgets.QDialog):
 		
 		if not partitionList:
 			self.uiMediaSelect.setEnabled(False)
-			self.uiMediaSelect.addItem("«none available»")
+			self.uiMediaSelect.addItem(self.tr("no storage found"))
 			return
 		self.uiMediaSelect.setEnabled(True)
 		
@@ -76,17 +77,28 @@ class UpdateFirmware(QtWidgets.QDialog):
 		#Maybe use init.d scripts instead?
 		#Restart gui, control, and video after... not sure how to stop this process though, just kill it?
 		
-		#Calibration data:
-		tar = subprocess.Popen('tar', '--create', 
-			'--preserve-permissions', '--gzip', '--xattrs',
+		self.uiLoadCalDataError.hide()
+		
+		if not self.uiMediaSelect.currentData():
+			self.uiSaveCalDataError.showError("Error: No readable external storage device detected.")
+			return
+		
+		self.uiSaveCalDataError.showMessage("Working…")
+		
+		#Bundle up all the configuration files on the camera.
+		tar = subprocess.Popen([
+			'tar', '--create', '--preserve-permissions', '--gzip', '--xattrs', '--absolute-names',
 			'--file', f"{self.uiMediaSelect.currentData()['path'].decode('utf-8')}/chronos_settings.tar",
-			#'cal', #Black/white calibration data. #TODO DDR 2019-06-26: Where are the cal files stored?
+			'/var/camera/cal', #Black/white calibration data. #TODO DDR 2019-06-26: Where are the cal files stored?
+			'/var/camera/userFPN', #User-generated calibration data.
 			'/var/camera/apiConfig.json', #D-Bus API configuration files. (Remember what the last camera settings were.)
-			'/root/.config/Krontech', #The settings for this program, the UI.
-		) 
+			'/root/.config/Krontech', #The settings for this Python script, the camera UI.
+		]) 
 		tar.communicate() #fill in .returncode
+		assert tar.returncode is not None
 		if tar.returncode:
-			raise Exception(f'tar failed with code {tar.returncode}')
+			self.uiSaveCalDataError.showError(f'tar failed with code {tar.returncode}', timeout=0)
+		self.uiSaveCalDataError.showMessage('Settings saved to "chronos_settings.tar".')
 	
 	
 	def loadCameraSettings(self):
@@ -94,22 +106,41 @@ class UpdateFirmware(QtWidgets.QDialog):
 		#subprocess.Popen('killall', '-SIGSTOP', ... control and video?
 		#Maybe use init.d scripts instead?
 		#Restart gui, control, and video after... not sure how to stop this process though, just kill it?
-		tar = subprocess.Popen('tar', '--extract', 
-			'--file', f"{self.uiMediaSelect.currentData()['path'].decode('utf-8')}/chronos_settings.tar"
-		)
+		
+		self.uiSaveCalDataError.hide()
+		
+		if not self.uiMediaSelect.currentData():
+			self.uiLoadCalDataError.showError("Error: No readable external storage device detected.")
+			return
+		
+		self.uiLoadCalDataError.showMessage("Working…")
+			
+		tar = subprocess.Popen([
+			'tar', '--extract', '--absolute-names',
+			'--file', f"{self.uiMediaSelect.currentData()['path'].decode('utf-8')}/chronos_settings.tar",
+		])
 		tar.communicate() #fill in .returncode
 		assert tar.returncode is not None
 		if tar.returncode:
 			raise Exception(f'tar failed with code {tar.returncode}')
 		
-		bye = subprocess.Popen('shutdown', '--reboot', 'now')
+		self.uiLoadCalDataError.showMessage("Settings restored. Restarting camera.")
+		for _ in range(10): #DDR 2019-06-27: Repaint screen to show message, I don't know how else to trigger it.
+			QtCore.QCoreApplication.processEvents()
+		sleep(3)
+		
+		bye = subprocess.Popen(['shutdown', '--reboot', 'now'])
 		bye.communicate() #fill in .returncode
 		assert bye.returncode is not None
 		if bye.returncode:
-			raise Exception(f'tar failed with code {tar.returncode}')
+			raise Exception(f'system shutdown failed with code {bye.returncode}')
 		
 			
 	def applySoftwareUpdate(self):
+		if not self.uiMediaSelect.currentData():
+			self.uiApplyUpdateError.showError("Failed to start update: No readable external storage device detected.")
+			return
+		
 		file = self.uiMediaSelect.currentData()["path"] + b"/camUpdate"
 		
 		if not os.path.isfile(file):

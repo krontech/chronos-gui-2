@@ -42,7 +42,7 @@ class FeedbackLabel(QLabel):
 		""" + self._customStyleSheet)
 	
 	
-	def showError(self, message: str='', *, timeout: int=0) -> None:
+	def showError(self, message: str='', *, timeout: int=30) -> None:
 		"""Show a highlighted error message.
 			
 			Use .hide() when the condition has passed, or specify a
@@ -53,6 +53,10 @@ class FeedbackLabel(QLabel):
 			background: transparent;
 			color: #c80000;
 		""" + self._customStyleSheet)
+		
+		#DDR 2019-06-27: Sometimes this seems to not be populated. I don't know why.
+		if not hasattr(self, '_hideMessageTimer'):
+			self._hideMessageTimer = QtCore.QTimer()
 		
 		message and self.setText(message)
 		self.show()
