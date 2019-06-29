@@ -1,18 +1,16 @@
 # -*- coding: future_fstrings -*-
 
-import time, math
+import math
 import logging; log = logging.getLogger('Chronos.gui')
 
 from PyQt5 import uic, QtCore
 from PyQt5.QtCore import pyqtSlot, QPropertyAnimation, QPoint
 from PyQt5.QtWidgets import QWidget, QApplication
 
-from termcolor import cprint
-
 from debugger import *; dbg
 from widgets.button import Button
 import settings
-import api, api2
+import api2
 
 
 class Main(QWidget):
@@ -116,7 +114,7 @@ class Main(QWidget):
 		
 		#Twiddle the calibration menu so it shows the right thing. It's pretty context-sensitive - you can't white-balance a black-and-white camera, and you can't do motion trigger calibration when there's no motion trigger set up.
 		#I think the sanest approach is to duplicate the button, one for each menu, since opening the menu is pretty complex and I don't want to try dynamically rebind menus.
-		if not api.get('sensorRecordsColor'):
+		if api2.getSync('sensorColorPattern') == 'mono':
 			self.uiCalibration = self.uiCalibrationOrBlackCal
 			self.uiBlackCal0 = Button(parent=self.uiCalibrationOrBlackCal.parent())
 			self.copyButton(src=self.uiCalibrationOrBlackCal, dest=self.uiBlackCal0)
@@ -145,7 +143,7 @@ class Main(QWidget):
 			self.uiBlackCal1.clicked.connect(lambda: 
 				api2.control('startCalibration', {'blackCal': True}) )
 			
-			api.observe('triggerConfiguration', self.updateBaWTriggers)
+			self.updateBaWTriggers()
 		else:
 			self.uiCalibration1 = self.uiCalibrationOrBlackCal
 			self.uiCalibration2 = Button(parent=self.uiCalibrationOrBlackCal.parent())
@@ -173,7 +171,7 @@ class Main(QWidget):
 			self.uiBlackCal2.clicked.connect(lambda: api2.control('startCalibration', {'blackCal': True}))
 			self.uiRecalibrateMotionTrigger.clicked.connect(self.closeCalibrationMenu1)
 			self.uiRecalibrateMotionTrigger.clicked.connect(self.closeCalibrationMenu2)
-			self.uiRecalibrateMotionTrigger.clicked.connect(lambda: api.control('takeStillReferenceForMotionTriggering'))
+			#self.uiRecalibrateMotionTrigger.clicked.connect(lambda: api.control('takeStillReferenceForMotionTriggering'))
 			
 			#Close other menus and vice-versa when menu opened.
 			self.uiRecordingAndTriggers.clicked.connect(self.closeCalibrationMenu1)
@@ -192,7 +190,7 @@ class Main(QWidget):
 			#self.uiPinchToZoomGestureInterceptionPanel.clicked.connect(closeRecordingAndTriggersMenu)
 			#self.uiPinchToZoomGestureInterceptionPanel.clicked.connect(closeShotAssistMenu)
 			
-			api.observe('triggerConfiguration', self.updateColorTriggers)
+			self.updateColorTriggers()
 		
 		
 		self.uiRecordModes.clicked.connect(lambda: window.show('record_mode'))
@@ -247,10 +245,6 @@ class Main(QWidget):
 	def onHide(self):
 		self._batteryChargeUpdateTimer.stop() #ms
 	
-	
-	# @pyqtSlot() is not strictly needed - see http://pyqt.sourceforge.net/Docs/PyQt5/signals_slots.html#the-pyqtslot-decorator for details. (import with `from PyQt5.QtCore import pyqtSlot`)
-	def printAnalogGain(self):
-		print("Analog gain is %ix." % api.get("recordingAnalogGainMultiplier"))
 	
 	def updateBatteryCharge(self):
 		api2.control.call(
@@ -314,34 +308,34 @@ class Main(QWidget):
 		)
 	
 	
-	@pyqtSlot('QVariantMap', name="updateBaWTriggers")
-	def updateBaWTriggers(self, triggers):
-		#	VAR IF no mocal
+	def updateBaWTriggers(self):
+		#	IF no mocal
 		#		show black cal button
 		#	ELSE
 		#		show cal menu button → recal motion menu
-		if triggers['motion']['action'] == 'none':
-			self.uiCalibration.hide()
-			self.uiBlackCal0.show()
-		else:
+		motion_calibration = False
+		if motion_calibration: 
 			self.uiCalibration.show()
 			self.uiBlackCal0.hide()
+		else:
+			self.uiCalibration.hide()
+			self.uiBlackCal0.show()
 		
 		#Ensure this menu is closed, since we're about to hide the thing to close it.
 		self.closeCalibrationMenu()
 	
-	@pyqtSlot('QVariantMap', name="updateColorTriggers")
-	def updateColorTriggers(self, triggers):
-		#	VAR IF no mocal
+	def updateColorTriggers(self):
+		#	IF no mocal
 		#		show cal menu button → wb/bc menu
 		#	ELSE
 		#		show cal menu button → wb/bc/recal menu
-		if triggers['motion']['action'] == 'none':
-			self.uiCalibration1.show()
-			self.uiCalibration2.hide()
-		else:
+		motion_calibration = False
+		if motion_calibration:
 			self.uiCalibration1.hide()
 			self.uiCalibration2.show()
+		else:
+			self.uiCalibration1.show()
+			self.uiCalibration2.hide()
 	
 		#Ensure this menu is closed, since we're about to hide the thing to close it.
 		self.closeCalibrationMenu1()
