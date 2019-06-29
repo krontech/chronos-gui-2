@@ -407,13 +407,18 @@ class GlobalFilter(QtCore.QObject):
 
 
 def connectHardwareEvents(app, hardware):
-	def linkLightToRecordButton():
-		hardware.recordingLightsAreLit = hardware.recordButtonPressed #This is dumb. Lambdas can call functions, this is a setter function, but I can't call it because it uses =. -_-
+	#def linkLightToRecordButton():
+	#	hardware.recordingLightsAreLit = hardware.recordButtonPressed #This is dumb. Lambdas can call functions, this is a setter function, but I can't call it because it uses =. -_-
+	#
+	##We don't have recording yet as a concept, so just link the record button to the recording lights. :p
+	##This should become a d-bus call at some point.
+	#hardware.subscribe('recordButtonDown', linkLightToRecordButton)
+	#hardware.subscribe('recordButtonUp', linkLightToRecordButton)
 	
-	#We don't have recording yet as a concept, so just link the record button to the recording lights. :p
-	#This should become a d-bus call at some point.
-	hardware.subscribe('recordButtonDown', linkLightToRecordButton)
-	hardware.subscribe('recordButtonUp', linkLightToRecordButton)
+	hardware.subscribe('recordButtonDown', lambda: (
+		window._screens['main'].toggleRecording(),
+		window.currentScreen != 'main' and window.show('main'),
+	))
 	
 	def injectSelect():
 		app.postEvent(

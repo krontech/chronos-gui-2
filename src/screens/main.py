@@ -26,8 +26,21 @@ class Main(QWidget):
 		self.setWindowFlags(QtCore.Qt.FramelessWindowHint)
 		self.setAttribute(QtCore.Qt.WA_TranslucentBackground, True)
 		
+		api2.set('cameraTallyMode', 'auto')
+		
+		#Set the kerning to false because it looks way better.
+		#Doesn't seem to be working? --DDR 2019-05-29
+		font = self.uiResolutionOverlay.font()
+		font.setKerning(False)
+		self.uiResolutionOverlay.setFont(font)
+		self.uiExposureOverlay.setFont(font)
+		self.uiResolutionOverlayTemplate = self.uiResolutionOverlay.text()
+		self.uiExposureOverlayTemplate = self.uiExposureOverlay.text()
+		
 		# Widget behavour.
-		self.uiRecord.clicked.connect(self.recordPressed)
+		self.uiRecord.clicked.connect(self.toggleRecording)
+		api2.observe('state', self.updateRecordButtonText)
+		
 		self.uiDebugA.clicked.connect(self.makeFailingCall)
 		self.uiDebugB.clicked.connect(lambda: window.show('test'))
 		self.uiDebugC.setFocusPolicy(QtCore.Qt.NoFocus) #Break into debugger without loosing focus, so you can debug focus issues.
@@ -207,15 +220,20 @@ class Main(QWidget):
 			"top": 10, "left": 30, "bottom": 10, "right": 30
 		}
 		
+		
+		
+		self._framerate = None
+		self._resolution = None
+		api2.observe('exposurePeriod', lambda ns: 
+			setattr(self, '_framerate', api2.getSync('frameRate')) )
+		api2.observe('resolution', lambda res: 
+			setattr(self, '_resolution', res) )
+		api2.observe('exposurePeriod', self.updateResolutionOverlay)
+		api2.observe('resolution', self.updateResolutionOverlay)
+		
+		
 		#Oh god this is gonna mess up scroll wheel selection so badly. 😭
 		self.uiShowWhiteClipping.stateChanged.connect(self.uiShotAssistMenu.setFocus)
-		
-		#Set the kerning to false because it looks way better.
-		#Doesn't seem to be working? --DDR 2019-05-29
-		font = self.uiResolutionOverlay.font()
-		font.setKerning(False)
-		self.uiResolutionOverlay.setFont(font)
-		self.uiExposureOverlay.setFont(font)
 	
 	def onShow(self):
 		api2.video.call('configure', {
@@ -275,11 +293,25 @@ class Main(QWidget):
 	def updateExposureDependancies(self):
 		"""Update exposure text to match exposure slider, and sets the slider step so clicking the gutter always moves 1%."""
 		percent = api2.getSync('exposurePercent')
-		self.uiExposureOverlay.setText(f"{round(self.uiExposureSlider.value()/1000, 2)}µs ({percent:.0f}%)")
+		self.uiExposureOverlay.setText(
+			self.uiExposureOverlayTemplate.format(
+				self.uiExposureSlider.value()/1000,
+				percent,
+			)
+		)
 		
 		step1percent = (self.uiExposureSlider.minimum() + self.uiExposureSlider.maximum()) // 100
 		self.uiExposureSlider.setSingleStep(step1percent)
 		self.uiExposureSlider.setPageStep(step1percent*10)
+	
+	def updateResolutionOverlay(self, _):
+		self.uiResolutionOverlay.setText(
+			self.uiResolutionOverlayTemplate.format(
+				self._resolution['hRes'],
+				self._resolution['vRes'],
+				self._framerate,
+			)
+		)
 	
 	
 	@pyqtSlot('QVariantMap', name="updateBaWTriggers")
@@ -475,31 +507,14 @@ class Main(QWidget):
 		).catch(lambda err:
 			log.print(f'Test passed: Error ({err}) was returned.')
 		)
-
-	lastTime = -1
-	def debounceRecord(self):
-		now = time.time()
-		if now - self.lastTime > 0.05:
-			ret = True
-		else:
-			ret = False
-			cprint("              RECORD BUTTON BOUNCE IGNORED              ", "red", "on_white")
-		self.lastTime = now
-		return ret
-
-	def recordPressed(self):
-		if self.debounceRecord():
-			videoState = api.get('videoState')
-			if videoState == 'recording':
-				api.set({'videoState': 'pre-recording'})
-				self.stopRecord()
-			else:
-				api.set({'videoState': 'recording'})
-				self.startRecord()
-
-
-	def startRecord(self):
-		print("startRecord")
-
-	def stopRecord(self):
-		print("stopRecord")
+	
+	#Invoked by hardware button in ~/src/main.py.
+	def toggleRecording(self, *_):
+		api2.get('state').then(lambda state:
+			api2.control.call('startRecording') and self.uiRecord.setText('Stop') #updateRecordButtonText was taking a little long to be called
+			if state == 'idle' else
+			api2.control.call('stopRecording') and self.uiRecord.setText('Rec')
+		)
+	
+	def updateRecordButtonText(self, state):
+		self.uiRecord.setText('Rec' if state == 'idle' else 'Stop')

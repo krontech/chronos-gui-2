@@ -339,7 +339,7 @@ Save</string>
     </string>
    </property>
    <property name="text">
-    <string>1280×1024 @ 1057fps</string>
+    <string>{}×{} @ {:.0f}fps</string>
    </property>
   </widget>
   <widget class="Label" name="uiExposureOverlay">
@@ -359,7 +359,7 @@ Save</string>
     </string>
    </property>
    <property name="text">
-    <string>Exposure: 713.1µs (75%)</string>
+    <string>{:.2f}µs ({:.0f}%)</string>
    </property>
    <property name="alignment">
     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -715,10 +715,10 @@ Clipping</string>
 					background: rgba(255,255,255,127); /* The background is drawn under the button borders, so they are opaque if the background is opaque. */
 					
 					/* use borders instead of margins so we can see what we're doing */
-					border-left:   21px solid rgba(20, 3, 129, 48);
-					border-right:  1px solid rgba(20, 3, 129, 48);
-					border-top:    11px solid rgba(20, 3, 129, 48);
-					border-bottom: 1px solid rgba(20, 3, 129, 48);
+					border-left:   21px solid rgba(0, 28, 153, 68);
+					border-right:  1px solid rgba(0, 28, 153, 68);
+					border-top:    11px solid rgba(0, 28, 153, 68);
+					border-bottom: 1px solid rgba(0, 28, 153, 68);
 				}
 			Button { background: #7a70f7 }</string>
     </property>
