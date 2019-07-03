@@ -41,7 +41,13 @@ class StorageMediaSelect(ComboBox):
 			updated first, and then we run the (theoretically, at
 			time of writing) async usageFor() query to fill the %
 			display."""
-			
+		
+		initialUUIDs = {
+			self.itemData(i)['uuid'] 
+			for i in range(self.count())
+			if self.itemData(i)
+		}
+		
 		self.clear()
 		
 		if not partitionList:
@@ -50,7 +56,7 @@ class StorageMediaSelect(ComboBox):
 			return
 		self.setEnabled(True)
 		
-		def capturePartitionIndex(i: int): 
+		def updateTextFor(i: int): 
 			def updateTextWith(space: dict):
 				if self.itemData(i):
 					if self.itemData(i)["path"] == partitionList[i]["path"]: #Check we're still current after async call.
@@ -59,5 +65,20 @@ class StorageMediaSelect(ComboBox):
 			return updateTextWith
 		
 		for i in range(len(partitionList)):
-			self.addItem(f"{partitionList[i]['name']} (scanning…)", partitionList[i]),
-			api.externalPartitions.usageFor(partitionList[i]['device'], capturePartitionIndex(i))
+			if not partitionList[i]['name']:
+				#Use GB rather than GiB. Decided by poll: https://t.me/videografurs/108377
+				#partitionList[i]['name'] = f"{partitionList[i]['size'] / 2.**30:1.1f}GiB Storage Device"
+				partitionList[i]['name'] = f"{round(partitionList[i]['size'] / 1e9):1.0f}GB Storage Device"
+			
+			self.addItem(
+				f"{partitionList[i]['name']} (scanning…)", 
+				partitionList[i],
+			),
+			api.externalPartitions.usageFor(
+				partitionList[i]['device'], 
+				updateTextFor(i),
+			)
+			
+			#Select a new partition, because we probably plugged something in with the intent of using it.
+			if partitionList[i]['uuid'] not in initialUUIDs:
+				self.setCurrentIndex(i)
