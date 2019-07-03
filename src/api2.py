@@ -766,33 +766,39 @@ class ExternalPartitions(QObject):
 	def usageFor(self, device: str, callback: Callable[[], Dict[str,int]]):
 		for partition in self._partitions:
 			if partition['device'] == device:
-				try:
-					info = (
-						subprocess.Popen(
-							['df', partition['path'], '--output=avail,used'], #used+avail != 1k-blocks
-							stdout=subprocess.PIPE,
-							stderr=subprocess.DEVNULL )
-						.communicate()[0]
-						.split(b'\n')[1]
-						.split()
-					)
-					
-					delay(self, 1, lambda: #TODO: This should an async call, because df takes a while. The interface is such that it should be a drop-in replacement. It would probably be a good idea to combine redundant calls here - eg., if two calls to df /dev/sda1 are called before df calculates the data, df should only run once.
-						callback({'available':int(info[0])+int(info[1]), 'used':int(info[1])}) )
-					return
+				df = subprocess.Popen(
+					['df', partition['path'], '--output=avail,used'], #used+avail != 1k-blocks
+					stdout=subprocess.PIPE,
+					stderr=subprocess.DEVNULL )
 				
-				except IndexError:
-					#When a storage device with multiple partitions is removed,
-					#the observer fires once for each partition. This means
-					#that, for one partition, the client will issue a spurious
-					#call to this function with the stale partition's device.
-					log.debug('Tried to find usage of unknown device.')
-					return
-		
-		#If no partition was the partition we wanted, panic.
-		raise ValueError(f'Unknown device {device}.\nKnown devices are {[p["device"] for p in self._partitions]}.')
-	
-
+				def checkDf(*, timeout):
+					exitStatus = df.poll()
+					if exitStatus is None: #Still running, check again later.
+						#Standard clamped exponential decay. Keeps polling to a reasonable amount, frequent at first then low.
+						delay(self, timeout, lambda:
+							checkDf(timeout=max(1, timeout*2)) )
+					elif exitStatus: #df failure, raise an error
+						if exitStatus == 1:
+							#When a storage device with multiple partitions is removed,
+							#the observer fires once for each partition. This means
+							#that, for one partition, the client will issue a spurious
+							#call to this function with the stale partition's device.
+							log.info(f'Unknown device {device}.')
+							log.info(f'Known devices are {[p["device"] for p in self._partitions]}.')
+						else:
+							raise Exception(f'df exited with error {exitStatus}')
+					else:
+						info = ( #Chop up df command output.
+							df.communicate()[0]
+							.split(b'\n')[1] #Remove first line, column headings
+							.split() #Each output is now in a list.
+						)
+						callback({
+							'available': int(info[0]) + int(info[1]),
+							'used': int(info[1])
+						})
+				delay(self, 0.20, lambda: #Initial delay, df usually runs in .17s.
+					checkDf(timeout=0.05) )
 externalPartitions = ExternalPartitions()
 del ExternalPartitions
 
