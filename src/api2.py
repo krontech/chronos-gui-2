@@ -612,7 +612,7 @@ def observe(name: str, callback: Callable[[Any], None]) -> None:
 	callback(apiValues.get(name))
 
 
-def observe_future_only(name: str, callback: Callable[[Any], None], saftyCheckForSilencedWidgets=True) -> None:
+def observe_future_only(name: str, callback: Callable[[Any], None]) -> None:
 	"""Like `observe`, but without the initial callback when observing.
 	
 		Useful when `observe`ing a derived value, which observe can't deal with yet.
@@ -783,8 +783,8 @@ class ExternalPartitions(QObject):
 							#the observer fires once for each partition. This means
 							#that, for one partition, the client will issue a spurious
 							#call to this function with the stale partition's device.
-							log.info(f'Unknown device {device}.')
-							log.info(f'Known devices are {[p["device"] for p in self._partitions]}.')
+							log.debug(f'Unknown device {device}.')
+							log.debug(f'Known devices are {[p["device"] for p in self._partitions]}.')
 						else:
 							raise Exception(f'df exited with error {exitStatus}')
 					else:
