@@ -9,7 +9,7 @@ while true; do
 		if [[ \$(cat git_description) != \$(git describe --tags --always) ]]; then #Only update when description changes, results in some thrashing otherwise.
 			git describe --tags --always > git_description
 		fi
-		rsync -ir ./ \"${CAM_ADDRESS:-root@192.168.12.1}:/opt/camera/chronos-gui-2/\" \
+		rsync -ir ./ \"${CAM_ADDRESS:-root@192.168.12.1}:/root/gui/\" \
 			--delete --links \
 			--rsh=\"/usr/bin/sshpass -p $CHRONOS_PASSWORD ssh -l root\" --times --inplace \
 			--exclude \"__pycache__\" --exclude \"/.git\" \

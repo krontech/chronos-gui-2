@@ -4,16 +4,7 @@ from urllib.request import urlopen
 import json
 import logging; log = logging.getLogger('Chronos.perf')
 
-serialNumber = -1
-try:
-	with open('/opt/camera/serial_number', 'r') as sn_file:
-		serialNumber = sn_file.read().strip()
-except Exception:
-	#OK, can't read that file. Fall back to MAC address.
-	with open('/proc/net/arp') as arp_file:
-		import re
-		serialNumber = re.search('(?:[\\d\\w:]{2,3}){6}', arp_file.read())[0]
-
+import api2
 
 appVersion = 'unknown'
 try:
@@ -31,7 +22,7 @@ def report(tag: str, data: dict):
 	assert "serial_number" not in data
 		
 	data["tag"] = tag
-	data["serial_number"] = serialNumber #Always append this (hopefully) unique identifier.
+	data["serial_number"] = api2.getSync('cameraSerial')
 	try:
 		urlopen(report_url, bytes(json.dumps(data), 'utf-8'), 0.1)
 	except Exception:
