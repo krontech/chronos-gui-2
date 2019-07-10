@@ -103,7 +103,7 @@
     <rect>
      <x>20</x>
      <y>280</y>
-     <width>281</width>
+     <width>301</width>
      <height>71</height>
     </rect>
    </property>
@@ -119,7 +119,7 @@
     <rect>
      <x>20</x>
      <y>350</y>
-     <width>281</width>
+     <width>301</width>
      <height>61</height>
     </rect>
    </property>
@@ -139,7 +139,7 @@
   <widget class="ComboBox" name="uiPowerDownThreshold">
    <property name="geometry">
     <rect>
-     <x>284</x>
+     <x>296</x>
      <y>340</y>
      <width>151</width>
      <height>81</height>
@@ -174,7 +174,7 @@
   <widget class="Label" name="label_4">
    <property name="geometry">
     <rect>
-     <x>424</x>
+     <x>436</x>
      <y>360</y>
      <width>161</width>
      <height>41</height>
@@ -189,7 +189,7 @@
     <rect>
      <x>20</x>
      <y>410</y>
-     <width>371</width>
+     <width>401</width>
      <height>71</height>
     </rect>
    </property>

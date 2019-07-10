@@ -154,7 +154,7 @@ class Power(QtWidgets.QDialog):
 		def projectToPlotSpace(x,y):
 			return [
 				chartTotalWidth - chartPadding["right"] - x,
-				chartPadding["top"] + chartLineHeight - y*chartLineHeight,
+				chartPadding["top"] + chartLineHeight - 1 - y * (chartLineHeight - 2),
 			]
 		
 		
@@ -219,11 +219,9 @@ class Power(QtWidgets.QDialog):
 		minSpaceBetweenLabels = 14 #px
 		labelDelta = chargeLabelLocation[1] - voltageLabelLocation[1]
 		if abs(labelDelta) < minSpaceBetweenLabels:
-			print('a', chargeLabelLocation)
 			labelAverageY = (chargeLabelLocation[1] + voltageLabelLocation[1])/2
 			chargeLabelLocation[1] = labelAverageY + copysign(minSpaceBetweenLabels/2, labelDelta)
 			voltageLabelLocation[1] = labelAverageY - copysign(minSpaceBetweenLabels/2, labelDelta)
-			print('b', chargeLabelLocation)
 		
 		
 		#Charge
