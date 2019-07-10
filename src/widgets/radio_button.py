@@ -58,9 +58,11 @@ class RadioButton(QRadioButton, TouchMarginPlugin, DirectAPILinkPlugin, Focusabl
 					border-bottom: {self.clickMarginBottom * 10 + 1}px solid {self.clickMarginColor};
 				}}
 				
-				RadioButton::indicator {{
-					width: 18px;
-					height: 18px;
+				RadioButton::indicator:checked {{
+					image: url(../../assets/images/radio-button-checked.svg.png);
+				}}
+				RadioButton::indicator:unchecked {{
+					image: url(../../assets/images/radio-button-unchecked.svg.png);
 				}}
 			""" + self.originalStyleSheet())
 		else:
@@ -68,7 +70,6 @@ class RadioButton(QRadioButton, TouchMarginPlugin, DirectAPILinkPlugin, Focusabl
 				RadioButton {{
 					/* App style. Use margin to provide further click area outside the visual button. */
 					font-size: 16px;
-					padding-left: 10px;
 					background: white;
 					
 					/* Add some touch space so this widget is easier to press. */
@@ -78,8 +79,10 @@ class RadioButton(QRadioButton, TouchMarginPlugin, DirectAPILinkPlugin, Focusabl
 					margin-bottom: {self.clickMarginBottom*10}px;
 				}}
 				
-				RadioButton::indicator {{
-					width: 18px;
-					height: 18px;
+				RadioButton::indicator:checked {{
+					image: url(assets/images/radio-button-checked.svg.png);
+				}}
+				RadioButton::indicator:unchecked {{
+					image: url(assets/images/radio-button-unchecked.svg.png);
 				}}
 			""" + self.originalStyleSheet())

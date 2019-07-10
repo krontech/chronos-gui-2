@@ -22,11 +22,12 @@ class Test(QtWidgets.QWidget):
 		#self.uiDebug.clicked.connect(lambda: self.decimalspinbox_3.availableUnits()) #"self" is needed here, won't be available otherwise.
 		self.uiBack.clicked.connect(window.back)
 		
-		self.uiSlider.setMaximum(api2.get('exposureMax'))
-		self.uiSlider.setMinimum(api2.get('exposureMin'))
+		rtl = api2.control.callSync('getResolutionTimingLimits', api2.getSync('resolution'))
+		self.uiSlider.setMaximum(rtl['exposureMax'])
+		self.uiSlider.setMinimum(rtl['exposureMin'])
 		
 		self.uiSlider.debounce.sliderMoved.connect(self.onExposureChanged)
-		api2.observe('exposurePeriod', self.updateExposureNs, saftyCheckForSilencedWidgets=False)
+		api2.observe('exposurePeriod', self.updateExposureNs)
 	
 	
 	@pyqtSlot(int, name="updateExposureNs")

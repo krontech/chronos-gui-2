@@ -80,7 +80,8 @@ class ComboBox(QComboBox, TouchMarginPlugin, FocusablePlugin):
 				}}
 				ComboBox::drop-down:on {{
 					/*Stupid hack because the dropdown scrollbar *can't* be increased in width. It's off the width of the drop-down button by -1px. We can't just decrease the width of the drop-down button, because every other button we own is 40px instead of 39px. So. What we do is adjust the button size down when the drop-down is open, because that's the only time the off-by-one with QScrollBar is noticable, and you're distracted by the scrollbar then.*/
-					padding-left: -1px;
+					/*This issue is fixed in Qt 5.7, but may reappear in 5.11.*/
+					/*padding-left: -1px;*/
 				}}
 				ComboBox::down-arrow {{
 					image: url(../../assets/images/wedge-down-enabled.png);
@@ -141,7 +142,8 @@ class ComboBox(QComboBox, TouchMarginPlugin, FocusablePlugin):
 				}}
 				ComboBox::drop-down:on {{
 					/*Stupid hack because the dropdown scrollbar *can't* be increased in width. It's off the width of the drop-down button by -1px. We can't just decrease the width of the drop-down button, because every other button we own is 40px instead of 39px. So. What we do is adjust the button size down when the drop-down is open, because that's the only time the off-by-one with QScrollBar is noticable, and you're distracted by the scrollbar then.*/
-					padding-left: -1px;
+					/*This issue is fixed in Qt 5.7, but may reappear in 5.11.*/
+					/*padding-left: -1px;*/
 				}}
 				ComboBox::down-arrow {{
 					image: url(assets/images/wedge-down-enabled.png);

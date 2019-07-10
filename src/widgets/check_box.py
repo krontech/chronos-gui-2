@@ -64,9 +64,11 @@ class CheckBox(QCheckBox, TouchMarginPlugin, DirectAPILinkPlugin, FocusablePlugi
 					border-bottom: {self.clickMarginBottom * 10 + 1}px solid {self.clickMarginColor};
 				}}
 				
-				CheckBox::indicator {{
-					width: 18px;
-					height: 18px;
+				CheckBox::indicator:checked {{
+					image: url(../../assets/images/checkbox-checked.svg.png);
+				}}
+				CheckBox::indicator:unchecked {{
+					image: url(../../assets/images/checkbox-unchecked.svg.png);
 				}}
 				
 			""" + self.originalStyleSheet())
@@ -75,7 +77,6 @@ class CheckBox(QCheckBox, TouchMarginPlugin, DirectAPILinkPlugin, FocusablePlugi
 				CheckBox {{
 					/* App style. Use margin to provide further click area outside the visual button. */
 					font-size: 16px;
-					padding-left: 10px;
 					background: white;
 					
 					/* Add some touch space so this widget is easier to press. */
@@ -85,8 +86,10 @@ class CheckBox(QCheckBox, TouchMarginPlugin, DirectAPILinkPlugin, FocusablePlugi
 					margin-bottom: {self.clickMarginBottom*10}px;
 				}}
 				
-				CheckBox::indicator {{
-					width: 18px;
-					height: 18px;
+				CheckBox::indicator:checked {{
+					image: url(assets/images/checkbox-checked.svg.png);
+				}}
+				CheckBox::indicator:unchecked {{
+					image: url(assets/images/checkbox-unchecked.svg.png);
 				}}
 			""" + self.originalStyleSheet())
