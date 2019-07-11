@@ -32,11 +32,11 @@ class Test(QtWidgets.QWidget):
 	
 	@pyqtSlot(int, name="updateExposureNs")
 	def updateExposureNs(self, newExposureNs):
-		print(f'updating slider to {newExposureNs}')
+		#print(f'updating slider to {newExposureNs}')
 		self.uiSlider.setValue(newExposureNs)
 	
 	def onExposureChanged(self, newExposureNs):
-		print(f'slider moved to {newExposureNs}')
+		#print(f'slider moved to {newExposureNs}')
 		self.uiSlider.setValue(
 			api2.control('set', {
 				'exposurePeriod': newExposureNs,

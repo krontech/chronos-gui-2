@@ -1398,6 +1398,7 @@
  </customwidgets>
  <tabstops>
   <tabstop>uiBack</tabstop>
+  <tabstop>lineedit_2</tabstop>
   <tabstop>uiDebug</tabstop>
   <tabstop>checkbox</tabstop>
   <tabstop>uiAnimateTriangle</tabstop>
@@ -1410,7 +1411,9 @@
   <tabstop>spinbox_2</tabstop>
   <tabstop>combobox</tabstop>
   <tabstop>radiobutton</tabstop>
+  <tabstop>combobox_2</tabstop>
   <tabstop>radiobutton_2</tabstop>
+  <tabstop>lineedit_3</tabstop>
  </tabstops>
  <resources/>
  <connections/>

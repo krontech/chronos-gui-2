@@ -2,7 +2,8 @@
 
 from random import randint
 
-from PyQt5.QtCore import Q_ENUMS, QSize, Qt, QEvent
+from PyQt5.QtCore import Q_ENUMS, QSize, Qt
+from PyQt5.QtGui import QPainter
 from PyQt5.QtWidgets import QLineEdit
 
 from debugger import *; dbg
@@ -125,3 +126,16 @@ class LineEdit(QLineEdit, TouchMarginPlugin, DirectAPILinkPlugin, FocusablePlugi
 			self.window().app.setCursorFlashTime(cursorFlashTime)
 		else:
 			self.selectWidget(delta)
+	
+	def paintEvent(self, event):
+		super().paintEvent(event)
+		
+		#If we're in jog wheel mode, this input does not show the cursor because
+		#focus is on the keyboard. To work around this issue, we draw our own
+		#cursor. It's a cheap hack, though, so it doesn't blink or adjust kerning.
+		if self.inputMode == 'jogWheel':
+			rect = self.cursorRect()
+			half = rect.width()//2
+			rect.translate(+half, 0)
+			rect.setWidth(1)
+			QPainter(self).fillRect(rect, Qt.SolidPattern)
