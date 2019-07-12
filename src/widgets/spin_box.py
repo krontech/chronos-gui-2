@@ -19,29 +19,11 @@ class SpinBox(QSpinBox, TouchMarginPlugin, DirectAPILinkPlugin, FocusablePlugin)
 		self.clickMarginColor = f"rgba({randint(0, 32)}, {randint(128, 255)}, {randint(128, 255)}, {randint(32,96)})"
 		self._units = ''
 		
-		#Jog wheel-based state.
 		self.isFocused = False
-		
-		def onLowResRotate(delta, pressed):
-			if self.isFocused:
-				if pressed:
-					self.changeJogWheelCharacterSelection(delta)
-				else: 
-					self.incrementJogWheelCharacterSelection(self.jogWheelIndex, delta, keepOrderOfMagnitude=True)
-			else:
-				if pressed:
-					self.incrementJogWheelCharacterSelection(1, delta)
-				else:
-					self.selectWidget(delta)
-		self.jogWheelLowResolutionRotation.connect(onLowResRotate)
-		
-		def toggleFocussed():
-			self.isFocused = not self.isFocused
-			if(self.isFocused):
-				self.changeJogWheelCharacterSelection(0)
-		self.jogWheelClick.connect(toggleFocussed)
-
-
+		self.jogWheelClick.connect(self.toggleFocussed)
+		self.jogWheelLowResolutionRotation.connect(self.onLowResRotate)
+	
+	
 	def sizeHint(self):
 		return QSize(201, 81)
 	
@@ -138,7 +120,33 @@ class SpinBox(QSpinBox, TouchMarginPlugin, DirectAPILinkPlugin, FocusablePlugin)
 	@pyqtProperty(str)
 	def units(self):
 		return self._units
-	
 	@units.setter
 	def units(self, newUnitCSVList):
 		self._units = newUnitCSVList
+	
+	
+	def onLowResRotate(self, delta, pressed):
+		if self.isFocused:
+			if pressed:
+				self.injectKeystrokes(
+					Qt.Key_PageUp if delta > 0 else Qt.Key_PageDown,
+					count=abs(delta) )
+			else:
+				self.injectKeystrokes(
+					Qt.Key_Up if delta > 0 else Qt.Key_Down,
+					count=abs(delta) )
+		else:
+			if pressed:
+				self.injectKeystrokes(
+					Qt.Key_PageUp if delta > 0 else Qt.Key_PageDown,
+					count=abs(delta) )
+			else:
+				self.selectWidget(delta)
+	
+	
+	def toggleFocussed(self):
+		self.isFocused = not self.isFocused
+		if self.isFocused:
+			self.window().focusRing.focusIn()
+		else:
+			self.window().focusRing.focusOut()

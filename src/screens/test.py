@@ -37,8 +37,4 @@ class Test(QtWidgets.QWidget):
 	
 	def onExposureChanged(self, newExposureNs):
 		#print(f'slider moved to {newExposureNs}')
-		self.uiSlider.setValue(
-			api2.control('set', {
-				'exposurePeriod': newExposureNs,
-			})['exposurePeriod']
-		)
+		api2.set('exposurePeriod', newExposureNs)

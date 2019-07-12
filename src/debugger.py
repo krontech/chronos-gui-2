@@ -102,6 +102,10 @@ def breakIf(widget):
 			deal. You can't stop triggering it.
 		"""
 	
+	if not widget:
+		print('\033[41mError: No widget supplied to breakIf.\033[m This is needed because we need to listen to key events in the app.')
+		return brk()
+	
 	def parents(item):
 		while item:
 			yield item
@@ -112,7 +116,7 @@ def breakIf(widget):
 		app = [i.app for i in parents(widget) if hasattr(i, 'app')][0]
 	except IndexError:
 		print('\033[41mError: Widget does not seem to be a part of the app.\033[m This is needed because we need to listen to key events in the app.')
-		brk()
+		return brk()
 	
 	if int(app.keyboardModifiers()) != QtCore.Qt.NoModifier: #33554432: #heck if I know
 		brk()

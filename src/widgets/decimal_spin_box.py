@@ -19,9 +19,9 @@ class DecimalSpinBox(QDoubleSpinBox, TouchMarginPlugin, DirectAPILinkPlugin, Foc
 		self.clickMarginColor = f"rgba({randint(0, 32)}, {randint(128, 255)}, {randint(128, 255)}, {randint(32,96)})"
 		self._units = ''
 		
-		self.jogWheelLowResolutionRotation.connect(lambda delta, pressed: 
-			not pressed and self.selectWidget(delta) )
-		self.jogWheelClick.connect(lambda: self.injectKeystrokes(Qt.Key_Space))
+		self.isFocused = False
+		self.jogWheelClick.connect(self.toggleFocussed)
+		self.jogWheelLowResolutionRotation.connect(self.onLowResRotate)
 
 
 	def sizeHint(self):
@@ -126,3 +126,30 @@ class DecimalSpinBox(QDoubleSpinBox, TouchMarginPlugin, DirectAPILinkPlugin, Foc
 	@units.setter
 	def units(self, newUnitCSVList):
 		self._units = newUnitCSVList
+	
+	
+	def onLowResRotate(self, delta, pressed):
+		if self.isFocused:
+			if pressed:
+				self.injectKeystrokes(
+					Qt.Key_PageUp if delta > 0 else Qt.Key_PageDown,
+					count=abs(delta) )
+			else:
+				self.injectKeystrokes(
+					Qt.Key_Up if delta > 0 else Qt.Key_Down,
+					count=abs(delta) )
+		else:
+			if pressed:
+				self.injectKeystrokes(
+					Qt.Key_PageUp if delta > 0 else Qt.Key_PageDown,
+					count=abs(delta) )
+			else:
+				self.selectWidget(delta)
+	
+	
+	def toggleFocussed(self):
+		self.isFocused = not self.isFocused
+		if self.isFocused:
+			self.window().focusRing.focusIn()
+		else:
+			self.window().focusRing.focusOut()
