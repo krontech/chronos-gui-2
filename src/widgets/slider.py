@@ -3,7 +3,7 @@
 from random import randint
 import time
 
-from PyQt5.QtCore import QSize, Qt, pyqtSignal, QObject, QRect
+from PyQt5.QtCore import QSize, Qt, pyqtSignal, QObject, QRect, QPoint
 from PyQt5.QtWidgets import QSlider
 from PyQt5.QtGui import QRegion, QPaintEvent
 
@@ -42,9 +42,9 @@ class Slider(ShowPaintRectsPlugin, FocusablePlugin, QSlider): #Must be in this o
 		self.clickMarginColorHandle = f"rgba({randint(0, 32)}, {randint(128, 255)}, {randint(0, 32)}, {randint(32,96)})"
 		self.refreshStyle()
 		
-		self.jogWheelLowResolutionRotation.connect(lambda delta, pressed: 
-			not pressed and self.selectWidget(delta) )
-		self.jogWheelClick.connect(lambda: self.injectKeystrokes(Qt.Key_Space))
+		self.isFocused = False
+		self.jogWheelClick.connect(self.toggleFocussed)
+		self.jogWheelLowResolutionRotation.connect(self.onLowResRotate)
 		
 		self.debounce = Slider.Debounce()
 		
@@ -65,6 +65,10 @@ class Slider(ShowPaintRectsPlugin, FocusablePlugin, QSlider): #Must be in this o
 		self._fpsMonitorLastFrame = time.perf_counter()
 		
 		self.setContentsMargins(30, 10, 30, 10) #rough guess, good enough?
+		
+		#Move the focus ring with the slider.
+		self.valueChanged.connect(self.tryRefocus)
+		self.rangeChanged.connect(self.tryRefocus)
 
 	def sizeHint(self):
 		return QSize(81, 201)
@@ -123,12 +127,32 @@ class Slider(ShowPaintRectsPlugin, FocusablePlugin, QSlider): #Must be in this o
 		}
 	
 	def visibleRegion(self):
-		#print('recalculating visible region')
 		return QRegion(
 			self.getContentsMargins()[0],
 			self.getContentsMargins()[1],
 			self.width() - self.getContentsMargins()[0] - self.getContentsMargins()[2],
 			self.height() - self.getContentsMargins()[1] - self.getContentsMargins()[3],
+		)
+	
+	def focusGeometry(self):
+		focusGeometryMargin = QSize(10,10)
+		range_ = self.maximum() - self.minimum()
+		adjustPct = self.value() / range_ - 0.5 #±50% of range
+		pos = self.rect().center()
+		if self.width() < self.height():
+			sliderSize = QSize(40, 80)
+			sliderPlay = self.height() - self.touchMargins()['top'] - self.touchMargins()['bottom'] - sliderSize.height()
+			pos = pos + QPoint(0, -adjustPct * sliderPlay)
+		else:
+			sliderSize = QSize(80, 40)
+			pass
+		
+		pos = self.mapToGlobal(pos)
+		return QRect(
+			pos.x() - sliderSize.width()/2 - focusGeometryMargin.width(),
+			pos.y() - sliderSize.height()/2 - focusGeometryMargin.height(),
+			sliderSize.width() + focusGeometryMargin.width()*2,
+			sliderSize.height() + focusGeometryMargin.height()*2,
 		)
 	
 	#Neither of these seem to be overridable, they never get called. If they
@@ -162,3 +186,36 @@ class Slider(ShowPaintRectsPlugin, FocusablePlugin, QSlider): #Must be in this o
 			if self._userGeneratedEvent:
 				self._userGeneratedEvent = False
 				self.debounce.sliderMoved.emit(val)
+	
+	
+	def onLowResRotate(self, delta, pressed):
+		if self.isFocused:
+			if pressed:
+				self.injectKeystrokes(
+					Qt.Key_PageUp if delta > 0 else Qt.Key_PageDown,
+					count=abs(delta) )
+			else:
+				self.injectKeystrokes(
+					Qt.Key_Up if delta > 0 else Qt.Key_Down,
+					count=abs(delta) )
+		else:
+			if pressed:
+				self.injectKeystrokes(
+					Qt.Key_PageUp if delta > 0 else Qt.Key_PageDown,
+					count=abs(delta) )
+			else:
+				self.selectWidget(delta)
+	
+	
+	def toggleFocussed(self):
+		self.isFocused = not self.isFocused
+		if self.isFocused:
+			self.window().focusRing.focusIn()
+		else:
+			self.window().focusRing.focusOut()
+	
+	def tryRefocus(self, *_):
+		try:
+			self.window().focusRing.refocus()
+		except AttributeError:
+			pass #No focus ring yet. There will be. :)

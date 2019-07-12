@@ -52,26 +52,30 @@ class FocusRing(QLabel):
 			self.setGeometry(-9999,-9999,10,10) #Just move the focus ring off-screen if it's supposed to be hidden. That way, it doesn't mess with hidden/shown status.
 			return
 		
-		xy = widget.parentWidget().mapToGlobal(widget.pos())
-		wh = widget.size()
-		
-		#Subtract the invisible touch margins, *usually* supplied by TouchMarginPlugin.
-		try:
-			margins = widget.touchMargins()
-		except AttributeError:
-			margins = None
-		
-		if margins:
-			xy += QPoint(
-				margins["left"], 
-				margins["top"],
-			) - QPoint(self._currentPadding, self._currentPadding)
-			wh -= QSize(
-				margins["left"] + margins["right"], 
-				margins["bottom"] + margins["top"],
-			) - QSize(self._currentPadding, self._currentPadding)*2
-		
-		self.setGeometry(QRect(xy, wh))
+		if hasattr(widget, 'focusGeometry'):
+			self.setGeometry(widget.focusGeometry())
+		else:
+			#None supplied. Calculate it ourselves from the bounding box and margin.
+			xy = widget.parentWidget().mapToGlobal(widget.pos())
+			wh = widget.size()
+			
+			#Subtract the invisible touch margins, *usually* supplied by TouchMarginPlugin.
+			try:
+				margins = widget.touchMargins()
+			except AttributeError:
+				margins = None
+			
+			if margins:
+				xy += QPoint(
+					margins["left"], 
+					margins["top"],
+				) - QPoint(self._currentPadding, self._currentPadding)
+				wh -= QSize(
+					margins["left"] + margins["right"], 
+					margins["bottom"] + margins["top"],
+				) - QSize(self._currentPadding, self._currentPadding)*2
+			
+			self.setGeometry(QRect(xy, wh))
 		self.raise_() #Make focus ring appear above keyboard.
 	
 	
