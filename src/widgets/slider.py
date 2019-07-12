@@ -69,6 +69,7 @@ class Slider(ShowPaintRectsPlugin, FocusablePlugin, QSlider): #Must be in this o
 		#Move the focus ring with the slider.
 		self.valueChanged.connect(self.tryRefocus)
 		self.rangeChanged.connect(self.tryRefocus)
+		self.focusGeometryNudge = (0,0,0,0) #x/y tuple to move the focus ring to be aligned. Different sliders have different nudges, and I can't figure out why.
 
 	def sizeHint(self):
 		return QSize(81, 201)
@@ -134,8 +135,8 @@ class Slider(ShowPaintRectsPlugin, FocusablePlugin, QSlider): #Must be in this o
 			self.height() - self.getContentsMargins()[1] - self.getContentsMargins()[3],
 		)
 	
-	def focusGeometry(self):
-		focusGeometryMargin = QSize(10,10)
+	def focusGeometry(self, padding):
+		focusGeometryMargin = QSize(padding,padding)
 		range_ = self.maximum() - self.minimum()
 		adjustPct = self.value() / range_ - 0.5 #±50% of range
 		pos = self.rect().center()
@@ -149,10 +150,10 @@ class Slider(ShowPaintRectsPlugin, FocusablePlugin, QSlider): #Must be in this o
 		
 		pos = self.mapToGlobal(pos)
 		return QRect(
-			pos.x() - sliderSize.width()/2 - focusGeometryMargin.width(),
-			pos.y() - sliderSize.height()/2 - focusGeometryMargin.height(),
-			sliderSize.width() + focusGeometryMargin.width()*2,
-			sliderSize.height() + focusGeometryMargin.height()*2,
+			pos.x() - sliderSize.width()/2 - focusGeometryMargin.width() + self.focusGeometryNudge[0],
+			pos.y() - sliderSize.height()/2 - focusGeometryMargin.height() + self.focusGeometryNudge[1],
+			sliderSize.width() + focusGeometryMargin.width()*2 + self.focusGeometryNudge[2],
+			sliderSize.height() + focusGeometryMargin.height()*2 + self.focusGeometryNudge[3],
 		)
 	
 	#Neither of these seem to be overridable, they never get called. If they

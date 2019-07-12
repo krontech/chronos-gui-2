@@ -53,7 +53,7 @@ class FocusRing(QLabel):
 			return
 		
 		if hasattr(widget, 'focusGeometry'):
-			self.setGeometry(widget.focusGeometry())
+			self.setGeometry(widget.focusGeometry(self._currentPadding))
 		else:
 			#None supplied. Calculate it ourselves from the bounding box and margin.
 			xy = widget.parentWidget().mapToGlobal(widget.pos())

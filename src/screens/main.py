@@ -217,6 +217,7 @@ class Main(QWidget):
 		self.uiExposureSlider.touchMargins = lambda: {
 			"top": 10, "left": 30, "bottom": 10, "right": 30
 		}
+		self.uiExposureSlider.focusGeometryNudge = (1,1,1,1)
 		
 		
 		
