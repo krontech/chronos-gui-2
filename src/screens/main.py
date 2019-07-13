@@ -134,14 +134,14 @@ class Main(QWidget):
 			self.uiWhiteBalance1.clicked.connect(self.closeCalibrationMenu)
 			self.uiWhiteBalance1.clicked.connect(self.closeShotAssistMenu)
 			self.uiWhiteBalance1.clicked.connect(self.closeRecordingAndTriggersMenu)
-			self.uiWhiteBalance1.clicked.connect(lambda: api2.control('startAutoWhiteBalance', {}))
+			self.uiWhiteBalance1.clicked.connect(lambda: api2.control.call('startAutoWhiteBalance', {}))
 			
 			self.uiBlackCal0.clicked.connect(self.closeCalibrationMenu)
 			self.uiBlackCal0.clicked.connect(lambda: 
-				api2.control('startCalibration', {'blackCal': True}) ) #may time out if already in progress - check state is 'idle' before issuing call!
+				api2.control.call('startCalibration', {'blackCal': True}) ) #may time out if already in progress - check state is 'idle' before issuing call!
 			self.uiBlackCal1.clicked.connect(self.closeCalibrationMenu)
 			self.uiBlackCal1.clicked.connect(lambda: 
-				api2.control('startCalibration', {'blackCal': True}) )
+				api2.control.call('startCalibration', {'blackCal': True}) )
 			
 			self.updateBaWTriggers()
 		else:
@@ -159,16 +159,16 @@ class Main(QWidget):
 			#Calibration either opens the uiCalibrationMenu or the uiCalibrationMenuWithMotion [trigger button].
 			self.uiWhiteBalance1.clicked.connect(self.closeCalibrationMenu1)
 			self.uiWhiteBalance1.clicked.connect(self.closeCalibrationMenu2)
-			self.uiWhiteBalance1.clicked.connect(lambda: api2.control('startAutoWhiteBalance', {}))
+			self.uiWhiteBalance1.clicked.connect(lambda: api2.control.call('startAutoWhiteBalance', {}))
 			self.uiWhiteBalance2.clicked.connect(self.closeCalibrationMenu1)
 			self.uiWhiteBalance2.clicked.connect(self.closeCalibrationMenu2)
-			self.uiWhiteBalance2.clicked.connect(lambda: api2.control('startAutoWhiteBalance', {}))
+			self.uiWhiteBalance2.clicked.connect(lambda: api2.control.call('startAutoWhiteBalance', {}))
 			self.uiBlackCal1.clicked.connect(self.closeCalibrationMenu1)
 			self.uiBlackCal1.clicked.connect(self.closeCalibrationMenu2)
-			self.uiBlackCal1.clicked.connect(lambda: api2.control('startCalibration', {'blackCal': True}))
+			self.uiBlackCal1.clicked.connect(lambda: api2.control.call('startCalibration', {'blackCal': True}))
 			self.uiBlackCal2.clicked.connect(self.closeCalibrationMenu1)
 			self.uiBlackCal2.clicked.connect(self.closeCalibrationMenu2)
-			self.uiBlackCal2.clicked.connect(lambda: api2.control('startCalibration', {'blackCal': True}))
+			self.uiBlackCal2.clicked.connect(lambda: api2.control.call('startCalibration', {'blackCal': True}))
 			self.uiRecalibrateMotionTrigger.clicked.connect(self.closeCalibrationMenu1)
 			self.uiRecalibrateMotionTrigger.clicked.connect(self.closeCalibrationMenu2)
 			#self.uiRecalibrateMotionTrigger.clicked.connect(lambda: api.control('takeStillReferenceForMotionTriggering'))
@@ -241,6 +241,7 @@ class Main(QWidget):
 			'hres': self.width() - self.uiSidebarBackdropAlsoUsedForMeasuringWidth.width(),
 			'vres': self.height(),
 		})
+		api2.video.call('livedisplay', {})
 		self._batteryChargeUpdateTimer.start() #ms
 	
 	def onHide(self):

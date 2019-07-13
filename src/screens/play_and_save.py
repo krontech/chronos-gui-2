@@ -2,12 +2,12 @@
 from random import sample
 
 from PyQt5 import uic, QtWidgets, QtCore
-from PyQt5.QtCore import pyqtSlot, pyqtSignal, QByteArray
+from PyQt5.QtCore import pyqtSlot, QByteArray
 from PyQt5.QtGui import QImage, QTransform, QPainter, QColor, QPainterPath, QBrush, QStandardItemModel, QStandardItem, QIcon, QIconEngine
 
 from debugger import *; dbg
 
-import api
+import api, api2
 from api import silenceCallbacks
 from animate import MenuToggle, delay
 from widgets.line_edit import LineEdit
@@ -44,7 +44,6 @@ class PlayAndSave(QtWidgets.QDialog):
 		self.totalRecordedFrames = 0
 		
 		#Use get and set marked regions, they redraw.
-		self.markedRegions = [] #{mark start, mark end, segment ids, region name}
 		self.markedRegions = [
 			{'region id': 'aaaaaaaa', 'hue': 240, 'mark end': 19900, 'mark start': 13002, 'saved': 0.0, 'highlight': 0, 'segment ids': ['KxIjG09V'], 'region name': 'Clip 1'},
 			{'region id': 'aaaaaaab', 'hue': 300, 'mark end': 41797, 'mark start': 40597, 'saved': 0.0, 'highlight': 0, 'segment ids': ['KxIjG09V'], 'region name': 'Clip 2'},
@@ -60,6 +59,7 @@ class PlayAndSave(QtWidgets.QDialog):
 			{'region id': 'aaaaaaal', 'hue': 420, 'mark end': 39068, 'mark start': 37868, 'saved': 0.0, 'highlight': 0, 'segment ids': ['KxIjG09V'], 'region name': 'Clip 12'},
 			{'region id': 'aaaaaaam', 'hue': 180, 'mark end': 13930, 'mark start': 0,     'saved': 0.0, 'highlight': 0, 'segment ids': ['ldPxTT5R', 'KxIjG09V'], 'region name': 'Clip 13'},
 		]
+		self.markedRegions = [] #{mark start, mark end, segment ids, region name}
 		self.markedStart = None #Note: Mark start/end are reversed if start is after end.
 		self.markedEnd = None
 		
@@ -81,15 +81,17 @@ class PlayAndSave(QtWidgets.QDialog):
 		
 		self.seekRate = 60
 		self.uiSeekRate.setValue(self.seekRate)
+		#self.uiSeekRate.valueChanged.connect(lambda rate:
+		#	api2.video.call('playback', {'framerate': rate}) )
 		
 		self.seekForwardTimer = QtCore.QTimer()
 		self.seekForwardTimer.timeout.connect(self.updateBattery)
 		self.seekForwardTimer.setInterval(16) #ms, 1/frame hopefully
 		
-		self.uiSeekBackward.pressed.connect( lambda: api.set({'playbackFramerate': -self.seekRate }))
-		self.uiSeekBackward.released.connect(lambda: api.set({'playbackFramerate': 0 }))
-		self.uiSeekForward.pressed.connect(  lambda: api.set({'playbackFramerate': +self.seekRate }))
-		self.uiSeekForward.released.connect( lambda: api.set({'playbackFramerate': 0 }))
+		self.uiSeekBackward.pressed.connect( lambda: api2.video.call('playback', {'framerate': -self.seekRate}))
+		self.uiSeekBackward.released.connect(lambda: api2.video.call('playback', {'framerate': 0}))
+		self.uiSeekForward.pressed.connect(  lambda: api2.video.call('playback', {'framerate': +self.seekRate}))
+		self.uiSeekForward.released.connect( lambda: api2.video.call('playback', {'framerate': 0}))
 		
 		self.uiSeekFaster.clicked.connect(self.seekFaster)
 		self.uiSeekSlower.clicked.connect(self.seekSlower)
@@ -124,7 +126,7 @@ class PlayAndSave(QtWidgets.QDialog):
 					border: none;
 				}}
 			""")
-		self.uiSeekSlider.valueChanged.connect(lambda f: api.set({'playbackFrame': f}))
+		self.uiSeekSlider.debounce.valueChanged.connect(lambda f: api2.video.call('playback', {'position':f}))
 		api.observe('totalRecordedFrames', self.onRecordingLengthChange)
 		api.observe('playbackFrame', self.updateCurrentFrame)
 		
@@ -161,7 +163,7 @@ class PlayAndSave(QtWidgets.QDialog):
 		
 	def onShow(self):
 		#Don't update the labels while hidden. But do show with accurate info when we start.
-		api.set({'videoState': 'playback'})
+		api2.video.call('playback', {'framerate':0})
 		self.updateBatteryTimer.start()
 		self.updateBattery()
 		

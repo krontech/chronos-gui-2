@@ -522,6 +522,7 @@ _camState = control.callSync('get', [
 ])
 if(not _camState):
 	raise Exception("Cache failed to populate. This indicates the get call is not working.")
+_camState['error'] = '' #Last error is reported inline sometimes.
 _camStateAge = {k:0 for k,v in _camState.items()}
 class APIValues(QObject):
 	"""Wrapper class for subscribing to API values in the chronos API."""
