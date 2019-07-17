@@ -113,7 +113,7 @@ class PlayAndSave(QtWidgets.QDialog):
 		self.uiSavedFileSettings.clicked.connect(lambda: window.show('file_settings'))
 		self.uiDone.clicked.connect(window.back)
 		
-		self.uiSeekSlider.setStyleSheet(
+		self.uiSeekSlider.setStyleSheet( #Can't use setCustomStylesheet because slider is not a child of touch_margin_plugin.
 			self.uiSeekSlider.styleSheet() + f"""
 				/* ----- Play And Save Screen Styling ----- */
 				
@@ -126,6 +126,8 @@ class PlayAndSave(QtWidgets.QDialog):
 					border: none;
 				}}
 			""")
+		self.uiSeekSlider.sliderSize = lambda: QtCore.QSize(156, 61) #Line up focus ring.
+		self.uiSeekSlider.touchMargins = lambda: { "top": 10, "left": 0, "bottom": 10, "right": 0, } #Report real margins.
 		self.uiSeekSlider.debounce.valueChanged.connect(lambda f: api2.video.call('playback', {'position':f}))
 		api.observe('totalRecordedFrames', self.onRecordingLengthChange)
 		api.observe('playbackFrame', self.updateCurrentFrame)
@@ -207,10 +209,15 @@ class PlayAndSave(QtWidgets.QDialog):
 	def onHide(self):
 		self.updateBatteryTimer.stop()
 	
+	
 	def updateBattery(self):
-		self.uiBatteryReadout.setText(
-			self.uiBatteryReadout.formatString.format(
-				api.get('batteryCharge')*100 ) )
+		api2.control.call(
+			'get', ['batteryChargePercent']
+		).then(lambda data:
+			self.uiBatteryReadout.setText(
+				self.uiBatteryReadout.formatString.format(data['batteryChargePercent']) )
+		)
+	
 	
 	def updateMotionHeatmap(self) -> None:
 		"""Repaint the motion heatmap when we enter this screen.

@@ -140,13 +140,13 @@ class Slider(ShowPaintRectsPlugin, FocusablePlugin, QSlider): #Must be in this o
 		range_ = self.maximum() - self.minimum()
 		adjustPct = self.value() / range_ - 0.5 #±50% of range
 		pos = self.rect().center()
+		sliderSize = self.sliderSize()
 		if self.width() < self.height():
-			sliderSize = QSize(40, 80)
 			sliderPlay = self.height() - self.touchMargins()['top'] - self.touchMargins()['bottom'] - sliderSize.height()
-			pos = pos + QPoint(0, -adjustPct * sliderPlay)
+			pos = pos + QPoint(0, round(-adjustPct * sliderPlay))
 		else:
-			sliderSize = QSize(80, 40)
-			pass
+			sliderPlay = self.width() - self.touchMargins()['left'] - self.touchMargins()['right'] - sliderSize.width()
+			pos = pos + QPoint(round(adjustPct * sliderPlay), 0)
 		
 		pos = self.mapToGlobal(pos)
 		return QRect(
@@ -155,6 +155,9 @@ class Slider(ShowPaintRectsPlugin, FocusablePlugin, QSlider): #Must be in this o
 			sliderSize.width() + focusGeometryMargin.width()*2 + self.focusGeometryNudge[2],
 			sliderSize.height() + focusGeometryMargin.height()*2 + self.focusGeometryNudge[3],
 		)
+	
+	def sliderSize(self):
+		return QSize(40, 80) if self.width() < self.height() else QSize(80, 40)
 	
 	#Neither of these seem to be overridable, they never get called. If they
 	#were called, we could use update() to not cause the main menu buttons to
