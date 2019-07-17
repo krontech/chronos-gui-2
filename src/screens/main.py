@@ -390,11 +390,11 @@ class Main(QWidget):
 		elif color == 'cyan':
 			origin = self.uiCyanFocusPeaking.geometry().topLeft()
 			box.move(origin)
-		elif color == 'white':
-			origin = self.uiWhiteFocusPeaking.geometry().topRight()
-			box.move(origin - QPoint(boxSize.x()-1, 0))
 		elif color == 'black':
-			origin = self.uiBlackFocusPeaking.geometry().topLeft()
+			origin = self.uiBlackFocusPeaking.geometry().topRight()
+			box.move(origin - QPoint(boxSize.x()-1, 0))
+		elif color == 'white':
+			origin = self.uiWhiteFocusPeaking.geometry().topLeft()
 			box.move(origin)
 		else:
 			print('unknown focus peaking color', color)
