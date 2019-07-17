@@ -18,7 +18,7 @@
     <rect>
      <x>20</x>
      <y>10</y>
-     <width>241</width>
+     <width>271</width>
      <height>31</height>
     </rect>
    </property>
@@ -39,30 +39,20 @@
     <string>File Size</string>
    </property>
   </widget>
-  <widget class="ComboBox" name="uiSavedVideoLocation">
-   <property name="geometry">
-    <rect>
-     <x>0</x>
-     <y>30</y>
-     <width>351</width>
-     <height>81</height>
-    </rect>
-   </property>
-   <property name="clickMarginRight" stdset="0">
-    <enum>ComboBox::half</enum>
-   </property>
-  </widget>
   <widget class="Button" name="uiSafelyRemove">
    <property name="geometry">
     <rect>
-     <x>330</x>
+     <x>350</x>
      <y>30</y>
-     <width>181</width>
+     <width>161</width>
      <height>81</height>
     </rect>
    </property>
    <property name="text">
     <string>Safely Remove</string>
+   </property>
+   <property name="clickMarginLeft" stdset="0">
+    <enum>Button::none</enum>
    </property>
   </widget>
   <widget class="QWidget" name="uiDiskSpaceVisualization" native="true">
@@ -192,12 +182,15 @@
     <rect>
      <x>0</x>
      <y>130</y>
-     <width>361</width>
+     <width>351</width>
      <height>81</height>
     </rect>
    </property>
    <property name="text">
     <string>Vid_%date%_%time%_%mark%</string>
+   </property>
+   <property name="clickMarginRight" stdset="0">
+    <enum>LineEdit::half</enum>
    </property>
   </widget>
   <widget class="ComboBox" name="uiSavedVideoFileExtention">
@@ -212,6 +205,21 @@
    <property name="clickMarginLeft" stdset="0">
     <enum>ComboBox::none</enum>
    </property>
+   <item>
+    <property name="text">
+     <string>.mp4</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>.raw</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>.dng</string>
+    </property>
+   </item>
   </widget>
   <widget class="Label" name="label_4">
    <property name="geometry">
@@ -442,6 +450,19 @@ After Save Complete</string>
     </rect>
    </property>
   </widget>
+  <widget class="StorageMediaSelect" name="uiSavedVideoLocation">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>30</y>
+     <width>351</width>
+     <height>81</height>
+    </rect>
+   </property>
+   <property name="clickMarginRight" stdset="0">
+    <enum>ComboBox::half</enum>
+   </property>
+  </widget>
   <zorder>backdrop</zorder>
   <zorder>label_8</zorder>
   <zorder>label_5</zorder>
@@ -450,7 +471,6 @@ After Save Complete</string>
   <zorder>headerlabel</zorder>
   <zorder>headerlabel_2</zorder>
   <zorder>uiSafelyRemove</zorder>
-  <zorder>uiSavedVideoLocation</zorder>
   <zorder>uiDiskSpaceVisualization</zorder>
   <zorder>uiDiskSpaceUsed</zorder>
   <zorder>uiDiskSpaceFree</zorder>
@@ -474,6 +494,7 @@ After Save Complete</string>
   <zorder>label_9</zorder>
   <zorder>label_10</zorder>
   <zorder>uiSavedFileMaxBitrate</zorder>
+  <zorder>uiSavedVideoLocation</zorder>
  </widget>
  <customwidgets>
   <customwidget>
@@ -516,9 +537,13 @@ After Save Complete</string>
    <extends>QSpinBox</extends>
    <header>spin_box</header>
   </customwidget>
+  <customwidget>
+   <class>StorageMediaSelect</class>
+   <extends>ComboBox</extends>
+   <header>storage_media_select</header>
+  </customwidget>
  </customwidgets>
  <tabstops>
-  <tabstop>uiSavedVideoLocation</tabstop>
   <tabstop>uiSafelyRemove</tabstop>
   <tabstop>uiSavedVideoName</tabstop>
   <tabstop>uiSavedVideoFileExtention</tabstop>
