@@ -75,18 +75,46 @@ class PlayAndSave(QtWidgets.QDialog):
 		self.updateBatteryTimer.timeout.connect(self.updateBattery)
 		self.updateBatteryTimer.setInterval(2000) #ms
 		
+		lastKnownFrame = -1
+		lastKnownFilesaveStatus = False
+		self.labelUpdateTimer = QtCore.QTimer()
+		iteration = 0
+		def checkLastKnownFrame(status):
+			nonlocal iteration
+			nonlocal lastKnownFrame
+			nonlocal lastKnownFilesaveStatus
+			
+			if not self.isVisible(): #Stop updates if screen has been exited.
+				return
+			
+			iteration += 1
+			log.print(f'iteration {iteration} (f{lastKnownFrame}, {lastKnownFilesaveStatus})')
+			
+			if status['position'] != lastKnownFrame:
+				lastKnownFrame = status['position']
+				self.updateCurrentFrame(lastKnownFrame)
+			
+			if status['filesave'] != lastKnownFilesaveStatus:
+				lastKnownFilesaveStatus = status['filesave']
+				if not lastKnownFilesaveStatus:
+					#Restore the seek rate display to the manual play rate.
+					self.uiSeekRate.setValue(self.seekRate)
+				
+			if lastKnownFilesaveStatus:
+				self.uiSeekRate.setValue(status['framerate'])
+			
+			#Loop after a short timeout, if the screen is still visible.
+			self.labelUpdateTimer.start()
+		self.labelUpdateTimer.timeout.connect(lambda: #Now, the timer is not running, so we can't just stop it to stop this process. We may be waiting on the dbus call instead.
+			api2.video.call(dump('querying', 'status')).then(checkLastKnownFrame) )
+		self.labelUpdateTimer.setInterval(16) #ms, cap at 60fps. (Technically this is just a penalty, we need to *race* the timer and the dbus call but we can't easily do that because we need something like .~*Promise.all()*~. for that and it's a bit of a pain in the neck to construct right now.)
+		self.labelUpdateTimer.setSingleShot(True) #Start the timer again after the update.
+		
 		self.uiCurrentFrame.suffixFormatString = self.uiCurrentFrame.suffix()
 		self.uiCurrentFrame.valueChanged.connect(lambda f: api.set({'playbackFrame': f}))
 		
-		
 		self.seekRate = 60
 		self.uiSeekRate.setValue(self.seekRate)
-		#self.uiSeekRate.valueChanged.connect(lambda rate:
-		#	api2.video.call('playback', {'framerate': rate}) )
-		
-		self.seekForwardTimer = QtCore.QTimer()
-		self.seekForwardTimer.timeout.connect(self.updateBattery)
-		self.seekForwardTimer.setInterval(16) #ms, 1/frame hopefully
 		
 		self.uiSeekBackward.pressed.connect( lambda: api2.video.call('playback', {'framerate': -self.seekRate}))
 		self.uiSeekBackward.released.connect(lambda: api2.video.call('playback', {'framerate': 0}))
@@ -129,8 +157,6 @@ class PlayAndSave(QtWidgets.QDialog):
 		self.uiSeekSlider.sliderSize = lambda: QtCore.QSize(156, 61) #Line up focus ring.
 		self.uiSeekSlider.touchMargins = lambda: { "top": 10, "left": 0, "bottom": 10, "right": 0, } #Report real margins.
 		self.uiSeekSlider.debounce.valueChanged.connect(lambda f: api2.video.call('playback', {'position':f}))
-		api.observe('totalRecordedFrames', self.onRecordingLengthChange)
-		api.observe('playbackFrame', self.updateCurrentFrame)
 		
 		self.motionHeatmap = QImage() #Updated by updateMotionHeatmap, used by self.paintMotionHeatmap.
 		self.uiTimelineVisualization.paintEvent = self.paintMotionHeatmap
@@ -203,11 +229,15 @@ class PlayAndSave(QtWidgets.QDialog):
 		)
 		self.uiBatteryReadout.setGeometry(geom)
 		
-		
 		self.updateMotionHeatmap()
+		
+		api2.observe('state', self.onStateChange)
+		self.labelUpdateTimer.start() #This will stop on its own.
+		self.updateCurrentFrame(api2.video.callSync('status')['position'])
 		
 	def onHide(self):
 		self.updateBatteryTimer.stop()
+		api2.unobserve('state', self.onStateChange)
 	
 	
 	def updateBattery(self):
@@ -273,15 +303,10 @@ class PlayAndSave(QtWidgets.QDialog):
 			p.drawPath(path)
 		
 	
-	@pyqtSlot(int, name="onRecordingLengthChange")
-	@silenceCallbacks('uiSeekSlider')
-	def onRecordingLengthChange(self, newRecordingLength):
-		self.uiSeekSlider.setMaximum(newRecordingLength)
-		self.isVisible() and self.updateMotionHeatmap() #Don't update motion heatmap if not visible. It's actually a little expensive.
-	
 	@pyqtSlot(int, name="setCurrentFrame")
 	@silenceCallbacks('uiSeekSlider', 'uiCurrentFrame')
 	def updateCurrentFrame(self, frame):
+		log.print(f'updating frame to {frame}')
 		self.uiSeekSlider.setValue(frame)
 		
 		#TODO DDR 2018-11-19: This is very slow, tanking the framerate. Why is that?
@@ -539,6 +564,12 @@ class PlayAndSave(QtWidgets.QDialog):
 	@pyqtSlot(str, float, name="onRegionSaving")
 	def onRegionSaving(self, regionId, ratioSaved):
 		[r for r in self.markedRegions if r['region id'] == regionId][0]['saved'] = ratioSaved
+	
+	@pyqtSlot(str, float)
+	def onStateChange(self, state): #Only fires when screen open.
+		#Reset number of frames.
+		self.uiSeekSlider.setMaximum(api2.video.callSync('status')['totalFrames'])
+		self.updateMotionHeatmap()
 		
 	
 class EditMarkedRegionsItemDelegate(QtWidgets.QStyledItemDelegate):

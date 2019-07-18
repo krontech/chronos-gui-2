@@ -41,7 +41,7 @@ def setUpLogging():
 	#custom log level for each of the components because we'd have to
 	#sort the components by importance. Which doesn't make any sense.
 	logging.getLogger('Chronos.gui').setLevel(logging.INFO)#logging.DEBUG) #GUI, having to do with the QT GUI code. Catchall for the other two categories, since everything is in service of the GUI here.
-	logging.getLogger('Chronos.api').setLevel(logging.INFO) #The API client logging. This 
+	logging.getLogger('Chronos.api').setLevel(logging.DEBUG) #The API client logging. This 
 	logging.getLogger('Chronos.perf').setLevel(logging.WARNING)
 	
 	#logging.disable(PERF_LEVEL) #Don't need this until it starts acting up.
