@@ -118,6 +118,20 @@ class video():
 			if not hasNewInformation:
 				return
 		
+		if coalesce and pendingCall._args[0] == 'playback':
+			#Always merge playback states.
+			#Take the playback state already enqueued, {}, and overlay the current playback state. (so, {a:1, b:1} + {b:2} = {a:1, b:2})
+			assert type(pendingCall._args[1]) is dict, f"playback() takes a {{key:value}} dict, got {pendingCall._args[1]} of type {type(pendingCall._args[1])}."
+			existingParams = [call._args[1] for call in video._videoEnqueuedCalls if call._args[0] == 'playback']
+			if not existingParams:
+				video._videoEnqueuedCalls += [pendingCall]
+			else:
+				#Update the parameters of the next playback call instead of enqueueing a new call.
+				for k, v in pendingCall._args[1].items():
+					existingParams[-1][k] = v
+				
+			return
+		
 		#Step 2: Is there already a set call pending? (Note that non-set calls act as set barriers; two sets won't get coalesced if a non-set call is between them.)
 		if coalesce and [pendingCall] == video._videoEnqueuedCalls[:1]:
 			video._videoEnqueuedCalls[-1] = pendingCall
@@ -161,6 +175,7 @@ class video():
 			
 			log.debug(f'enquing {self._args[0]}({self._args[1:]})')
 			video._enqueueCallback(self)
+			log.print(f'current video queue: {video._videoEnqueuedCalls}')
 			if not video._videoCallInProgress:
 				#Don't start multiple callbacks at once, the most recent one will block.
 				video._startNextCallback()
@@ -345,6 +360,7 @@ class control():
 			
 			log.debug(f'enquing {self._args[0]}({self._args[1:]})')
 			control._enqueueCallback(self)
+			log.print(f'current control queue: {control._controlEnqueuedCalls}')
 			if not control._controlCallInProgress:
 				#Don't start multiple callbacks at once, the most recent one will block.
 				control._startNextCallback()
@@ -514,7 +530,7 @@ def set(*args):
 # State cache for observe(), so it doesn't have to query the status of a variable on each subscription.
 # Since this often crashes during development, the following line can be run to try getting each variable independently.
 #     for key in [k for k in control.callSync('availableKeys') if k not in {'dateTime', 'externalStorage'}]: print('getting', key); control.callSync('get', [key])
-__badKeys = {'externalStorage'} #blacklist
+__badKeys = {} #set of blacklisted keys - useful for when one is unretrievable during development.
 _camState = control.callSync('get', [
 	key
 	for key in control.callSync('availableKeys')
@@ -549,11 +565,11 @@ class APIValues(QObject):
 	
 	def observe(self, key, callback):
 		"""Add a function to get called when a value is updated."""
-		self._callbacks[key] += [callback]
+		self._callbacks[key].append(callback)
 	
 	def unobserve(self, key, callback):
 		"""Stop a function from getting called when a value is updated."""
-		raise NotImplmentedError()
+		self._callbacks[key].remove(callback)
 	
 	def __newValueIsEnqueued(self, key):
 		return True in [
@@ -621,6 +637,8 @@ def observe_future_only(name: str, callback: Callable[[Any], None]) -> None:
 	
 	apiValues.observe(name, callback)
 
+
+unobserve = apiValues.unobserve
 
 
 
