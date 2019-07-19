@@ -137,8 +137,8 @@ class Slider(ShowPaintRectsPlugin, FocusablePlugin, QSlider): #Must be in this o
 	
 	def focusGeometry(self, padding):
 		focusGeometryMargin = QSize(padding,padding)
-		range_ = self.maximum() - self.minimum()
-		adjustPct = self.value() / range_ - 0.5 #±50% of range
+		range_ = self.maximum() - self.minimum() or 1
+		adjustPct = range_ and self.value() / range_ - 0.5 #±50% of range
 		pos = self.rect().center()
 		sliderSize = self.sliderSize()
 		if self.width() < self.height():

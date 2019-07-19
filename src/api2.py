@@ -15,6 +15,7 @@ import logging; log = logging.getLogger('Chronos.api')
 
 #Mock out the old API; use production for this one so we can switch over piecemeal.
 USE_MOCK = False #os.environ.get('USE_CHRONOS_API_MOCK') in ('always', 'web')
+API_INTERCALL_DELAY = 0
 
 
 # Set up d-bus interface. Connect to mock system buses. Check everything's working.
@@ -175,7 +176,7 @@ class video():
 			
 			log.debug(f'enquing {self._args[0]}({self._args[1:]})')
 			video._enqueueCallback(self)
-			log.print(f'current video queue: {video._videoEnqueuedCalls}')
+			#log.print(f'current video queue: {video._videoEnqueuedCalls}')
 			if not video._videoCallInProgress:
 				#Don't start multiple callbacks at once, the most recent one will block.
 				video._startNextCallback()
@@ -230,7 +231,8 @@ class video():
 				#is covered by the UI updating another few times anyway.
 				#Note that because each call still lags a little, this
 				#causes a few dropped frames every time the API is called.
-				delay(self, 64, video._startNextCallback)
+				#video._startNextCallback()
+				delay(self, API_INTERCALL_DELAY, video._startNextCallback)
 		
 		def then(self, callback):
 			assert callable(callback), "video().then() only accepts a single, callable function."
@@ -360,7 +362,7 @@ class control():
 			
 			log.debug(f'enquing {self._args[0]}({self._args[1:]})')
 			control._enqueueCallback(self)
-			log.print(f'current control queue: {control._controlEnqueuedCalls}')
+			#log.print(f'current control queue: {control._controlEnqueuedCalls}')
 			if not control._controlCallInProgress:
 				#Don't start multiple callbacks at once, the most recent one will block.
 				control._startNextCallback()
@@ -415,7 +417,7 @@ class control():
 				#is covered by the UI updating another few times anyway.
 				#Note that because each call still lags a little, this
 				#causes a few dropped frames every time the API is called.
-				delay(self, 64, control._startNextCallback)
+				delay(self, API_INTERCALL_DELAY, control._startNextCallback)
 		
 		def then(self, callback):
 			assert callable(callback), "control().then() only accepts a single, callable function."
