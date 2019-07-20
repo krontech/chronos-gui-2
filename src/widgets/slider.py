@@ -67,7 +67,7 @@ class Slider(ShowPaintRectsPlugin, FocusablePlugin, QSlider): #Must be in this o
 		self.setContentsMargins(30, 10, 30, 10) #rough guess, good enough?
 		
 		#Move the focus ring with the slider.
-		self.valueChanged.connect(self.tryRefocus)
+		self.debounce.valueChanged.connect(self.tryRefocus)
 		self.rangeChanged.connect(self.tryRefocus)
 		self.focusGeometryNudge = (0,0,0,0) #x/y tuple to move the focus ring to be aligned. Different sliders have different nudges, and I can't figure out why.
 

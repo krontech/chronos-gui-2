@@ -1,5 +1,6 @@
 # -*- coding: future_fstrings -*-
 from random import sample
+from time import perf_counter
 
 from PyQt5 import uic, QtWidgets, QtCore
 from PyQt5.QtCore import pyqtSlot, QByteArray
@@ -79,12 +80,17 @@ class PlayAndSave(QtWidgets.QDialog):
 		self.updateBatteryTimer.timeout.connect(self.updateBattery)
 		self.updateBatteryTimer.setInterval(2000) #ms
 		
+		self.labelUpdateIdleDelayTimer = QtCore.QTimer() #Used to skip calling the api alltogether when seeking.
+		self.labelUpdateIdleDelayTimer.setInterval(32)
+		self.labelUpdateIdleDelayTimer.setSingleShot(True)
 		self.labelUpdateTimer = QtCore.QTimer()
+		self.labelUpdateTimer.setInterval(32) #ms, cap at 60fps. (Technically this is just a penalty, we need to *race* the timer and the dbus call but we can't easily do that because we need something like .~*Promise.all()*~. for that and it's a bit of a pain in the neck to construct right now.)
+		self.labelUpdateTimer.setSingleShot(True) #Start the timer again after the update.
 		lastKnownFrame = -1
 		lastKnownFilesaveStatus = False
 		iteration = 0
 		noLoopUpdateCounter = 0 #When < 0, don't update slider to avoid the following issue: 1) Slider is updated. 2) D-Bus message is sent. 3) Slider is updated several times more. 4) D-Bus message returns and updates slider. 5) Slider is updated from old position, producing a jerk or a jump.
-		def checkLastKnownFrame(status):
+		def checkLastKnownFrame(status=None):
 			nonlocal iteration
 			nonlocal lastKnownFrame
 			nonlocal lastKnownFilesaveStatus
@@ -98,33 +104,37 @@ class PlayAndSave(QtWidgets.QDialog):
 			#log.print(f'iteration {iteration} (f{lastKnownFrame}, {lastKnownFilesaveStatus})')
 			#log.print(f'loop {noLoopUpdateCounter}')
 			
-			if status['position'] != lastKnownFrame:
-				lastKnownFrame = status['position']
-				self.uiCurrentFrame.setValue(lastKnownFrame)
-				if noLoopUpdateCounter > 0:
-					self.uiSeekSlider.blockSignals(True)
-					self.uiSeekSlider.setValue(lastKnownFrame)
-					self.uiSeekSlider.blockSignals(False)
-					
-			
-			if status['filesave'] != lastKnownFilesaveStatus:
-				lastKnownFilesaveStatus = status['filesave']
-				if not lastKnownFilesaveStatus:
-					#Restore the seek rate display to the manual play rate.
-					self.uiSeekRate.setValue(self.seekRate)
+			if status:
+				if status['position'] != lastKnownFrame:
+					lastKnownFrame = status['position']
+					self.uiCurrentFrame.setValue(lastKnownFrame)
+					if noLoopUpdateCounter > 0:
+						self.uiSeekSlider.blockSignals(True)
+						self.uiSeekSlider.setValue(lastKnownFrame)
+						self.uiSeekSlider.blockSignals(False)
+						
 				
-			if lastKnownFilesaveStatus:
-				self.uiSeekRate.setValue(status['framerate'])
+				if status['filesave'] != lastKnownFilesaveStatus:
+					lastKnownFilesaveStatus = status['filesave']
+					if not lastKnownFilesaveStatus:
+						#Restore the seek rate display to the manual play rate.
+						self.uiSeekRate.setValue(self.seekRate)
+					
+				if lastKnownFilesaveStatus:
+					self.uiSeekRate.setValue(status['framerate'])
 			
 			#Loop after a short timeout, if the screen is still visible.
-			self.labelUpdateTimer.start()
+			if noLoopUpdateCounter > 0:
+				self.labelUpdateTimer.start()
+			else:
+				self.labelUpdateIdleDelayTimer.start()
+		self.labelUpdateIdleDelayTimer.timeout.connect(checkLastKnownFrame)
 		self.labelUpdateTimer.timeout.connect(lambda: #Now, the timer is not running, so we can't just stop it to stop this process. We may be waiting on the dbus call instead.
 			api2.video.call('status').then(checkLastKnownFrame) )
-		self.labelUpdateTimer.setInterval(16) #ms, cap at 60fps. (Technically this is just a penalty, we need to *race* the timer and the dbus call but we can't easily do that because we need something like .~*Promise.all()*~. for that and it's a bit of a pain in the neck to construct right now.)
-		self.labelUpdateTimer.setSingleShot(True) #Start the timer again after the update.
 		
 		self.uiCurrentFrame.suffixFormatString = self.uiCurrentFrame.suffix()
-		self.uiCurrentFrame.valueChanged.connect(lambda f: api.set({'playbackFrame': f}))
+		self.uiCurrentFrame.valueChanged.connect(lambda f: 
+			self.uiCurrentFrame.hasFocus() and api2.video.call('playback', {'position':f}) )
 		
 		self.seekRate = 60
 		self.uiSeekRate.setValue(self.seekRate)
@@ -136,7 +146,6 @@ class PlayAndSave(QtWidgets.QDialog):
 		
 		self.uiSeekFaster.clicked.connect(self.seekFaster)
 		self.uiSeekSlower.clicked.connect(self.seekSlower)
-		
 		
 		self.uiMarkStart.clicked.connect(self.markStart)
 		self.uiMarkEnd.clicked.connect(self.markEnd)
@@ -169,12 +178,20 @@ class PlayAndSave(QtWidgets.QDialog):
 			""")
 		self.uiSeekSlider.sliderSize = lambda: QtCore.QSize(156, 61) #Line up focus ring.
 		self.uiSeekSlider.touchMargins = lambda: { "top": 10, "left": 0, "bottom": 10, "right": 0, } #Report real margins.
-		self.uiSeekSlider.debounce.valueChanged.connect(lambda f: api2.video.call('playback', {'position':f}))
+		self.uiSeekSlider.debounce.sliderMoved.connect(lambda frame: 
+			api2.video.callSync('playback', {'position': frame}) )
+		self.uiSeekSlider.debounce.sliderMoved.connect(lambda frame: 
+			self.uiCurrentFrame.setValue(frame) )
+		last_perf = perf_counter()
+		def countPerfs(*_):
+			nonlocal last_perf
+			log.print(f'update took {(perf_counter() - last_perf)*1000}ms')
+			last_perf = perf_counter()
+		self.uiSeekSlider.debounce.sliderMoved.connect(countPerfs)
 		def updateNoLoopUpdateCounter(*_):
 			nonlocal noLoopUpdateCounter
 			noLoopUpdateCounter = -10 #Delay updating until the d-bus call has had a chance to return.
-		self.uiSeekSlider.sliderMoved.connect(updateNoLoopUpdateCounter)
-		self.uiSeekSlider.jogWheelLowResolutionRotation.connect(updateNoLoopUpdateCounter)
+		self.uiSeekSlider.debounce.sliderMoved.connect(updateNoLoopUpdateCounter)
 		
 		self.motionHeatmap = QImage() #Updated by updateMotionHeatmap, used by self.paintMotionHeatmap.
 		self.uiTimelineVisualization.paintEvent = self.paintMotionHeatmap
@@ -222,27 +239,12 @@ class PlayAndSave(QtWidgets.QDialog):
 		
 		data = api.get(['recordedSegments', 'totalRecordedFrames']) #No destructuring bind in python. 😭
 		self.recordedSegments = data['recordedSegments']
-		self.totalRecordedFrames = data['totalRecordedFrames']
-		self.uiCurrentFrame.setMaximum(data['totalRecordedFrames'])
-		self.uiCurrentFrame.setSuffix(
-			self.uiCurrentFrame.suffixFormatString % data['totalRecordedFrames']
-		)
 		
 		self.checkMarkedRegionsValid()
 		
 		#Recalculate width width of frame readout and battery readout, choosing max.
 		#This tends to jump around otherwise, unlike the edit marked regions button, so keep it static.
-		geom = self.uiCurrentFrame.geometry()
-		geom.setLeft(
-			geom.right() 
-			- 10*2 - 5 #qss margin, magic
-			- self.uiCurrentFrame.fontMetrics().width(
-				self.uiCurrentFrame.prefix()
-				+ str(data['totalRecordedFrames'])
-				+ self.uiCurrentFrame.suffixFormatString % data['totalRecordedFrames']
-			)
-		)
-		self.uiCurrentFrame.setGeometry(geom)
+
 		
 		geom = self.uiBatteryReadout.geometry()
 		geom.setLeft(
@@ -585,8 +587,28 @@ class PlayAndSave(QtWidgets.QDialog):
 	@pyqtSlot(str, float)
 	def onStateChange(self, state): #Only fires when screen open.
 		#Reset number of frames.
-		self.uiSeekSlider.setMaximum(api2.video.callSync('status')['totalFrames'])
+		status = api2.video.callSync('status')
+		self.uiSeekSlider.setMaximum(status['totalFrames'])
+		self.uiSeekSlider.setMaximum(status['totalFrames'])
 		self.updateMotionHeatmap()
+		
+		
+		self.totalRecordedFrames = status['totalFrames']
+		self.uiCurrentFrame.setMaximum(status['totalFrames'])
+		self.uiCurrentFrame.setSuffix(
+			self.uiCurrentFrame.suffixFormatString % status['totalFrames']
+		)
+		geom = self.uiCurrentFrame.geometry()
+		geom.setLeft(
+			geom.right() 
+			- 10*2 - 5 #qss margin, magic
+			- self.uiCurrentFrame.fontMetrics().width(
+				self.uiCurrentFrame.prefix()
+				+ str(status['totalFrames'])
+				+ self.uiCurrentFrame.suffixFormatString % status['totalFrames']
+			)
+		)
+		self.uiCurrentFrame.setGeometry(geom)
 		
 	
 class EditMarkedRegionsItemDelegate(QtWidgets.QStyledItemDelegate):

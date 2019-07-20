@@ -488,8 +488,10 @@ if __name__ == '__main__':
 	
 	window = Window(app)
 	
-	eventFilter = GlobalFilter(app, window)
-	app.installEventFilter(eventFilter)
+	#I don't think this is striiiiictly needed any more? Incurs 10ms penalty for slider fps.
+	#eventFilter = GlobalFilter(app, window)
+	#app.installEventFilter(eventFilter)
+	
 	app.setStyleSheet("""
 		/* Remove the little dotted focus ring. It's too hard to see, but still looks messy now that we've got our own. */
 		*:focus {

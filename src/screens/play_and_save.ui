@@ -610,6 +610,16 @@ Save Start</string>
     <string>      Button {       font-size: 16px;       background: rgba(255,255,255, 128);       text-align: left;       padding: 0 10px;      border-color: transparent;      }     </string>
    </property>
   </widget>
+  <widget class="QWidget" name="uiVideoArea" native="true">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>30</y>
+     <width>601</width>
+     <height>361</height>
+    </rect>
+   </property>
+  </widget>
   <widget class="SpinBox" name="uiSeekRate">
    <property name="geometry">
     <rect>
@@ -621,9 +631,6 @@ Save Start</string>
    </property>
    <property name="alignment">
     <set>Qt::AlignCenter</set>
-   </property>
-   <property name="buttonSymbols">
-    <enum>QAbstractSpinBox::NoButtons</enum>
    </property>
    <property name="suffix">
     <string>fps</string>
@@ -638,7 +645,7 @@ Save Start</string>
     <number>20480</number>
    </property>
    <property name="singleStep">
-    <number>10</number>
+    <number>15</number>
    </property>
    <property name="clickMarginLeft" stdset="0">
     <enum>SpinBox::none</enum>
@@ -657,28 +664,22 @@ Save Start</string>
    <property name="geometry">
     <rect>
      <x>400</x>
-     <y>370</y>
-     <width>200</width>
-     <height>49</height>
+     <y>360</y>
+     <width>201</width>
+     <height>61</height>
     </rect>
    </property>
    <property name="focusPolicy">
-    <enum>Qt::NoFocus</enum>
+    <enum>Qt::ClickFocus</enum>
    </property>
    <property name="alignment">
     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-   </property>
-   <property name="buttonSymbols">
-    <enum>QAbstractSpinBox::NoButtons</enum>
    </property>
    <property name="suffix">
     <string>/%i</string>
    </property>
    <property name="prefix">
     <string>Frame </string>
-   </property>
-   <property name="singleStep">
-    <number>1</number>
    </property>
    <property name="clickMarginLeft" stdset="0">
     <enum>SpinBox::none</enum>
@@ -689,23 +690,14 @@ Save Start</string>
    <property name="clickMarginBottom" stdset="0">
     <enum>SpinBox::none</enum>
    </property>
-   <property name="customStyleSheet" stdset="0">
-    <string>SpinBox { border-color: transparent }</string>
-   </property>
   </widget>
-  <widget class="QWidget" name="uiVideoArea" native="true">
-   <property name="geometry">
-    <rect>
-     <x>0</x>
-     <y>30</y>
-     <width>601</width>
-     <height>361</height>
-    </rect>
-   </property>
-  </widget>
+  <zorder>uiVideoArea</zorder>
+  <zorder>uiSeekRate</zorder>
+  <zorder>backdrop_6</zorder>
+  <zorder>uiTimelineVisualization</zorder>
+  <zorder>uiCurrentFrame</zorder>
   <zorder>uiEditMarkedRegions</zorder>
   <zorder>uiMarkedRegionsPanel</zorder>
-  <zorder>backdrop_6</zorder>
   <zorder>backdrop_3</zorder>
   <zorder>backdrop_4</zorder>
   <zorder>backdrop_5</zorder>
@@ -716,7 +708,6 @@ Save Start</string>
   <zorder>uiSave</zorder>
   <zorder>uiMarkEnd</zorder>
   <zorder>uiMarkStart</zorder>
-  <zorder>uiTimelineVisualization</zorder>
   <zorder>uiMarkedRegionVisualization</zorder>
   <zorder>uiSeekSlider</zorder>
   <zorder>comment</zorder>
@@ -725,9 +716,6 @@ Save Start</string>
   <zorder>comment_2</zorder>
   <zorder>uiBatteryReadout</zorder>
   <zorder>uiSeekSlower</zorder>
-  <zorder>uiSeekRate</zorder>
-  <zorder>uiCurrentFrame</zorder>
-  <zorder>uiVideoArea</zorder>
  </widget>
  <customwidgets>
   <customwidget>
@@ -781,6 +769,7 @@ Save Start</string>
   <tabstop>uiMarkEnd</tabstop>
   <tabstop>uiSave</tabstop>
   <tabstop>uiSavedFileSettings</tabstop>
+  <tabstop>uiMarkedRegionPanelClose</tabstop>
  </tabstops>
  <resources/>
  <connections/>
