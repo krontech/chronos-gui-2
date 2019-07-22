@@ -34,8 +34,8 @@ cameraVideoAPI = QDBusInterface(
 	f"", #Interface
 	QDBusConnection.systemBus() )
 
-cameraControlAPI.setTimeout(1000) #Default is -1, which means 25000ms. 25 seconds is too long to go without some sort of feedback, and the only real long-running operation we have - saving - can take upwards of 5 minutes. Instead of setting the timeout to half an hour, we use events which are emitted as the task progresses. One frame (at 15fps) should be plenty of time for the API to respond, and also quick enough that we'll notice any slowness.
-cameraVideoAPI.setTimeout(1000)
+cameraControlAPI.setTimeout(1500) #Default is -1, which means 25000ms. 25 seconds is too long to go without some sort of feedback, and the only real long-running operation we have - saving - can take upwards of 5 minutes. Instead of setting the timeout to half an hour, we use events which are emitted as the task progresses. One frame (at 15fps) should be plenty of time for the API to respond, and also quick enough that we'll notice any slowness.
+cameraVideoAPI.setTimeout(1500)
 
 if not cameraControlAPI.isValid():
 	print("Error: Can not connect to control D-Bus API at %s. (%s: %s)" % (
