@@ -42,6 +42,7 @@ class StorageMediaSelect(ComboBox):
 			time of writing) async usageFor() query to fill the %
 			display."""
 		
+		initialUUID = (self.currentData() or {}).get('uuid') or ''
 		initialUUIDs = {
 			self.itemData(i)['uuid'] 
 			for i in range(self.count())
@@ -78,7 +79,16 @@ class StorageMediaSelect(ComboBox):
 				partitionList[i]['device'], 
 				updateTextFor(i),
 			)
-			
+		
+		log.print('checking for selection')
+		for i in range(len(partitionList)-1, 0-1, -1):
 			#Select a new partition, because we probably plugged something in with the intent of using it.
 			if partitionList[i]['uuid'] not in initialUUIDs:
+				log.print(f"Found new ID {partitionList[i]['name']} / {partitionList[i]['uuid']}")
+				self.setCurrentIndex(i)
+				return
+			
+			#If no new partition found, use the current partition.
+			if partitionList[i]['uuid'] == initialUUID:
+				log.print(f"Using old ID {partitionList[i]['name']} / {partitionList[i]['uuid']}")
 				self.setCurrentIndex(i)

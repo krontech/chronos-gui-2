@@ -1,18 +1,18 @@
 # -*- coding: future_fstrings -*-
 from random import sample
-from time import perf_counter
+from datetime import datetime
 
 from PyQt5 import uic, QtWidgets, QtCore
-from PyQt5.QtCore import pyqtSlot, QByteArray
+from PyQt5.QtCore import pyqtSlot, QByteArray, QRect
 from PyQt5.QtGui import QImage, QTransform, QPainter, QColor, QPainterPath, QBrush, QStandardItemModel, QStandardItem, QIcon, QIconEngine
 
 from debugger import *; dbg
 
 import api, api2
-from api import silenceCallbacks
 from animate import MenuToggle, delay
 from widgets.line_edit import LineEdit
 from widgets.button import Button
+import settings
 
 
 
@@ -44,6 +44,9 @@ class PlayAndSave(QtWidgets.QDialog):
 		self.recordedSegments = []
 		self.totalRecordedFrames = 0
 		
+		self.videoState = None
+		self.regionBeingSaved = None
+		
 		#Use get and set marked regions, they redraw.
 		self.markedRegions = [
 			{'region id': 'aaaaaaaa', 'hue': 240, 'mark end': 19900, 'mark start': 13002, 'saved': 0.0, 'highlight': 0, 'segment ids': ['KxIjG09V'], 'region name': 'Clip 1'},
@@ -60,7 +63,11 @@ class PlayAndSave(QtWidgets.QDialog):
 			{'region id': 'aaaaaaal', 'hue': 420, 'mark end': 39068, 'mark start': 37868, 'saved': 0.0, 'highlight': 0, 'segment ids': ['KxIjG09V'], 'region name': 'Clip 12'},
 			{'region id': 'aaaaaaam', 'hue': 180, 'mark end': 13930, 'mark start': 0,     'saved': 0.0, 'highlight': 0, 'segment ids': ['ldPxTT5R', 'KxIjG09V'], 'region name': 'Clip 13'},
 		]
-		self.markedRegions = [] #{mark start, mark end, segment ids, region name}
+		self.markedRegions = []
+		self.markedRegions = [
+			{'region id': 'aaaaaaaa', 'hue': 240, 'mark end': 199, 'mark start': 130, 'saved': 0.0, 'highlight': 0, 'segment ids': ['KxIjG09V'], 'region name': 'Clip 1'},
+			{'region id': 'aaaaaaab', 'hue': 300, 'mark end': 417, 'mark start': 105, 'saved': 0.0, 'highlight': 0, 'segment ids': ['KxIjG09V'], 'region name': 'Clip 2'},
+		]
 		self.markedStart = None #Note: Mark start/end are reversed if start is after end.
 		self.markedEnd = None
 		
@@ -104,7 +111,7 @@ class PlayAndSave(QtWidgets.QDialog):
 			#log.print(f'iteration {iteration} (f{lastKnownFrame}, {lastKnownFilesaveStatus})')
 			#log.print(f'loop {noLoopUpdateCounter}')
 			
-			if status:
+			if status and self.videoState in ('play', 'filesave'):
 				if status['position'] != lastKnownFrame:
 					lastKnownFrame = status['position']
 					self.uiCurrentFrame.setValue(lastKnownFrame)
@@ -112,14 +119,20 @@ class PlayAndSave(QtWidgets.QDialog):
 						self.uiSeekSlider.blockSignals(True)
 						self.uiSeekSlider.setValue(lastKnownFrame)
 						self.uiSeekSlider.blockSignals(False)
-						
 				
 				if status['filesave'] != lastKnownFilesaveStatus:
 					lastKnownFilesaveStatus = status['filesave']
 					if not lastKnownFilesaveStatus:
 						#Restore the seek rate display to the manual play rate.
 						self.uiSeekRate.setValue(self.seekRate)
-					
+				
+				if self.videoState == 'filesave':
+					region = [r for r in self.markedRegions if r['region id'] == self.regionBeingSaved][:1]
+					if region: #Protect against resets in the middle of saving.
+						region = region[0]
+						region['saved'] = (lastKnownFrame - region['mark start']) / (region['mark end'] - region['mark start'])
+				
+				#Set the seek rate counter back to what the camera operator set it to.
 				if lastKnownFilesaveStatus:
 					self.uiSeekRate.setValue(status['framerate'])
 			
@@ -150,15 +163,9 @@ class PlayAndSave(QtWidgets.QDialog):
 		self.uiMarkStart.clicked.connect(self.markStart)
 		self.uiMarkEnd.clicked.connect(self.markEnd)
 		
-		self.uiSave.clicked.connect(lambda: api.control('saveRegions', [{
-			"id": region['region id'],
-			"start": region['mark start'],
-			"end": region['mark end'],
-			"path": '/dev/sda', #TODO: Retrieve this from saved file settings screen, via local settings.
-			"format": {'fps': 30, 'encoding': 'h264'},
-			"filename": r'普通棕色蝙蝠_%DATE%_劃分_%REGION NAME%-%START FRAME%-%END FRAME%.mp4'
-				.replace(r'%REGION NAME%', region['region name']),
-		} for region in self.markedRegions if not region['saved']]))
+		self.uiSave.clicked.connect(self.saveMarkedRegion)
+		self.uiSaveCancel.clicked.connect(self.cancelSave)
+		self.uiSaveCancel.hide()
 		
 		self.uiSavedFileSettings.clicked.connect(lambda: window.show('file_settings'))
 		self.uiDone.clicked.connect(window.back)
@@ -167,6 +174,8 @@ class PlayAndSave(QtWidgets.QDialog):
 			self.uiSeekSlider.styleSheet() + f"""
 				/* ----- Play And Save Screen Styling ----- */
 				
+				
+				/*Heatmap got delayed. Don't style for now… (Remove the "X-"s to apply again.)*/
 				Slider::handle:horizontal {{
 					image: url({"../../" if self.uiSeekSlider.showHitRects else ""}assets/images/handle-bars-156x61+40.png); /* File name fields: width x height + horizontal padding. */
 					margin: -200px -40px; /* y: -slider groove margin. x: touch padding outsidet the groove. Clipped by Slider width. Should be enough for most customizations if we move stuff around. */
@@ -176,18 +185,21 @@ class PlayAndSave(QtWidgets.QDialog):
 					border: none;
 				}}
 			""")
-		self.uiSeekSlider.sliderSize = lambda: QtCore.QSize(156, 61) #Line up focus ring.
-		self.uiSeekSlider.touchMargins = lambda: { "top": 10, "left": 0, "bottom": 10, "right": 0, } #Report real margins.
+		#Heatmap got delayed. Don't report different size/touchMargins for heatmap styling.
+		#self.uiSeekSlider.sliderSize = lambda: QtCore.QSize(156, 61) #Line up focus ring.
+		self.uiSeekSlider.touchMargins = lambda: { "top": 10, "left": 10, "bottom": 10, "right": 10, } #Report real margins.
+		self.uiSeekSlider.focusGeometryNudge = (0,0,0,0)
+		#self.uiSeekSlider.touchMargins = lambda: { "top": 10, "left": 0, "bottom": 10, "right": 0, } #Report real margins.
 		self.uiSeekSlider.debounce.sliderMoved.connect(lambda frame: 
 			api2.video.callSync('playback', {'position': frame}) )
 		self.uiSeekSlider.debounce.sliderMoved.connect(lambda frame: 
 			self.uiCurrentFrame.setValue(frame) )
-		last_perf = perf_counter()
-		def countPerfs(*_):
-			nonlocal last_perf
-			log.print(f'update took {(perf_counter() - last_perf)*1000}ms')
-			last_perf = perf_counter()
-		self.uiSeekSlider.debounce.sliderMoved.connect(countPerfs)
+		#last_perf = perf_counter()
+		#def countPerfs(*_):
+		#	nonlocal last_perf
+		#	log.print(f'update took {(perf_counter() - last_perf)*1000}ms')
+		#	last_perf = perf_counter()
+		#self.uiSeekSlider.debounce.sliderMoved.connect(countPerfs)
 		def updateNoLoopUpdateCounter(*_):
 			nonlocal noLoopUpdateCounter
 			noLoopUpdateCounter = -10 #Delay updating until the d-bus call has had a chance to return.
@@ -195,6 +207,7 @@ class PlayAndSave(QtWidgets.QDialog):
 		
 		self.motionHeatmap = QImage() #Updated by updateMotionHeatmap, used by self.paintMotionHeatmap.
 		self.uiTimelineVisualization.paintEvent = self.paintMotionHeatmap
+		self.uiTimelineVisualization.hide() #Heatmap got delayed. Hide for now, some logic still depends on it.
 		
 		#Set up for marked regions.
 		self._tracks = [] #Used as cache for updateMarkedRegions / paintMarkedRegions.
@@ -223,6 +236,8 @@ class PlayAndSave(QtWidgets.QDialog):
 		self.uiMarkedRegions.clicked.connect(self.selectMarkedRegion)
 		
 		api.connectSignal('regionSaving', self.onRegionSaving)
+		
+		api2.observe('videoState', self.onVideoStateChangeAlways)
 		
 	def onShow(self):
 		#Don't update the labels while hidden. But do show with accurate info when we start.
@@ -258,16 +273,17 @@ class PlayAndSave(QtWidgets.QDialog):
 		
 		self.updateMotionHeatmap()
 		
-		api2.observe('state', self.onStateChange)
 		self.labelUpdateTimer.start() #This will stop on its own.
 		
 		frame = api2.video.callSync('status')['position']
 		self.uiSeekSlider.setValue(frame)
 		self.uiCurrentFrame.setValue(frame)
 		
+		api2.observe('state', self.onStateChangeWhenScreenActive)
+		
 	def onHide(self):
 		self.updateBatteryTimer.stop()
-		api2.unobserve('state', self.onStateChange)
+		api2.unobserve('state', self.onStateChangeWhenScreenActive)
 	
 	
 	def updateBattery(self):
@@ -286,6 +302,8 @@ class PlayAndSave(QtWidgets.QDialog):
 			have to live-update here. This is partially due to the
 			fact that the camera is modal around this, it can either
 			record xor playback."""
+		
+		return #Heatmap got delayed. Just return for now…
 		
 		heatmapHeight = 16
 		
@@ -307,6 +325,11 @@ class PlayAndSave(QtWidgets.QDialog):
 		self.uiTimelineVisualization.update() #Invokes self.paintMotionHeatmap if needed.
 	
 	def paintMotionHeatmap(self, paintEvent):
+		return #Heatmap got delayed. Just return for now…
+		
+		if not self.totalRecordedFrames:
+			return
+		
 		p = QPainter(self.uiTimelineVisualization)
 		
 		#Draw the scrollbar motion heatmap.
@@ -362,7 +385,7 @@ class PlayAndSave(QtWidgets.QDialog):
 	
 	def markStart(self):
 		"""Set mark in."""
-		self.markedStart = api.get('playbackFrame')
+		self.markedStart = self.uiSeekSlider.value()
 		
 		if self.markedStart == self.markedEnd:
 			self.markedEnd = None
@@ -372,7 +395,7 @@ class PlayAndSave(QtWidgets.QDialog):
 	
 	def markEnd(self):
 		"""Set mark out."""
-		self.markedEnd = api.get('playbackFrame')
+		self.markedEnd = self.uiSeekSlider.value()
 		
 		if self.markedStart == self.markedEnd:
 			self.markedEnd = None
@@ -405,7 +428,7 @@ class PlayAndSave(QtWidgets.QDialog):
 		
 		self.markedStart, self.markedEnd = None, None
 		
-		pp(self.markedRegions)
+		log.print(f'Marked region {self.markedRegions}')
 		
 		self.updateMarkedRegions()
 	
@@ -478,6 +501,9 @@ class PlayAndSave(QtWidgets.QDialog):
 			"""Convert frame number to pixel coordinates."""
 			return round(frameNumber / self.totalRecordedFrames * (self.uiMarkedRegionVisualization.width()-1))
 		
+		if not self.totalRecordedFrames:
+			return
+		
 		p = QPainter(self.uiMarkedRegionVisualization)
 		
 		#This causes borders to get merged and generally mis-drawn.
@@ -493,7 +519,14 @@ class PlayAndSave(QtWidgets.QDialog):
 		trackOffset = -1
 		for track in reversed(self._tracks):
 			for region in track:
-				if region['saved'] < 1.0:
+				regionRect = QRect(
+					f2px(region['mark start']),
+					trackOffset + self.saveRegionBorder,
+					f2px(region['mark end'] - region['mark start']),
+					self.saveRegionMarkerHeight,
+				)
+				
+				if region['saved'] < 1: #Draw coloured, unsaved marked region.
 					p.setPen(hsva(
 						region['hue'],
 						{-1:150, 0:230, 1:255}[region['highlight']],
@@ -504,7 +537,10 @@ class PlayAndSave(QtWidgets.QDialog):
 						{-1:0, 0:153, 1:255}[region['highlight']], 
 						{-1:0, 0:230, 1:255}[region['highlight']],
 					)))
-				else: #TODO: Draw progress. (This will involve drawing both colours of rect and clipping.)
+					p.setClipRect(regionRect.adjusted(regionRect.width() * region['saved'],0, 0,0))
+					p.drawRect(regionRect)
+				
+				if region['saved'] > 0: #Draw green, saved marked region.
 					p.setPen(hsva(
 						120, #green
 						{-1:150, 0:230, 1:255}[region['highlight']],
@@ -515,13 +551,8 @@ class PlayAndSave(QtWidgets.QDialog):
 						{-1:0, 0:153, 1:255}[region['highlight']], 
 						{-1:0, 0:230, 1:255}[region['highlight']],
 					)))
-				
-				p.drawRect(
-					f2px(region['mark start']),
-					trackOffset + self.saveRegionBorder,
-					f2px(region['mark end'] - region['mark start']),
-					self.saveRegionMarkerHeight,
-				)
+					p.setClipRect(regionRect.adjusted(0,0, -regionRect.width() * (1-region['saved']),0))
+					p.drawRect(regionRect)
 			
 			trackOffset += self.saveRegionMarkerOffset
 	
@@ -579,15 +610,114 @@ class PlayAndSave(QtWidgets.QDialog):
 		index = topLeft.row()
 		self.markedRegions[index]['region name'] = self.regionsListModel.item(index).text()
 	
+	class NoRegionMarked(Exception):
+		pass
+	
+	class NoSaveMedia(Exception):
+		pass
+	
+	def saveMarkedRegion(self):
+		"""Save the next marked region.
+			
+			Note: This method is invoked from a button and from a state-change
+			watcher. This means that, once started, it will be called for each
+			marked region sequentially as saving completes."""
+		uuid = settings.value('preferredFileSavingUUID', '')
+		if uuid in [part['uuid'] for part in api2.externalPartitions.list()]:
+			#Use the operator-set partition.
+			partition = [part for part in api2.externalPartitions.list() if part['uuid'] == uuid][0]
+		elif api2.externalPartitions.list()[-1:]:
+			#The operator-set partition is not mounted. Use the most recent partition instead.
+			partition = api2.externalPartitions.list()[-1]
+		else:
+			#No media is usable for saving.
+			raise type(self).NoSaveMedia()
+		
+		roi = [r for r in self.markedRegions if r['saved'] == 0][:1]
+		if not roi:
+			#No regions marked for saving.
+			raise type(self).NoRegionMarked()
+		roi = roi[0]
+		self.regionBeingSaved = roi['region id']
+		
+		self.uiSave.hide()
+		self.uiSaveCancel.show()
+		
+		#regions are like {'region id': 'aaaaaaag', 'hue': 390, 'mark end': 42587, 'mark start': 16716, 'saved': 0.0, 'highlight': 0, 'segment ids': ['KxIjG09V'], 'region name': 'Clip 7'},
+		now = datetime.now()
+		res = api2.getSync('resolution') #TODO DDR 2019-07-26 Get this from the segment metadata we don't have as of writing.
+		api2.video.callSync('recordfile', dump('recordfile', {
+			'filename': 
+				f'''{
+					partition['path'].decode('utf-8')
+				}/{
+					settings.value('savedVideoName', r'vid_%date%_%time%')
+						.replace(r'%region name%', str(roi['region name']))
+						.replace(r'%date%', now.strftime("%Y-%m-%d"))
+						.replace(r'%time%', now.strftime("%H-%M-%S"))
+						.replace(r'%start frame%', str(roi['mark start']))
+						.replace(r'%end frame%', str(roi['mark end']))
+				}{
+					settings.value('savedVideoFileExtention', '.mp4')
+				}''',
+			'format': {
+				'.mp4':'h264', 
+				'.dng':'dng', 
+				'.tiff':'tiff', 
+				'.raw':'byr2',
+			}[settings.value('savedVideoFileExtention', '.mp4')],
+			'start': roi['mark start'],
+			'length': roi['mark end'] - roi['mark start'],
+			'framerate': settings.value('savedFileFramerate', 30), #TODO DDR 2019-07-24 read this from recording settings
+			'bitrate': min(
+				res['hRes'] * res['vRes'] * api2.getSync('frameRate') * settings.value('savedFileBPP', 0.7),
+				settings.value('savedFileMaxBitrate', 40) * 1000000.0,
+			)
+		}))
+		
+	def cancelSave(self, evt):
+		#Set the UI back to seek mode.
+		api2.video.call('stop')
+		self.uiSeekRate.setValue(self.seekRate)
+		self.uiSave.show()
+		self.uiSaveCancel.hide()
+		
+		#Reset the region saved amount, since the file is now deleted.
+		region = [r for r in self.markedRegions if r['region id'] == self.regionBeingSaved][:1]
+		if region: #Protect against resets in the middle of saving.
+			region = region[0]
+			region['saved'] = 0.
 	
 	@pyqtSlot(str, float, name="onRegionSaving")
 	def onRegionSaving(self, regionId, ratioSaved):
 		[r for r in self.markedRegions if r['region id'] == regionId][0]['saved'] = ratioSaved
 	
+	
+	
 	@pyqtSlot(str, float)
-	def onStateChange(self, state): #Only fires when screen open.
+	def onVideoStateChangeAlways(self, state): #Always fires, even when screen closed.
+		self.videoState = state
+		
+		#If we were saving a region, progress to the next region.
+		if state == 'play' and self.regionBeingSaved:
+			region = [r for r in self.markedRegions if r['region id'] == self.regionBeingSaved][:1]
+			if region: #Protect against resets in the middle of saving.
+				region = region[0]
+				#{'region id': 'aaaaaaaa', 'hue': 240, 'mark end': 199, 'mark start': 130, 'saved': 0.0, 'highlight': 0, 'segment ids': ['KxIjG09V'], 'region name': 'Clip 1'},
+				region['saved'] = 1.0
+				try:
+					self.saveMarkedRegion()
+				except type(self).NoRegionMarked:
+					self.regionBeingSaved = None
+			
+			
+				
+	
+	@pyqtSlot(str, float)
+	def onStateChangeWhenScreenActive(self, state): #Only fires when screen open.
+		api2.video.call('status').then(self.onStateChangeWhenScreenActive2)
+	def onStateChangeWhenScreenActive2(self, status):
 		#Reset number of frames.
-		status = api2.video.callSync('status')
 		self.uiSeekSlider.setMaximum(status['totalFrames'])
 		self.uiSeekSlider.setMaximum(status['totalFrames'])
 		self.updateMotionHeatmap()

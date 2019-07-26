@@ -18,7 +18,7 @@
     <rect>
      <x>20</x>
      <y>10</y>
-     <width>271</width>
+     <width>291</width>
      <height>31</height>
     </rect>
    </property>
@@ -169,7 +169,7 @@
     <rect>
      <x>20</x>
      <y>110</y>
-     <width>241</width>
+     <width>251</width>
      <height>41</height>
     </rect>
    </property>
@@ -187,7 +187,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>Vid_%date%_%time%_%mark%</string>
+    <string>vid_%date%_%time%</string>
    </property>
    <property name="clickMarginRight" stdset="0">
     <enum>LineEdit::half</enum>
@@ -212,12 +212,17 @@
    </item>
    <item>
     <property name="text">
-     <string>.raw</string>
+     <string>.dng</string>
     </property>
    </item>
    <item>
     <property name="text">
-     <string>.dng</string>
+     <string>.tiff</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>.raw</string>
     </property>
    </item>
   </widget>
@@ -265,7 +270,7 @@
     <rect>
      <x>20</x>
      <y>240</y>
-     <width>241</width>
+     <width>271</width>
      <height>41</height>
     </rect>
    </property>
@@ -308,6 +313,15 @@
      <height>81</height>
     </rect>
    </property>
+   <property name="maximum">
+    <number>480</number>
+   </property>
+   <property name="singleStep">
+    <number>5</number>
+   </property>
+   <property name="value">
+    <number>30</number>
+   </property>
   </widget>
   <widget class="Label" name="label_8">
    <property name="geometry">
@@ -322,7 +336,7 @@
     <string>fps</string>
    </property>
   </widget>
-  <widget class="SpinBox" name="uiSavedFileBPP">
+  <widget class="DecimalSpinBox" name="uiSavedFileBPP">
    <property name="geometry">
     <rect>
      <x>240</x>
@@ -330,6 +344,18 @@
      <width>191</width>
      <height>81</height>
     </rect>
+   </property>
+   <property name="minimum">
+    <double>0.050000000000000</double>
+   </property>
+   <property name="maximum">
+    <double>4.000000000000000</double>
+   </property>
+   <property name="singleStep">
+    <double>0.100000000000000</double>
+   </property>
+   <property name="value">
+    <double>0.700000000000000</double>
    </property>
   </widget>
   <widget class="HeaderLabel" name="headerlabel_5">
@@ -350,7 +376,7 @@
     <rect>
      <x>0</x>
      <y>380</y>
-     <width>201</width>
+     <width>211</width>
      <height>81</height>
     </rect>
    </property>
@@ -363,7 +389,7 @@
     <rect>
      <x>200</x>
      <y>380</y>
-     <width>231</width>
+     <width>241</width>
      <height>81</height>
     </rect>
    </property>
@@ -409,7 +435,7 @@ After Save Complete</string>
     <rect>
      <x>490</x>
      <y>280</y>
-     <width>141</width>
+     <width>181</width>
      <height>21</height>
     </rect>
    </property>
@@ -439,6 +465,15 @@ After Save Complete</string>
      <height>81</height>
     </rect>
    </property>
+   <property name="minimum">
+    <number>6</number>
+   </property>
+   <property name="maximum">
+    <number>200</number>
+   </property>
+   <property name="value">
+    <number>40</number>
+   </property>
   </widget>
   <widget class="Backdrop" name="backdrop">
    <property name="geometry">
@@ -461,6 +496,16 @@ After Save Complete</string>
    </property>
    <property name="clickMarginRight" stdset="0">
     <enum>ComboBox::half</enum>
+   </property>
+  </widget>
+  <widget class="FeedbackLabel" name="uiStorageFeedbackLabel">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>90</y>
+     <width>205</width>
+     <height>21</height>
+    </rect>
    </property>
   </widget>
   <zorder>backdrop</zorder>
@@ -495,6 +540,7 @@ After Save Complete</string>
   <zorder>label_10</zorder>
   <zorder>uiSavedFileMaxBitrate</zorder>
   <zorder>uiSavedVideoLocation</zorder>
+  <zorder>uiStorageFeedbackLabel</zorder>
  </widget>
  <customwidgets>
   <customwidget>
@@ -516,6 +562,16 @@ After Save Complete</string>
    <class>ComboBox</class>
    <extends>QComboBox</extends>
    <header>combo_box</header>
+  </customwidget>
+  <customwidget>
+   <class>DecimalSpinBox</class>
+   <extends>QDoubleSpinBox</extends>
+   <header>decimal_spin_box</header>
+  </customwidget>
+  <customwidget>
+   <class>FeedbackLabel</class>
+   <extends>QLabel</extends>
+   <header>feedback_label</header>
   </customwidget>
   <customwidget>
    <class>HeaderLabel</class>

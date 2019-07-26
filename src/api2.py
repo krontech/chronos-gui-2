@@ -5,6 +5,7 @@
 from typing import Callable, Any, Dict
 import sys, os
 import subprocess
+from time import perf_counter
 
 from PyQt5.QtCore import pyqtSlot, QObject
 from PyQt5.QtDBus import QDBusConnection, QDBusInterface, QDBusReply, QDBusPendingCallWatcher, QDBusPendingReply
@@ -16,6 +17,8 @@ import logging; log = logging.getLogger('Chronos.api')
 #Mock out the old API; use production for this one so we can switch over piecemeal.
 USE_MOCK = False #os.environ.get('USE_CHRONOS_API_MOCK') in ('always', 'web')
 API_INTERCALL_DELAY = 0
+API_SLOW_WARN_MS = 100
+API_TIMEOUT_MS = 5000
 
 
 # Set up d-bus interface. Connect to mock system buses. Check everything's working.
@@ -34,8 +37,8 @@ cameraVideoAPI = QDBusInterface(
 	f"", #Interface
 	QDBusConnection.systemBus() )
 
-cameraControlAPI.setTimeout(1500) #Default is -1, which means 25000ms. 25 seconds is too long to go without some sort of feedback, and the only real long-running operation we have - saving - can take upwards of 5 minutes. Instead of setting the timeout to half an hour, we use events which are emitted as the task progresses. One frame (at 15fps) should be plenty of time for the API to respond, and also quick enough that we'll notice any slowness.
-cameraVideoAPI.setTimeout(1500)
+cameraControlAPI.setTimeout(API_TIMEOUT_MS) #Default is -1, which means 25000ms. 25 seconds is too long to go without some sort of feedback, and the only real long-running operation we have - saving - can take upwards of 5 minutes. Instead of setting the timeout to half an hour, we use events which are emitted as the task progresses. One frame (at 15fps) should be plenty of time for the API to respond, and also quick enough that we'll notice any slowness.
+cameraVideoAPI.setTimeout(API_TIMEOUT_MS)
 
 if not cameraControlAPI.isValid():
 	print("Error: Can not connect to control D-Bus API at %s. (%s: %s)" % (
@@ -173,8 +176,14 @@ class video():
 			self._catches = []
 			self._done = False
 			self._watcherHolder = None
+			self.performance = {
+				'enqueued': perf_counter(),
+				'started': 0.,
+				'finished': 0.,
+				'handled': 0.,
+			}
 			
-			log.debug(f'enquing {self._args[0]}({self._args[1:]})')
+			log.debug(f'enquing {self}')
 			video._enqueueCallback(self)
 			#log.print(f'current video queue: {video._videoEnqueuedCalls}')
 			if not video._videoCallInProgress:
@@ -194,11 +203,12 @@ class video():
 			)
 		
 		def __repr__(self):
-			return f'''call({', '.join([repr(x) for x in self._args])})'''
+			return f'''video.call({', '.join([repr(x) for x in self._args])})'''
 			
 		
 		def _startAsyncCall(self):
 			log.debug(f'starting async call: {self._args[0]}({self._args[1:]})')
+			self.performance['started'] = perf_counter()
 			self._watcherHolder = QDBusPendingCallWatcher(
 				cameraVideoAPI.asyncCallWithArgumentList(self._args[0], self._args[1:])
 			)
@@ -207,7 +217,8 @@ class video():
 			
 		
 		def _asyncCallFinished(self, watcher):
-			log.debug(f'finished async call: {self._args[0]}({self._args[1:]})')
+			log.debug(f'finished async call: {self}')
+			self.performance['finished'] = perf_counter()
 			self._done = True
 			
 			reply = QDBusPendingReply(watcher)
@@ -218,7 +229,10 @@ class video():
 							catch(reply.error())
 					else:
 						#This won't do much, but (I'm assuming) most calls simply won't ever fail.
-						raise DBusException("%s: %s" % (reply.error().name(), reply.error().message()))
+						if reply.error().name() == 'org.freedesktop.DBus.Error.NoReply':
+							raise DBusException(f"{self} timed out ({API_TIMEOUT_MS}ms)")
+						else:
+							raise DBusException("%s: %s" % (reply.error().name(), reply.error().message()))
 				else:
 					value = reply.value()
 					for then in self._thens:
@@ -233,6 +247,16 @@ class video():
 				#causes a few dropped frames every time the API is called.
 				#video._startNextCallback()
 				delay(self, API_INTERCALL_DELAY, video._startNextCallback)
+				
+				self.performance['handled'] = perf_counter()
+				if self.performance['finished'] - self.performance['started'] > API_SLOW_WARN_MS / 1000:
+					log.warn(
+						f'''slow call: {self} took {
+							(self.performance['finished'] - self.performance['started'])*1000
+						:0.0f}ms/{API_SLOW_WARN_MS}ms. (Total call time was {
+							(self.performance['handled'] - self.performance['enqueued'])*1000
+						:0.0f}ms.)'''
+					)
 		
 		def then(self, callback):
 			assert callable(callback), "video().then() only accepts a single, callable function."
@@ -246,7 +270,7 @@ class video():
 			self._catches += [callback]
 			return self
 	
-	def callSync(*args, **kwargs):
+	def callSync(*args, warnWhenCallIsSlow=True, **kwargs):
 		"""Call the camera video DBus API. First arg is the function name.
 			
 			This is the synchronous version of the call() method. It
@@ -258,13 +282,21 @@ class video():
 		"""
 		
 		#Unwrap D-Bus errors from message.
-		log.debug(f'sync call: {args[0]}({args[1:]})')
+		log.debug(f'control.callSync{tuple(args)}')
+		
+		start = perf_counter()
 		msg = QDBusReply(cameraVideoAPI.call(*args, **kwargs))
+		end = perf_counter()
+		if warnWhenCallIsSlow and (end - start > API_SLOW_WARN_MS / 1000):
+			log.warn(f'slow call: control.callSync{tuple(args)} took {(end-start)*1000:.0f}ms/{API_SLOW_WARN_MS}ms.')
 		
 		if msg.isValid():
 			return msg.value()
 		else:
-			raise DBusException("%s: %s" % (msg.error().name(), msg.error().message()))
+			if msg.error().name() == 'org.freedesktop.DBus.Error.NoReply':
+				raise DBusException(f"control.callSync{tuple(args)} timed out ({API_TIMEOUT_MS}ms)")
+			else:
+				raise DBusException("%s: %s" % (msg.error().name(), msg.error().message()))
 	
 	def restart(*_):
 		"""Helper method to reboot the video pipeline.
@@ -359,8 +391,14 @@ class control():
 			self._catches = []
 			self._done = False
 			self._watcherHolder = None
+			self.performance = {
+				'enqueued': perf_counter(),
+				'started': 0.,
+				'finished': 0.,
+				'handled': 0.,
+			}
 			
-			log.debug(f'enquing {self._args[0]}({self._args[1:]})')
+			log.debug(f'enquing {self}')
 			control._enqueueCallback(self)
 			#log.print(f'current control queue: {control._controlEnqueuedCalls}')
 			if not control._controlCallInProgress:
@@ -380,11 +418,12 @@ class control():
 			)
 		
 		def __repr__(self):
-			return f'''call({', '.join([repr(x) for x in self._args])})'''
+			return f'''control.call({', '.join([repr(x) for x in self._args])})'''
 			
 		
 		def _startAsyncCall(self):
 			log.debug(f'starting async call: {self._args[0]}({self._args[1:]})')
+			self.performance['started'] = perf_counter()
 			self._watcherHolder = QDBusPendingCallWatcher(
 				cameraControlAPI.asyncCallWithArgumentList(self._args[0], self._args[1:])
 			)
@@ -393,7 +432,8 @@ class control():
 			
 		
 		def _asyncCallFinished(self, watcher):
-			log.debug(f'finished async call: {self._args[0]}({self._args[1:]})')
+			log.debug(f'finished async call: {self}')
+			self.performance['finished'] = perf_counter()
 			self._done = True
 			
 			reply = QDBusPendingReply(watcher)
@@ -404,7 +444,10 @@ class control():
 							catch(reply.error())
 					else:
 						#This won't do much, but (I'm assuming) most calls simply won't ever fail.
-						raise DBusException("%s: %s" % (reply.error().name(), reply.error().message()))
+						if reply.error().name() == 'org.freedesktop.DBus.Error.NoReply':
+							raise DBusException(f"{self} timed out ({API_TIMEOUT_MS}ms)")
+						else:
+							raise DBusException("%s: %s" % (reply.error().name(), reply.error().message()))
 				else:
 					value = reply.value()
 					for then in self._thens:
@@ -418,6 +461,16 @@ class control():
 				#Note that because each call still lags a little, this
 				#causes a few dropped frames every time the API is called.
 				delay(self, API_INTERCALL_DELAY, control._startNextCallback)
+				
+				self.performance['handled'] = perf_counter()
+				if self.performance['finished'] - self.performance['started'] > API_SLOW_WARN_MS / 1000:
+					log.warn(
+						f'''slow call: {self} took {
+							(self.performance['finished'] - self.performance['started'])*1000
+						:0.0f}ms/{API_SLOW_WARN_MS}ms. (Total call time was {
+							(self.performance['handled'] - self.performance['enqueued'])*1000
+						:0.0f}ms.)'''
+					)
 		
 		def then(self, callback):
 			assert callable(callback), "control().then() only accepts a single, callable function."
@@ -431,7 +484,7 @@ class control():
 			self._catches += [callback]
 			return self
 	
-	def callSync(*args, **kwargs):
+	def callSync(*args, warnWhenCallIsSlow=True, **kwargs):
 		"""Call the camera control DBus API. First arg is the function name.
 			
 			This is the synchronous version of the call() method. It
@@ -443,13 +496,21 @@ class control():
 		"""
 		
 		#Unwrap D-Bus errors from message.
-		log.debug(f'sync call: {args[0]}({args[1:]})')
-		msg = QDBusReply(cameraControlAPI.call(*args, **kwargs))
+		log.debug(f'control.callSync{tuple(args)}')
 		
+		start = perf_counter()
+		msg = QDBusReply(cameraControlAPI.call(*args, **kwargs))
+		end = perf_counter()
+		if warnWhenCallIsSlow and (end - start > API_SLOW_WARN_MS / 1000):
+			log.warn(f'slow call: control.callSync{tuple(args)} took {(end-start)*1000:.0f}ms/{API_SLOW_WARN_MS}ms.')
+			
 		if msg.isValid():
 			return msg.value()
 		else:
-			raise DBusException("%s: %s" % (msg.error().name(), msg.error().message()))
+			if msg.error().name() == 'org.freedesktop.DBus.Error.NoReply':
+				raise DBusException(f"control.callSync{tuple(args)} timed out ({API_TIMEOUT_MS}ms)")
+			else:
+				raise DBusException("%s: %s" % (msg.error().name(), msg.error().message()))
 
 	
 
@@ -466,7 +527,7 @@ def getSync(keyOrKeys):
 		See control's `availableKeys` for a list of valid inputs.
 	"""
 	
-	valueList = control.callSync('get', 
+	valueList = control.callSync('get',
 		[keyOrKeys] if isinstance(keyOrKeys, str) else keyOrKeys )
 	return valueList[keyOrKeys] if isinstance(keyOrKeys, str) else valueList
 
@@ -537,7 +598,7 @@ _camState = control.callSync('get', [
 	key
 	for key in control.callSync('availableKeys')
 	if key not in __badKeys
-])
+], warnWhenCallIsSlow=False)
 if(not _camState):
 	raise Exception("Cache failed to populate. This indicates the get call is not working.")
 _camState['error'] = '' #Last error is reported inline sometimes.
@@ -650,17 +711,18 @@ unobserve = apiValues.unobserve
 
 class ExternalPartitions(QObject):
 	def __init__(self):
+		"""
+			Get _partitions, a list of things you can save video to.
+			{
+				"name": "Testdisk",
+				"device": "mmcblk0p1",
+				"uuid": "a14d610d-b524-4af2-9a1a-fa3dd1184258",
+				"path": bytes("/dev/sda", 'utf8'),
+				"size": 1294839100, #bytes, 64-bit positive integer
+				"interface": "usb", #"usb" or "sd"
+			}
+		"""
 		super().__init__()
-		
-		# _partitions is a list of high-level concepts of a thing you can save to
-		# {
-		# 	"name": "Testdisk",
-		# 	"device": "mmcblk0p1",
-		# 	"uuid": "a14d610d-b524-4af2-9a1a-fa3dd1184258",
-		# 	"path": "/dev/sda",
-		# 	"size": 1294839100, #bytes, 64-bit positive integer
-		# 	"interface": "usb", #"usb" or "sd"
-		# }
 		self._partitions = []
 		
 		#observers collection
@@ -759,7 +821,7 @@ class ExternalPartitions(QObject):
 				'name': data['org.freedesktop.UDisks2.Block']['IdLabel'],
 				'device': name,
 				'uuid': data['org.freedesktop.UDisks2.Block']['IdUUID'], #Found at `/dev/disk/by-uuid/`.
-				'path': bytes(data['org.freedesktop.UDisks2.Filesystem']['MountPoints'][0])[:-1], #bytes because file paths can be weirder than strs. Not that ours are, but good practise and all. Also trim off a null byte at the end, we don't need it in python-land.
+				'path': bytes(data['org.freedesktop.UDisks2.Filesystem']['MountPoints'][0])[:-1], #Trim off a null byte at the end, we don't need it in python.
 				'size': data['org.freedesktop.UDisks2.Block']['Size'], #number of bytes, 64-bit positive integer
 				'interface': 'usb' if True in [b'usb' in symlink for symlink in data['org.freedesktop.UDisks2.Block']['Symlinks']] else 'other', #This data comes in one message earlier, but it would be enough complexity to link the two that it makes more sense to just string match here.
 			}]

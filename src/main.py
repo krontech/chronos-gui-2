@@ -13,9 +13,9 @@ import time
 
 # QT-specific imports
 from PyQt5 import QtWidgets, QtCore, QtGui
-from stats import report
 
 import set_up_logging; set_up_logging #imported for the side-effects, ignore "unused" warning
+from stats import report
 from debugger import *; dbg #imported for occasional use debugging, ignore "unused" warning
 import settings
 from hardware import Hardware

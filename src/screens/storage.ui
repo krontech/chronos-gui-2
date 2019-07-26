@@ -76,9 +76,6 @@
     <property name="clickMarginBottom" stdset="0">
      <enum>LineEdit::half</enum>
     </property>
-    <property name="linkedValueName" stdset="0">
-     <string>networkStorageUsername</string>
-    </property>
    </widget>
    <widget class="LineEdit" name="uiNetworkStoragePassoword">
     <property name="geometry">
@@ -94,9 +91,6 @@
     </property>
     <property name="clickMarginTop" stdset="0">
      <enum>LineEdit::none</enum>
-    </property>
-    <property name="linkedValueName" stdset="0">
-     <string>networkStoragePassword</string>
     </property>
    </widget>
    <widget class="Label" name="label_6">
@@ -145,9 +139,6 @@
     </property>
     <property name="clickMarginBottom" stdset="0">
      <enum>LineEdit::none</enum>
-    </property>
-    <property name="linkedValueName" stdset="0">
-     <string>networkStorageAddress</string>
     </property>
    </widget>
    <widget class="Label" name="label_5">

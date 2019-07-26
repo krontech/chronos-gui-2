@@ -262,7 +262,7 @@ Save End</string>
      <x>600</x>
      <y>360</y>
      <width>201</width>
-     <height>60</height>
+     <height>61</height>
     </rect>
    </property>
    <property name="sizePolicy">
@@ -384,7 +384,7 @@ Save Start</string>
     </string>
    </property>
   </widget>
-  <widget class="Backdrop" name="backdrop_4">
+  <widget class="Backdrop" name="uiTimelineVisualisationEndcapLeft">
    <property name="geometry">
     <rect>
      <x>0</x>
@@ -397,7 +397,7 @@ Save Start</string>
     <string>border-top: 1px solid black; border-right: 1px solid darkgrey; background: darkgrey;</string>
    </property>
   </widget>
-  <widget class="Backdrop" name="backdrop_5">
+  <widget class="Backdrop" name="uiTimelineVisualisationEndcapRight">
    <property name="geometry">
     <rect>
      <x>721</x>
@@ -575,12 +575,12 @@ Save Start</string>
     <string>      Button {       font-size: 16px;       background: rgba(255,255,255, 128);       text-align: left;       padding: 0 10px;      border-color: transparent;      }     </string>
    </property>
   </widget>
-  <widget class="Backdrop" name="backdrop_6">
+  <widget class="Backdrop" name="uiTimelineVisualisationBackground">
    <property name="geometry">
     <rect>
-     <x>70</x>
+     <x>-5</x>
      <y>420</y>
-     <width>651</width>
+     <width>810</width>
      <height>61</height>
     </rect>
    </property>
@@ -664,9 +664,9 @@ Save Start</string>
    <property name="geometry">
     <rect>
      <x>400</x>
-     <y>360</y>
+     <y>370</y>
      <width>201</width>
-     <height>61</height>
+     <height>51</height>
     </rect>
    </property>
    <property name="focusPolicy">
@@ -690,17 +690,48 @@ Save Start</string>
    <property name="clickMarginBottom" stdset="0">
     <enum>SpinBox::none</enum>
    </property>
+   <property name="customStyleSheet" stdset="0">
+    <string>      SpinBox {       font-size: 16px;       background: rgba(255,255,255, 128);    }     </string>
+   </property>
   </widget>
+  <widget class="Button" name="uiSaveCancel">
+   <property name="geometry">
+    <rect>
+     <x>580</x>
+     <y>230</y>
+     <width>221</width>
+     <height>61</height>
+    </rect>
+   </property>
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="Ignored" vsizetype="Ignored">
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
+   </property>
+   <property name="text">
+    <string>Cancel Save</string>
+   </property>
+   <property name="clickMarginRight" stdset="0">
+    <enum>Button::none</enum>
+   </property>
+   <property name="clickMarginTop" stdset="0">
+    <enum>Button::none</enum>
+   </property>
+   <property name="clickMarginBottom" stdset="0">
+    <enum>Button::none</enum>
+   </property>
+  </widget>
+  <zorder>uiTimelineVisualisationBackground</zorder>
+  <zorder>uiTimelineVisualisationEndcapRight</zorder>
+  <zorder>uiTimelineVisualisationEndcapLeft</zorder>
   <zorder>uiVideoArea</zorder>
   <zorder>uiSeekRate</zorder>
-  <zorder>backdrop_6</zorder>
   <zorder>uiTimelineVisualization</zorder>
   <zorder>uiCurrentFrame</zorder>
   <zorder>uiEditMarkedRegions</zorder>
   <zorder>uiMarkedRegionsPanel</zorder>
   <zorder>backdrop_3</zorder>
-  <zorder>backdrop_4</zorder>
-  <zorder>backdrop_5</zorder>
   <zorder>backdrop_2</zorder>
   <zorder>uiSeekBackward</zorder>
   <zorder>uiSavedFileSettings</zorder>
@@ -716,6 +747,7 @@ Save Start</string>
   <zorder>comment_2</zorder>
   <zorder>uiBatteryReadout</zorder>
   <zorder>uiSeekSlower</zorder>
+  <zorder>uiSaveCancel</zorder>
  </widget>
  <customwidgets>
   <customwidget>

@@ -51,9 +51,6 @@
    <property name="clickMarginRight" stdset="0">
     <enum>LineEdit::none</enum>
    </property>
-   <property name="linkedValueName" stdset="0">
-    <string>networkPassword</string>
-   </property>
   </widget>
   <widget class="Label" name="label">
    <property name="geometry">
@@ -133,9 +130,6 @@
     <property name="clickMarginTop" stdset="0">
      <enum>CheckBox::none</enum>
     </property>
-    <property name="linkedValueName" stdset="0">
-     <string>remoteSSHAccess</string>
-    </property>
    </widget>
    <widget class="Label" name="label_2">
     <property name="geometry">
@@ -187,9 +181,6 @@
     <property name="clickMarginTop" stdset="0">
      <enum>CheckBox::none</enum>
     </property>
-    <property name="linkedValueName" stdset="0">
-     <string>localSSHAccess</string>
-    </property>
    </widget>
    <widget class="Label" name="label_3">
     <property name="geometry">
@@ -228,9 +219,6 @@
     <property name="clickMarginBottom" stdset="0">
      <enum>CheckBox::none</enum>
     </property>
-    <property name="linkedValueName" stdset="0">
-     <string>localHTTPAccess</string>
-    </property>
    </widget>
    <widget class="CheckBox" name="uiEnableRemoteHTTP">
     <property name="geometry">
@@ -246,9 +234,6 @@
     </property>
     <property name="clickMarginBottom" stdset="0">
      <enum>CheckBox::none</enum>
-    </property>
-    <property name="linkedValueName" stdset="0">
-     <string>remoteHTTPAccess</string>
     </property>
    </widget>
    <widget class="Label" name="label_5">
@@ -361,9 +346,6 @@
      <property name="clickMarginTop" stdset="0">
       <enum>SpinBox::half</enum>
      </property>
-     <property name="linkedValueName" stdset="0">
-      <string>HTTPPort</string>
-     </property>
     </widget>
     <widget class="Label" name="label_9">
      <property name="geometry">
@@ -414,9 +396,6 @@
      </property>
      <property name="clickMarginRight" stdset="0">
       <enum>SpinBox::none</enum>
-     </property>
-     <property name="linkedValueName" stdset="0">
-      <string>SSHPort</string>
      </property>
     </widget>
     <widget class="Label" name="label_8">
