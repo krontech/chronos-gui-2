@@ -59,12 +59,12 @@ class FileSettings(QtWidgets.QDialog):
 			settings.setValue('savedFileMaxBitrate', value) )
 		
 		
-		self.uiAutoSaveVideo.setCheckState(
+		self.uiAutoSaveVideo.setCheckState( #[autosave]
 			bool(settings.value('autoSaveVideo', self.uiAutoSaveVideo.checkState())) * 2 )
 		self.uiAutoSaveVideo.stateChanged.connect(lambda value:
 			settings.setValue('autoSaveVideo', bool(value)) )
 		
-		self.uiResumeRecordingAfterSave.setCheckState(
+		self.uiResumeRecordingAfterSave.setCheckState( #[autosave]
 			bool(settings.value('resumeRecordingAfterSave', self.uiResumeRecordingAfterSave.checkState())) * 2 )
 		self.uiResumeRecordingAfterSave.stateChanged.connect(lambda value:
 			settings.setValue('resumeRecordingAfterSave', bool(value)) )

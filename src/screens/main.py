@@ -24,6 +24,8 @@ class Main(QWidget):
 		self.setWindowFlags(QtCore.Qt.FramelessWindowHint)
 		self.setAttribute(QtCore.Qt.WA_TranslucentBackground, True)
 		
+		self._window = window
+		
 		api2.set('cameraTallyMode', 'auto')
 		
 		#Set the kerning to false because it looks way better.
@@ -37,7 +39,7 @@ class Main(QWidget):
 		
 		# Widget behavour.
 		self.uiRecord.clicked.connect(self.toggleRecording)
-		api2.observe('state', self.updateRecordButtonText)
+		api2.observe('state', self.onStateChange)
 		
 		self.uiDebugA.clicked.connect(self.makeFailingCall)
 		self.uiDebugB.clicked.connect(lambda: window.show('test'))
@@ -243,6 +245,9 @@ class Main(QWidget):
 		})
 		api2.video.call('livedisplay', {})
 		self._batteryChargeUpdateTimer.start() #ms
+		
+		if api2.apiValues.get('state') == 'idle' and settings.value('autoSaveVideo', False):
+			self.startRecording()
 	
 	def onHide(self):
 		self._batteryChargeUpdateTimer.stop() #ms
@@ -506,11 +511,24 @@ class Main(QWidget):
 	
 	#Invoked by hardware button in ~/src/main.py.
 	def toggleRecording(self, *_):
-		api2.get('state').then(lambda state:
-			api2.control.call('startRecording') and self.uiRecord.setText('Stop') #updateRecordButtonText was taking a little long to be called
-			if state == 'idle' else
-			api2.control.call('stopRecording') and self.uiRecord.setText('Rec')
-		)
+		if api2.apiValues.get('state') == 'idle':
+			self.startRecording()
+		else:
+			self.stopRecording()
 	
-	def updateRecordButtonText(self, state):
+	def onStateChange(self, state):
+		#This text update takes a little while to fire, so we do it in the start and stop recording functions as well so it's more responsive when the operator clicks.
 		self.uiRecord.setText('Rec' if state == 'idle' else 'Stop')
+		
+		if state == 'idle' and settings.value('autoSaveVideo', False): #[autosave]
+			self._window.show('play_and_save')
+		
+	
+	
+	def startRecording(self):
+		self.uiRecord.setText('Stop')
+		api2.control.callSync('startRecording')
+	
+	def stopRecording(self):
+		self.uiRecord.setText('Rec')
+		api2.control.callSync('stopRecording')

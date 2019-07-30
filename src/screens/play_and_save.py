@@ -8,7 +8,7 @@ from PyQt5.QtGui import QImage, QTransform, QPainter, QColor, QPainterPath, QBru
 
 from debugger import *; dbg
 
-import api, api2
+import api2
 from animate import MenuToggle, delay
 from widgets.line_edit import LineEdit
 from widgets.button import Button
@@ -28,6 +28,8 @@ def randomCharacters(count: int):
 	"""Return a random string without lookalike characters, 1/l, 0/O, etc."""
 	return ''.join(sample('0123456789abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ', count))
 
+segmentData = [{'start': 0, 'hres': 200, 'id': 'ldPxTT5R', 'end': int(1e10), 'vres': 300, 'milliframerate': 12580000.0}]
+
 
 
 class PlayAndSave(QtWidgets.QDialog):
@@ -40,6 +42,8 @@ class PlayAndSave(QtWidgets.QDialog):
 	def __init__(self, window):
 		super().__init__()
 		uic.loadUi("src/screens/play_and_save.ui", self)
+		
+		self._window = window
 		
 		self.recordedSegments = []
 		self.totalRecordedFrames = 0
@@ -63,11 +67,11 @@ class PlayAndSave(QtWidgets.QDialog):
 			{'region id': 'aaaaaaal', 'hue': 420, 'mark end': 39068, 'mark start': 37868, 'saved': 0.0, 'highlight': 0, 'segment ids': ['KxIjG09V'], 'region name': 'Clip 12'},
 			{'region id': 'aaaaaaam', 'hue': 180, 'mark end': 13930, 'mark start': 0,     'saved': 0.0, 'highlight': 0, 'segment ids': ['ldPxTT5R', 'KxIjG09V'], 'region name': 'Clip 13'},
 		]
-		self.markedRegions = []
 		self.markedRegions = [
 			{'region id': 'aaaaaaaa', 'hue': 240, 'mark end': 199, 'mark start': 130, 'saved': 0.0, 'highlight': 0, 'segment ids': ['KxIjG09V'], 'region name': 'Clip 1'},
 			{'region id': 'aaaaaaab', 'hue': 300, 'mark end': 417, 'mark start': 105, 'saved': 0.0, 'highlight': 0, 'segment ids': ['KxIjG09V'], 'region name': 'Clip 2'},
 		]
+		self.markedRegions = []
 		self.markedStart = None #Note: Mark start/end are reversed if start is after end.
 		self.markedEnd = None
 		
@@ -235,9 +239,8 @@ class PlayAndSave(QtWidgets.QDialog):
 		self.lastSelectedRegion = None
 		self.uiMarkedRegions.clicked.connect(self.selectMarkedRegion)
 		
-		api.connectSignal('regionSaving', self.onRegionSaving)
-		
 		api2.observe('videoState', self.onVideoStateChangeAlways)
+		api2.observe('state', self.onStateChangeAlways)
 		
 	def onShow(self):
 		#Don't update the labels while hidden. But do show with accurate info when we start.
@@ -252,8 +255,7 @@ class PlayAndSave(QtWidgets.QDialog):
 		self.updateBatteryTimer.start()
 		self.updateBattery()
 		
-		data = api.get(['recordedSegments', 'totalRecordedFrames']) #No destructuring bind in python. 😭
-		self.recordedSegments = data['recordedSegments']
+		self.recordedSegments = segmentData #api2.get('recordedSegments')
 		
 		self.checkMarkedRegionsValid()
 		
@@ -307,7 +309,7 @@ class PlayAndSave(QtWidgets.QDialog):
 		
 		heatmapHeight = 16
 		
-		motionData = QByteArray.fromRawData(api.control('waterfallMotionMap', {'segment':'placeholder', 'startFrame':400})["heatmap"]) # 16×(n<1024) heatmap. motionData: {"startFrame": int, "endFrame": int, "heatmap": QByteArray}
+		motionData = QByteArray.fromRawData(api2.control('waterfallMotionMap', {'segment':'placeholder', 'startFrame':400})["heatmap"]) # 16×(n<1024) heatmap. motionData: {"startFrame": int, "endFrame": int, "heatmap": QByteArray}
 		assert len(motionData) % heatmapHeight == 0, f"Incompatible heatmap size {len(motionData)}; must be a multiple of {heatmapHeight}."
 		
 		self.motionHeatmap = (
@@ -417,7 +419,7 @@ class PlayAndSave(QtWidgets.QDialog):
 			"mark end": self.markedEnd,
 			"segment ids": [
 				segment['id']
-				for segment in api.get('recordedSegments') 
+				for segment in segmentData#api2.get('recordedSegments') 
 				if not (segment['start'] >= self.markedEnd or segment['end'] < self.markedStart)
 			],
 			"region name": f'Clip {len(self.markedRegions)+1}',
@@ -646,7 +648,7 @@ class PlayAndSave(QtWidgets.QDialog):
 		#regions are like {'region id': 'aaaaaaag', 'hue': 390, 'mark end': 42587, 'mark start': 16716, 'saved': 0.0, 'highlight': 0, 'segment ids': ['KxIjG09V'], 'region name': 'Clip 7'},
 		now = datetime.now()
 		res = api2.getSync('resolution') #TODO DDR 2019-07-26 Get this from the segment metadata we don't have as of writing.
-		api2.video.callSync('recordfile', dump('recordfile', {
+		api2.video.callSync('recordfile', {
 			'filename': 
 				f'''{
 					partition['path'].decode('utf-8')
@@ -673,7 +675,7 @@ class PlayAndSave(QtWidgets.QDialog):
 				res['hRes'] * res['vRes'] * api2.getSync('frameRate') * settings.value('savedFileBPP', 0.7),
 				settings.value('savedFileMaxBitrate', 40) * 1000000.0,
 			)
-		}))
+		})
 		
 	def cancelSave(self, evt):
 		#Set the UI back to seek mode.
@@ -709,14 +711,29 @@ class PlayAndSave(QtWidgets.QDialog):
 					self.saveMarkedRegion()
 				except type(self).NoRegionMarked:
 					self.regionBeingSaved = None
-			
-			
-				
+					
+					#Close this screen and return to the main screen for more recording, now that we're done saving. [autosave]
+					if settings.value('resumeRecordingAfterSave', False):
+						self._window.show('main')
+	
 	
 	@pyqtSlot(str, float)
-	def onStateChangeWhenScreenActive(self, state): #Only fires when screen open.
+	def onStateChangeAlways(self, state): #Only fires when screen open. Fires once when opened.
+		if state == 'recording' and (self.markedRegions or self.uiSeekSlider.value()):
+			self.markedRegions.clear()
+			self.updateMarkedRegions()
+			api2.setSync('playbackPosition', 0)
+			self.uiSeekSlider.setValue(0)
+	
+	
+	@pyqtSlot(str, float)
+	def onStateChangeWhenScreenActive(self, state): #Only fires when screen open. Fires once when opened.
 		api2.video.call('status').then(self.onStateChangeWhenScreenActive2)
 	def onStateChangeWhenScreenActive2(self, status):
+		#Filesave doesn't actually affect anything, just the transition to/from playback.
+		if status['filesave']:
+			return
+		
 		#Reset number of frames.
 		self.uiSeekSlider.setMaximum(status['totalFrames'])
 		self.uiSeekSlider.setMaximum(status['totalFrames'])
@@ -739,6 +756,13 @@ class PlayAndSave(QtWidgets.QDialog):
 			)
 		)
 		self.uiCurrentFrame.setGeometry(geom)
+		
+		
+		if settings.value('autoSaveVideo', False) and not self.markedRegions: #[autosave]
+			self.markedStart = self.uiSeekSlider.minimum()
+			self.markedEnd = self.uiSeekSlider.maximum()
+			self.addMarkedRegion()
+			self.saveMarkedRegion()
 		
 	
 class EditMarkedRegionsItemDelegate(QtWidgets.QStyledItemDelegate):

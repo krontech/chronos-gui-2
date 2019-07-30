@@ -275,7 +275,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>MP4 (H.256) Settings</string>
+    <string>.mp4 Settings</string>
    </property>
   </widget>
   <widget class="Label" name="label_6">
