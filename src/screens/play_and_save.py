@@ -190,10 +190,10 @@ class PlayAndSave(QtWidgets.QDialog):
 				}}
 			""")
 		#Heatmap got delayed. Don't report different size/touchMargins for heatmap styling.
-		#self.uiSeekSlider.sliderSize = lambda: QtCore.QSize(156, 61) #Line up focus ring.
-		self.uiSeekSlider.touchMargins = lambda: { "top": 10, "left": 10, "bottom": 10, "right": 10, } #Report real margins.
-		self.uiSeekSlider.focusGeometryNudge = (0,0,0,0)
-		#self.uiSeekSlider.touchMargins = lambda: { "top": 10, "left": 0, "bottom": 10, "right": 0, } #Report real margins.
+		self.uiSeekSlider.sliderSize = lambda: QtCore.QSize(156, 61) #Line up focus ring.
+		#self.uiSeekSlider.touchMargins = lambda: { "top": 10, "left": 10, "bottom": 10, "right": 10, } #Report real margins.
+		#self.uiSeekSlider.focusGeometryNudge = (0,0,0,0)
+		self.uiSeekSlider.touchMargins = lambda: { "top": 10, "left": 0, "bottom": 10, "right": 0, } #Report real margins.
 		self.uiSeekSlider.debounce.sliderMoved.connect(lambda frame: 
 			api2.video.callSync('playback', {'position': frame}) )
 		self.uiSeekSlider.debounce.sliderMoved.connect(lambda frame: 
