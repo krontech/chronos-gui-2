@@ -711,8 +711,8 @@ class Signal(QObject):
 		super().__init__()
 		
 		self._signalObservers = {
-			'SOF': [], #Use lists here to preserve order of callbacks.
-			'EOF': [],
+			'sof': [], #Use lists here to preserve order of callbacks.
+			'eof': [],
 			'segment': [],
 		}
 		
@@ -725,8 +725,8 @@ class Signal(QObject):
 		
 		for signal_ in self._signalObservers:
 			QDBusConnection.systemBus().connect(
-				f"ca.krontech.chronos.{'control_mock' if USE_MOCK else 'control'}", 
-				f"/ca/krontech/chronos/{'control_mock' if USE_MOCK else 'control'}",
+				f"ca.krontech.chronos.{'video_mock' if USE_MOCK else 'video'}", 
+				f"/ca/krontech/chronos/{'video_mock' if USE_MOCK else 'video'}",
 				f"",
 				signal_, 
 				getattr(self, f'_{type(self).__name__}__{signal_}')
@@ -735,13 +735,13 @@ class Signal(QObject):
 	
 	#Sort of a reverse trampoline, needed because callbacks must be decorated.
 	@pyqtSlot('QDBusMessage')
-	def __SOF(self, msg):
-		log.info(f'''video signal: SOF ({len(self._signalObservers['SOF'])} handlers)''')
-		self.__invokeCallbacks('SOF', *msg.arguments())
+	def __sof(self, msg):
+		log.info(f'''video signal: sof ({len(self._signalObservers['sof'])} handlers)''')
+		self.__invokeCallbacks('sof', *msg.arguments())
 	@pyqtSlot('QDBusMessage')
-	def __EOF(self, msg):
-		log.info(f'''video signal: EOF ({len(self._signalObservers['EOF'])} handlers)''')
-		self.__invokeCallbacks('EOF', *msg.arguments())
+	def __eof(self, msg):
+		log.info(f'''video signal: eof ({len(self._signalObservers['eof'])} handlers)''')
+		self.__invokeCallbacks('eof', *msg.arguments())
 	@pyqtSlot('QDBusMessage')
 	def __segment(self, msg):
 		log.info(f'''video signal: segment ({len(self._signalObservers['segment'])} handlers)''')
