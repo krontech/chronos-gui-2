@@ -246,7 +246,7 @@ class Main(QWidget):
 		api2.video.call('livedisplay', {})
 		self._batteryChargeUpdateTimer.start() #ms
 		
-		if api2.apiValues.get('state') == 'idle' and settings.value('autoSaveVideo', False):
+		if api2.apiValues.get('state') == 'idle' and settings.value('resumeRecordingAfterSave', False):
 			self.startRecording()
 	
 	def onHide(self):

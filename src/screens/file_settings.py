@@ -21,6 +21,18 @@ class FileSettings(QtWidgets.QDialog):
 		self.setWindowFlags(QtCore.Qt.FramelessWindowHint)
 		self.setAttribute(QtCore.Qt.WA_TranslucentBackground, True)
 		
+		# Hide some stuff we haven't programmed yet. (Filesize, file name preview.)
+		for id_ in {
+			'headerlabel_2', 'uiDiskSpaceVisualization',
+			'frame', 'frame_2', 'frame_3',
+			'uiDiskSpaceFree', 'uiDiskSpaceRequired', 'uiDiskSpaceUsed',
+			'label_4', 'widget_2', 'label_5'
+		}:
+			getattr(self, id_).deleteLater()
+			
+			
+			
+		
 		# Button binding.
 		#The preferred external partition is the one set in settings' preferredFileSavingUUID, OR the most recent partition.
 		settings.observe('preferredFileSavingUUID', '', self.setPreferredSavingDevice)

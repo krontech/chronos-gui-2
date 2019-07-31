@@ -242,6 +242,9 @@ class PlayAndSave(QtWidgets.QDialog):
 		api2.observe('videoState', self.onVideoStateChangeAlways)
 		api2.observe('state', self.onStateChangeAlways)
 		
+		api2.signal.observe('SOF', self.onSOF)
+		api2.signal.observe('EOF', self.onEOF)
+		
 	def onShow(self):
 		#Don't update the labels while hidden. But do show with accurate info when we start.
 		api2.video.call('configure', {
@@ -641,27 +644,29 @@ class PlayAndSave(QtWidgets.QDialog):
 			raise type(self).NoRegionMarked()
 		roi = roi[0]
 		self.regionBeingSaved = roi['region id']
+		self.uiSeekSlider.setEnabled(False)
+		
+		now = datetime.now()
+		res = api2.getSync('resolution') #TODO DDR 2019-07-26 Get this from the segment metadata we don't have as of writing.
+		roi['file'] = f'''{
+			partition['path'].decode('utf-8')
+		}/{
+			settings.value('savedVideoName', r'vid_%date%_%time%')
+				.replace(r'%region name%', str(roi['region name']))
+				.replace(r'%date%', now.strftime("%Y-%m-%d"))
+				.replace(r'%time%', now.strftime("%H-%M-%S"))
+				.replace(r'%start frame%', str(roi['mark start']))
+				.replace(r'%end frame%', str(roi['mark end']))
+		}{
+			settings.value('savedVideoFileExtention', '.mp4')
+		}'''
 		
 		self.uiSave.hide()
 		self.uiSaveCancel.show()
 		
 		#regions are like {'region id': 'aaaaaaag', 'hue': 390, 'mark end': 42587, 'mark start': 16716, 'saved': 0.0, 'highlight': 0, 'segment ids': ['KxIjG09V'], 'region name': 'Clip 7'},
-		now = datetime.now()
-		res = api2.getSync('resolution') #TODO DDR 2019-07-26 Get this from the segment metadata we don't have as of writing.
 		api2.video.callSync('recordfile', {
-			'filename': 
-				f'''{
-					partition['path'].decode('utf-8')
-				}/{
-					settings.value('savedVideoName', r'vid_%date%_%time%')
-						.replace(r'%region name%', str(roi['region name']))
-						.replace(r'%date%', now.strftime("%Y-%m-%d"))
-						.replace(r'%time%', now.strftime("%H-%M-%S"))
-						.replace(r'%start frame%', str(roi['mark start']))
-						.replace(r'%end frame%', str(roi['mark end']))
-				}{
-					settings.value('savedVideoFileExtention', '.mp4')
-				}''',
+			'filename': roi['file'],
 			'format': {
 				'.mp4':'h264', 
 				'.dng':'dng', 
@@ -678,17 +683,21 @@ class PlayAndSave(QtWidgets.QDialog):
 		})
 		
 	def cancelSave(self, evt):
-		#Set the UI back to seek mode.
-		api2.video.call('stop')
-		self.uiSeekRate.setValue(self.seekRate)
-		self.uiSave.show()
-		self.uiSaveCancel.hide()
-		
 		#Reset the region saved amount, since the file is now deleted.
 		region = [r for r in self.markedRegions if r['region id'] == self.regionBeingSaved][:1]
 		if region: #Protect against resets in the middle of saving.
 			region = region[0]
 			region['saved'] = 0.
+		
+		self.regionBeingSaved = None
+		self.uiSeekSlider.setEnabled(True)
+		api2.video.call('stop')
+		
+		#Set the UI back to seek mode.
+		self.uiSeekRate.setValue(self.seekRate)
+		self.uiSave.show()
+		self.uiSaveCancel.hide()
+		
 	
 	@pyqtSlot(str, float, name="onRegionSaving")
 	def onRegionSaving(self, regionId, ratioSaved):
@@ -711,6 +720,7 @@ class PlayAndSave(QtWidgets.QDialog):
 					self.saveMarkedRegion()
 				except type(self).NoRegionMarked:
 					self.regionBeingSaved = None
+					self.uiSeekSlider.setEnabled(True)
 					
 					#Close this screen and return to the main screen for more recording, now that we're done saving. [autosave]
 					if settings.value('resumeRecordingAfterSave', False):
@@ -763,7 +773,15 @@ class PlayAndSave(QtWidgets.QDialog):
 			self.markedEnd = self.uiSeekSlider.maximum()
 			self.addMarkedRegion()
 			self.saveMarkedRegion()
+	
+	
+	def onSOF(self, state):
+		self.regionBeingSaved = "«unknown»"
+		self.uiSeekSlider.setEnabled(False)
 		
+	def onEOF(self, state):
+		self.regionBeingSaved = None
+		self.uiSeekSlider.setEnabled(True)
 	
 class EditMarkedRegionsItemDelegate(QtWidgets.QStyledItemDelegate):
 	class EditorAndDeleterFactory(QtWidgets.QItemEditorFactory):
