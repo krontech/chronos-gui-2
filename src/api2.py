@@ -298,6 +298,7 @@ class video():
 			else:
 				raise DBusException("%s: %s" % (msg.error().name(), msg.error().message()))
 	
+	
 	def restart(*_):
 		"""Helper method to reboot the video pipeline.
 			
@@ -705,6 +706,64 @@ unobserve = apiValues.unobserve
 
 
 
+class Signal(QObject):
+	def __init__(self):
+		super().__init__()
+		
+		self._signalObservers = {
+			'SOF': [], #Use lists here to preserve order of callbacks.
+			'EOF': [],
+			'segment': [],
+		}
+		
+		
+		#The .connect call freezes if we don't do this, or if we do this twice.
+		QDBusConnection.systemBus().registerObject(
+			f"/ca/krontech/chronos/{'video_mock_hack' if USE_MOCK else 'video_hack'}", 
+			self,
+		)
+		
+		for signal_ in self._signalObservers:
+			QDBusConnection.systemBus().connect(
+				f"ca.krontech.chronos.{'control_mock' if USE_MOCK else 'control'}", 
+				f"/ca/krontech/chronos/{'control_mock' if USE_MOCK else 'control'}",
+				f"",
+				signal_, 
+				getattr(self, f'_{type(self).__name__}__{signal_}')
+			)
+	
+	
+	#Sort of a reverse trampoline, needed because callbacks must be decorated.
+	@pyqtSlot('QDBusMessage')
+	def __SOF(self, msg):
+		log.info(f'''video signal: SOF ({len(self._signalObservers['SOF'])} handlers)''')
+		self.__invokeCallbacks('SOF', *msg.arguments())
+	@pyqtSlot('QDBusMessage')
+	def __EOF(self, msg):
+		log.info(f'''video signal: EOF ({len(self._signalObservers['EOF'])} handlers)''')
+		self.__invokeCallbacks('EOF', *msg.arguments())
+	@pyqtSlot('QDBusMessage')
+	def __segment(self, msg):
+		log.info(f'''video signal: segment ({len(self._signalObservers['segment'])} handlers)''')
+		self.__invokeCallbacks('segment', *msg.arguments())
+	
+	def __invokeCallbacks(self, signal, data):
+		for callback in self._signalObservers[signal]:
+			callback(data)
+	
+	
+	def observe(self, signal: str, handler: Callable[[Any], None]) -> None:
+		"""Add a function to get called when a D-BUS signal is emitted."""
+		self._signalObservers[signal].append(handler)
+	
+	def unobserve(self, signal: str, handler: Callable[[Any], None]) -> None:
+		"""Stop a function from getting called when a D-BUS signal is emitted."""
+		self._signalObservers[signal].remove(handler)
+signal = Signal()
+del Signal
+
+
+
 ##############################
 #   Non-Chronos D-Bus APIs   #
 ##############################
@@ -889,12 +948,12 @@ del ExternalPartitions
 #Perform self-test if launched as a standalone.
 if __name__ == '__main__':
 	from PyQt5.QtCore import QCoreApplication
-	import signal
+	import signal as sysSignal
 	
 	app = QCoreApplication(sys.argv)
 	
 	#Quit on ctrl-c.
-	signal.signal(signal.SIGINT, signal.SIG_DFL)
+	sysSignal.sysSignal(sysSignal.SIGINT, sysSignal.SIG_DFL)
 	
 	print("Self-test: Retrieve exposure period.")
 	print(f"Exposure is {get('exposurePeriod')}ns.")
