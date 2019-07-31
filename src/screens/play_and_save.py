@@ -51,6 +51,8 @@ class PlayAndSave(QtWidgets.QDialog):
 		self.videoState = None
 		self.regionBeingSaved = None
 		
+		self.saveCancelled = False
+		
 		#Use get and set marked regions, they redraw.
 		self.markedRegions = [
 			{'region id': 'aaaaaaaa', 'hue': 240, 'mark end': 19900, 'mark start': 13002, 'saved': 0.0, 'highlight': 0, 'segment ids': ['KxIjG09V'], 'region name': 'Clip 1'},
@@ -664,8 +666,9 @@ class PlayAndSave(QtWidgets.QDialog):
 			settings.value('savedVideoFileExtention', '.mp4')
 		}'''
 		
-		self.uiSave.hide()
 		self.uiSaveCancel.show()
+		self.uiSave.hasFocus() and self.uiSaveCancel.setFocus()
+		self.uiSave.hide()
 		
 		#regions are like {'region id': 'aaaaaaag', 'hue': 390, 'mark end': 42587, 'mark start': 16716, 'saved': 0.0, 'highlight': 0, 'segment ids': ['KxIjG09V'], 'region name': 'Clip 7'},
 		api2.video.callSync('recordfile', {
@@ -693,13 +696,17 @@ class PlayAndSave(QtWidgets.QDialog):
 			#Saved files are partially retained. Don't reset save progress. region['saved'] = 0.
 		
 		self.regionBeingSaved = None
+		self.saveCancelled = True
 		self.uiSeekSlider.setEnabled(True)
 		api2.video.call('stop')
 		
 		#Set the UI back to seek mode.
 		self.uiSeekRate.setValue(self.seekRate)
 		self.uiSave.show()
+		self.uiSaveCancel.hasFocus() and self.uiSave.setFocus()
 		self.uiSaveCancel.hide()
+		
+
 		
 	
 	@pyqtSlot(str, float, name="onRegionSaving")
@@ -777,26 +784,28 @@ class PlayAndSave(QtWidgets.QDialog):
 	def onSOF(self, state):
 		if state['filesave']: #Check event is relevant to saving.
 			self.uiSeekSlider.setEnabled(False)
-			self.uiSave.hide()
 			self.uiSaveCancel.show()
+			self.uiSave.hasFocus() and self.uiSaveCancel.setFocus()
+			self.uiSave.hide()
 		
 	def onEOF(self, state):
 		if state['filesave']: #Check event is relevant to saving.
 			self.regionBeingSaved = None
 			self.uiSeekSlider.setEnabled(True)
 			self.uiSave.show()
+			self.uiSaveCancel.hasFocus() and self.uiSave.setFocus()
 			self.uiSaveCancel.hide()
 			
 			#Close this screen and return to the main screen for more recording, now that we're done saving. [autosave]
-			noUnsavedRegionsLeft = not [r for r in self.markedRegions if r['saved'] == 0]
-			if noUnsavedRegionsLeft and settings.value('resumeRecordingAfterSave', False):
+			unsavedRegionsLeft = [r for r in self.markedRegions if r['saved'] == 0]
+			if not unsavedRegionsLeft and settings.value('resumeRecordingAfterSave', False) and not self.saveCancelled:
 				self._window.show('main')
-	
+			self.saveCancelled = False
 	
 	def onSaveClicked(self, evt):
 		try:
 			self.saveMarkedRegion()
-		except e:
+		except Exception as e:
 			raise e #TODO: Display proper errors.
 			
 	

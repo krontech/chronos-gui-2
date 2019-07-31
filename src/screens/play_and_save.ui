@@ -35,9 +35,6 @@
      <height>101</height>
     </rect>
    </property>
-   <property name="maximum">
-    <number>1000</number>
-   </property>
    <property name="orientation">
     <enum>Qt::Horizontal</enum>
    </property>
@@ -800,6 +797,7 @@ Save Start</string>
   <tabstop>uiMarkStart</tabstop>
   <tabstop>uiMarkEnd</tabstop>
   <tabstop>uiSave</tabstop>
+  <tabstop>uiSaveCancel</tabstop>
   <tabstop>uiSavedFileSettings</tabstop>
   <tabstop>uiMarkedRegionPanelClose</tabstop>
  </tabstops>
