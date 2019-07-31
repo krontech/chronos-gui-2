@@ -736,15 +736,15 @@ class Signal(QObject):
 	#Sort of a reverse trampoline, needed because callbacks must be decorated.
 	@pyqtSlot('QDBusMessage')
 	def __sof(self, msg):
-		log.info(f'''video signal: sof ({len(self._signalObservers['sof'])} handlers)''')
+		log.debug(f'''video signal: sof ({len(self._signalObservers['sof'])} handlers)''')
 		self.__invokeCallbacks('sof', *msg.arguments())
 	@pyqtSlot('QDBusMessage')
 	def __eof(self, msg):
-		log.info(f'''video signal: eof ({len(self._signalObservers['eof'])} handlers)''')
+		log.debug(f'''video signal: eof ({len(self._signalObservers['eof'])} handlers)''')
 		self.__invokeCallbacks('eof', *msg.arguments())
 	@pyqtSlot('QDBusMessage')
 	def __segment(self, msg):
-		log.info(f'''video signal: segment ({len(self._signalObservers['segment'])} handlers)''')
+		log.debug(f'''video signal: segment ({len(self._signalObservers['segment'])} handlers)''')
 		self.__invokeCallbacks('segment', *msg.arguments())
 	
 	def __invokeCallbacks(self, signal, data):
