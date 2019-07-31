@@ -167,7 +167,7 @@ class PlayAndSave(QtWidgets.QDialog):
 		self.uiMarkStart.clicked.connect(self.markStart)
 		self.uiMarkEnd.clicked.connect(self.markEnd)
 		
-		self.uiSave.clicked.connect(self.saveMarkedRegion)
+		self.uiSave.clicked.connect(self.onSaveClicked)
 		self.uiSaveCancel.clicked.connect(self.cancelSave)
 		self.uiSaveCancel.hide()
 		
@@ -242,8 +242,8 @@ class PlayAndSave(QtWidgets.QDialog):
 		api2.observe('videoState', self.onVideoStateChangeAlways)
 		api2.observe('state', self.onStateChangeAlways)
 		
-		api2.signal.observe('SOF', self.onSOF)
-		api2.signal.observe('EOF', self.onEOF)
+		api2.signal.observe('sof', self.onSOF)
+		api2.signal.observe('eof', self.onEOF)
 		
 	def onShow(self):
 		#Don't update the labels while hidden. But do show with accurate info when we start.
@@ -687,7 +687,7 @@ class PlayAndSave(QtWidgets.QDialog):
 		region = [r for r in self.markedRegions if r['region id'] == self.regionBeingSaved][:1]
 		if region: #Protect against resets in the middle of saving.
 			region = region[0]
-			region['saved'] = 0.
+			#Saved files are partially retained. Don't reset save progress. region['saved'] = 0.
 		
 		self.regionBeingSaved = None
 		self.uiSeekSlider.setEnabled(True)
@@ -721,10 +721,6 @@ class PlayAndSave(QtWidgets.QDialog):
 				except type(self).NoRegionMarked:
 					self.regionBeingSaved = None
 					self.uiSeekSlider.setEnabled(True)
-					
-					#Close this screen and return to the main screen for more recording, now that we're done saving. [autosave]
-					if settings.value('resumeRecordingAfterSave', False):
-						self._window.show('main')
 	
 	
 	@pyqtSlot(str, float)
@@ -776,12 +772,30 @@ class PlayAndSave(QtWidgets.QDialog):
 	
 	
 	def onSOF(self, state):
-		self.regionBeingSaved = "«unknown»"
-		self.uiSeekSlider.setEnabled(False)
+		if state['filesave']: #Check event is relevant to saving.
+			self.uiSeekSlider.setEnabled(False)
+			self.uiSave.hide()
+			self.uiSaveCancel.show()
 		
 	def onEOF(self, state):
-		self.regionBeingSaved = None
-		self.uiSeekSlider.setEnabled(True)
+		if state['filesave']: #Check event is relevant to saving.
+			self.regionBeingSaved = None
+			self.uiSeekSlider.setEnabled(True)
+			self.uiSave.show()
+			self.uiSaveCancel.hide()
+			
+			#Close this screen and return to the main screen for more recording, now that we're done saving. [autosave]
+			noUnsavedRegionsLeft = not [r for r in self.markedRegions if r['saved'] == 0]
+			if noUnsavedRegionsLeft and settings.value('resumeRecordingAfterSave', False):
+				self._window.show('main')
+	
+	
+	def onSaveClicked(self, evt):
+		try:
+			self.saveMarkedRegion()
+		except e:
+			raise e #TODO: Display proper errors.
+			
 	
 class EditMarkedRegionsItemDelegate(QtWidgets.QStyledItemDelegate):
 	class EditorAndDeleterFactory(QtWidgets.QItemEditorFactory):
