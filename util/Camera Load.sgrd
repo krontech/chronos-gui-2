@@ -1,25 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE KSysGuardWorkSheet>
-<WorkSheet interval="0.5" title="Cam Load" rows="3" locked="0" columns="1">
- <host port="-1" command="" name="cam" shell="ssh"/>
- <display title="User Load" rowSpan="1" svgBackground="" fontSize="8" column="0" hLines="1" autoRange="1" labels="1" showUnit="0" class="FancyPlotter" hScale="6" manualRange="0" unit="" vDistance="30" columnSpan="1" vScroll="0" row="0" version="1" stacked="1" vLines="0">
-  <beam hostName="cam" sensorType="float" sensorName="cpu/cpu0/user" color="0xff0057ae"/>
-  <beam hostName="cam" sensorType="float" sensorName="cpu/cpu0/nice" color="0xffe20800"/>
-  <beam hostName="cam" sensorType="float" sensorName="cpu/cpu0/sys" color="0xfff3c300"/>
-  <beam hostName="cam" sensorType="float" sensorName="cpu/cpu0/wait" color="0xff00a900"/>
+<WorkSheet locked="0" interval="0.5" title="Cam Load" columns="1" rows="3">
+ <host command="" port="-1" shell="ssh" name="cam"/>
+ <display vScroll="0" row="0" unit="" column="0" fontSize="8" vLines="0" columnSpan="1" hScale="6" class="FancyPlotter" version="1" showUnit="0" svgBackground="" title="User Load" labels="1" autoRange="1" rowSpan="1" stacked="1" hLines="1" vDistance="30" manualRange="0">
+  <beam sensorType="float" color="0xff0057ae" hostName="cam" sensorName="cpu/cpu0/user"/>
+  <beam sensorType="float" color="0xffe20800" hostName="cam" sensorName="cpu/cpu0/nice"/>
+  <beam sensorType="float" color="0xfff3c300" hostName="cam" sensorName="cpu/cpu0/sys"/>
+  <beam sensorType="float" color="0xff00a900" hostName="cam" sensorName="cpu/cpu0/wait"/>
  </display>
- <display title="Total Accesses" rowSpan="1" svgBackground="" fontSize="8" column="0" hLines="1" autoRange="1" labels="1" showUnit="0" class="FancyPlotter" hScale="6" manualRange="0" unit="" vDistance="30" columnSpan="1" vScroll="0" row="1" version="1" stacked="0" vLines="0">
-  <beam hostName="cam" sensorType="float" sensorName="disk/mmcblk0_(179:0)/Rate/totalio" color="0xff0057ae"/>
-  <beam hostName="cam" sensorType="float" sensorName="disk/mmcblk0p1_(179:1)/Rate/totalio" color="0xffe20800"/>
-  <beam hostName="cam" sensorType="float" sensorName="disk/mmcblk0p2_(179:2)/Rate/totalio" color="0xfff3c300"/>
-  <beam hostName="cam" sensorType="float" sensorName="disk/mmcblk1_(179:8)/Rate/totalio" color="0xffff0000"/>
-  <beam hostName="cam" sensorType="float" sensorName="disk/mmcblk1p1_(179:9)/Rate/totalio" color="0xff00a900"/>
+ <display vScroll="0" row="2" unit="" column="0" fontSize="8" vLines="0" columnSpan="1" hScale="6" class="FancyPlotter" version="1" showUnit="0" svgBackground="" title="Free Memory" labels="1" autoRange="1" rowSpan="1" stacked="0" hLines="1" vDistance="30" manualRange="0">
+  <beam sensorType="integer" color="0xff0057ae" hostName="cam" sensorName="mem/physical/free"/>
+  <beam sensorType="integer" color="0xffe20800" hostName="cam" sensorName="mem/physical/used"/>
+  <beam sensorType="integer" color="0xfff3c300" hostName="cam" sensorName="mem/physical/application"/>
+  <beam sensorType="integer" color="0xffff0000" hostName="cam" sensorName="mem/physical/buf"/>
+  <beam sensorType="integer" color="0xff00a900" hostName="cam" sensorName="mem/physical/cached"/>
  </display>
- <display title="Free Memory" rowSpan="1" svgBackground="" fontSize="8" column="0" hLines="1" autoRange="1" labels="1" showUnit="0" class="FancyPlotter" hScale="6" manualRange="0" unit="" vDistance="30" columnSpan="1" vScroll="0" row="2" version="1" stacked="0" vLines="0">
-  <beam hostName="cam" sensorType="integer" sensorName="mem/physical/free" color="0xff0057ae"/>
-  <beam hostName="cam" sensorType="integer" sensorName="mem/physical/used" color="0xffe20800"/>
-  <beam hostName="cam" sensorType="integer" sensorName="mem/physical/application" color="0xfff3c300"/>
-  <beam hostName="cam" sensorType="integer" sensorName="mem/physical/buf" color="0xffff0000"/>
-  <beam hostName="cam" sensorType="integer" sensorName="mem/physical/cached" color="0xff00a900"/>
+ <display vScroll="0" row="1" unit="" column="0" fontSize="8" vLines="0" columnSpan="1" hScale="6" class="FancyPlotter" version="1" showUnit="0" svgBackground="" title="Context Switches" labels="1" autoRange="1" rowSpan="1" stacked="0" hLines="1" vDistance="30" manualRange="0">
+  <beam sensorType="float" color="0xff0057ae" hostName="cam" sensorName="cpu/context"/>
+  <beam sensorType="float" color="0xffe20800" hostName="cam" sensorName="cpu/pageIn"/>
+  <beam sensorType="float" color="0xfff3c300" hostName="cam" sensorName="cpu/pageOut"/>
  </display>
 </WorkSheet>
