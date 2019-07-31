@@ -246,6 +246,8 @@ class PlayAndSave(QtWidgets.QDialog):
 		api2.signal.observe('eof', self.onEOF)
 		
 	def onShow(self):
+		status = api2.video.callSync('status')
+		
 		#Don't update the labels while hidden. But do show with accurate info when we start.
 		api2.video.call('configure', {
 			'xoff': self.videoArea.x(),
@@ -253,7 +255,9 @@ class PlayAndSave(QtWidgets.QDialog):
 			'hres': self.videoArea.width(),
 			'vres': self.videoArea.height(),
 		})
-		api2.video.call('playback', {'framerate':0})
+		
+		if not status['filesave']:
+			api2.video.call('playback', {'framerate':0})
 		
 		self.updateBatteryTimer.start()
 		self.updateBattery()
@@ -280,9 +284,8 @@ class PlayAndSave(QtWidgets.QDialog):
 		
 		self.labelUpdateTimer.start() #This will stop on its own.
 		
-		frame = api2.video.callSync('status')['position']
-		self.uiSeekSlider.setValue(frame)
-		self.uiCurrentFrame.setValue(frame)
+		self.uiSeekSlider.setValue(status['position'])
+		self.uiCurrentFrame.setValue(status['position'])
 		
 		api2.observe('state', self.onStateChangeWhenScreenActive)
 		
