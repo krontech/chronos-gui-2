@@ -1,38 +1,31 @@
 # -*- coding: future_fstrings -*-
+import logging; log = logging.getLogger('Chronos.gui')
 
 from PyQt5 import uic, QtWidgets, QtCore
-from PyQt5.QtCore import pyqtSlot
 
 from debugger import *; dbg
 import settings
-import api
-from api import silenceCallbacks
+import api2 as api
 
 
 
 class RecordMode(QtWidgets.QDialog):
 	
 	#Save current screen by ID, not by index or display text because those are UI changes.
-	availableRecordModeIds = ['regular', 'segmented', 'runAndGun']
+	availableRecordModeIds = ['normal', 'segmented', 'burst', 'runAndGun']
 	
 	def __init__(self, window):
 		super().__init__()
 		uic.loadUi('src/screens/record_mode.ui', self)
-		
 		
 		# Panel init.
 		self.move(0, 0)
 		self.setWindowFlags(QtCore.Qt.FramelessWindowHint)
 		self.setAttribute(QtCore.Qt.WA_TranslucentBackground, True)
 		
-		# Secret high-percision backing value.
-		self.recordingSegments = 0
-		# api.observe('recordingSegments', self.updateSegmentLength)
-		# api.observe('totalAvailableFrames', )
-		# api.observe('recordingExposureNs', )
-		
 		# Set up panel switching.
-		#DDR 2018-07-24 It's impossible to associate an identifier with anything in QT Designer. Painfully load the identifiers here. Also check everything because I will mess this up next time I add a trigger.
+		#DDR 2018-07-24: It's impossible to associate an identifier with anything in QT Designer. Painfully load the identifiers here. Also check everything because I will mess this up next time I add a trigger.
+		#DDR 2019-08-01: Aaaand the safety check paid off. Told myself.
 		if(self.uiRecordMode.count() != len(self.availableRecordModeIds)):
 			raise Exception("Record mode screen available record mode IDs does not match the number of textual entries in uiRecordMode.")
 		if(self.uiRecordModePanes.count() != len(self.availableRecordModeIds)):
@@ -43,28 +36,76 @@ class RecordMode(QtWidgets.QDialog):
 			print(f'{currentScreenId} is not a known record mode ID, defaulting to {self.availableRecordModeIds[0]}')
 			currentScreenId = self.availableRecordModeIds[0]
 		
-		currentScreenIndex = self.availableRecordModeIds.index(currentScreenId)
-		self.uiRecordMode.setCurrentIndex(currentScreenIndex)
-		self.changeShownTrigger(currentScreenIndex)
-		
 		#Disable run-n-gun mode screen until it's added.
 		self.uiRecordMode.removeItem(self.availableRecordModeIds.index('runAndGun'))
 		
+		self.uiRunNGunTimeInSeconds.template = self.uiRunNGunTimeInSeconds.text()
+		self.uiRunNGunTimeInFrames.template = self.uiRunNGunTimeInFrames.text()
+		self.uiRegularLengthInSeconds.template = self.uiRegularLengthInSeconds.text()
+		self.uiRegularLengthInFrames.template = self.uiRegularLengthInFrames.text()
+		self.uiBurstTimeInSeconds.template = self.uiBurstTimeInSeconds.text()
+		self.uiBurstTimeInFrames.template = self.uiBurstTimeInFrames.text()
+		
 		# Widget behavour.
-		self.uiDone.clicked.connect(window.back)
+		api.observe('recMode', self.setCurrentScreenIndexFromRecordMode)
 		self.uiRecordMode.currentIndexChanged.connect(self.changeShownTrigger)
 		
-	def changeShownTrigger(self, index):
-		lastModeId = self.availableRecordModeIds[self.uiRecordModePanes.currentIndex()]
-		self.uiRecordModePanes.setCurrentIndex(index)
-		recordModeID = self.availableRecordModeIds[index]
-		settings.setValue('active record mode', recordModeID)
+		api.observe('cameraMaxFrames', self.recalculateEverything)
+		api.observe('recSegments',     self.recalculateEverything)
+		api.observe('recMaxFrames',    self.recalculateEverything)
+		api.observe('framePeriod',     self.recalculateEverything)
 		
-		if lastModeId == 'segmented':
-			settings.setValue('segmented mode segment duration', )
+		self.uiSegmentLengthInSeconds.valueChanged.connect(lambda sec:
+			self.uiSegmentLengthInFrames.setValue(
+				int(sec * 1e9 / api.apiValues.get('framePeriod') * api.apiValues.get('recSegments')) ) )
+		self.uiSegmentLengthNumSegments.valueChanged.connect(lambda segments:
+			api.setSync('recSegments', segments) )
+		self.uiSegmentLengthInFrames.valueChanged.connect(lambda frames:
+			api.setSync('recMaxFrames', frames * api.apiValues.get('recSegments')) )
+		
+		self.uiDone.clicked.connect(window.back)
+		
 	
-	# @pyqtSlot(int, name="updateSegmentLength")
-	# @silenceCallbacks('uiExposureSlider')
-	# def updateSegmentLength(self, recordingSegments: int):
-	# 	lengthPct = recordingSegments*1e9
-	# 	self.uiSegmentLengthInSeconds.setValue()
+	def setCurrentScreenIndexFromRecordMode(self, mode):
+		self.uiRecordMode.setCurrentIndex(self.availableRecordModeIds.index(mode))
+		self.uiRecordModePanes.setCurrentIndex(self.availableRecordModeIds.index(mode))
+		
+	def changeShownTrigger(self, index):
+		self.uiRecordModePanes.setCurrentIndex(index)
+		settings.setValue('active record mode', self.availableRecordModeIds[index])
+		api.set('recMode', self.availableRecordModeIds[index])
+	
+	
+	def recalculateEverything(self, _):
+		segments = api.apiValues.get('recSegments')
+		frames = api.apiValues.get('recMaxFrames')
+		frameTime = api.apiValues.get('framePeriod')
+		totalTime = frames * frameTime / 1e9
+		segmentTime = totalTime / segments
+		segmentFrames = int(frames / segments)
+		maxFrames = api.apiValues.get('cameraMaxFrames')
+		segmentMaxFrames = int(maxFrames / segments)
+		maxTime = segmentMaxFrames * frameTime / 1e9
+		segmentMaxTime = maxTime / segments
+		
+		self.uiRegularLengthInSeconds.setText(
+			self.uiRegularLengthInSeconds.template.format(totalTime) )
+		self.uiRegularLengthInFrames.setText(
+			self.uiRegularLengthInFrames.template.format(frames) )
+		
+		self.uiSegmentLengthInSeconds.blockSignals(True)
+		self.uiSegmentLengthNumSegments.blockSignals(True)
+		self.uiSegmentLengthInFrames.blockSignals(True)
+		self.uiSegmentLengthInSeconds.setMaximum(segmentMaxTime)
+		self.uiSegmentLengthInSeconds.setValue(segmentTime)
+		self.uiSegmentLengthNumSegments.setValue(segments)
+		self.uiSegmentLengthInFrames.setMaximum(segmentMaxFrames)
+		self.uiSegmentLengthInFrames.setValue(segmentFrames)
+		self.uiSegmentLengthInSeconds.blockSignals(False)
+		self.uiSegmentLengthNumSegments.blockSignals(False)
+		self.uiSegmentLengthInFrames.blockSignals(False)
+		
+		self.uiBurstTimeInSeconds.setText(
+			self.uiBurstTimeInSeconds.template.format(totalTime))
+		self.uiBurstTimeInFrames.setText(
+			self.uiBurstTimeInFrames.template.format(frames) )
