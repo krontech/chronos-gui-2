@@ -30,6 +30,9 @@ export QT_QPA_GENERIC_PLUGINS=tslib:/dev/input/event0
 #Make Python 3.4 not choke on unicode characters.
 export PYTHONIOENCODING=utf-8
 
+#Set the camera to use utf8, to avoid extraneous escape sequences in `systemctl status`.
+export LC_CTYPE=en_US.utf8
+
 #Set API into mock mode.
 export USE_CHRONOS_API_MOCK='gui'
 export CHRONOS_SHOW_PAINT_RECTS='no'

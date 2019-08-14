@@ -1,5 +1,5 @@
 #!/bin/bash
-set -uo pipefail #enable bash's safer mode
+set -euxo pipefail #enable bash's unofficial safe mode
 IFS=$'\n'
 
 #This script runs the Python-based Chronos on-board GUI.
@@ -7,6 +7,10 @@ IFS=$'\n'
 #brk() may be used in the Python script to enter an interactive debugger.
 
 trap "{ stty sane; echo; kill 0; }" EXIT #Kill all children when we die. (This cleans up any windows lying around.) Also restore the console (keyboard stops being echoed after ctrl-c'ing out of pdb) and advance to a new line before printing the prompt again. When python is in pdb() on the camera, it will not respond to anything other than -9 unfortunately.
+
+#Stop the autostarted service from running, if available.
+systemctl stop chronos-gui2     2> /dev/null || true
+systemctl stop chronos-gui2-dev 2> /dev/null || true
 
 bash <<< "#sh doesn't do the equality test for 143, must use bash
 	QSG_RENDER_LOOP=basic

@@ -1,0 +1,17 @@
+[Unit]
+Description=⚠ Development version of the Gui2 user interface. ⚠
+After=chronos-video.service chronos-control-api-dev.service
+Requires=chronos-video.service chronos-control-api-dev.service
+
+[Service]
+WorkingDirectory=/root/gui
+EnvironmentFile=/etc/chronos-gui2.conf
+ExecStart=/root/gui/src/main.py
+StandardOutput=journal+console
+StandardError=inherit
+
+# Make the "close" debug button work on the main screen.
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
