@@ -13,820 +13,6 @@
   <property name="windowTitle">
    <string>Triggers</string>
   </property>
-  <widget class="QStackedWidget" name="uiTriggerScreens">
-   <property name="geometry">
-    <rect>
-     <x>0</x>
-     <y>0</y>
-     <width>801</width>
-     <height>401</height>
-    </rect>
-   </property>
-   <property name="currentIndex">
-    <number>2</number>
-   </property>
-   <widget class="QWidget" name="uiTrigger1">
-    <widget class="HeaderLabel" name="headerlabel_2">
-     <property name="geometry">
-      <rect>
-       <x>20</x>
-       <y>110</y>
-       <width>141</width>
-       <height>31</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Threshold</string>
-     </property>
-    </widget>
-    <widget class="DecimalSpinBox" name="uiTrigger1ThresholdVoltage">
-     <property name="geometry">
-      <rect>
-       <x>0</x>
-       <y>130</y>
-       <width>311</width>
-       <height>81</height>
-      </rect>
-     </property>
-    </widget>
-    <widget class="Label" name="label">
-     <property name="geometry">
-      <rect>
-       <x>310</x>
-       <y>150</y>
-       <width>141</width>
-       <height>41</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>volts</string>
-     </property>
-    </widget>
-    <widget class="HeaderLabel" name="headerlabel_3">
-     <property name="geometry">
-      <rect>
-       <x>20</x>
-       <y>210</y>
-       <width>141</width>
-       <height>25</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Modifiers</string>
-     </property>
-    </widget>
-    <widget class="CheckBox" name="uiTrigger11mAPullup">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>230</y>
-       <width>191</width>
-       <height>61</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>1mA Pullup</string>
-     </property>
-     <property name="clickMarginBottom" stdset="0">
-      <enum>CheckBox::none</enum>
-     </property>
-    </widget>
-    <widget class="ComboBox" name="uiTrigger1Action">
-     <property name="geometry">
-      <rect>
-       <x>440</x>
-       <y>30</y>
-       <width>341</width>
-       <height>81</height>
-      </rect>
-     </property>
-     <item>
-      <property name="text">
-       <string>None</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>Stop Recording</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>Exposure Gating</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>Genlock Input</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>Genlock Output</string>
-      </property>
-     </item>
-    </widget>
-    <widget class="HeaderLabel" name="headerlabel_4">
-     <property name="geometry">
-      <rect>
-       <x>460</x>
-       <y>10</y>
-       <width>301</width>
-       <height>41</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Trigger Action</string>
-     </property>
-    </widget>
-    <widget class="HeaderLabel" name="headerlabel_5">
-     <property name="geometry">
-      <rect>
-       <x>460</x>
-       <y>110</y>
-       <width>141</width>
-       <height>31</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Visualization</string>
-     </property>
-    </widget>
-    <widget class="QWidget" name="uiTrigger1Visualization" native="true">
-     <property name="geometry">
-      <rect>
-       <x>440</x>
-       <y>130</y>
-       <width>341</width>
-       <height>231</height>
-      </rect>
-     </property>
-    </widget>
-    <widget class="Backdrop" name="backdrop_2">
-     <property name="geometry">
-      <rect>
-       <x>0</x>
-       <y>0</y>
-       <width>801</width>
-       <height>401</height>
-      </rect>
-     </property>
-    </widget>
-    <widget class="CheckBox" name="uiTrigger1Invert">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>290</y>
-       <width>191</width>
-       <height>71</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Invert</string>
-     </property>
-     <property name="clickMarginTop" stdset="0">
-      <enum>CheckBox::half</enum>
-     </property>
-    </widget>
-    <widget class="CheckBox" name="uiTrigger1Debounce">
-     <property name="geometry">
-      <rect>
-       <x>200</x>
-       <y>290</y>
-       <width>191</width>
-       <height>71</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Debounce</string>
-     </property>
-     <property name="clickMarginTop" stdset="0">
-      <enum>CheckBox::half</enum>
-     </property>
-    </widget>
-    <widget class="CheckBox" name="uiTrigger120mAPullup">
-     <property name="geometry">
-      <rect>
-       <x>200</x>
-       <y>230</y>
-       <width>191</width>
-       <height>61</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>20mA Pullup</string>
-     </property>
-     <property name="clickMarginBottom" stdset="0">
-      <enum>CheckBox::none</enum>
-     </property>
-    </widget>
-    <widget class="QLabel" name="uiTrigger1Icon">
-     <property name="geometry">
-      <rect>
-       <x>310</x>
-       <y>50</y>
-       <width>41</width>
-       <height>41</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string/>
-     </property>
-     <property name="pixmap">
-      <pixmap>../../assets/images/bnc-connector.png</pixmap>
-     </property>
-    </widget>
-    <zorder>backdrop_2</zorder>
-    <zorder>headerlabel_2</zorder>
-    <zorder>uiTrigger1ThresholdVoltage</zorder>
-    <zorder>label</zorder>
-    <zorder>headerlabel_3</zorder>
-    <zorder>uiTrigger11mAPullup</zorder>
-    <zorder>headerlabel_4</zorder>
-    <zorder>headerlabel_5</zorder>
-    <zorder>uiTrigger1Action</zorder>
-    <zorder>uiTrigger1Visualization</zorder>
-    <zorder>uiTrigger1Invert</zorder>
-    <zorder>uiTrigger1Debounce</zorder>
-    <zorder>uiTrigger120mAPullup</zorder>
-    <zorder>uiTrigger1Icon</zorder>
-   </widget>
-   <widget class="QWidget" name="uiTrigger2">
-    <widget class="HeaderLabel" name="headerlabel_6">
-     <property name="geometry">
-      <rect>
-       <x>460</x>
-       <y>10</y>
-       <width>301</width>
-       <height>41</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Trigger Action</string>
-     </property>
-    </widget>
-    <widget class="CheckBox" name="uiTrigger2Invert">
-     <property name="geometry">
-      <rect>
-       <x>200</x>
-       <y>230</y>
-       <width>191</width>
-       <height>81</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Invert</string>
-     </property>
-    </widget>
-    <widget class="HeaderLabel" name="headerlabel_7">
-     <property name="geometry">
-      <rect>
-       <x>460</x>
-       <y>110</y>
-       <width>141</width>
-       <height>31</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Visualization</string>
-     </property>
-    </widget>
-    <widget class="HeaderLabel" name="headerlabel_8">
-     <property name="geometry">
-      <rect>
-       <x>20</x>
-       <y>110</y>
-       <width>141</width>
-       <height>31</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Threshold</string>
-     </property>
-    </widget>
-    <widget class="QWidget" name="uiTrigger2Visualization" native="true">
-     <property name="geometry">
-      <rect>
-       <x>440</x>
-       <y>130</y>
-       <width>341</width>
-       <height>231</height>
-      </rect>
-     </property>
-    </widget>
-    <widget class="HeaderLabel" name="headerlabel_9">
-     <property name="geometry">
-      <rect>
-       <x>20</x>
-       <y>210</y>
-       <width>141</width>
-       <height>25</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Modifiers</string>
-     </property>
-    </widget>
-    <widget class="Label" name="label_3">
-     <property name="geometry">
-      <rect>
-       <x>310</x>
-       <y>150</y>
-       <width>141</width>
-       <height>41</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>volts</string>
-     </property>
-    </widget>
-    <widget class="DecimalSpinBox" name="uiTrigger2ThresholdVoltage">
-     <property name="geometry">
-      <rect>
-       <x>0</x>
-       <y>130</y>
-       <width>311</width>
-       <height>81</height>
-      </rect>
-     </property>
-    </widget>
-    <widget class="CheckBox" name="uiTrigger220mAPullup">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>230</y>
-       <width>191</width>
-       <height>81</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>20mA Pullup</string>
-     </property>
-    </widget>
-    <widget class="CheckBox" name="uiTrigger2Debounce">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>290</y>
-       <width>191</width>
-       <height>71</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Debounce</string>
-     </property>
-     <property name="clickMarginTop" stdset="0">
-      <enum>CheckBox::half</enum>
-     </property>
-    </widget>
-    <widget class="Backdrop" name="backdrop_3">
-     <property name="geometry">
-      <rect>
-       <x>0</x>
-       <y>0</y>
-       <width>801</width>
-       <height>401</height>
-      </rect>
-     </property>
-    </widget>
-    <widget class="QLabel" name="uiTrigger2Icon">
-     <property name="geometry">
-      <rect>
-       <x>300</x>
-       <y>45</y>
-       <width>50</width>
-       <height>50</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <pointsize>12</pointsize>
-      </font>
-     </property>
-     <property name="text">
-      <string/>
-     </property>
-     <property name="pixmap">
-      <pixmap>../../assets/images/green-connector.png</pixmap>
-     </property>
-    </widget>
-    <widget class="ComboBox" name="uiTrigger2Action">
-     <property name="geometry">
-      <rect>
-       <x>440</x>
-       <y>30</y>
-       <width>341</width>
-       <height>81</height>
-      </rect>
-     </property>
-     <item>
-      <property name="text">
-       <string>None</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>Stop Recording</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>Exposure Gating</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>Genlock Input</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>Genlock Output</string>
-      </property>
-     </item>
-    </widget>
-    <zorder>backdrop_3</zorder>
-    <zorder>headerlabel_6</zorder>
-    <zorder>headerlabel_7</zorder>
-    <zorder>headerlabel_8</zorder>
-    <zorder>uiTrigger2Visualization</zorder>
-    <zorder>headerlabel_9</zorder>
-    <zorder>label_3</zorder>
-    <zorder>uiTrigger2ThresholdVoltage</zorder>
-    <zorder>uiTrigger2Icon</zorder>
-    <zorder>uiTrigger220mAPullup</zorder>
-    <zorder>uiTrigger2Debounce</zorder>
-    <zorder>uiTrigger2Action</zorder>
-    <zorder>uiTrigger2Invert</zorder>
-   </widget>
-   <widget class="QWidget" name="uiTrigger3">
-    <widget class="Backdrop" name="backdrop_4">
-     <property name="geometry">
-      <rect>
-       <x>0</x>
-       <y>0</y>
-       <width>801</width>
-       <height>401</height>
-      </rect>
-     </property>
-    </widget>
-    <widget class="HeaderLabel" name="headerlabel_10">
-     <property name="geometry">
-      <rect>
-       <x>20</x>
-       <y>160</y>
-       <width>141</width>
-       <height>31</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Modifiers</string>
-     </property>
-    </widget>
-    <widget class="CheckBox" name="uiTrigger3Debounce">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>250</y>
-       <width>201</width>
-       <height>61</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Debounce</string>
-     </property>
-     <property name="clickMarginTop" stdset="0">
-      <enum>CheckBox::none</enum>
-     </property>
-    </widget>
-    <widget class="CheckBox" name="uiTrigger3Invert">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>180</y>
-       <width>201</width>
-       <height>71</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Invert</string>
-     </property>
-     <property name="clickMarginBottom" stdset="0">
-      <enum>CheckBox::half</enum>
-     </property>
-    </widget>
-    <widget class="QWidget" name="uiTrigger3Visualization" native="true">
-     <property name="geometry">
-      <rect>
-       <x>440</x>
-       <y>130</y>
-       <width>341</width>
-       <height>231</height>
-      </rect>
-     </property>
-    </widget>
-    <widget class="HeaderLabel" name="headerlabel_11">
-     <property name="geometry">
-      <rect>
-       <x>460</x>
-       <y>110</y>
-       <width>141</width>
-       <height>31</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Visualization</string>
-     </property>
-    </widget>
-    <widget class="HeaderLabel" name="headerlabel_15">
-     <property name="geometry">
-      <rect>
-       <x>460</x>
-       <y>10</y>
-       <width>301</width>
-       <height>41</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Trigger Action</string>
-     </property>
-    </widget>
-    <widget class="ComboBox" name="uiTrigger3Action">
-     <property name="geometry">
-      <rect>
-       <x>440</x>
-       <y>30</y>
-       <width>341</width>
-       <height>81</height>
-      </rect>
-     </property>
-     <item>
-      <property name="text">
-       <string>None</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>Stop Recording</string>
-      </property>
-     </item>
-    </widget>
-    <widget class="Label" name="uiTrigger3ThresholdVoltage">
-     <property name="geometry">
-      <rect>
-       <x>30</x>
-       <y>100</y>
-       <width>211</width>
-       <height>31</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Threshold: {0:.2f} volts</string>
-     </property>
-    </widget>
-    <widget class="QLabel" name="uiTrigger3Icon">
-     <property name="geometry">
-      <rect>
-       <x>305</x>
-       <y>50</y>
-       <width>40</width>
-       <height>40</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string/>
-     </property>
-     <property name="pixmap">
-      <pixmap>../../assets/images/green-connector-bottom.png</pixmap>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignCenter</set>
-     </property>
-    </widget>
-    <zorder>backdrop_4</zorder>
-    <zorder>headerlabel_10</zorder>
-    <zorder>uiTrigger3Debounce</zorder>
-    <zorder>uiTrigger3Invert</zorder>
-    <zorder>headerlabel_11</zorder>
-    <zorder>headerlabel_15</zorder>
-    <zorder>uiTrigger3Action</zorder>
-    <zorder>uiTrigger3ThresholdVoltage</zorder>
-    <zorder>uiTrigger3Icon</zorder>
-    <zorder>uiTrigger3Visualization</zorder>
-   </widget>
-   <widget class="QWidget" name="uiMotionTrigger">
-    <widget class="Backdrop" name="backdrop_5">
-     <property name="geometry">
-      <rect>
-       <x>0</x>
-       <y>0</y>
-       <width>801</width>
-       <height>151</height>
-      </rect>
-     </property>
-    </widget>
-    <widget class="Backdrop" name="backdrop_6">
-     <property name="geometry">
-      <rect>
-       <x>0</x>
-       <y>150</y>
-       <width>21</width>
-       <height>201</height>
-      </rect>
-     </property>
-    </widget>
-    <widget class="Backdrop" name="backdrop_7">
-     <property name="geometry">
-      <rect>
-       <x>0</x>
-       <y>350</y>
-       <width>801</width>
-       <height>51</height>
-      </rect>
-     </property>
-    </widget>
-    <widget class="Backdrop" name="backdrop_8">
-     <property name="geometry">
-      <rect>
-       <x>330</x>
-       <y>150</y>
-       <width>471</width>
-       <height>201</height>
-      </rect>
-     </property>
-    </widget>
-    <widget class="Button" name="uiMotionTriggerConfigure">
-     <property name="geometry">
-      <rect>
-       <x>170</x>
-       <y>85</y>
-       <width>181</width>
-       <height>81</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Configure</string>
-     </property>
-    </widget>
-    <widget class="CheckBox" name="uiMotionTriggerDebounce">
-     <property name="geometry">
-      <rect>
-       <x>440</x>
-       <y>320</y>
-       <width>161</width>
-       <height>81</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Debounce</string>
-     </property>
-    </widget>
-    <widget class="QWidget" name="uiMotionTriggerVisualization" native="true">
-     <property name="geometry">
-      <rect>
-       <x>440</x>
-       <y>130</y>
-       <width>361</width>
-       <height>191</height>
-      </rect>
-     </property>
-    </widget>
-    <widget class="HeaderLabel" name="headerlabel_12">
-     <property name="geometry">
-      <rect>
-       <x>460</x>
-       <y>110</y>
-       <width>141</width>
-       <height>31</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Visualization</string>
-     </property>
-    </widget>
-    <widget class="HeaderLabel" name="headerlabel_13">
-     <property name="geometry">
-      <rect>
-       <x>460</x>
-       <y>10</y>
-       <width>301</width>
-       <height>41</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Trigger Action</string>
-     </property>
-    </widget>
-    <widget class="ComboBox" name="uiMotionTriggerAction">
-     <property name="geometry">
-      <rect>
-       <x>440</x>
-       <y>30</y>
-       <width>341</width>
-       <height>81</height>
-      </rect>
-     </property>
-     <item>
-      <property name="text">
-       <string>None</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>Stop Recording</string>
-      </property>
-     </item>
-    </widget>
-    <widget class="HeaderLabel" name="headerlabel_14">
-     <property name="geometry">
-      <rect>
-       <x>20</x>
-       <y>110</y>
-       <width>141</width>
-       <height>31</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Trigger Area</string>
-     </property>
-    </widget>
-    <widget class="QLabel" name="uiMotionTriggerIcon">
-     <property name="geometry">
-      <rect>
-       <x>305</x>
-       <y>50</y>
-       <width>51</width>
-       <height>41</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string/>
-     </property>
-     <property name="pixmap">
-      <pixmap>../../assets/images/motion.png</pixmap>
-     </property>
-    </widget>
-    <widget class="CheckBox" name="uiMotionTriggerInvert">
-     <property name="geometry">
-      <rect>
-       <x>600</x>
-       <y>320</y>
-       <width>201</width>
-       <height>81</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Invert Signal</string>
-     </property>
-    </widget>
-    <zorder>backdrop_5</zorder>
-    <zorder>backdrop_6</zorder>
-    <zorder>backdrop_7</zorder>
-    <zorder>backdrop_8</zorder>
-    <zorder>headerlabel_12</zorder>
-    <zorder>headerlabel_13</zorder>
-    <zorder>uiMotionTriggerAction</zorder>
-    <zorder>headerlabel_14</zorder>
-    <zorder>uiMotionTriggerIcon</zorder>
-    <zorder>uiMotionTriggerConfigure</zorder>
-    <zorder>uiMotionTriggerInvert</zorder>
-    <zorder>uiMotionTriggerDebounce</zorder>
-    <zorder>uiMotionTriggerVisualization</zorder>
-   </widget>
-  </widget>
-  <widget class="ComboBox" name="uiActiveTrigger">
-   <property name="geometry">
-    <rect>
-     <x>0</x>
-     <y>30</y>
-     <width>311</width>
-     <height>71</height>
-    </rect>
-   </property>
-   <property name="clickMarginBottom" stdset="0">
-    <enum>ComboBox::half</enum>
-   </property>
-   <item>
-    <property name="text">
-     <string comment="trig1" extracomment="trig1">Trigger 1 (TRIG1⇄)</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string comment="trig2" extracomment="trig2">Trigger 2 (TRG2⇄)</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string comment="trig3">Trigger 3 (Isolated, TRIG3±)</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string comment="motion">Motion</string>
-    </property>
-   </item>
-  </widget>
   <widget class="HeaderLabel" name="headerlabel">
    <property name="geometry">
     <rect>
@@ -837,25 +23,25 @@
     </rect>
    </property>
    <property name="text">
-    <string>Trigger</string>
+    <string>Triggers &amp; IO</string>
    </property>
   </widget>
   <widget class="Backdrop" name="backdrop">
    <property name="geometry">
     <rect>
      <x>0</x>
-     <y>400</y>
+     <y>0</y>
      <width>801</width>
-     <height>81</height>
+     <height>481</height>
     </rect>
    </property>
   </widget>
   <widget class="Label" name="uiUnsavedChangesWarning">
    <property name="geometry">
     <rect>
-     <x>480</x>
+     <x>420</x>
      <y>397</y>
-     <width>301</width>
+     <width>361</width>
      <height>21</height>
     </rect>
    </property>
@@ -898,71 +84,6 @@
     <enum>Button::half</enum>
    </property>
   </widget>
-  <widget class="Label" name="uiTrig1Status">
-   <property name="geometry">
-    <rect>
-     <x>30</x>
-     <y>400</y>
-     <width>141</width>
-     <height>30</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Trig1⇄: %s</string>
-   </property>
-  </widget>
-  <widget class="Label" name="uiTrig2Status">
-   <property name="geometry">
-    <rect>
-     <x>190</x>
-     <y>400</y>
-     <width>140</width>
-     <height>30</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Trig2⇄: %s</string>
-   </property>
-  </widget>
-  <widget class="Label" name="uiTrig3Status">
-   <property name="geometry">
-    <rect>
-     <x>30</x>
-     <y>430</y>
-     <width>140</width>
-     <height>30</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Trig3+: %s</string>
-   </property>
-  </widget>
-  <widget class="Label" name="uiMotionTriggerStatus">
-   <property name="geometry">
-    <rect>
-     <x>190</x>
-     <y>430</y>
-     <width>140</width>
-     <height>30</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Motion: %s</string>
-   </property>
-  </widget>
-  <widget class="HeaderLabel" name="headerlabel_16">
-   <property name="geometry">
-    <rect>
-     <x>20</x>
-     <y>370</y>
-     <width>241</width>
-     <height>31</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Trigger Status</string>
-   </property>
-  </widget>
   <widget class="Button" name="uiCancel">
    <property name="geometry">
     <rect>
@@ -975,23 +96,597 @@
    <property name="text">
     <string>Cancel</string>
    </property>
-   <property name="clickMarginLeft" stdset="0">
-    <enum>Button::full</enum>
+   <property name="clickMarginRight" stdset="0">
+    <enum>Button::half</enum>
    </property>
   </widget>
+  <widget class="Subheader" name="subheader">
+   <property name="geometry">
+    <rect>
+     <x>30</x>
+     <y>50</y>
+     <width>321</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Action</string>
+   </property>
+  </widget>
+  <widget class="ComboBox" name="uiTriggerList">
+   <property name="geometry">
+    <rect>
+     <x>400</x>
+     <y>60</y>
+     <width>361</width>
+     <height>71</height>
+    </rect>
+   </property>
+   <property name="currentIndex">
+    <number>5</number>
+   </property>
+   <property name="clickMarginBottom" stdset="0">
+    <enum>ComboBox::half</enum>
+   </property>
+   <item>
+    <property name="text">
+     <string>Never</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>Always</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>TRIG1⇄ Input</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>TRIG2⇄ Input</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>TRIG3± Input</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>While Delayed Signal Arrives</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>While Flipflop On</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>While Shutter Open</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>While Recording</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>On Frame Recorded</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>On Recording Start</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>On Recording End</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>On New Segment</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>Timing Signal</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>When Motion Detected</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>When Audio Detected</string>
+    </property>
+   </item>
+  </widget>
+  <widget class="Subheader" name="subheader_2">
+   <property name="geometry">
+    <rect>
+     <x>420</x>
+     <y>50</y>
+     <width>371</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Trigger for Action</string>
+   </property>
+  </widget>
+  <widget class="CheckBox" name="checkbox">
+   <property name="geometry">
+    <rect>
+     <x>400</x>
+     <y>130</y>
+     <width>201</width>
+     <height>71</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Invert Condition</string>
+   </property>
+   <property name="clickMarginTop" stdset="0">
+    <enum>CheckBox::half</enum>
+   </property>
+  </widget>
+  <widget class="CheckBox" name="checkbox_2">
+   <property name="geometry">
+    <rect>
+     <x>600</x>
+     <y>130</y>
+     <width>201</width>
+     <height>71</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Debounce</string>
+   </property>
+   <property name="clickMarginTop" stdset="0">
+    <enum>CheckBox::half</enum>
+   </property>
+  </widget>
+  <widget class="ScrollList" name="uiActionList">
+   <property name="geometry">
+    <rect>
+     <x>30</x>
+     <y>80</y>
+     <width>321</width>
+     <height>261</height>
+    </rect>
+   </property>
+   <property name="movement">
+    <enum>QListView::Free</enum>
+   </property>
+  </widget>
+  <widget class="QWidget" name="widget" native="true">
+   <property name="geometry">
+    <rect>
+     <x>30</x>
+     <y>390</y>
+     <width>321</width>
+     <height>91</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="Subheader" name="subheader_3">
+   <property name="geometry">
+    <rect>
+     <x>30</x>
+     <y>360</y>
+     <width>321</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Preview</string>
+   </property>
+  </widget>
+  <widget class="QStackedWidget" name="uiIndividualTriggerConfigurationPanes">
+   <property name="geometry">
+    <rect>
+     <x>400</x>
+     <y>190</y>
+     <width>401</width>
+     <height>211</height>
+    </rect>
+   </property>
+   <property name="currentIndex">
+    <number>1</number>
+   </property>
+   <widget class="QWidget" name="uiNonePane"/>
+   <widget class="QWidget" name="uiIo1Pane">
+    <widget class="DecimalSpinBox" name="uiIo1ThresholdVoltage">
+     <property name="geometry">
+      <rect>
+       <x>140</x>
+       <y>-10</y>
+       <width>221</width>
+       <height>81</height>
+      </rect>
+     </property>
+     <property name="suffix">
+      <string> Volts</string>
+     </property>
+    </widget>
+    <widget class="CheckBox" name="uiIo120MAPullup">
+     <property name="geometry">
+      <rect>
+       <x>140</x>
+       <y>90</y>
+       <width>151</width>
+       <height>81</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>20mA at
+5 Volts</string>
+     </property>
+    </widget>
+    <widget class="CheckBox" name="uiIo11MAPullup">
+     <property name="geometry">
+      <rect>
+       <x>0</x>
+       <y>90</y>
+       <width>141</width>
+       <height>81</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>1mA at
+5 Volts</string>
+     </property>
+    </widget>
+    <widget class="Label" name="label_2">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>10</y>
+       <width>171</width>
+       <height>41</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Input Threshold</string>
+     </property>
+    </widget>
+    <widget class="Label" name="label_4">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>80</y>
+       <width>181</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Pullups</string>
+     </property>
+    </widget>
+    <zorder>uiIo1ThresholdVoltage</zorder>
+    <zorder>uiIo11MAPullup</zorder>
+    <zorder>label_2</zorder>
+    <zorder>label_4</zorder>
+    <zorder>uiIo120MAPullup</zorder>
+   </widget>
+   <widget class="QWidget" name="uiIo2Pane">
+    <widget class="DecimalSpinBox" name="uiIo2ThresholdVoltage">
+     <property name="geometry">
+      <rect>
+       <x>140</x>
+       <y>-10</y>
+       <width>221</width>
+       <height>81</height>
+      </rect>
+     </property>
+     <property name="suffix">
+      <string> Volts</string>
+     </property>
+    </widget>
+    <widget class="CheckBox" name="uiIo220MAPullup">
+     <property name="geometry">
+      <rect>
+       <x>0</x>
+       <y>90</y>
+       <width>211</width>
+       <height>81</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>20mA
+at 5 Volts</string>
+     </property>
+    </widget>
+    <widget class="Label" name="label_5">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>80</y>
+       <width>181</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Pullup</string>
+     </property>
+    </widget>
+    <widget class="Label" name="label_6">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>10</y>
+       <width>171</width>
+       <height>41</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Input Threshold</string>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QWidget" name="uiIo3Pane">
+    <widget class="Label" name="label_7">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>0</y>
+       <width>321</width>
+       <height>41</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Note: Input threshold is 5 volts.</string>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QWidget" name="uiAudioPane">
+    <widget class="Label" name="label">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>20</y>
+       <width>81</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Volume</string>
+     </property>
+    </widget>
+    <widget class="Label" name="label_9">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>80</y>
+       <width>80</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Duration</string>
+     </property>
+    </widget>
+    <widget class="QWidget" name="uiAudioGraph" native="true">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>130</y>
+       <width>321</width>
+       <height>71</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">border: 1px solid black</string>
+     </property>
+    </widget>
+    <widget class="Label" name="uiAudioGraphLabel">
+     <property name="geometry">
+      <rect>
+       <x>21</x>
+       <y>131</y>
+       <width>151</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">
+			font-size: 16px;
+			background: rgba(255,255,255,127);</string>
+     </property>
+     <property name="text">
+      <string>Audio Over Time</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+    <widget class="Label" name="label_11">
+     <property name="geometry">
+      <rect>
+       <x>200</x>
+       <y>20</y>
+       <width>41</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>or</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+    <widget class="DecimalSpinBox" name="uiAudioTriggerDB">
+     <property name="geometry">
+      <rect>
+       <x>80</x>
+       <y>-10</y>
+       <width>141</width>
+       <height>71</height>
+      </rect>
+     </property>
+     <property name="suffix">
+      <string>dB</string>
+     </property>
+     <property name="clickMarginBottom" stdset="0">
+      <enum>DecimalSpinBox::half</enum>
+     </property>
+    </widget>
+    <widget class="SpinBox" name="uiAudioTriggerPercent">
+     <property name="geometry">
+      <rect>
+       <x>220</x>
+       <y>-10</y>
+       <width>141</width>
+       <height>71</height>
+      </rect>
+     </property>
+     <property name="suffix">
+      <string>%</string>
+     </property>
+     <property name="clickMarginBottom" stdset="0">
+      <enum>SpinBox::half</enum>
+     </property>
+    </widget>
+    <widget class="SpinBox" name="uiAudioTriggerDuration">
+     <property name="geometry">
+      <rect>
+       <x>80</x>
+       <y>60</y>
+       <width>141</width>
+       <height>71</height>
+      </rect>
+     </property>
+     <property name="clickMarginTop" stdset="0">
+      <enum>SpinBox::half</enum>
+     </property>
+     <property name="units" stdset="0">
+      <string>s</string>
+     </property>
+    </widget>
+    <zorder>label</zorder>
+    <zorder>label_9</zorder>
+    <zorder>uiAudioGraph</zorder>
+    <zorder>uiAudioGraphLabel</zorder>
+    <zorder>uiAudioTriggerDB</zorder>
+    <zorder>label_11</zorder>
+    <zorder>uiAudioTriggerPercent</zorder>
+    <zorder>uiAudioTriggerDuration</zorder>
+   </widget>
+   <widget class="QWidget" name="uiMotionPane">
+    <widget class="QWidget" name="uiMotionGraph" native="true">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>10</y>
+       <width>321</width>
+       <height>121</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">border: 1px solid black</string>
+     </property>
+    </widget>
+    <widget class="Button" name="uiConfigureMotionTriggering">
+     <property name="geometry">
+      <rect>
+       <x>0</x>
+       <y>120</y>
+       <width>361</width>
+       <height>81</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Configure Motion Triggering</string>
+     </property>
+    </widget>
+    <widget class="Label" name="uiMotionGraphLabel">
+     <property name="geometry">
+      <rect>
+       <x>21</x>
+       <y>11</y>
+       <width>151</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">
+			font-size: 16px;
+			background: rgba(255,255,255,127);</string>
+     </property>
+     <property name="text">
+      <string>Motion Over Time</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QWidget" name="uiDelayPane">
+    <widget class="DecimalSpinBox" name="uiDelayAmount">
+     <property name="geometry">
+      <rect>
+       <x>50</x>
+       <y>-10</y>
+       <width>151</width>
+       <height>81</height>
+      </rect>
+     </property>
+     <property name="decimals">
+      <number>2</number>
+     </property>
+     <property name="units" stdset="0">
+      <string>s</string>
+     </property>
+    </widget>
+    <widget class="Label" name="label_8">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>10</y>
+       <width>171</width>
+       <height>41</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Delay</string>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QWidget" name="uiCombPane"/>
+   <widget class="QWidget" name="uiTogglePane"/>
+   <widget class="QWidget" name="uiShutterPane"/>
+   <widget class="QWidget" name="uiRecordingPane"/>
+   <widget class="QWidget" name="uiDispFramePane"/>
+   <widget class="QWidget" name="uiStartRecPane"/>
+   <widget class="QWidget" name="uiEndRecPane"/>
+   <widget class="QWidget" name="uiNextSegPane"/>
+   <widget class="QWidget" name="uiTimingIoPane"/>
+   <widget class="QWidget" name="uiAlwaysHighPane"/>
+  </widget>
   <zorder>backdrop</zorder>
-  <zorder>uiTriggerScreens</zorder>
   <zorder>headerlabel</zorder>
-  <zorder>uiActiveTrigger</zorder>
   <zorder>uiUnsavedChangesWarning</zorder>
   <zorder>uiSave</zorder>
   <zorder>uiDone</zorder>
-  <zorder>uiTrig1Status</zorder>
-  <zorder>uiTrig2Status</zorder>
-  <zorder>uiTrig3Status</zorder>
-  <zorder>uiMotionTriggerStatus</zorder>
-  <zorder>headerlabel_16</zorder>
   <zorder>uiCancel</zorder>
+  <zorder>subheader</zorder>
+  <zorder>subheader_2</zorder>
+  <zorder>uiTriggerList</zorder>
+  <zorder>checkbox</zorder>
+  <zorder>checkbox_2</zorder>
+  <zorder>uiActionList</zorder>
+  <zorder>widget</zorder>
+  <zorder>subheader_3</zorder>
+  <zorder>uiIndividualTriggerConfigurationPanes</zorder>
  </widget>
  <customwidgets>
   <customwidget>
@@ -1029,28 +724,27 @@
    <extends>QLabel</extends>
    <header>label</header>
   </customwidget>
+  <customwidget>
+   <class>ScrollList</class>
+   <extends>QListView</extends>
+   <header>scroll_list</header>
+  </customwidget>
+  <customwidget>
+   <class>SpinBox</class>
+   <extends>QSpinBox</extends>
+   <header>spin_box</header>
+  </customwidget>
+  <customwidget>
+   <class>Subheader</class>
+   <extends>QLabel</extends>
+   <header>subheader</header>
+  </customwidget>
  </customwidgets>
  <tabstops>
   <tabstop>uiDone</tabstop>
-  <tabstop>uiActiveTrigger</tabstop>
-  <tabstop>uiTrigger1Action</tabstop>
-  <tabstop>uiTrigger1ThresholdVoltage</tabstop>
-  <tabstop>uiTrigger11mAPullup</tabstop>
-  <tabstop>uiTrigger120mAPullup</tabstop>
-  <tabstop>uiTrigger1Invert</tabstop>
-  <tabstop>uiTrigger1Debounce</tabstop>
-  <tabstop>uiTrigger2Action</tabstop>
-  <tabstop>uiTrigger2ThresholdVoltage</tabstop>
-  <tabstop>uiTrigger220mAPullup</tabstop>
-  <tabstop>uiTrigger2Invert</tabstop>
-  <tabstop>uiTrigger2Debounce</tabstop>
-  <tabstop>uiTrigger3Action</tabstop>
-  <tabstop>uiTrigger3Invert</tabstop>
-  <tabstop>uiTrigger3Debounce</tabstop>
-  <tabstop>uiMotionTriggerAction</tabstop>
-  <tabstop>uiMotionTriggerConfigure</tabstop>
-  <tabstop>uiMotionTriggerDebounce</tabstop>
-  <tabstop>uiMotionTriggerInvert</tabstop>
+  <tabstop>uiIo1ThresholdVoltage</tabstop>
+  <tabstop>uiIo11MAPullup</tabstop>
+  <tabstop>uiIo120MAPullup</tabstop>
   <tabstop>uiSave</tabstop>
  </tabstops>
  <resources>

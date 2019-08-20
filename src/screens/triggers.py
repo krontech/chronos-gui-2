@@ -1,6 +1,31 @@
 # -*- coding: future_fstrings -*-
+"""Trigger/IO Settings screen.
+	
+	Triggers in the Chronos work as follows: Each action has a few options, such
+	as whether to debounce the incoming signal, and one trigger. So, instead of
+	saying "When io1 is > 2.5v, stop the recording", you say "Stop the recording
+	when io1 is > 2.5v".
+	
+	This is the inverse of how it works in camApp. Loial completed a rewrite of
+	the trigger/io block in 2019, which caused the change, but only gui2 was
+	updated to support the full range of functionality this introduced.
+	
+	To get the data provided by this screen, run either
+	
+		cam-json --control get - <<< '["ioMapping"]'
+	
+	or
+	
+		gdbus call --system \
+			--dest ca.krontech.chronos.control \
+			--object-path /ca/krontech/chronos/control \
+			--method ca.krontech.chronos.control.get \
+			"['ioMapping']"
+	
+	"""
 
 from copy import deepcopy
+from functools import partial
 
 from PyQt5 import uic, QtWidgets, QtCore, QtGui
 from PyQt5.QtCore import pyqtSlot
@@ -11,8 +36,81 @@ from debugger import *; dbg
 import api
 from api import silenceCallbacks
 
-
 settings = QtCore.QSettings('Krontech', 'back-of-camera interface')
+tr = partial(QtCore.QCoreApplication.translate, "Triggers")
+
+actionData = [
+	{ 'id': 'start',       'tags': {'action', 'video', 'edge'},         'name': tr("Start Recording")       },
+	{ 'id': 'stop',        'tags': {'action', 'video', 'edge'},         'name': tr("Stop Recording")        },
+	{ 'id': 'io1',         'tags': {'action', 'trigger', 'level'},      'name': tr("Output to TRIG1⇄")      },
+	{ 'id': 'io2',         'tags': {'action', 'trigger', 'level'},      'name': tr("Output to TRG2⇄")       },
+	{ 'id': 'delay',       'tags': {'time', 'level'},                   'name': tr("Delay the Signal")      },
+	{ 'id': 'shutter',     'tags': {'action', 'shutter', 'edge'},       'name': tr("Open Shutter")          },
+	{ 'id': 'gate',        'tags': {'action', 'shutter', 'level'},      'name': tr("Shutter Gating")        },
+	{ 'id': 'combOr1',     'tags': {'logic', 'combinatorial', 'level'}, 'name': tr("Set Logic Block OR #1") },
+	{ 'id': 'combOr2',     'tags': {'logic', 'combinatorial', 'level'}, 'name': tr("Set Logic Block OR #2") },
+	{ 'id': 'combOr3',     'tags': {'logic', 'combinatorial', 'level'}, 'name': tr("Set Logic Block OR #3") },
+	{ 'id': 'combAnd',     'tags': {'logic', 'combinatorial', 'level'}, 'name': tr("Set Logic Block AND")   },
+	{ 'id': 'combXOr',     'tags': {'logic', 'combinatorial', 'level'}, 'name': tr("Set Logic Block XOR")   },
+	{ 'id': 'toggleClear', 'tags': {'logic', 'toggle', 'edge'},         'name': tr("Turn Flipflop Off")     },
+	{ 'id': 'toggleSet',   'tags': {'logic', 'toggle', 'edge'},         'name': tr("Turn Flipflop On")      },
+	{ 'id': 'toggleFlip',  'tags': {'logic', 'toggle', 'edge'},         'name': tr("Toggle the Flipflop")   },
+]
+triggerData = [
+	{ 'id': 'none',        'tags': {'constant'},                        'name': { 'whenLevelTriggered': tr("Never"),                          'whenEdgeTriggered': tr("Never")                         } },             
+	{ 'id': 'virtual',     'tags': {'emulated', 'software', 'special'}, 'name': { 'whenLevelTriggered': tr("While Record Button Held"),       'whenEdgeTriggered': tr("When Record Button Pressed")    } },               
+	{ 'id': 'io1',         'tags': {'io'},                              'name': { 'whenLevelTriggered': tr("While TRIG1⇄ Input"),             'whenEdgeTriggered': tr("On TRIG1⇄ Input")               } },                           
+	{ 'id': 'io2',         'tags': {'io'},                              'name': { 'whenLevelTriggered': tr("While TRIG2⇄ Input"),             'whenEdgeTriggered': tr("On TRIG2⇄ Input")               } },                           
+	{ 'id': 'io3',         'tags': {'io'},                              'name': { 'whenLevelTriggered': tr("While TRIG3± Input"),             'whenEdgeTriggered': tr("On TRIG3± Input")               } },                           
+	{ 'id': 'audio',       'tags': {'disabled'},                        'name': { 'whenLevelTriggered': tr("While Audio Detected"),           'whenEdgeTriggered': tr("When Audio Detected")           } },                                         
+	{ 'id': 'motion',      'tags': {'disabled'},                        'name': { 'whenLevelTriggered': tr("While Motion Detected"),          'whenEdgeTriggered': tr("When Motion Detected")          } },                                           
+	{ 'id': 'delay',       'tags': {},                                  'name': { 'whenLevelTriggered': tr("While Delayed Signal Arrives"),   'whenEdgeTriggered': tr("When Delayed Signal Arrives")   } },                                                           
+	{ 'id': 'comb',        'tags': {'logic', 'combinatorial'},          'name': { 'whenLevelTriggered': tr("While Logic Block Is True"),      'whenEdgeTriggered': tr("When Logic Block Becomes True") } },                                         
+	{ 'id': 'toggle',      'tags': {'logic', 'toggle'},                 'name': { 'whenLevelTriggered': tr("While Flipflop On"),              'whenEdgeTriggered': tr("When Flipflop Turns On")        } },                                     
+	{ 'id': 'shutter',     'tags': {},                                  'name': { 'whenLevelTriggered': tr("While Shutter Open"),             'whenEdgeTriggered': tr("When Shutter Opens")            } },                                       
+	{ 'id': 'recording',   'tags': {},                                  'name': { 'whenLevelTriggered': tr("While Recording"),                'whenEdgeTriggered': tr("When Recording Starts")         } },                                 
+	{ 'id': 'dispFrame',   'tags': {'pulse'},                           'name': { 'whenLevelTriggered': tr("When Frame Recorded"),            'whenEdgeTriggered': tr("When Frame Recorded")           } },                                     
+	{ 'id': 'startRec',    'tags': {'pulse'},                           'name': { 'whenLevelTriggered': tr("When Recording Starts"),          'whenEdgeTriggered': tr("When Recording Starts")         } },                                       
+	{ 'id': 'endRec',      'tags': {'pulse'},                           'name': { 'whenLevelTriggered': tr("When Recording Ends"),            'whenEdgeTriggered': tr("When Recording Ends")           } },                                   
+	{ 'id': 'nextSeg',     'tags': {'pulse'},                           'name': { 'whenLevelTriggered': tr("When New Segment"),               'whenEdgeTriggered': tr("When New Segment")              } },                               
+	{ 'id': 'timingIo',    'tags': {},                                  'name': { 'whenLevelTriggered': tr("While Timing Signal"),            'whenEdgeTriggered': tr("On Timing Signal")              } },                             
+	{ 'id': 'alwaysHigh',  'tags': {'constant'},                        'name': { 'whenLevelTriggered': tr("Always"),                         'whenEdgeTriggered': tr("Once")                          } },               
+]
+
+
+
+
+class Triggers(QtWidgets.QDialog):
+	"""Trigger screen. Configure one IO trigger at a time.
+	
+		This screen is slightly unusual in that triggers are only
+		applied when you hit "apply" or "done", instead of the usual
+		apply-on-change. This is because these settings change
+		electrical properties, and some configurations - such as
+		changing a 1mA pullup to a 20mA pullup - could do physical
+		damage. Having to hit another button provides some safety.
+		
+		Here are some notable variables involved:
+			- triggerCapabilities: The properties of the each
+				available trigger. Things like what type it is, what
+				pullups are available, etc. These only change between
+				models of camera, never on an individual camera.
+			- triggerConfiguration: How the triggers are set up on
+				this camera. When you hit Save or Done, this is what
+				is saved.
+			- triggerState: Which triggers are currently active. This
+				can change extremely frequently, but is only polled
+				every so often to avoid network congestion.
+		"""
+	
+	def __init__(self, window):
+		super().__init__()
+		uic.loadUi('src/screens/triggers.ui', self)
+
+
+
+
+
 
 allInputIds = (
 	'uiTrigger1Action', 'uiTrigger1ThresholdVoltage', 'uiTrigger11mAPullup', 'uiTrigger120mAPullup', 'uiTrigger1Invert', 'uiTrigger1Debounce',
@@ -26,7 +124,9 @@ visualizationPadding = (15, 20, 0, 20) #top, right, bottom, left; like CSS
 highStrength = 1.0
 lowStrength = 0.5
 
-class Triggers(QtWidgets.QDialog):
+#Old-style triggers. Obsolete, rewritten by otters.
+#Grab a working copy with: git checkout tags/old-triggers
+class TriggersOld(QtWidgets.QDialog):
 	"""Trigger screen. Configure one IO trigger at a time.
 	
 		This screen is slightly unusual in that triggers are only
