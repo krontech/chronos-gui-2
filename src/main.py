@@ -101,7 +101,7 @@ class Window(QtCore.QObject):
 		from screens.recording_settings import RecordingSettings
 		from screens.stamp import Stamp
 		from screens.trigger_delay import TriggerDelay
-		from screens.triggers import Triggers
+		from screens.triggers_and_io import TriggersAndIO
 		from screens.update_firmware import UpdateFirmware
 		from screens.user_settings import UserSettings
 		from screens.test import Test
@@ -113,7 +113,7 @@ class Window(QtCore.QObject):
 			'main': Main, #load order, load items on main screen first, main screen submenus next, and it doesn't really matter after that. All screens get loaded in less than 10 seconds, so this is only a startup concern.
 			'primary_settings': PrimarySettings,
 			'recording_settings': RecordingSettings,
-			'triggers': Triggers,
+			'triggers_and_io': TriggersAndIO,
 			'trigger_delay': TriggerDelay,
 			'record_mode': RecordMode,
 			'play_and_save': PlayAndSave,

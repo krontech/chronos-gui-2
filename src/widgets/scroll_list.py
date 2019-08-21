@@ -28,6 +28,8 @@ class ScrollList(QListView, FocusablePlugin):
 		self.setHorizontalScrollMode(self.ScrollPerPixel) #Make grab gesture work, otherwise moves dropdown 1 entry per pixel dragged.
 		self.setVerticalScrollMode(self.ScrollPerPixel)
 		self.setAttribute(Qt.WA_AcceptTouchEvents, True) #Enable touch gestures according to http://doc.qt.io/qt-5/qtouchevent.html#enabling-touch-events, which appears to be lieing.
+		self.setDragDropMode(self.NoDragDrop)
+		self.setMovement(self.Static)
 		
 		self.jogWheelLowResolutionRotation.connect(lambda delta:
 			self.injectKeystrokes(

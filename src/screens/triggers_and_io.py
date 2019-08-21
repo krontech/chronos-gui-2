@@ -26,14 +26,16 @@
 
 from copy import deepcopy
 from functools import partial
+from collections import defaultdict
 
 from PyQt5 import uic, QtWidgets, QtCore, QtGui
-from PyQt5.QtCore import pyqtSlot
+from PyQt5.QtCore import pyqtSlot, Qt, QItemSelection, QItemSelectionModel
 from PyQt5.QtWidgets import QGraphicsOpacityEffect #Also available: QGraphicsBlurEffect, QGraphicsColorizeEffect, QGraphicsDropShadowEffect
+from PyQt5.QtGui import QStandardItemModel
 
 from debugger import *; dbg
 
-import api
+import api, api2
 from api import silenceCallbacks
 
 settings = QtCore.QSettings('Krontech', 'back-of-camera interface')
@@ -80,7 +82,7 @@ triggerData = [
 
 
 
-class Triggers(QtWidgets.QDialog):
+class TriggersAndIO(QtWidgets.QDialog):
 	"""Trigger screen. Configure one IO trigger at a time.
 	
 		This screen is slightly unusual in that triggers are only
@@ -90,25 +92,179 @@ class Triggers(QtWidgets.QDialog):
 		changing a 1mA pullup to a 20mA pullup - could do physical
 		damage. Having to hit another button provides some safety.
 		
-		Here are some notable variables involved:
-			- triggerCapabilities: The properties of the each
-				available trigger. Things like what type it is, what
-				pullups are available, etc. These only change between
-				models of camera, never on an individual camera.
-			- triggerConfiguration: How the triggers are set up on
-				this camera. When you hit Save or Done, this is what
-				is saved.
-			- triggerState: Which triggers are currently active. This
-				can change extremely frequently, but is only polled
-				every so often to avoid network congestion.
-		"""
+		Note: There is one trigger which is special. The "virtual"
+		trigger is emulated by the UI by setting whatever it's connected
+		to to "alwaysHigh" and the "none". This trigger is stored and
+		handled by a *completely* separate mechanism than the others."""
 	
 	def __init__(self, window):
 		super().__init__()
-		uic.loadUi('src/screens/triggers.ui', self)
-
-
-
+		uic.loadUi('src/screens/triggers_and_io.ui', self)
+		
+		# Panel init.
+		self.move(0, 0)
+		self.setWindowFlags(QtCore.Qt.FramelessWindowHint)
+		self.setAttribute(QtCore.Qt.WA_TranslucentBackground, True)
+		
+		#State init, screen loads in superposition.
+		self.markStateClean()
+		
+		self.load(actions=actionData, triggers=triggerData)
+		
+		self.oldIOMapping = defaultdict(lambda: defaultdict(lambda: None))
+		self.newIOMapping = defaultdict(lambda: defaultdict(lambda: None))
+		api2.observe('ioMapping', self.onNewIOMapping)
+		
+		
+		self.uiActionList.selectionModel().selectionChanged.connect(
+			self.onActionChanged)
+		self.uiTriggerList.currentIndexChanged.connect(lambda index:
+			self.uiIndividualTriggerConfigurationPanes.setCurrentIndex(
+				self.uiTriggerList.itemData(index) ) )
+		self.uiActionList.selectionModel().setCurrentIndex(
+			self.uiActionList.model().index(0,0),
+			QItemSelectionModel.ClearAndSelect )
+		
+		self.uiInvertCondition.stateChanged.connect(self.onInvertConditionChanged)
+		self.uiDebounce.stateChanged.connect(self.onDebounceChanged)
+		
+		#When we change an input, mark the current state dirty until we save.
+		self.uiTriggerList  .currentIndexChanged.connect(self.markStateDirty)
+		self.uiInvertCondition     .stateChanged.connect(self.markStateDirty)
+		self.uiDebounce            .stateChanged.connect(self.markStateDirty)
+		self.uiIo1ThresholdVoltage .valueChanged.connect(self.markStateDirty)
+		self.uiIo11MAPullup        .stateChanged.connect(self.markStateDirty)
+		self.uiIo120MAPullup       .stateChanged.connect(self.markStateDirty)
+		self.uiIo2ThresholdVoltage .valueChanged.connect(self.markStateDirty)
+		self.uiIo220MAPullup       .stateChanged.connect(self.markStateDirty)
+		self.uiAudioTriggerDB      .valueChanged.connect(self.markStateDirty)
+		self.uiAudioTriggerPercent .valueChanged.connect(self.markStateDirty)
+		self.uiAudioTriggerDuration.valueChanged.connect(self.markStateDirty)
+		self.uiDelayAmount         .valueChanged.connect(self.markStateDirty)
+		
+		self.uiSave.clicked.connect(lambda:
+			api.set('ioMapping', self.newIOMapping).then(window.back) )
+		self.uiCancel.clicked.connect(lambda:
+			self.updateTriggerConfiguration(self.lastTriggerConfiguration))
+		self.uiDone.clicked.connect(window.back)
+	
+	
+	def markStateClean(self):
+		self.uiUnsavedChangesWarning.hide()
+		self.uiSave.hide()
+		self.uiDone.show()
+		self.uiCancel.hide()
+		
+	def markStateDirty(self):
+		self.uiUnsavedChangesWarning.show()
+		self.uiSave.show()
+		self.uiDone.hide()
+		self.uiCancel.show()
+	
+	
+	def load(self, actions: list, triggers: list):
+		"""Populate the "Action" list and the "Trigger for Action" list.
+			
+			Does not add any additional data or logic, merely preps."""
+		
+		assert len(triggers) == self.uiIndividualTriggerConfigurationPanes.count(), \
+			f"There must be as many triggers specified in triggers.py ({len(triggers)}) as there are trigger configuration panes in triggers.ui ({self.uiIndividualTriggerConfigurationPanes.count()}). Otherwise, a trigger would be inaccessible or have no screen."
+		
+		#Populate uiActionList from actions.
+		actionListModel = QStandardItemModel(len(actions), 1, self.uiActionList)
+		self.uiActionList.setModel(actionListModel)
+		for actionIndex in reversed(range(len(actions))):
+			if 'disabled' in actions[actionIndex]['tags']:
+				actionListModel.removeRow(actionIndex)
+			else:
+				actionListModel.setItemData(actionListModel.index(actionIndex, 0), {
+					Qt.DisplayRole: actions[actionIndex]['name'],
+					Qt.UserRole: actionIndex,
+					Qt.ForegroundRole: 'red', #Gets set to 'green' or something if trigger is activatable, depending on ioMapping which we don't have yet because of a circular dependency.
+					Qt.DecorationRole: None, #Icon would go here.
+				})
+		
+		#Populate uiTriggerList from triggers.
+		triggerListModel = self.uiTriggerList.model()
+		triggerListModel.insertRows(0, len(triggers))
+		for triggerIndex in reversed(range(len(triggers))):
+			if 'disabled' in triggers[triggerIndex]['tags']:
+				triggerListModel.removeRow(triggerIndex)
+			else:
+				triggerListModel.setItemData(triggerListModel.index(triggerIndex, 0), {
+					Qt.DisplayRole: triggers[triggerIndex]['name']['whenLevelTriggered'],
+					Qt.UserRole: triggerIndex,
+				})
+		
+	
+	def onNewIOMapping(self, ioMapping: dict):
+		"""Update the IO display with new values, overriding any pending changes."""
+		for action in ioMapping:
+			if ioMapping[action] == self.oldIOMapping[action]:
+				continue
+			
+			#Override any pending changes to this trigger, since it's been updated elsewhere.
+			try: 
+				del self.newIOMapping[action]
+			except KeyError:
+				pass
+			
+			state = ioMapping[action]
+			#If the trigger is active, update the invert and debounce common conditions.
+			if action == triggerData[self.uiTriggerList.currentData()]['id']:
+				self.uiInvertCondition.setChecked(bool(state['invert'])) #tristate checkboxes
+				self.uiDebounce.setChecked(bool(state['debounce']))
+			
+			if action == "io1":
+				self.uiIo11MAPullup.setChecked(bool(state['driveStrength'] & 1))
+				self.uiIo120MAPullup.setChecked(bool(state['driveStrength'] & 2))
+			elif action == "io1In":
+				self.uiIo1ThresholdVoltage.setValue(state['threshold'])
+			elif action == "io2":
+				self.uiIo220MAPullup.setChecked(bool(state['driveStrength']))
+			elif action == "io2In":
+				self.uiIo2ThresholdVoltage.setValue(state['threshold'])
+			elif action == "delay":
+				self.uiDelayAmount.setValue(state['delayTime'])
+		
+		self.oldIOMapping = ioMapping
+		
+		#Check if all operator changes have been overwritten by updates.
+		if not (value for value in self.newIOMapping if value):
+			self.markStateClean()
+	
+	
+	def onActionChanged(self, selected: QItemSelection, deselected: QItemSelection):
+		"""Update the UI when the selected action is changed.
+			
+			This function updates the trigger list, invert,
+				and debounce elements. The trigger list will
+				sync the active configuration pane, because
+				it needs to do that anyway when the operator
+				changes the trigger."""
+		
+		action = actionData[selected.indexes()[0].data(Qt.UserRole)]
+		config = api2.apiValues.get('ioMapping')[action['id']]
+		newConfig = self.newIOMapping[action['id']]
+		dataIndex = [trigger['id'] for trigger in triggerData].index(config['source'])
+		
+		for listIndex in range(self.uiTriggerList.count()):
+			if self.uiTriggerList.itemData(listIndex) == dataIndex:
+				return self.uiTriggerList.setCurrentIndex(listIndex)
+		raise Exception(f"Could not find index for {trigger['source']} ({dataIndex}) in uiTriggerList.")
+		
+		self.uiInvertCondition.setChecked(bool(
+			config['invert'] if newConfig['invert'] is None else newConfig['invert'] ))
+		self.uiDebounce.setChecked(bool(
+			config['invert'] if newConfig['invert'] is None else newConfig['invert'] ))
+	
+	
+	def onInvertConditionChanged(self, state: int):
+		pass
+	
+	def onDebounceChanged(self, state: int):
+		pass
+		
 
 
 

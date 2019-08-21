@@ -17,7 +17,7 @@
    <property name="geometry">
     <rect>
      <x>20</x>
-     <y>14</y>
+     <y>10</y>
      <width>271</width>
      <height>31</height>
     </rect>
@@ -123,91 +123,11 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>5</number>
+    <number>-1</number>
    </property>
    <property name="clickMarginBottom" stdset="0">
     <enum>ComboBox::half</enum>
    </property>
-   <item>
-    <property name="text">
-     <string>Never</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>Always</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>TRIG1⇄ Input</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>TRIG2⇄ Input</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>TRIG3± Input</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>While Delayed Signal Arrives</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>While Flipflop On</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>While Shutter Open</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>While Recording</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>On Frame Recorded</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>On Recording Start</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>On Recording End</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>On New Segment</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>Timing Signal</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>When Motion Detected</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>When Audio Detected</string>
-    </property>
-   </item>
   </widget>
   <widget class="Subheader" name="subheader_2">
    <property name="geometry">
@@ -222,12 +142,12 @@
     <string>Trigger for Action</string>
    </property>
   </widget>
-  <widget class="CheckBox" name="checkbox">
+  <widget class="CheckBox" name="uiInvertCondition">
    <property name="geometry">
     <rect>
      <x>400</x>
      <y>130</y>
-     <width>201</width>
+     <width>191</width>
      <height>71</height>
     </rect>
    </property>
@@ -238,12 +158,12 @@
     <enum>CheckBox::half</enum>
    </property>
   </widget>
-  <widget class="CheckBox" name="checkbox_2">
+  <widget class="CheckBox" name="uiDebounce">
    <property name="geometry">
     <rect>
-     <x>600</x>
+     <x>590</x>
      <y>130</y>
-     <width>201</width>
+     <width>171</width>
      <height>71</height>
     </rect>
    </property>
@@ -260,20 +180,20 @@
      <x>30</x>
      <y>80</y>
      <width>321</width>
-     <height>261</height>
+     <height>231</height>
     </rect>
    </property>
-   <property name="movement">
-    <enum>QListView::Free</enum>
+   <property name="editTriggers">
+    <set>QAbstractItemView::NoEditTriggers</set>
    </property>
   </widget>
   <widget class="QWidget" name="widget" native="true">
    <property name="geometry">
     <rect>
      <x>30</x>
-     <y>390</y>
-     <width>321</width>
-     <height>91</height>
+     <y>370</y>
+     <width>431</width>
+     <height>111</height>
     </rect>
    </property>
   </widget>
@@ -281,7 +201,7 @@
    <property name="geometry">
     <rect>
      <x>30</x>
-     <y>360</y>
+     <y>340</y>
      <width>321</width>
      <height>21</height>
     </rect>
@@ -300,9 +220,10 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>1</number>
+    <number>5</number>
    </property>
    <widget class="QWidget" name="uiNonePane"/>
+   <widget class="QWidget" name="uiVirtualPane"/>
    <widget class="QWidget" name="uiIo1Pane">
     <widget class="DecimalSpinBox" name="uiIo1ThresholdVoltage">
      <property name="geometry">
@@ -321,7 +242,7 @@
      <property name="geometry">
       <rect>
        <x>140</x>
-       <y>90</y>
+       <y>80</y>
        <width>151</width>
        <height>81</height>
       </rect>
@@ -335,7 +256,7 @@
      <property name="geometry">
       <rect>
        <x>0</x>
-       <y>90</y>
+       <y>80</y>
        <width>141</width>
        <height>81</height>
       </rect>
@@ -362,7 +283,7 @@
      <property name="geometry">
       <rect>
        <x>20</x>
-       <y>80</y>
+       <y>70</y>
        <width>181</width>
        <height>21</height>
       </rect>
@@ -371,10 +292,10 @@
       <string>Pullups</string>
      </property>
     </widget>
+    <zorder>label_4</zorder>
+    <zorder>label_2</zorder>
     <zorder>uiIo1ThresholdVoltage</zorder>
     <zorder>uiIo11MAPullup</zorder>
-    <zorder>label_2</zorder>
-    <zorder>label_4</zorder>
     <zorder>uiIo120MAPullup</zorder>
    </widget>
    <widget class="QWidget" name="uiIo2Pane">
@@ -395,7 +316,7 @@
      <property name="geometry">
       <rect>
        <x>0</x>
-       <y>90</y>
+       <y>80</y>
        <width>211</width>
        <height>81</height>
       </rect>
@@ -409,7 +330,7 @@ at 5 Volts</string>
      <property name="geometry">
       <rect>
        <x>20</x>
-       <y>80</y>
+       <y>70</y>
        <width>181</width>
        <height>21</height>
       </rect>
@@ -431,6 +352,10 @@ at 5 Volts</string>
       <string>Input Threshold</string>
      </property>
     </widget>
+    <zorder>label_5</zorder>
+    <zorder>label_6</zorder>
+    <zorder>uiIo2ThresholdVoltage</zorder>
+    <zorder>uiIo220MAPullup</zorder>
    </widget>
    <widget class="QWidget" name="uiIo3Pane">
     <widget class="Label" name="label_7">
@@ -629,6 +554,9 @@ at 5 Volts</string>
       <set>Qt::AlignCenter</set>
      </property>
     </widget>
+    <zorder>uiMotionGraph</zorder>
+    <zorder>uiMotionGraphLabel</zorder>
+    <zorder>uiConfigureMotionTriggering</zorder>
    </widget>
    <widget class="QWidget" name="uiDelayPane">
     <widget class="DecimalSpinBox" name="uiDelayAmount">
@@ -652,7 +580,7 @@ at 5 Volts</string>
       <rect>
        <x>20</x>
        <y>10</y>
-       <width>171</width>
+       <width>51</width>
        <height>41</height>
       </rect>
      </property>
@@ -660,6 +588,8 @@ at 5 Volts</string>
       <string>Delay</string>
      </property>
     </widget>
+    <zorder>label_8</zorder>
+    <zorder>uiDelayAmount</zorder>
    </widget>
    <widget class="QWidget" name="uiCombPane"/>
    <widget class="QWidget" name="uiTogglePane"/>
@@ -672,6 +602,22 @@ at 5 Volts</string>
    <widget class="QWidget" name="uiTimingIoPane"/>
    <widget class="QWidget" name="uiAlwaysHighPane"/>
   </widget>
+  <widget class="QLabel" name="label_3">
+   <property name="geometry">
+    <rect>
+     <x>378</x>
+     <y>70</y>
+     <width>30</width>
+     <height>121</height>
+    </rect>
+   </property>
+   <property name="pixmap">
+    <pixmap>../../assets/images/triggers-and-io-group-arrow.png</pixmap>
+   </property>
+   <property name="scaledContents">
+    <bool>false</bool>
+   </property>
+  </widget>
   <zorder>backdrop</zorder>
   <zorder>headerlabel</zorder>
   <zorder>uiUnsavedChangesWarning</zorder>
@@ -681,12 +627,13 @@ at 5 Volts</string>
   <zorder>subheader</zorder>
   <zorder>subheader_2</zorder>
   <zorder>uiTriggerList</zorder>
-  <zorder>checkbox</zorder>
-  <zorder>checkbox_2</zorder>
+  <zorder>uiInvertCondition</zorder>
+  <zorder>uiDebounce</zorder>
   <zorder>uiActionList</zorder>
-  <zorder>widget</zorder>
   <zorder>subheader_3</zorder>
   <zorder>uiIndividualTriggerConfigurationPanes</zorder>
+  <zorder>widget</zorder>
+  <zorder>label_3</zorder>
  </widget>
  <customwidgets>
   <customwidget>

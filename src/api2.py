@@ -629,10 +629,12 @@ class APIValues(QObject):
 	
 	def observe(self, key, callback):
 		"""Add a function to get called when a value is updated."""
+		assert callable(callback), f"Callback is not callable. (Expected function, got {callback}.)"
 		self._callbacks[key].append(callback)
 	
 	def unobserve(self, key, callback):
 		"""Stop a function from getting called when a value is updated."""
+		assert callable(callback), f"Callback is not callable. (Expected function, got {callback}.)"
 		self._callbacks[key].remove(callback)
 	
 	def __newValueIsEnqueued(self, key):
@@ -689,6 +691,7 @@ def observe(name: str, callback: Callable[[Any], None]) -> None:
 		key one syscall at a time as we instantiate each Qt control.
 	"""
 	
+	assert callable(callback), f"Callback is not callable. (Expected function, got {callback}.)"
 	apiValues.observe(name, callback)
 	callback(apiValues.get(name))
 
@@ -699,6 +702,7 @@ def observe_future_only(name: str, callback: Callable[[Any], None]) -> None:
 		Useful when `observe`ing a derived value, which observe can't deal with yet.
 	"""
 	
+	assert callable(callback), f"Callback is not callable. (Expected function, got {callback}.)"
 	apiValues.observe(name, callback)
 
 
@@ -754,10 +758,12 @@ class Signal(QObject):
 	
 	def observe(self, signal: str, handler: Callable[[Any], None]) -> None:
 		"""Add a function to get called when a D-BUS signal is emitted."""
+		assert callable(handler), f"Handler is not callable. (Expected function, got {handler}.)"
 		self._signalObservers[signal].append(handler)
 	
 	def unobserve(self, signal: str, handler: Callable[[Any], None]) -> None:
 		"""Stop a function from getting called when a D-BUS signal is emitted."""
+		assert callable(handler), f"Handler is not callable. (Expected function, got {handler}.)"
 		self._signalObservers[signal].remove(handler)
 signal = Signal()
 del Signal
@@ -848,11 +854,15 @@ class ExternalPartitions(QObject):
 		"""Add a function to get called when a volume is mounted or unmounted.
 			
 			The added function is immediately invoked."""
+		
+		assert callable(callback), f"Callback is not callable. (Expected function, got {callback}.)"
 		self._callbacks += [callback]
 		callback(self._partitions)
 	
 	def unobserve(self, callback):
 		"""Stop a function from getting called when a volume is mounted or unmounted."""
+		
+		assert callable(callback), f"Callback is not callable. (Expected function, got {callback}.)"
 		self._callbacks = list(filter(
 			lambda existingCallback: existingCallback != callback, 
 			self._callbacks ) )

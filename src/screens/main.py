@@ -197,7 +197,7 @@ class Main(QWidget):
 		
 		self.uiRecordModes.clicked.connect(lambda: window.show('record_mode'))
 		self.uiRecordingSettings.clicked.connect(lambda: window.show('recording_settings'))
-		self.uiTriggerIOSettings.clicked.connect(lambda: window.show('triggers'))
+		self.uiTriggerIOSettings.clicked.connect(lambda: window.show('triggers_and_io'))
 		self.uiTriggerDelay.clicked.connect(lambda: window.show('trigger_delay'))
 		
 		self.uiPlayAndSave.clicked.connect(lambda: window.show('play_and_save'))
