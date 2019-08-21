@@ -250,8 +250,10 @@ class TriggersAndIO(QtWidgets.QDialog):
 		
 		for listIndex in range(self.uiTriggerList.count()):
 			if self.uiTriggerList.itemData(listIndex) == dataIndex:
-				return self.uiTriggerList.setCurrentIndex(listIndex)
-		raise Exception(f"Could not find index for {trigger['source']} ({dataIndex}) in uiTriggerList.")
+				self.uiTriggerList.setCurrentIndex(listIndex)
+				break
+		else:
+			raise Exception(f"Could not find index for {config['source']} ({dataIndex}) in uiTriggerList.")
 		
 		self.uiInvertCondition.setChecked(bool(
 			config['invert'] if newConfig['invert'] is None else newConfig['invert'] ))
@@ -265,6 +267,8 @@ class TriggersAndIO(QtWidgets.QDialog):
 	def onDebounceChanged(self, state: int):
 		pass
 		
+
+
 
 
 

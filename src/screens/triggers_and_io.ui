@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>800</width>
+    <width>799</width>
     <height>480</height>
    </rect>
   </property>
@@ -117,7 +117,7 @@
    <property name="geometry">
     <rect>
      <x>400</x>
-     <y>60</y>
+     <y>30</y>
      <width>361</width>
      <height>71</height>
     </rect>
@@ -132,8 +132,8 @@
   <widget class="Subheader" name="subheader_2">
    <property name="geometry">
     <rect>
-     <x>420</x>
-     <y>50</y>
+     <x>410</x>
+     <y>20</y>
      <width>371</width>
      <height>21</height>
     </rect>
@@ -146,7 +146,7 @@
    <property name="geometry">
     <rect>
      <x>400</x>
-     <y>130</y>
+     <y>100</y>
      <width>191</width>
      <height>71</height>
     </rect>
@@ -162,7 +162,7 @@
    <property name="geometry">
     <rect>
      <x>590</x>
-     <y>130</y>
+     <y>100</y>
      <width>171</width>
      <height>71</height>
     </rect>
@@ -177,7 +177,7 @@
   <widget class="ScrollList" name="uiActionList">
    <property name="geometry">
     <rect>
-     <x>30</x>
+     <x>40</x>
      <y>80</y>
      <width>321</width>
      <height>231</height>
@@ -190,9 +190,9 @@
   <widget class="QWidget" name="widget" native="true">
    <property name="geometry">
     <rect>
-     <x>30</x>
+     <x>40</x>
      <y>370</y>
-     <width>431</width>
+     <width>321</width>
      <height>111</height>
     </rect>
    </property>
@@ -214,9 +214,9 @@
    <property name="geometry">
     <rect>
      <x>400</x>
-     <y>190</y>
+     <y>160</y>
      <width>401</width>
-     <height>211</height>
+     <height>241</height>
     </rect>
    </property>
    <property name="currentIndex">
@@ -229,7 +229,7 @@
      <property name="geometry">
       <rect>
        <x>140</x>
-       <y>-10</y>
+       <y>20</y>
        <width>221</width>
        <height>81</height>
       </rect>
@@ -242,7 +242,7 @@
      <property name="geometry">
       <rect>
        <x>140</x>
-       <y>80</y>
+       <y>110</y>
        <width>151</width>
        <height>81</height>
       </rect>
@@ -256,7 +256,7 @@
      <property name="geometry">
       <rect>
        <x>0</x>
-       <y>80</y>
+       <y>110</y>
        <width>141</width>
        <height>81</height>
       </rect>
@@ -270,7 +270,7 @@
      <property name="geometry">
       <rect>
        <x>20</x>
-       <y>10</y>
+       <y>40</y>
        <width>171</width>
        <height>41</height>
       </rect>
@@ -283,7 +283,7 @@
      <property name="geometry">
       <rect>
        <x>20</x>
-       <y>70</y>
+       <y>100</y>
        <width>181</width>
        <height>21</height>
       </rect>
@@ -292,18 +292,32 @@
       <string>Pullups</string>
      </property>
     </widget>
+    <widget class="Subheader" name="subheader_8">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>10</y>
+       <width>241</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Trigger Options</string>
+     </property>
+    </widget>
     <zorder>label_4</zorder>
     <zorder>label_2</zorder>
     <zorder>uiIo1ThresholdVoltage</zorder>
     <zorder>uiIo11MAPullup</zorder>
     <zorder>uiIo120MAPullup</zorder>
+    <zorder>subheader_8</zorder>
    </widget>
    <widget class="QWidget" name="uiIo2Pane">
     <widget class="DecimalSpinBox" name="uiIo2ThresholdVoltage">
      <property name="geometry">
       <rect>
        <x>140</x>
-       <y>-10</y>
+       <y>20</y>
        <width>221</width>
        <height>81</height>
       </rect>
@@ -316,7 +330,7 @@
      <property name="geometry">
       <rect>
        <x>0</x>
-       <y>80</y>
+       <y>110</y>
        <width>211</width>
        <height>81</height>
       </rect>
@@ -330,7 +344,7 @@ at 5 Volts</string>
      <property name="geometry">
       <rect>
        <x>20</x>
-       <y>70</y>
+       <y>100</y>
        <width>181</width>
        <height>21</height>
       </rect>
@@ -343,7 +357,7 @@ at 5 Volts</string>
      <property name="geometry">
       <rect>
        <x>20</x>
-       <y>10</y>
+       <y>40</y>
        <width>171</width>
        <height>41</height>
       </rect>
@@ -352,10 +366,24 @@ at 5 Volts</string>
       <string>Input Threshold</string>
      </property>
     </widget>
+    <widget class="Subheader" name="subheader_7">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>10</y>
+       <width>241</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Trigger Options</string>
+     </property>
+    </widget>
     <zorder>label_5</zorder>
     <zorder>label_6</zorder>
     <zorder>uiIo2ThresholdVoltage</zorder>
     <zorder>uiIo220MAPullup</zorder>
+    <zorder>subheader_7</zorder>
    </widget>
    <widget class="QWidget" name="uiIo3Pane">
     <widget class="Label" name="label_7">
@@ -364,7 +392,7 @@ at 5 Volts</string>
        <x>20</x>
        <y>0</y>
        <width>321</width>
-       <height>41</height>
+       <height>21</height>
       </rect>
      </property>
      <property name="text">
@@ -377,7 +405,7 @@ at 5 Volts</string>
      <property name="geometry">
       <rect>
        <x>20</x>
-       <y>20</y>
+       <y>50</y>
        <width>81</width>
        <height>21</height>
       </rect>
@@ -390,7 +418,7 @@ at 5 Volts</string>
      <property name="geometry">
       <rect>
        <x>20</x>
-       <y>80</y>
+       <y>110</y>
        <width>80</width>
        <height>21</height>
       </rect>
@@ -403,7 +431,7 @@ at 5 Volts</string>
      <property name="geometry">
       <rect>
        <x>20</x>
-       <y>130</y>
+       <y>160</y>
        <width>321</width>
        <height>71</height>
       </rect>
@@ -416,7 +444,7 @@ at 5 Volts</string>
      <property name="geometry">
       <rect>
        <x>21</x>
-       <y>131</y>
+       <y>161</y>
        <width>151</width>
        <height>31</height>
       </rect>
@@ -437,7 +465,7 @@ at 5 Volts</string>
      <property name="geometry">
       <rect>
        <x>200</x>
-       <y>20</y>
+       <y>50</y>
        <width>41</width>
        <height>21</height>
       </rect>
@@ -453,7 +481,7 @@ at 5 Volts</string>
      <property name="geometry">
       <rect>
        <x>80</x>
-       <y>-10</y>
+       <y>20</y>
        <width>141</width>
        <height>71</height>
       </rect>
@@ -469,7 +497,7 @@ at 5 Volts</string>
      <property name="geometry">
       <rect>
        <x>220</x>
-       <y>-10</y>
+       <y>20</y>
        <width>141</width>
        <height>71</height>
       </rect>
@@ -485,7 +513,7 @@ at 5 Volts</string>
      <property name="geometry">
       <rect>
        <x>80</x>
-       <y>60</y>
+       <y>90</y>
        <width>141</width>
        <height>71</height>
       </rect>
@@ -497,6 +525,19 @@ at 5 Volts</string>
       <string>s</string>
      </property>
     </widget>
+    <widget class="Subheader" name="subheader_4">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>10</y>
+       <width>241</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Trigger Options</string>
+     </property>
+    </widget>
     <zorder>label</zorder>
     <zorder>label_9</zorder>
     <zorder>uiAudioGraph</zorder>
@@ -505,13 +546,14 @@ at 5 Volts</string>
     <zorder>label_11</zorder>
     <zorder>uiAudioTriggerPercent</zorder>
     <zorder>uiAudioTriggerDuration</zorder>
+    <zorder>subheader_4</zorder>
    </widget>
    <widget class="QWidget" name="uiMotionPane">
     <widget class="QWidget" name="uiMotionGraph" native="true">
      <property name="geometry">
       <rect>
        <x>20</x>
-       <y>10</y>
+       <y>39</y>
        <width>321</width>
        <height>121</height>
       </rect>
@@ -524,7 +566,7 @@ at 5 Volts</string>
      <property name="geometry">
       <rect>
        <x>0</x>
-       <y>120</y>
+       <y>149</y>
        <width>361</width>
        <height>81</height>
       </rect>
@@ -537,7 +579,7 @@ at 5 Volts</string>
      <property name="geometry">
       <rect>
        <x>21</x>
-       <y>11</y>
+       <y>40</y>
        <width>151</width>
        <height>31</height>
       </rect>
@@ -554,16 +596,30 @@ at 5 Volts</string>
       <set>Qt::AlignCenter</set>
      </property>
     </widget>
+    <widget class="Subheader" name="subheader_5">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>10</y>
+       <width>241</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Trigger Options</string>
+     </property>
+    </widget>
     <zorder>uiMotionGraph</zorder>
     <zorder>uiMotionGraphLabel</zorder>
     <zorder>uiConfigureMotionTriggering</zorder>
+    <zorder>subheader_5</zorder>
    </widget>
    <widget class="QWidget" name="uiDelayPane">
     <widget class="DecimalSpinBox" name="uiDelayAmount">
      <property name="geometry">
       <rect>
        <x>50</x>
-       <y>-10</y>
+       <y>20</y>
        <width>151</width>
        <height>81</height>
       </rect>
@@ -579,7 +635,7 @@ at 5 Volts</string>
      <property name="geometry">
       <rect>
        <x>20</x>
-       <y>10</y>
+       <y>40</y>
        <width>51</width>
        <height>41</height>
       </rect>
@@ -588,8 +644,22 @@ at 5 Volts</string>
       <string>Delay</string>
      </property>
     </widget>
+    <widget class="Subheader" name="subheader_6">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>10</y>
+       <width>241</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Trigger Options</string>
+     </property>
+    </widget>
     <zorder>label_8</zorder>
     <zorder>uiDelayAmount</zorder>
+    <zorder>subheader_6</zorder>
    </widget>
    <widget class="QWidget" name="uiCombPane"/>
    <widget class="QWidget" name="uiTogglePane"/>
@@ -602,28 +672,11 @@ at 5 Volts</string>
    <widget class="QWidget" name="uiTimingIoPane"/>
    <widget class="QWidget" name="uiAlwaysHighPane"/>
   </widget>
-  <widget class="QLabel" name="label_3">
-   <property name="geometry">
-    <rect>
-     <x>378</x>
-     <y>70</y>
-     <width>30</width>
-     <height>121</height>
-    </rect>
-   </property>
-   <property name="pixmap">
-    <pixmap>../../assets/images/triggers-and-io-group-arrow.png</pixmap>
-   </property>
-   <property name="scaledContents">
-    <bool>false</bool>
-   </property>
-  </widget>
   <zorder>backdrop</zorder>
   <zorder>headerlabel</zorder>
   <zorder>uiUnsavedChangesWarning</zorder>
   <zorder>uiSave</zorder>
   <zorder>uiDone</zorder>
-  <zorder>uiCancel</zorder>
   <zorder>subheader</zorder>
   <zorder>subheader_2</zorder>
   <zorder>uiTriggerList</zorder>
@@ -633,7 +686,7 @@ at 5 Volts</string>
   <zorder>subheader_3</zorder>
   <zorder>uiIndividualTriggerConfigurationPanes</zorder>
   <zorder>widget</zorder>
-  <zorder>label_3</zorder>
+  <zorder>uiCancel</zorder>
  </widget>
  <customwidgets>
   <customwidget>
