@@ -22,7 +22,10 @@
 			--method ca.krontech.chronos.control.get \
 			"['ioMapping']"
 	
-	"""
+	When adding a new option for a trigger, don't forget to…
+		- add it to the "resetChanges" function.
+		- add it to the "self.markStateDirty" callback list.
+		- set up a handler to propagate the changes to self.newIOMapping"""
 
 from copy import deepcopy
 from functools import partial
@@ -40,6 +43,11 @@ from api import silenceCallbacks
 
 settings = QtCore.QSettings('Krontech', 'back-of-camera interface')
 tr = partial(QtCore.QCoreApplication.translate, "Triggers")
+
+#Keep unsaved changes when something else changes them?
+KEEP_CHANGES = True
+DISCARD_CHANGES = False
+updateMode = KEEP_CHANGES
 
 actionData = [
 	{ 'id': 'start',       'tags': {'action', 'video', 'edge'},         'name': tr("Start Recording")       },
@@ -111,8 +119,8 @@ class TriggersAndIO(QtWidgets.QDialog):
 		
 		self.load(actions=actionData, triggers=triggerData)
 		
-		self.oldIOMapping = defaultdict(lambda: defaultdict(lambda: None))
-		self.newIOMapping = defaultdict(lambda: defaultdict(lambda: None))
+		self.oldIOMapping = defaultdict(lambda: defaultdict(lambda: None)) #Set part and parcel to whatever the most recent mapping is.
+		self.newIOMapping = defaultdict(lambda: defaultdict(lambda: None)) #Set piece-by-piece to the new mapping.
 		api2.observe('ioMapping', self.onNewIOMapping)
 		
 		
@@ -124,28 +132,40 @@ class TriggersAndIO(QtWidgets.QDialog):
 		self.uiActionList.selectionModel().setCurrentIndex(
 			self.uiActionList.model().index(0,0),
 			QItemSelectionModel.ClearAndSelect )
+		self.uiIndividualTriggerConfigurationPanes.setCurrentIndex(0) #Ideally, this would not be set in the .ui file. Realistically, since it's set when we change "panels" with the little arrows at the top, we're not gonna remember to clear it every time in the property editor.
 		
-		self.uiInvertCondition.stateChanged.connect(self.onInvertConditionChanged)
+		self.uiTriggerList.currentIndexChanged.connect(self.onTriggerChanged)
+		self.uiInvertCondition.stateChanged.connect(self.onInvertChanged)
 		self.uiDebounce.stateChanged.connect(self.onDebounceChanged)
 		
 		#When we change an input, mark the current state dirty until we save.
-		self.uiTriggerList  .currentIndexChanged.connect(self.markStateDirty)
-		self.uiInvertCondition     .stateChanged.connect(self.markStateDirty)
-		self.uiDebounce            .stateChanged.connect(self.markStateDirty)
-		self.uiIo1ThresholdVoltage .valueChanged.connect(self.markStateDirty)
-		self.uiIo11MAPullup        .stateChanged.connect(self.markStateDirty)
-		self.uiIo120MAPullup       .stateChanged.connect(self.markStateDirty)
-		self.uiIo2ThresholdVoltage .valueChanged.connect(self.markStateDirty)
-		self.uiIo220MAPullup       .stateChanged.connect(self.markStateDirty)
-		self.uiAudioTriggerDB      .valueChanged.connect(self.markStateDirty)
-		self.uiAudioTriggerPercent .valueChanged.connect(self.markStateDirty)
-		self.uiAudioTriggerDuration.valueChanged.connect(self.markStateDirty)
-		self.uiDelayAmount         .valueChanged.connect(self.markStateDirty)
+		self.uiTriggerList   .currentIndexChanged.connect(self.markStateDirty)
+		self.uiInvertCondition      .stateChanged.connect(self.markStateDirty)
+		self.uiDebounce             .stateChanged.connect(self.markStateDirty)
+		self.uiIo1ThresholdVoltage  .valueChanged.connect(self.markStateDirty)
+		self.uiIo11MAPullup         .stateChanged.connect(self.markStateDirty)
+		self.uiIo120MAPullup        .stateChanged.connect(self.markStateDirty)
+		self.uiIo2ThresholdVoltage  .valueChanged.connect(self.markStateDirty)
+		self.uiIo220MAPullup        .stateChanged.connect(self.markStateDirty)
+		#self.uiAudioTriggerDB      .valueChanged.connect(self.markStateDirty)
+		#self.uiAudioTriggerPercent .valueChanged.connect(self.markStateDirty)
+		#self.uiAudioTriggerDuration.valueChanged.connect(self.markStateDirty)
+		self.uiDelayAmount          .valueChanged.connect(self.markStateDirty)
 		
-		self.uiSave.clicked.connect(lambda:
-			api.set('ioMapping', self.newIOMapping).then(window.back) )
-		self.uiCancel.clicked.connect(lambda:
-			self.updateTriggerConfiguration(self.lastTriggerConfiguration))
+		#Set the appropriate value in the newIOMapping when a custom updates.
+		self.uiIo1ThresholdVoltage  .valueChanged.connect(self.onIo1ThresholdVoltageChanged)
+		self.uiIo11MAPullup         .stateChanged.connect(self.onIo11MAPullupChanged)
+		self.uiIo120MAPullup        .stateChanged.connect(self.onIo120MAPullupChanged)
+		self.uiIo2ThresholdVoltage  .valueChanged.connect(self.onIo2ThresholdVoltageChanged)
+		self.uiIo220MAPullup        .stateChanged.connect(self.onIo220MAPullupChanged)
+		#self.uiAudioTriggerDB      .valueChanged.connect(self.onAudioTriggerDBChanged)
+		#self.uiAudioTriggerPercent .valueChanged.connect(self.onAudioTriggerPercentChanged)
+		#self.uiAudioTriggerDuration.valueChanged.connect(self.onAudioTriggerDurationChanged)
+		self.uiDelayAmount          .valueChanged.connect(self.onDelayAmountChanged)
+		
+		self.uiSave.clicked.connect(self.saveChanges)
+		self.uiCancel.clicked.connect(self.resetChanges)
+		self.uiCancel.clicked.connect(self.markStateClean)
 		self.uiDone.clicked.connect(window.back)
 	
 	
@@ -195,7 +215,38 @@ class TriggersAndIO(QtWidgets.QDialog):
 					Qt.DisplayRole: triggers[triggerIndex]['name']['whenLevelTriggered'],
 					Qt.UserRole: triggerIndex,
 				})
+	
+	def resetChanges(self, *_):
+		self.newIOMapping = defaultdict(lambda: defaultdict(lambda: None))
+		self.onActionChanged(self.uiActionList.selectionModel().selection())
 		
+		ioMapping = api2.apiValues.get('ioMapping')
+		self.uiIo1ThresholdVoltage.setValue(ioMapping['io1In']['threshold'])
+		self.uiIo11MAPullup.setChecked(bool(ioMapping['io1']['driveStrength'] & 1))
+		self.uiIo120MAPullup.setChecked(bool(ioMapping['io1']['driveStrength'] & 2))
+		self.uiIo2ThresholdVoltage.setValue(ioMapping['io2In']['threshold'])
+		self.uiIo220MAPullup.setChecked(bool(ioMapping['io2']['driveStrength']))
+		#self.uiAudioTriggerDB.setValue(ioMapping[''][''])
+		#self.uiAudioTriggerPercent.setValue(ioMapping[''][''])
+		#self.uiAudioTriggerDuration.setValue(ioMapping[''][''])
+		self.uiDelayAmount.setValue(ioMapping['delay']['delayTime'])
+	
+	def saveChanges(self, *_):
+		ioMapping = api2.apiValues.get('ioMapping')
+		api2.set('ioMapping', dump('ioMapping delta', { #Send along the update delta. Strictly speaking, we could send the whole thing and not a delta, but it seems more correct to only send what we want to change. data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACMAAAAjCAMAAAApB0NrAAAAdVBMVEUAAAAAFBwCJTYbKjQjOUwoPlI/QT5GTFRDVmVQY3N4XGhgZGbUPobePYXgQY2BZnedZ4GBeH7EYqCXdYjbX5yigJOIjI+NkZTgfai5jZ2gnaHkire6m6fknsPxm8CtsrToqczrr8S9wsTwttHztszzuNPe4N2lYYACAAAAAXRSTlMAQObYZgAAAaBJREFUOMt9kwFTgzAMhVGn4ibMuqql40WFxP//E01TNgpu5o47Lnx9SV9CVS3Dp6iuRVPEZeK1RJrWN43/V+WKWinjg2/zyzUZDxGGvyA0MwkhypC/zHgiFgiqNeObkiGAyXIFo00W3QBdB5h0wWieMtVi7GJ0255XjCcRIR8ABMHh/WOIyEy1ZIRF0Onjhrr+jFbreWZaZGDvemX7n7h7ykxRrDkyCXo3DIOa0+/cw+YddnnvX086XjvBNsbaKfPtNjf3W3xpeuEOhPpt/Nnd98yEt/1LMnE1CO0azkX3eNCqzNBL0Hr31Dp+c5uHu4OoxToMnWr1FwpdrG83qZY5gYkBUMzUd67ew0RERhCMSHgx94A+pcxPQqoG40umBfOYETtPoHwCxf4cNat7ocshpgAUTDY1cD5MYypmTU2qCVHtYEs6B86t2cXUZBYOQRaBUWYPIKPtT26QTufJoMkd8PS1bNNq8Oxkdk3s69HTCdKBnZ0BzU1Q285Ci2mdC6TFn2+3nOpUjo/JyCtMZZNh2+HARUMrSP21/zWMf3V+AVFTVrq9UKSZAAAAAElFTkSuQmCC
+			action: {
+				key:
+					self.newIOMapping[action][key] 
+					if self.newIOMapping[action][key] is not None 
+					else value
+				for key, value in ioMapping[action].items()
+			}
+			for action, config in self.newIOMapping.items()
+			if config
+		})).then(self.saveChanges2)
+	def saveChanges2(self, *_):
+		self.markStateClean()
+		self.newIOMapping = defaultdict(lambda: defaultdict(lambda: None))
 	
 	def onNewIOMapping(self, ioMapping: dict):
 		"""Update the IO display with new values, overriding any pending changes."""
@@ -203,11 +254,12 @@ class TriggersAndIO(QtWidgets.QDialog):
 			if ioMapping[action] == self.oldIOMapping[action]:
 				continue
 			
-			#Override any pending changes to this trigger, since it's been updated elsewhere.
-			try: 
-				del self.newIOMapping[action]
-			except KeyError:
-				pass
+			if updateMode == DISCARD_CHANGES:
+				#Override any pending changes to this trigger, since it's been updated elsewhere.
+				try: 
+					del self.newIOMapping[action]
+				except KeyError:
+					pass
 			
 			state = ioMapping[action]
 			#If the trigger is active, update the invert and debounce common conditions.
@@ -229,12 +281,13 @@ class TriggersAndIO(QtWidgets.QDialog):
 		
 		self.oldIOMapping = ioMapping
 		
-		#Check if all operator changes have been overwritten by updates.
-		if not (value for value in self.newIOMapping if value):
-			self.markStateClean()
+		if updateMode == DISCARD_CHANGES:
+			#Check if all operator changes have been overwritten by updates.
+			if not (value for value in self.newIOMapping if value):
+				self.markStateClean()
 	
 	
-	def onActionChanged(self, selected: QItemSelection, deselected: QItemSelection):
+	def onActionChanged(self, selected: QItemSelection, deselected: QItemSelection = []):
 		"""Update the UI when the selected action is changed.
 			
 			This function updates the trigger list, invert,
@@ -246,26 +299,69 @@ class TriggersAndIO(QtWidgets.QDialog):
 		action = actionData[selected.indexes()[0].data(Qt.UserRole)]
 		config = api2.apiValues.get('ioMapping')[action['id']]
 		newConfig = self.newIOMapping[action['id']]
-		dataIndex = [trigger['id'] for trigger in triggerData].index(config['source'])
+		dataIndex = [trigger['id'] for trigger in triggerData].index(newConfig['source'] or config['source'])
 		
-		for listIndex in range(self.uiTriggerList.count()):
-			if self.uiTriggerList.itemData(listIndex) == dataIndex:
-				self.uiTriggerList.setCurrentIndex(listIndex)
-				break
-		else:
-			raise Exception(f"Could not find index for {config['source']} ({dataIndex}) in uiTriggerList.")
+		listIndex = self.uiTriggerList.findData(dataIndex)
+		assert listIndex is not -1, f"Could not find index for {config['source']} ({dataIndex}) in uiTriggerList."
+		self.uiTriggerList.setCurrentIndex(listIndex)
 		
+		self.uiInvertCondition.blockSignals(True) #We can block these signals because nothing else depends on them. A few things depend on the Trigger for Action combobox, so it is just a little smarter about it's updates to deal with this changing.
 		self.uiInvertCondition.setChecked(bool(
 			config['invert'] if newConfig['invert'] is None else newConfig['invert'] ))
+		self.uiInvertCondition.blockSignals(False)
+		
+		self.uiDebounce.blockSignals(True)
 		self.uiDebounce.setChecked(bool(
-			config['invert'] if newConfig['invert'] is None else newConfig['invert'] ))
+			config['debounce'] if newConfig['debounce'] is None else newConfig['debounce'] ))
+		self.uiDebounce.blockSignals(False)
 	
 	
-	def onInvertConditionChanged(self, state: int):
-		pass
+	def onTriggerChanged(self, index: int):
+		activeAction = actionData[self.uiActionList.selectionModel().currentIndex().data(Qt.UserRole)]
+		newSource = triggerData[self.uiTriggerList.itemData(index)]['id']
+		activeMapping = self.newIOMapping[activeAction['id']]
+		if api2.apiValues.get('ioMapping')[activeAction['id']]['source'] == newSource:
+			if activeMapping['source']: #Clear key if it exists, no need to set. Otherwise, when we switched actions, the trigger would always get set to what it was, which is pointless.
+				del activeMapping['source']
+		else:
+			activeMapping['source'] = triggerData[self.uiTriggerList.itemData(index)]['id']
+	
+	def onInvertChanged(self, state: int):
+		activeAction = actionData[self.uiActionList.selectionModel().currentIndex().data(Qt.UserRole)]
+		self.newIOMapping[activeAction['id']]['invert'] = bool(state)
 	
 	def onDebounceChanged(self, state: int):
-		pass
+		activeAction = actionData[self.uiActionList.selectionModel().currentIndex().data(Qt.UserRole)]
+		self.newIOMapping[activeAction['id']]['debounce'] = bool(state)
+	
+	
+	def onIo1ThresholdVoltageChanged(self, value: float):
+		self.newIOMapping['io1In']['threshold'] = value
+	
+	def onIo11MAPullupChanged(self, state: int):
+		self.newIOMapping['io1']['driveStrength'] = bool(state) + self.uiIo120MAPullup.checkState()
+	
+	def onIo120MAPullupChanged(self, state: int):
+		self.newIOMapping['io1']['driveStrength'] = self.uiIo11MAPullup.isChecked() + state
+	
+	def onIo2ThresholdVoltageChanged(self, value: float):
+		self.newIOMapping['io2In']['threshold'] = value
+	
+	def onIo220MAPullupChanged(self, state: int):
+		self.newIOMapping['io2']['driveStrength'] = int(bool(state))
+	
+	def onAudioTriggerDBChanged(self, value: float):
+		raise NotImplementedError()
+	
+	def onAudioTriggerPercentChanged(self, value: float):
+		raise NotImplementedError()
+	
+	def onAudioTriggerDurationChanged(self, value: float):
+		raise NotImplementedError()
+	
+	def onDelayAmountChanged(self, value: float):
+		self.newIOMapping['delay']['delayTime'] = value
+	
 		
 
 

@@ -220,7 +220,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>5</number>
+    <number>7</number>
    </property>
    <widget class="QWidget" name="uiNonePane"/>
    <widget class="QWidget" name="uiVirtualPane"/>
@@ -627,6 +627,12 @@ at 5 Volts</string>
      <property name="decimals">
       <number>2</number>
      </property>
+     <property name="maximum">
+      <double>99999999.000000000000000</double>
+     </property>
+     <property name="singleStep">
+      <double>0.010000000000000</double>
+     </property>
      <property name="units" stdset="0">
       <string>s</string>
      </property>
@@ -742,10 +748,22 @@ at 5 Volts</string>
  </customwidgets>
  <tabstops>
   <tabstop>uiDone</tabstop>
+  <tabstop>uiSave</tabstop>
+  <tabstop>uiActionList</tabstop>
+  <tabstop>uiTriggerList</tabstop>
+  <tabstop>uiInvertCondition</tabstop>
+  <tabstop>uiDebounce</tabstop>
   <tabstop>uiIo1ThresholdVoltage</tabstop>
   <tabstop>uiIo11MAPullup</tabstop>
   <tabstop>uiIo120MAPullup</tabstop>
-  <tabstop>uiSave</tabstop>
+  <tabstop>uiIo2ThresholdVoltage</tabstop>
+  <tabstop>uiIo220MAPullup</tabstop>
+  <tabstop>uiAudioTriggerDB</tabstop>
+  <tabstop>uiAudioTriggerPercent</tabstop>
+  <tabstop>uiAudioTriggerDuration</tabstop>
+  <tabstop>uiConfigureMotionTriggering</tabstop>
+  <tabstop>uiDelayAmount</tabstop>
+  <tabstop>uiCancel</tabstop>
  </tabstops>
  <resources>
   <include location="../../assets.qrc"/>
