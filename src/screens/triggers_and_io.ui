@@ -237,6 +237,12 @@
      <property name="suffix">
       <string> Volts</string>
      </property>
+     <property name="maximum">
+      <double>6.600000000000000</double>
+     </property>
+     <property name="singleStep">
+      <double>0.100000000000000</double>
+     </property>
     </widget>
     <widget class="CheckBox" name="uiIo120MAPullup">
      <property name="geometry">
@@ -324,6 +330,12 @@
      </property>
      <property name="suffix">
       <string> Volts</string>
+     </property>
+     <property name="maximum">
+      <double>6.600000000000000</double>
+     </property>
+     <property name="singleStep">
+      <double>0.100000000000000</double>
      </property>
     </widget>
     <widget class="CheckBox" name="uiIo220MAPullup">
@@ -489,6 +501,12 @@ at 5 Volts</string>
      <property name="suffix">
       <string>dB</string>
      </property>
+     <property name="maximum">
+      <double>120.000000000000000</double>
+     </property>
+     <property name="singleStep">
+      <double>0.100000000000000</double>
+     </property>
      <property name="clickMarginBottom" stdset="0">
       <enum>DecimalSpinBox::half</enum>
      </property>
@@ -505,24 +523,11 @@ at 5 Volts</string>
      <property name="suffix">
       <string>%</string>
      </property>
+     <property name="maximum">
+      <number>100</number>
+     </property>
      <property name="clickMarginBottom" stdset="0">
       <enum>SpinBox::half</enum>
-     </property>
-    </widget>
-    <widget class="SpinBox" name="uiAudioTriggerDuration">
-     <property name="geometry">
-      <rect>
-       <x>80</x>
-       <y>90</y>
-       <width>141</width>
-       <height>71</height>
-      </rect>
-     </property>
-     <property name="clickMarginTop" stdset="0">
-      <enum>SpinBox::half</enum>
-     </property>
-     <property name="units" stdset="0">
-      <string>s</string>
      </property>
     </widget>
     <widget class="Subheader" name="subheader_4">
@@ -536,6 +541,28 @@ at 5 Volts</string>
      </property>
      <property name="text">
       <string>Trigger Options</string>
+     </property>
+    </widget>
+    <widget class="DecimalSpinBox" name="uiAudioTriggerDuration">
+     <property name="geometry">
+      <rect>
+       <x>80</x>
+       <y>90</y>
+       <width>141</width>
+       <height>71</height>
+      </rect>
+     </property>
+     <property name="maximum">
+      <double>999999999.000000000000000</double>
+     </property>
+     <property name="singleStep">
+      <double>0.100000000000000</double>
+     </property>
+     <property name="clickMarginTop" stdset="0">
+      <enum>DecimalSpinBox::half</enum>
+     </property>
+     <property name="units" stdset="0">
+      <string>s</string>
      </property>
     </widget>
     <zorder>label</zorder>

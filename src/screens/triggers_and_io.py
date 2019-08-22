@@ -89,6 +89,13 @@ triggerData = [
 
 
 
+def default(*args):
+	for arg in args:
+		if arg is not None:
+			return arg
+	return args[-1]
+
+
 
 class TriggersAndIO(QtWidgets.QDialog):
 	"""Trigger screen. Configure one IO trigger at a time.
@@ -262,22 +269,29 @@ class TriggersAndIO(QtWidgets.QDialog):
 					pass
 			
 			state = ioMapping[action]
+			delta = self.newIOMapping[action]
 			#If the trigger is active, update the invert and debounce common conditions.
 			if action == triggerData[self.uiTriggerList.currentData()]['id']:
 				self.uiInvertCondition.setChecked(bool(state['invert'])) #tristate checkboxes
 				self.uiDebounce.setChecked(bool(state['debounce']))
 			
 			if action == "io1":
-				self.uiIo11MAPullup.setChecked(bool(state['driveStrength'] & 1))
-				self.uiIo120MAPullup.setChecked(bool(state['driveStrength'] & 2))
+				self.uiIo11MAPullup.setChecked(bool(1 & default(
+					delta['driveStrength'], state['driveStrength'] )))
+				self.uiIo120MAPullup.setChecked(bool(2 & default(
+					delta['driveStrength'], state['driveStrength'] )))
 			elif action == "io1In":
-				self.uiIo1ThresholdVoltage.setValue(state['threshold'])
+				self.uiIo1ThresholdVoltage.setValue(default(
+					delta['threshold'], state['threshold'] ))
 			elif action == "io2":
-				self.uiIo220MAPullup.setChecked(bool(state['driveStrength']))
+				self.uiIo220MAPullup.setChecked(bool(default(
+					delta['driveStrength'], state['driveStrength'] )))
 			elif action == "io2In":
-				self.uiIo2ThresholdVoltage.setValue(state['threshold'])
+				self.uiIo2ThresholdVoltage.setValue(default(
+					delta['threshold'], state['threshold'] ))
 			elif action == "delay":
-				self.uiDelayAmount.setValue(state['delayTime'])
+				self.uiDelayAmount.setValue(default(
+					delta['delayTime'], state['delayTime'] ))
 		
 		self.oldIOMapping = ioMapping
 		
@@ -306,13 +320,13 @@ class TriggersAndIO(QtWidgets.QDialog):
 		self.uiTriggerList.setCurrentIndex(listIndex)
 		
 		self.uiInvertCondition.blockSignals(True) #We can block these signals because nothing else depends on them. A few things depend on the Trigger for Action combobox, so it is just a little smarter about it's updates to deal with this changing.
-		self.uiInvertCondition.setChecked(bool(
-			config['invert'] if newConfig['invert'] is None else newConfig['invert'] ))
+		self.uiInvertCondition.setChecked(bool(default(
+			newConfig['invert'], config['invert'] )))
 		self.uiInvertCondition.blockSignals(False)
 		
 		self.uiDebounce.blockSignals(True)
-		self.uiDebounce.setChecked(bool(
-			config['debounce'] if newConfig['debounce'] is None else newConfig['debounce'] ))
+		self.uiDebounce.setChecked(bool(default(
+			newConfig['debounce'], config['debounce'] )))
 		self.uiDebounce.blockSignals(False)
 		
 		#Update action label text for action level/edge triggering.
