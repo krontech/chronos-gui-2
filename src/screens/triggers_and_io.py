@@ -314,6 +314,19 @@ class TriggersAndIO(QtWidgets.QDialog):
 		self.uiDebounce.setChecked(bool(
 			config['debounce'] if newConfig['debounce'] is None else newConfig['debounce'] ))
 		self.uiDebounce.blockSignals(False)
+		
+		#Update action label text for action level/edge triggering.
+		assert ('level' in action['tags']) != ('edge' in action['tags']), f"actionData['{action['id']}'] needs to be tagged as either 'level' or 'edge' triggered."
+		if not deselected or not deselected.indexes():
+			return
+		if 'level' in action['tags'] == 'level' in actionData[deselected.indexes()[0].data(Qt.UserRole)]['tags']:
+			return
+		
+		whenLevelOrEdge = 'whenLevelTriggered' if 'level' in action['tags'] else 'whenEdgeTriggered'
+		for triggerListIndex in range(self.uiTriggerList.count()):
+			triggerDataIndex = self.uiTriggerList.itemData(triggerListIndex)
+			self.uiTriggerList.setItemText(triggerListIndex,
+				triggerData[triggerDataIndex]['name'][whenLevelOrEdge] )
 	
 	
 	def onTriggerChanged(self, index: int):
