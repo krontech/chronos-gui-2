@@ -130,6 +130,8 @@ class TriggersAndIO(QtWidgets.QDialog):
 		self.newIOMapping = defaultdict(lambda: defaultdict(lambda: None)) #Set piece-by-piece to the new mapping.
 		api2.observe('ioMapping', self.onNewIOMapping)
 		
+		#Only needed when trigger for action is set to Never, because the index changed event will never fire then and we'll be stuck with whatever index was set in the .ui file. Ideally, this would not be set in the .ui file in the first place, but realistically since it's set when we change "panels" with the little arrows at the top of the pane we're not gonna remember to clear it every time in the property editor and it'll just be a stupid recurring bug. So fix it here.
+		self.uiIndividualTriggerConfigurationPanes.setCurrentIndex(0) 
 		
 		self.uiActionList.selectionModel().selectionChanged.connect(
 			self.onActionChanged)
@@ -139,7 +141,6 @@ class TriggersAndIO(QtWidgets.QDialog):
 		self.uiActionList.selectionModel().setCurrentIndex(
 			self.uiActionList.model().index(0,0),
 			QItemSelectionModel.ClearAndSelect )
-		self.uiIndividualTriggerConfigurationPanes.setCurrentIndex(0) #Ideally, this would not be set in the .ui file. Realistically, since it's set when we change "panels" with the little arrows at the top, we're not gonna remember to clear it every time in the property editor.
 		
 		self.uiTriggerList.currentIndexChanged.connect(self.onTriggerChanged)
 		self.uiInvertCondition.stateChanged.connect(self.onInvertChanged)
@@ -252,8 +253,8 @@ class TriggersAndIO(QtWidgets.QDialog):
 			if config
 		})).then(self.saveChanges2)
 	def saveChanges2(self, *_):
-		self.markStateClean()
 		self.newIOMapping = defaultdict(lambda: defaultdict(lambda: None))
+		self.markStateClean()
 	
 	def onNewIOMapping(self, ioMapping: dict):
 		"""Update the IO display with new values, overriding any pending changes."""
