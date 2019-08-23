@@ -220,7 +220,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>7</number>
+    <number>2</number>
    </property>
    <widget class="QWidget" name="uiNonePane"/>
    <widget class="QWidget" name="uiVirtualPane"/>
@@ -705,6 +705,19 @@ at 5 Volts</string>
    <widget class="QWidget" name="uiTimingIoPane"/>
    <widget class="QWidget" name="uiAlwaysHighPane"/>
   </widget>
+  <widget class="QPushButton" name="uiDebug">
+   <property name="geometry">
+    <rect>
+     <x>700</x>
+     <y>10</y>
+     <width>91</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Debug</string>
+   </property>
+  </widget>
   <zorder>backdrop</zorder>
   <zorder>headerlabel</zorder>
   <zorder>uiUnsavedChangesWarning</zorder>
@@ -720,6 +733,7 @@ at 5 Volts</string>
   <zorder>uiIndividualTriggerConfigurationPanes</zorder>
   <zorder>widget</zorder>
   <zorder>uiCancel</zorder>
+  <zorder>uiDebug</zorder>
  </widget>
  <customwidgets>
   <customwidget>

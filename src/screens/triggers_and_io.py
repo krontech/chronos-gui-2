@@ -37,11 +37,10 @@ from PyQt5.QtWidgets import QGraphicsOpacityEffect #Also available: QGraphicsBlu
 from PyQt5.QtGui import QStandardItemModel
 
 from debugger import *; dbg
-
-import api, api2
+import settings
+import api2
 from api import silenceCallbacks
 
-settings = QtCore.QSettings('Krontech', 'back-of-camera interface')
 tr = partial(QtCore.QCoreApplication.translate, "Triggers")
 
 #Keep unsaved changes when something else changes them?
@@ -121,8 +120,10 @@ class TriggersAndIO(QtWidgets.QDialog):
 		self.setWindowFlags(QtCore.Qt.FramelessWindowHint)
 		self.setAttribute(QtCore.Qt.WA_TranslucentBackground, True)
 		
-		#State init, screen loads in superposition.
+		# State init, screen loads in superposition.
 		self.markStateClean()
+		#Only needed when trigger for action is set to Never, because the index changed event will never fire then and we'll be stuck with whatever index was set in the .ui file. Ideally, this would not be set in the .ui file in the first place, but realistically since it's set when we change "panels" with the little arrows at the top of the pane we're not gonna remember to clear it every time in the property editor and it'll just be a stupid recurring bug. So fix it here.
+		self.uiIndividualTriggerConfigurationPanes.setCurrentIndex(0) 
 		
 		self.load(actions=actionData, triggers=triggerData)
 		
@@ -130,8 +131,6 @@ class TriggersAndIO(QtWidgets.QDialog):
 		self.newIOMapping = defaultdict(lambda: defaultdict(lambda: None)) #Set piece-by-piece to the new mapping.
 		api2.observe('ioMapping', self.onNewIOMapping)
 		
-		#Only needed when trigger for action is set to Never, because the index changed event will never fire then and we'll be stuck with whatever index was set in the .ui file. Ideally, this would not be set in the .ui file in the first place, but realistically since it's set when we change "panels" with the little arrows at the top of the pane we're not gonna remember to clear it every time in the property editor and it'll just be a stupid recurring bug. So fix it here.
-		self.uiIndividualTriggerConfigurationPanes.setCurrentIndex(0) 
 		
 		self.uiActionList.selectionModel().selectionChanged.connect(
 			self.onActionChanged)
@@ -175,7 +174,10 @@ class TriggersAndIO(QtWidgets.QDialog):
 		self.uiCancel.clicked.connect(self.resetChanges)
 		self.uiCancel.clicked.connect(self.markStateClean)
 		self.uiDone.clicked.connect(window.back)
-	
+		
+		settings.observe('debug controls enabled', False, lambda show:
+			self.uiDebug.show() if show else self.uiDebug.hide() )
+		self.uiDebug.clicked.connect(self.debug)
 	
 	def markStateClean(self):
 		self.uiUnsavedChangesWarning.hide()
@@ -241,7 +243,7 @@ class TriggersAndIO(QtWidgets.QDialog):
 	
 	def saveChanges(self, *_):
 		ioMapping = api2.apiValues.get('ioMapping')
-		api2.set('ioMapping', dump('ioMapping delta', { #Send along the update delta. Strictly speaking, we could send the whole thing and not a delta, but it seems more correct to only send what we want to change. data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACMAAAAjCAMAAAApB0NrAAAAdVBMVEUAAAAAFBwCJTYbKjQjOUwoPlI/QT5GTFRDVmVQY3N4XGhgZGbUPobePYXgQY2BZnedZ4GBeH7EYqCXdYjbX5yigJOIjI+NkZTgfai5jZ2gnaHkire6m6fknsPxm8CtsrToqczrr8S9wsTwttHztszzuNPe4N2lYYACAAAAAXRSTlMAQObYZgAAAaBJREFUOMt9kwFTgzAMhVGn4ibMuqql40WFxP//E01TNgpu5o47Lnx9SV9CVS3Dp6iuRVPEZeK1RJrWN43/V+WKWinjg2/zyzUZDxGGvyA0MwkhypC/zHgiFgiqNeObkiGAyXIFo00W3QBdB5h0wWieMtVi7GJ0255XjCcRIR8ABMHh/WOIyEy1ZIRF0Onjhrr+jFbreWZaZGDvemX7n7h7ykxRrDkyCXo3DIOa0+/cw+YddnnvX086XjvBNsbaKfPtNjf3W3xpeuEOhPpt/Nnd98yEt/1LMnE1CO0azkX3eNCqzNBL0Hr31Dp+c5uHu4OoxToMnWr1FwpdrG83qZY5gYkBUMzUd67ew0RERhCMSHgx94A+pcxPQqoG40umBfOYETtPoHwCxf4cNat7ocshpgAUTDY1cD5MYypmTU2qCVHtYEs6B86t2cXUZBYOQRaBUWYPIKPtT26QTufJoMkd8PS1bNNq8Oxkdk3s69HTCdKBnZ0BzU1Q285Ci2mdC6TFn2+3nOpUjo/JyCtMZZNh2+HARUMrSP21/zWMf3V+AVFTVrq9UKSZAAAAAElFTkSuQmCC
+		api2.set('ioMapping', { #Send along the update delta. Strictly speaking, we could send the whole thing and not a delta, but it seems more correct to only send what we want to change. data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACMAAAAjCAMAAAApB0NrAAAAdVBMVEUAAAAAFBwCJTYbKjQjOUwoPlI/QT5GTFRDVmVQY3N4XGhgZGbUPobePYXgQY2BZnedZ4GBeH7EYqCXdYjbX5yigJOIjI+NkZTgfai5jZ2gnaHkire6m6fknsPxm8CtsrToqczrr8S9wsTwttHztszzuNPe4N2lYYACAAAAAXRSTlMAQObYZgAAAaBJREFUOMt9kwFTgzAMhVGn4ibMuqql40WFxP//E01TNgpu5o47Lnx9SV9CVS3Dp6iuRVPEZeK1RJrWN43/V+WKWinjg2/zyzUZDxGGvyA0MwkhypC/zHgiFgiqNeObkiGAyXIFo00W3QBdB5h0wWieMtVi7GJ0255XjCcRIR8ABMHh/WOIyEy1ZIRF0Onjhrr+jFbreWZaZGDvemX7n7h7ykxRrDkyCXo3DIOa0+/cw+YddnnvX086XjvBNsbaKfPtNjf3W3xpeuEOhPpt/Nnd98yEt/1LMnE1CO0azkX3eNCqzNBL0Hr31Dp+c5uHu4OoxToMnWr1FwpdrG83qZY5gYkBUMzUd67ew0RERhCMSHgx94A+pcxPQqoG40umBfOYETtPoHwCxf4cNat7ocshpgAUTDY1cD5MYypmTU2qCVHtYEs6B86t2cXUZBYOQRaBUWYPIKPtT26QTufJoMkd8PS1bNNq8Oxkdk3s69HTCdKBnZ0BzU1Q285Ci2mdC6TFn2+3nOpUjo/JyCtMZZNh2+HARUMrSP21/zWMf3V+AVFTVrq9UKSZAAAAAElFTkSuQmCC
 			action: {
 				key:
 					self.newIOMapping[action][key] 
@@ -251,13 +253,15 @@ class TriggersAndIO(QtWidgets.QDialog):
 			}
 			for action, config in self.newIOMapping.items()
 			if config
-		})).then(self.saveChanges2)
+		}).then(self.saveChanges2)
 	def saveChanges2(self, *_):
 		self.newIOMapping = defaultdict(lambda: defaultdict(lambda: None))
 		self.markStateClean()
 	
 	def onNewIOMapping(self, ioMapping: dict):
 		"""Update the IO display with new values, overriding any pending changes."""
+		selectedAction = actionData[self.uiActionList.selectionModel().currentIndex().data(Qt.UserRole) or 0]['id']
+		
 		for action in ioMapping:
 			if ioMapping[action] == self.oldIOMapping[action]:
 				continue
@@ -272,9 +276,16 @@ class TriggersAndIO(QtWidgets.QDialog):
 			state = ioMapping[action]
 			delta = self.newIOMapping[action]
 			#If the trigger is active, update the invert and debounce common conditions.
-			if action == triggerData[self.uiTriggerList.currentData()]['id']:
-				self.uiInvertCondition.setChecked(bool(state['invert'])) #tristate checkboxes
-				self.uiDebounce.setChecked(bool(state['debounce']))
+			if action == selectedAction:
+				self.uiInvertCondition.blockSignals(True)
+				self.uiInvertCondition.setChecked(bool(default(
+					delta['invert'], state['invert'] ))) #tristate checkboxes
+				self.uiInvertCondition.blockSignals(False)
+				
+				self.uiDebounce.blockSignals(True)
+				self.uiDebounce.setChecked(bool(default(
+					delta['debounce'], state['debounce'] )))
+				self.uiDebounce.blockSignals(False)
 			
 			if action == "io1":
 				self.uiIo11MAPullup.setChecked(bool(1 & default(
@@ -296,10 +307,9 @@ class TriggersAndIO(QtWidgets.QDialog):
 		
 		self.oldIOMapping = ioMapping
 		
-		if updateMode == DISCARD_CHANGES:
-			#Check if all operator changes have been overwritten by updates.
-			if not (value for value in self.newIOMapping if value):
-				self.markStateClean()
+		#Check if all operator changes have been overwritten by updates.
+		if not (value for value in self.newIOMapping if value):
+			self.markStateClean()
 	
 	
 	def onActionChanged(self, selected: QItemSelection, deselected: QItemSelection = []):
@@ -390,6 +400,17 @@ class TriggersAndIO(QtWidgets.QDialog):
 	def onDelayAmountChanged(self, value: float):
 		self.newIOMapping['delay']['delayTime'] = value
 	
+	
+	def debug(self, *_):
+		print()
+		print()
+		print('existing:')
+		pp(api2.apiValues.get('ioMapping'))
+		print()
+		print('pending:')
+		pp(self.newIOMapping)
+		print()
+		dbg()
 		
 
 
