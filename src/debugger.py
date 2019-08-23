@@ -125,15 +125,19 @@ if hasattr(pdb, 'hideframe'):
 	breakIf = pdb.hideframe(breakIf)
 
 
+__pprinter = pprint.PrettyPrinter(
+	width=int(popen('stty size').read().split()[1]), #Width of console.
+	compact=True,
+)
+
 def pp(*args, **kwargs):
 	"""Pretty-print the data passed in."""
-	pprint.PrettyPrinter(
-		width=int(popen('stty size').read().split()[1]), #Width of console.
-		compact=True,
-	).pprint(*args, **kwargs)
-
+	__pprinter.pprint(*args, **kwargs)
 
 #This doesn't really work. Running pp(dir(x)) here vs on the debug console produces different results.
 def pd(*args):
 	"""Pretty print and return the data passed in."""
 	pp(*[dir(arg) for arg in args])
+
+def prettyFormat(arg):
+	return __pprinter.pformat(arg)

@@ -604,6 +604,11 @@ if(not _camState):
 	raise Exception("Cache failed to populate. This indicates the get call is not working.")
 _camState['error'] = '' #Last error is reported inline sometimes.
 _camStateAge = {k:0 for k,v in _camState.items()}
+
+if 'videoSegments' not in _camState:
+	log.warn('videoSegments not found in availableKeys (pychronos/issues/31)')
+	_camState['videoSegments'] = []
+
 class APIValues(QObject):
 	"""Wrapper class for subscribing to API values in the chronos API."""
 	
@@ -648,10 +653,9 @@ class APIValues(QObject):
 	def __newKeyValue(self, msg):
 		"""Update _camState and invoke any  registered observers."""
 		newItems = msg.arguments()[0].items()
-		log.info(f'Received new information. {msg.arguments()[0]}')
+		log.info(f'Received new information. {msg.arguments()[0] if len(str(msg.arguments()[0])) <= 45 else chr(10)+prettyFormat(msg.arguments()[0])}')
 		for key, value in newItems:
 			if _camState[key] != value and not self.__newValueIsEnqueued(key):
-				log.info(f'Informing {key} → {value}.')
 				_camState[key] = value
 				_camStateAge[key] += 1
 				for callback in self._callbacks[key]:
