@@ -79,6 +79,7 @@ class DecimalSpinBox(QDoubleSpinBox, TouchMarginPlugin, DirectAPILinkPlugin, Foc
 				DecimalSpinBox {{ 
 					border: 1px solid black;
 					padding-right: 40px;
+					padding-right: 0px;
 					padding-left: 10px;
 					font-size: 16px;
 					background: white;
