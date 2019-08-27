@@ -240,7 +240,7 @@ class TriggersAndIO(QtWidgets.QDialog):
 				triggerListModel.removeRow(triggerIndex)
 			else:
 				triggerListModel.setItemData(triggerListModel.index(triggerIndex, 0), {
-					Qt.DisplayRole: triggers[triggerIndex]['name']['whenLevelTriggered'],
+					Qt.DisplayRole: triggers[triggerIndex]['name']['whenEdgeTriggered'],
 					Qt.UserRole: triggerIndex,
 				})
 	
