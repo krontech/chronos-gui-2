@@ -23,7 +23,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>Triggers &amp; IO</string>
+    <string>Triggers/IO</string>
    </property>
   </widget>
   <widget class="Backdrop" name="backdrop">
@@ -187,7 +187,7 @@
     <set>QAbstractItemView::NoEditTriggers</set>
    </property>
   </widget>
-  <widget class="QWidget" name="widget" native="true">
+  <widget class="QWidget" name="uiPreview" native="true">
    <property name="geometry">
     <rect>
      <x>40</x>
@@ -197,7 +197,7 @@
     </rect>
    </property>
   </widget>
-  <widget class="Subheader" name="subheader_3">
+  <widget class="Subheader" name="uiPreviewSubheader">
    <property name="geometry">
     <rect>
      <x>30</x>
@@ -220,7 +220,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>2</number>
+    <number>5</number>
    </property>
    <widget class="QWidget" name="uiNonePane"/>
    <widget class="QWidget" name="uiVirtualPane"/>
@@ -729,9 +729,9 @@ at 5 Volts</string>
   <zorder>uiInvertCondition</zorder>
   <zorder>uiDebounce</zorder>
   <zorder>uiActionList</zorder>
-  <zorder>subheader_3</zorder>
+  <zorder>uiPreviewSubheader</zorder>
   <zorder>uiIndividualTriggerConfigurationPanes</zorder>
-  <zorder>widget</zorder>
+  <zorder>uiPreview</zorder>
   <zorder>uiCancel</zorder>
   <zorder>uiDebug</zorder>
  </widget>
