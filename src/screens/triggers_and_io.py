@@ -45,6 +45,7 @@ KEEP_CHANGES = True
 DISCARD_CHANGES = False
 updateMode = KEEP_CHANGES
 
+#Verify this against cam-json get - <<< '["ioDetailedStatus"]'?
 actionData = [
 	{ 'id': 'start',       'tags': {'action', 'video', 'edge'},         'name': tr("Start Recording"),       'shortName':tr("Start Rec.")     },
 	{ 'id': 'stop',        'tags': {'action', 'video', 'edge'},         'name': tr("Stop Recording"),        'shortName':tr("Stop Rec.")      },

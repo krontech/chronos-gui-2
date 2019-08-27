@@ -714,6 +714,9 @@ at 5 Volts</string>
      <height>31</height>
     </rect>
    </property>
+   <property name="focusPolicy">
+    <enum>Qt::NoFocus</enum>
+   </property>
    <property name="text">
     <string>Debug</string>
    </property>
