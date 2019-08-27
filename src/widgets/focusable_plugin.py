@@ -1,6 +1,8 @@
 # -*- coding: future_fstrings -*-
 
-from PyQt5.QtCore import Qt, pyqtSignal, QObject, QEvent
+from math import copysign
+
+from PyQt5.QtCore import Qt, pyqtSignal, QEvent
 from PyQt5.QtGui import QKeyEvent
 from PyQt5.QtWidgets import QApplication
 
@@ -97,7 +99,10 @@ class FocusablePlugin():
 			widgetToFocus.focusPolicy() == Qt.ClickFocus
 		):
 			widgetToFocus = getattr(widgetToFocus, nextFn)()
+		if hasattr(widgetToFocus, 'beforeJogWheelFocus'): #Emit the event, used by scroll list in inline mode to select the right entry.
+			widgetToFocus.beforeJogWheelFocus(int(copysign(1, direction)))
 		widgetToFocus.setFocus(Qt.OtherFocusReason)
+		
 		
 		# Can't do this for focus, backtab doesn't work reliably when looping
 		# over, arrow keys don't work unless compiled for apparently?
