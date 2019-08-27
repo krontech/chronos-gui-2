@@ -42,6 +42,7 @@ class MenuToggle():
 		self, *, 
 		menu: QWidget,
 		button: Union[QWidget, List[QWidget]],
+		focusTarget: QWidget = None, #Set to a widget to have the widget focused when the panel opens. Menu is focussused otherwise.
 		xRange: Tuple[int, int],
 		invisiblePadding: int = 0, 
 		duration: int = 17 #ms
@@ -59,6 +60,8 @@ class MenuToggle():
 		menu.hide() #All menus start closed.
 		
 		self._buttons = button if button is list else [button]
+		
+		self._focusTarget = focusTarget
 		
 		#Can't extract invisiblePadding from the CSS without string parsing.
 		if xRange[0] < xRange[1]:
@@ -86,12 +89,14 @@ class MenuToggle():
 			
 		if self._anim.currentTime() == 0 or self._anim.direction() == QPropertyAnimation.Backward:
 			self._anim.setDirection(QPropertyAnimation.Forward)
-			self._menu.setFocus()
+			(self._focusTarget or self._menu).setFocus()
 			for button in self._buttons:
 				button.keepActiveLook = True
 				button.refreshStyle()
 		else:
 			self._anim.setDirection(QPropertyAnimation.Backward)
+			for button in self._buttons[:1]:
+				button.setFocus() #Meh. Just select the first one, might be fine.
 			
 		if self._anim.state() == QPropertyAnimation.Stopped:
 			self._anim.start()

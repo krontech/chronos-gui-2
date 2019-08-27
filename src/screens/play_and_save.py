@@ -229,10 +229,13 @@ class PlayAndSave(QtWidgets.QDialog):
 		self.markedRegionMenu = MenuToggle(
 			menu = self.uiMarkedRegionsPanel,
 			button = self.uiEditMarkedRegions,
+			focusTarget = self.uiMarkedRegions,
 			xRange = (-self.uiMarkedRegionsPanel.width(), -1),
 			duration = 30,
 		)
 		#delay(self, 1, self.markedRegionMenu.toggle) #mmm, just like a crappy javascript app - work around a mysterious black bar appearing on the right-hand side of the window.
+		#This doesn't work, never fires.
+		#self.uiMarkedRegionsPanel.focusInEvent = self.uiMarkedRegions.setFocus
 		
 		self.uiMarkedRegionsPanelHeader.setAttribute(QtCore.Qt.WA_TransparentForMouseEvents)
 		self.uiMarkedRegionsPanelHeaderX.setAttribute(QtCore.Qt.WA_TransparentForMouseEvents)
