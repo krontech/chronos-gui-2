@@ -245,6 +245,7 @@ class TriggersAndIO(QtWidgets.QDialog):
 					Qt.UserRole: triggerIndex,
 				})
 	
+	
 	def resetChanges(self, *_):
 		self.newIOMapping = defaultdict(lambda: defaultdict(lambda: None))
 		self.onActionChanged(self.uiActionList.selectionModel().selection())
@@ -260,26 +261,63 @@ class TriggersAndIO(QtWidgets.QDialog):
 		#self.uiAudioTriggerDuration.setValue(ioMapping[''][''])
 		self.uiDelayAmount.setValue(ioMapping['delay']['delayTime'])
 	
+	
 	def saveChanges(self, *_):
 		ioMapping = api2.apiValues.get('ioMapping')
-		api2.set('ioMapping', { #Send along the update delta. Strictly speaking, we could send the whole thing and not a delta, but it seems more correct to only send what we want to change. data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACMAAAAjCAMAAAApB0NrAAAAdVBMVEUAAAAAFBwCJTYbKjQjOUwoPlI/QT5GTFRDVmVQY3N4XGhgZGbUPobePYXgQY2BZnedZ4GBeH7EYqCXdYjbX5yigJOIjI+NkZTgfai5jZ2gnaHkire6m6fknsPxm8CtsrToqczrr8S9wsTwttHztszzuNPe4N2lYYACAAAAAXRSTlMAQObYZgAAAaBJREFUOMt9kwFTgzAMhVGn4ibMuqql40WFxP//E01TNgpu5o47Lnx9SV9CVS3Dp6iuRVPEZeK1RJrWN43/V+WKWinjg2/zyzUZDxGGvyA0MwkhypC/zHgiFgiqNeObkiGAyXIFo00W3QBdB5h0wWieMtVi7GJ0255XjCcRIR8ABMHh/WOIyEy1ZIRF0Onjhrr+jFbreWZaZGDvemX7n7h7ykxRrDkyCXo3DIOa0+/cw+YddnnvX086XjvBNsbaKfPtNjf3W3xpeuEOhPpt/Nnd98yEt/1LMnE1CO0azkX3eNCqzNBL0Hr31Dp+c5uHu4OoxToMnWr1FwpdrG83qZY5gYkBUMzUd67ew0RERhCMSHgx94A+pcxPQqoG40umBfOYETtPoHwCxf4cNat7ocshpgAUTDY1cD5MYypmTU2qCVHtYEs6B86t2cXUZBYOQRaBUWYPIKPtT26QTufJoMkd8PS1bNNq8Oxkdk3s69HTCdKBnZ0BzU1Q285Ci2mdC6TFn2+3nOpUjo/JyCtMZZNh2+HARUMrSP21/zWMf3V+AVFTVrq9UKSZAAAAAElFTkSuQmCC
-			action: {
-				key:
-					self.newIOMapping[action][key] 
-					if self.newIOMapping[action][key] is not None 
-					else value
-				for key, value in ioMapping[action].items()
+		
+		existingVirtuals = settings.value('virtually triggered actions', {})
+		newVirtuals = {
+			trigger
+			for trigger, configuration in self.newIOMapping.items()
+			if 'virtual' in configuration.values()
+		}
+		
+		virtuals = { #Merge old and new virtuals configurations, filtering out old virtuals which are no longer and adding new virtuals.
+			action: { #Merge the keys of the old and new virtual, since someone could have updated only, say, invert.
+				key: default(
+					self.newIOMapping.get(action, {}).get(key), #Find "most recent" value, defaulting to false if it was never set.
+					existingVirtuals.get(action, {}).get(key),
+					False )
+				for key in self.newIOMapping.get(action, {}).keys() | existingVirtuals.get(action, {}).keys()
 			}
+			for action in existingVirtuals.keys() | newVirtuals #Consider only actions which are or were virtuals. Now, we need to filter out items which aren't verticals any more, and merge those which are.
+			if self.newIOMapping.get(action, {}).get('source') in (None, 'virtual') #Filter out newly non-virtual actions, allowing unchanged and newly-virtual actions.
+		}
+		settings.setValue('virtually triggered actions', virtuals)
+		pp({
+			'newIOMapping': self.newIOMapping,
+			'existingVirtuals': existingVirtuals, 
+			'newVirtuals': newVirtuals, 
+			'virtuals': virtuals,
+		})
+		
+		api2.set('ioMapping', dump('sending IO mapping', { #Send along the update delta. Strictly speaking, we could send the whole thing and not a delta, but it seems more correct to only send what we want to change. data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACMAAAAjCAMAAAApB0NrAAAAdVBMVEUAAAAAFBwCJTYbKjQjOUwoPlI/QT5GTFRDVmVQY3N4XGhgZGbUPobePYXgQY2BZnedZ4GBeH7EYqCXdYjbX5yigJOIjI+NkZTgfai5jZ2gnaHkire6m6fknsPxm8CtsrToqczrr8S9wsTwttHztszzuNPe4N2lYYACAAAAAXRSTlMAQObYZgAAAaBJREFUOMt9kwFTgzAMhVGn4ibMuqql40WFxP//E01TNgpu5o47Lnx9SV9CVS3Dp6iuRVPEZeK1RJrWN43/V+WKWinjg2/zyzUZDxGGvyA0MwkhypC/zHgiFgiqNeObkiGAyXIFo00W3QBdB5h0wWieMtVi7GJ0255XjCcRIR8ABMHh/WOIyEy1ZIRF0Onjhrr+jFbreWZaZGDvemX7n7h7ykxRrDkyCXo3DIOa0+/cw+YddnnvX086XjvBNsbaKfPtNjf3W3xpeuEOhPpt/Nnd98yEt/1LMnE1CO0azkX3eNCqzNBL0Hr31Dp+c5uHu4OoxToMnWr1FwpdrG83qZY5gYkBUMzUd67ew0RERhCMSHgx94A+pcxPQqoG40umBfOYETtPoHwCxf4cNat7ocshpgAUTDY1cD5MYypmTU2qCVHtYEs6B86t2cXUZBYOQRaBUWYPIKPtT26QTufJoMkd8PS1bNNq8Oxkdk3s69HTCdKBnZ0BzU1Q285Ci2mdC6TFn2+3nOpUjo/JyCtMZZNh2+HARUMrSP21/zWMf3V+AVFTVrq9UKSZAAAAAElFTkSuQmCC
+			action: 
+				{
+					key:
+						config[key] 
+						if config[key] is not None 
+						else value
+					for key, value in ioMapping[action].items()
+				}
+				if action not in virtuals else
+				{ #Disable the input of any virtual element. It is set to "always" to implement the virtual trigger firing.
+					'source': 'none',
+					'invert': 0,
+					'debounce': 0,
+				}
 			for action, config in self.newIOMapping.items()
-			if config
-		}).then(self.saveChanges2)
+			if [value for value in config.values() if value is not None]
+		})).then(self.saveChanges2)
 	def saveChanges2(self, *_):
 		self.newIOMapping = defaultdict(lambda: defaultdict(lambda: None))
 		self.markStateClean()
 	
+	
 	def onNewIOMapping(self, ioMapping: dict):
 		"""Update the IO display with new values, overriding any pending changes."""
 		selectedAction = actionData[self.uiActionList.selectionModel().currentIndex().data(Qt.UserRole) or 0]['id']
+		virtuals = settings.value('virtually triggered actions', {}) #Different from soft trigger, that's a hardware-based interrupt thing. The virtual trigger is a gui2 hallucination.
 		
 		for action in ioMapping:
 			if ioMapping[action] == self.oldIOMapping[action]:
@@ -294,6 +332,22 @@ class TriggersAndIO(QtWidgets.QDialog):
 			
 			state = ioMapping[action]
 			delta = self.newIOMapping[action]
+			
+			if action in virtuals:
+				virtual = virtuals[action]
+				
+				self.uiInvertCondition.blockSignals(True)
+				self.uiInvertCondition.setChecked(default(
+					delta['invert'], virtual.get('invert'), False ))
+				self.uiInvertCondition.blockSignals(False)
+				
+				self.uiDebounce.blockSignals(True)
+				self.uiDebounce.setChecked(default(
+					delta['debounce'], virtual.get('debounce'), False ))
+				self.uiDebounce.blockSignals(False)
+				
+				continue
+			
 			#If the trigger is active, update the invert and debounce common conditions.
 			if action == selectedAction:
 				self.uiInvertCondition.blockSignals(True)
@@ -343,10 +397,20 @@ class TriggersAndIO(QtWidgets.QDialog):
 		action = actionData[selected.indexes()[0].data(Qt.UserRole)]
 		config = api2.apiValues.get('ioMapping')[action['id']]
 		newConfig = self.newIOMapping[action['id']]
-		dataIndex = [trigger['id'] for trigger in triggerData].index(newConfig['source'] or config['source'])
+		virtuals = settings.value('virtually triggered actions', {})
+		
+		if action['id'] in virtuals:
+			source = newConfig['source'] or 'virtual'
+			virtual = source == 'virtual'
+		else:
+			source = newConfig['source'] or config['source']
+			virtual = None
+		
+		dataIndex = [trigger['id'] for trigger in triggerData].index(source)
 		
 		listIndex = self.uiTriggerList.findData(dataIndex)
 		assert listIndex is not -1, f"Could not find index for {config['source']} ({dataIndex}) in uiTriggerList."
+		
 		try: #Fix for state getting marked dirty when we view a different action.
 			self.uiTriggerList.currentIndexChanged.disconnect(self.markStateDirty)
 			self.uiTriggerList.setCurrentIndex(listIndex)
@@ -356,12 +420,18 @@ class TriggersAndIO(QtWidgets.QDialog):
 		
 		self.uiInvertCondition.blockSignals(True) #We can block these signals because nothing else depends on them. A few things depend on the Trigger for Action combobox, so it is just a little smarter about it's updates to deal with this changing.
 		self.uiInvertCondition.setChecked(bool(default(
-			newConfig['invert'], config['invert'] )))
+			newConfig['invert'], 
+			virtual and (virtuals[action['id']].get('invert') or False), #.get returns False or None, we always want False so default stops here if this is a virtual trigger.
+			config['invert'],
+		)))
 		self.uiInvertCondition.blockSignals(False)
 		
 		self.uiDebounce.blockSignals(True)
 		self.uiDebounce.setChecked(bool(default(
-			newConfig['debounce'], config['debounce'] )))
+			newConfig['debounce'], 
+			virtual and (virtuals[action['id']].get('debounce') or False),
+			config['debounce'],
+		)))
 		self.uiDebounce.blockSignals(False)
 		
 		#Update action label text for action level/edge triggering.
@@ -382,11 +452,14 @@ class TriggersAndIO(QtWidgets.QDialog):
 		activeAction = actionData[self.uiActionList.selectionModel().currentIndex().data(Qt.UserRole)]
 		newSource = triggerData[self.uiTriggerList.itemData(index)]['id']
 		activeMapping = self.newIOMapping[activeAction['id']]
-		if api2.apiValues.get('ioMapping')[activeAction['id']]['source'] == newSource:
+		virtuals = settings.value('virtually triggered actions', {})
+		oldSource = api2.apiValues.get('ioMapping')[activeAction['id']]['source']
+		if oldSource == newSource and activeAction['id'] not in virtuals: #If this was a virtual item, don't delete it if it's the same as what's corporeal. (Virtual defaults to "none", so if we switch from "virtual" to "none" we're actually switching from "none" to "none" which gets optimized out, which means we don't actually switch.
 			if activeMapping['source']: #Clear key if it exists, no need to set. Otherwise, when we switched actions, the trigger would always get set to what it was, which is pointless.
 				del activeMapping['source']
 		else:
 			activeMapping['source'] = triggerData[self.uiTriggerList.itemData(index)]['id']
+	
 	
 	def onInvertChanged(self, state: int):
 		activeAction = actionData[self.uiActionList.selectionModel().currentIndex().data(Qt.UserRole)]
