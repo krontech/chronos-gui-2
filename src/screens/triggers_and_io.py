@@ -295,19 +295,19 @@ class TriggersAndIO(QtWidgets.QDialog):
 			action: 
 				{
 					key:
-						config[key] 
-						if config[key] is not None 
+						newConfig[key] 
+						if newConfig[key] is not None 
 						else value
 					for key, value in ioMapping[action].items()
 				}
 				if action not in virtuals else
 				{ #Disable the input of any virtual element. It is set to "always" to implement the virtual trigger firing.
 					'source': 'none',
-					'invert': 0,
-					'debounce': 0,
+					'invert': newConfig['invert'],
+					'debounce': newConfig['debounce'],
 				}
-			for action, config in self.newIOMapping.items()
-			if [value for value in config.values() if value is not None]
+			for action, newConfig in self.newIOMapping.items()
+			if [value for value in newConfig.values() if value is not None]
 		})).then(self.saveChanges2)
 	def saveChanges2(self, *_):
 		self.newIOMapping = defaultdict(lambda: defaultdict(lambda: None))
@@ -421,7 +421,7 @@ class TriggersAndIO(QtWidgets.QDialog):
 		self.uiInvertCondition.blockSignals(True) #We can block these signals because nothing else depends on them. A few things depend on the Trigger for Action combobox, so it is just a little smarter about it's updates to deal with this changing.
 		self.uiInvertCondition.setChecked(bool(default(
 			newConfig['invert'], 
-			virtual and (virtuals[action['id']].get('invert') or False), #.get returns False or None, we always want False so default stops here if this is a virtual trigger.
+			(virtuals[action['id']].get('invert') or False) if virtual else None, #.get returns False or None, we always want False so default stops here if this is a virtual trigger.
 			config['invert'],
 		)))
 		self.uiInvertCondition.blockSignals(False)
@@ -429,7 +429,7 @@ class TriggersAndIO(QtWidgets.QDialog):
 		self.uiDebounce.blockSignals(True)
 		self.uiDebounce.setChecked(bool(default(
 			newConfig['debounce'], 
-			virtual and (virtuals[action['id']].get('debounce') or False),
+			(virtuals[action['id']].get('debounce') or False) if virtual else None,
 			config['debounce'],
 		)))
 		self.uiDebounce.blockSignals(False)
@@ -506,6 +506,9 @@ class TriggersAndIO(QtWidgets.QDialog):
 		print()
 		print('pending:')
 		pp(self.newIOMapping)
+		print()
+		print('virtual:')
+		pp(settings.value('virtually triggered actions', {}))
 		print()
 		dbg()
 	
