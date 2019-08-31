@@ -12,6 +12,9 @@ from widgets.button import Button
 import settings
 import api2
 
+RECORDING_MODES = {'START/STOP':1, 'SOFT_TRIGGER':2, 'VIRTUAL_TRIGGER':3}
+RECORDING_MODE = RECORDING_MODES['START/STOP']
+
 
 class Main(QWidget):
 	def __init__(self, window):
@@ -39,6 +42,9 @@ class Main(QWidget):
 		
 		# Widget behavour.
 		self.uiRecord.clicked.connect(self.toggleRecording)
+		self.uiRecord.pressed.connect(lambda: self.setVirtualTrigger(True))
+		self.uiRecord.released.connect(lambda: self.setVirtualTrigger(False))
+		
 		api2.observe('state', self.onStateChange)
 		
 		self.uiDebugA.clicked.connect(self.makeFailingCall)
@@ -509,12 +515,75 @@ class Main(QWidget):
 			log.print(f'Test passed: Error ({err}) was returned.')
 		)
 	
-	#Invoked by hardware button in ~/src/main.py.
 	def toggleRecording(self, *_):
+		"""Hard start or stop recording. Doesn't use trigger/io signals."""
+		
+		if RECORDING_MODE != RECORDING_MODES['START/STOP']:
+			return
+		
 		if api2.apiValues.get('state') == 'idle':
 			self.startRecording()
 		else:
 			self.stopRecording()
+	
+	
+	#Invoked by hardware button, in ~/src/main.py.
+	def publicToggleRecordingState(self, *_):
+		"""Switch the camera between 'not recording' and 'recording'."""
+		
+		if RECORDING_MODE != RECORDING_MODES['START/STOP']:
+			return
+		
+		self.toggleRecording()
+		
+		#If we're not on this screen when the red record button is pressed, go there.
+		if self._window.currentScreen != 'main':
+			self._window.show('main')
+	
+	@staticmethod
+	def setVirtualTrigger(state: bool):
+		"""Set the virtual trigger signal high or low.
+			
+			May or may not start a recording, depending on how
+			trigger/io is set up.
+			
+			(See trigger/io screen for details.)"""
+		
+		#Can't use self.uiRecord.setText text here becasue we don't
+		#know what the virtual trigger is actually hooked up to, on
+		#what delay, so we have to wait for the signal. (We could,
+		#but writing that simulation would be a lot of work.)
+		
+		if RECORDING_MODE == RECORDING_MODES['START/STOP']:
+			pass #Taken care of by publicToggleRecordingState
+		
+		elif RECORDING_MODE == RECORDING_MODES['SOFT_TRIGGER']:
+			raise ValueError('Soft trigger not available in FPGA.')
+		
+		elif RECORDING_MODE == RECORDING_MODES['VIRTUAL_TRIGGER']:
+			virtuals = settings.value('virtually triggered actions', {})
+			if virtuals:
+				api2.setSync('ioMapping', dump('new io mapping', {
+					action: { 
+						'source': 'alwaysHigh' if state else 'none',
+						'invert': config['invert'],
+						'debounce': config['debounce'],
+					} for action, config in virtuals.items()
+				}))
+			else:
+				#TODO: Log warning visually for operator, not just to console.
+				log.warn('No virtual triggers configured!')
+		
+		else:
+			raise ValueError(F'Unknown RECORDING_MODE: {RECORDING_MODE}.')
+	
+	
+	def publicStartVirtualTrigger(self, *_):
+		self.setVirtualTrigger(True)
+	
+	def publicStopVirtualTrigger(self, *_):
+		self.setVirtualTrigger(False)
+			
 	
 	def onStateChange(self, state):
 		#This text update takes a little while to fire, so we do it in the start and stop recording functions as well so it's more responsive when the operator clicks.
@@ -526,7 +595,7 @@ class Main(QWidget):
 	
 	
 	def startRecording(self):
-		self.uiRecord.setText('Stop')
+		self.uiRecord.setText('Stop') #Show feedback quick, the signal takes a noticable amount of time.
 		api2.control.callSync('startRecording')
 	
 	def stopRecording(self):

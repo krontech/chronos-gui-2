@@ -416,10 +416,13 @@ def connectHardwareEvents(app, hardware):
 	#hardware.subscribe('recordButtonDown', linkLightToRecordButton)
 	#hardware.subscribe('recordButtonUp', linkLightToRecordButton)
 	
-	hardware.subscribe('recordButtonDown', lambda: (
-		window._screens['main'].toggleRecording(),
-		window.currentScreen != 'main' and window.show('main'),
-	))
+	hardware.subscribe('recordButtonDown', lambda:
+		window._screens['main'].publicToggleRecordingState() )
+	
+	hardware.subscribe('recordButtonDown', lambda:
+		window._screens['main'].publicStartVirtualTrigger() )
+	hardware.subscribe('recordButtonUp', lambda:
+		window._screens['main'].publicStopVirtualTrigger() )
 	
 	def injectSelect():
 		app.postEvent(
@@ -521,7 +524,7 @@ if __name__ == '__main__':
 		try:
 			hardware = Hardware() #Must be instantiated like this, I think the event pump timer gets eaten by GC otherwise.
 			connectHardwareEvents(app, hardware)
-		except Exception as e:
+		except Exception:
 			#We're probably in the VM, just print a message.
 			print('GUI2: Could not initialize camera hardware for input.')
 	
