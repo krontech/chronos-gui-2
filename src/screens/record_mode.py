@@ -89,9 +89,9 @@ class RecordMode(QtWidgets.QDialog):
 		segmentMaxTime = maxTime / segments
 		
 		self.uiRegularLengthInSeconds.setText(
-			self.uiRegularLengthInSeconds.template.format(totalTime) )
+			self.uiRegularLengthInSeconds.template.format(maxTime) )
 		self.uiRegularLengthInFrames.setText(
-			self.uiRegularLengthInFrames.template.format(frames) )
+			self.uiRegularLengthInFrames.template.format(maxFrames) )
 		
 		self.uiSegmentLengthInSeconds.blockSignals(True)
 		self.uiSegmentLengthNumSegments.blockSignals(True)
