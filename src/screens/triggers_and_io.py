@@ -294,17 +294,14 @@ class TriggersAndIO(QtWidgets.QDialog):
 		api2.set('ioMapping', dump('sending IO mapping', { #Send along the update delta. Strictly speaking, we could send the whole thing and not a delta, but it seems more correct to only send what we want to change. data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACMAAAAjCAMAAAApB0NrAAAAdVBMVEUAAAAAFBwCJTYbKjQjOUwoPlI/QT5GTFRDVmVQY3N4XGhgZGbUPobePYXgQY2BZnedZ4GBeH7EYqCXdYjbX5yigJOIjI+NkZTgfai5jZ2gnaHkire6m6fknsPxm8CtsrToqczrr8S9wsTwttHztszzuNPe4N2lYYACAAAAAXRSTlMAQObYZgAAAaBJREFUOMt9kwFTgzAMhVGn4ibMuqql40WFxP//E01TNgpu5o47Lnx9SV9CVS3Dp6iuRVPEZeK1RJrWN43/V+WKWinjg2/zyzUZDxGGvyA0MwkhypC/zHgiFgiqNeObkiGAyXIFo00W3QBdB5h0wWieMtVi7GJ0255XjCcRIR8ABMHh/WOIyEy1ZIRF0Onjhrr+jFbreWZaZGDvemX7n7h7ykxRrDkyCXo3DIOa0+/cw+YddnnvX086XjvBNsbaKfPtNjf3W3xpeuEOhPpt/Nnd98yEt/1LMnE1CO0azkX3eNCqzNBL0Hr31Dp+c5uHu4OoxToMnWr1FwpdrG83qZY5gYkBUMzUd67ew0RERhCMSHgx94A+pcxPQqoG40umBfOYETtPoHwCxf4cNat7ocshpgAUTDY1cD5MYypmTU2qCVHtYEs6B86t2cXUZBYOQRaBUWYPIKPtT26QTufJoMkd8PS1bNNq8Oxkdk3s69HTCdKBnZ0BzU1Q285Ci2mdC6TFn2+3nOpUjo/JyCtMZZNh2+HARUMrSP21/zWMf3V+AVFTVrq9UKSZAAAAAElFTkSuQmCC
 			action: 
 				{
-					key:
-						newConfig[key] 
-						if newConfig[key] is not None 
-						else value
+					key: default(newConfig[key], value)
 					for key, value in ioMapping[action].items()
 				}
 				if action not in virtuals else
-				{ #Disable the input of any virtual element. It is set to "always" to implement the virtual trigger firing.
-					'source': 'none',
-					'invert': newConfig['invert'],
-					'debounce': newConfig['debounce'],
+				{ 
+					'source': 'none', #Disable the input of any virtual element. It is set to "always" to implement the virtual trigger firing.
+					'invert': default(newConfig['invert'], ioMapping[action]['invert']),
+					'debounce': default(newConfig['debounce'], ioMapping[action]['debounce']),
 				}
 			for action, newConfig in self.newIOMapping.items()
 			if [value for value in newConfig.values() if value is not None]
