@@ -22,7 +22,7 @@ class LineEdit(QLineEdit, TouchMarginPlugin, DirectAPILinkPlugin, FocusablePlugi
 		
 		# Set some default text, so we can see the widget.
 		if not self.text():
-			self.setText('')
+			self.setText('text input')
 		
 		self.setCursorMoveStyle(Qt.LogicalMoveStyle) #Left moves left, right moves right. Defaults is right arrow key moves left under rtl writing systems.
 			
@@ -61,6 +61,8 @@ class LineEdit(QLineEdit, TouchMarginPlugin, DirectAPILinkPlugin, FocusablePlugi
 				LineEdit {{
 					font-size: 16px;
 					background: rgba(255,255,255,127); /* The background is drawn under the button borders, so they are opaque if the background is opaque. */
+					padding-right: 0px;
+					padding-left: 10px;
 					
 					/* use borders instead of margins so we can see what we're doing */
 					border-left:   {self.clickMarginLeft   * 10 + 1}px solid {self.clickMarginColor};
@@ -78,6 +80,8 @@ class LineEdit(QLineEdit, TouchMarginPlugin, DirectAPILinkPlugin, FocusablePlugi
 					border: 1px solid black;
 					border-left-color: rgb(50,50,50);
 					border-top-color: rgb(50,50,50); /* Add a subtle 3d-ness until we figure out drop-shadows. */
+					padding-right: 0px;
+					padding-left: 10px;
 					
 					/* Add some touch space so this widget is easier to press. */
 					margin-left: {self.clickMarginLeft*10}px;
@@ -112,6 +116,7 @@ class LineEdit(QLineEdit, TouchMarginPlugin, DirectAPILinkPlugin, FocusablePlugi
 	def doneEditingCallback(self):
 		self.inputMode = ''
 		self.window().app.window.hideInput()
+		self.window().focusRing.focusOut()
 	
 	def handleJogWheelRotation(self, delta, pressed):
 		if self.inputMode:
@@ -124,7 +129,7 @@ class LineEdit(QLineEdit, TouchMarginPlugin, DirectAPILinkPlugin, FocusablePlugi
 			cursorFlashTime = self.window().app.cursorFlashTime()
 			self.window().app.setCursorFlashTime(-1)
 			self.window().app.setCursorFlashTime(cursorFlashTime)
-		else:
+		elif not pressed:
 			self.selectWidget(delta)
 	
 	def paintEvent(self, event):

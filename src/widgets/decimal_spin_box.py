@@ -35,8 +35,7 @@ class DecimalSpinBox(QDoubleSpinBox, TouchMarginPlugin, DirectAPILinkPlugin, Foc
 					/* Editor style. Use border to show were click margin is, so we don't mess it up during layout. */
 					font-size: 16px;
 					border: 1px solid black;
-					padding-right: 40px;
-					padding-right: 10px;
+					padding-right: 0px;
 					padding-left: 10px;
 					background: rgba(255,255,255,127); /* The background is drawn under the button borders, so they are opaque if the background is opaque. */
 					
@@ -49,39 +48,17 @@ class DecimalSpinBox(QDoubleSpinBox, TouchMarginPlugin, DirectAPILinkPlugin, Foc
 				DecimalSpinBox:disabled {{ 
 					color: #969696;
 				}}
-				DecimalSpinBox::up-button {{ 
-					subcontrol-position: right; 
-					right: 40px;
-					image: url(../../assets/images/wedge-up-enabled.png);
-				}}
-				DecimalSpinBox::up-button:disabled {{ 
-					image: url(../../assets/images/wedge-up-disabled.png);
-				}}
-				DecimalSpinBox::down-button {{ 
-					subcontrol-position: right;
-					image: url(../../assets/images/wedge-down-enabled.png);
-				}}
-				DecimalSpinBox::down-button:disabled {{ 
-					subcontrol-position: right; 
-					image: url(../../assets/images/wedge-down-disabled.png);
-				}}
 				DecimalSpinBox::up-button, DecimalSpinBox::down-button {{
-					border: 0px solid black;
-					border-left-width: 1px;
-					width: 40px; 
-					height: 40px;
 					width: 0px; /*These buttons just take up room. We have a jog wheel for them.*/
-					height: 0px;
 				}}
 			""" + self.originalStyleSheet())
 		else:
 			self.setStyleSheet(f"""
 				DecimalSpinBox {{ 
+					font-size: 16px;
 					border: 1px solid black;
-					padding-right: 40px;
 					padding-right: 0px;
 					padding-left: 10px;
-					font-size: 16px;
 					background: white;
 					
 					/* Add some touch space so this widget is easier to press. */
@@ -93,29 +70,8 @@ class DecimalSpinBox(QDoubleSpinBox, TouchMarginPlugin, DirectAPILinkPlugin, Foc
 				DecimalSpinBox:disabled {{ 
 					color: #969696;
 				}}
-				DecimalSpinBox::up-button {{ 
-					subcontrol-position: right; 
-					right: 40px; 
-					image: url(assets/images/wedge-up-enabled.png);
-				}}
-				DecimalSpinBox::up-button:disabled {{ 
-					image: url(assets/images/wedge-up-disabled.png);
-				}}
-				DecimalSpinBox::down-button {{ 
-					subcontrol-position: right; 
-					image: url(assets/images/wedge-down-enabled.png);
-				}}
-				DecimalSpinBox::down-button:disabled {{ 
-					subcontrol-position: right; 
-					image: url(assets/images/wedge-down-disabled.png);
-				}}
 				DecimalSpinBox::up-button, DecimalSpinBox::down-button {{
-					border: 0px solid black;
-					border-left-width: 1px;
-					width: 40px; 
-					height: 40px;
 					width: 0px; /*These buttons just take up room. We have a jog wheel for them.*/
-					height: 0px;
 				}}
 			""" + self.originalStyleSheet())
 	
