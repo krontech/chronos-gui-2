@@ -22,5 +22,5 @@ while true; do
 			--exclude \"util/stats_reported\" \
 			--exclude \"src/read_jog_wheel_encoder\" \
 			--exclude \".directory\" \
-	"
+	" || true
 done
