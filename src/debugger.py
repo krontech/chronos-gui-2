@@ -126,7 +126,7 @@ if hasattr(pdb, 'hideframe'):
 
 
 __pprinter = pprint.PrettyPrinter(
-	width=int(popen('stty size').read().split()[1]), #Width of console.
+	width=int((popen('stty size').read().split()[1:2] or [80])[0]), #Width of console.
 	compact=True,
 )
 
