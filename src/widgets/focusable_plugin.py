@@ -39,14 +39,6 @@ class FocusablePlugin():
 	
 	doneEditing = pyqtSignal() #Fired when the keyboard input should close.
 	
-	#Specify the widget property "units", on numeric inputs, to provide a list of units to choose from. It is recommended to stick to 4, since that's how many unit buttons are on the numeric keyboard. Units can be scrolled with the jog wheel.
-	unitList = ['y', 'z', 'a', 'f', 'p', 'n', 'µ', 'm', '', 'k', 'M', 'G', 'T', 'P', 'E', 'Z', 'Y']
-	knownUnits = { #Map of units to their multipliers. eg, k = kilo = ×1000. Or µs = microseconds = ×0.000001. Usually queried with unit[:1], because something like mV or ms both have the same common numerical multiplier. [0] is not used because it fails on "".
-		suffix: 10**((index-8)*3) for index, suffix in enumerate(unitList) #Position 8 is neutral, 'no unit'.
-	}
-	knownUnits['s'] = 1 #seconds
-	knownUnits['V'] = 1 #volts
-	
 	def __init__(self, *args, **kwargs):
 		super().__init__(*args, **kwargs)
 		
@@ -59,11 +51,6 @@ class FocusablePlugin():
 		
 		self.jogWheelIndex = 1
 		self.editMode = 'touch' #vs 'jogwheel'
-		
-		if hasattr(self, 'units'): #The 
-			self.originalPrefix = self.prefix()
-			self.originalSuffix = self.suffix()
-			assert self.suffix()[:1] in self.availableUnits(), f'{self.window().objectName()}.{self.objectName()}: Suffix "{self.suffix()}" unit "{self.suffix()[:1]}" not found in {self.availableUnits()}. (List via "units" widget property set to "{self.units}.")' #Test slice, might not have first character if unit is "".
 		
 		self.installEventFilter(self)
 	
@@ -124,41 +111,6 @@ class FocusablePlugin():
 	#	#if hasattr(super(), 'mouseReleaseEvent'):
 	#	super(type(self)).mouseReleaseEvent(self, event)
 	
-	
-	
-	#Units are only really used for decimal spin boxes, but they affect the logic of the spin boxes, and the spin box logic is sort of shared with everything.
-	
-	def availableUnits(self) -> [str]:
-		if not hasattr(self, 'units'):
-			return ['']
-		
-		units = self.units
-		if units == 'standard': #We usually only want these four common prefixes.
-			units = 'n,µ,,k'
-		if units == 'seconds': #We usually only want these four common prefixes.
-			units = 'ns,µs,ms,s'
-		
-		units = sorted(
-			[s.strip() for s in units.split(',')], #Strip to accept space in definition.
-			key=lambda unit: self.knownUnits.get(unit[:1]) ) #Use get, which returns None on miss, so it doesn't fail before our nice assert.
-		
-		for unit in units: #See above for list of known units.
-			assert unit[:1] in self.knownUnits, f'{self.window().objectName()}.{self.objectName()}: Unit "{unit}" not found in {units}.'
-			
-		self.availableUnits = lambda _: units #Cache results. We should never have to change units.
-		return units
-		
-	
-	def unit(self) -> str:
-		return self.suffix() if hasattr(self, 'units') else ''
-	
-	def realValue(self) -> float:
-		#Get real value of input, taking into account units such as 'k' or 'µs'.
-		return (
-			self.value() * self.knownUnits[self.suffix()[:1]]
-			if hasattr(self, 'units') else 
-			self.value() 
-		)
 	
 	
 	#Install event filter here to detect touch events and set

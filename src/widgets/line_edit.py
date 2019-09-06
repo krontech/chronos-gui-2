@@ -37,16 +37,10 @@ class LineEdit(QLineEdit, TouchMarginPlugin, DirectAPILinkPlugin, FocusablePlugi
 		
 		self.doneEditing.connect(self.doneEditingCallback)
 		
-		###
-		### TODO: Add an event filter to get clicked events. (We can't 
-		###       use focus events because the jog wheel does that when
-		###       it rolls over an input.) Bring up the input panel.
-		###
-		
 		#When we tap an input, we deselect selected text. But we want to
-		#select all text. So, select it again after we've tapped it. Note:
-		#This only applies if the keyboard hasn't bumped the text out of the
-		#way first.
+		#select all text. So, select it again after we've tapped it.
+		#Note: This only applies if the keyboard hasn't bumped the text
+		#out of the way first.
 		self.selectAllTimer = QtCore.QTimer()
 		self.selectAllTimer.timeout.connect(self.selectAll)
 		self.selectAllTimer.setSingleShot(True)

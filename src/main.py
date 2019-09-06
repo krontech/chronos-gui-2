@@ -296,9 +296,6 @@ class Window(QtCore.QObject):
 			focus: Determines if the keyboard takes focus or not.
 				Behaves like a modal dialog if it does focus."""
 		
-		if self.activeInputName() == name:
-			return
-		
 		if self.activeInput():
 			self.hideInput()
 		

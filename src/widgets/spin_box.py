@@ -2,26 +2,41 @@
 
 from random import randint
 
-from PyQt5.QtCore import Q_ENUMS, QSize, Qt, pyqtProperty
-from PyQt5.QtWidgets import QSpinBox
+from PyQt5.QtCore import Q_ENUMS, QSize, Qt
+from PyQt5.QtWidgets import QSpinBox, QLineEdit
 
 from debugger import *; dbg
+
 from touch_margin_plugin import TouchMarginPlugin, MarginWidth
 from direct_api_link_plugin import DirectAPILinkPlugin
 from focusable_plugin import FocusablePlugin
+from si_units_plugin import SIUnitsPlugin
 
 
-class SpinBox(QSpinBox, TouchMarginPlugin, DirectAPILinkPlugin, FocusablePlugin):
+class SpinBox(QSpinBox, TouchMarginPlugin, DirectAPILinkPlugin, FocusablePlugin, SIUnitsPlugin):
 	Q_ENUMS(MarginWidth) #This is needed here. I don't know why the definition in the TouchMarginPlugin doesn't work.
 	
 	def __init__(self, parent=None, showHitRects=False):
 		super().__init__(parent, showHitRects=showHitRects)
 		self.clickMarginColor = f"rgba({randint(0, 32)}, {randint(128, 255)}, {randint(128, 255)}, {randint(32,96)})"
-		self._units = ''
 		
 		self.isFocused = False
-		self.jogWheelClick.connect(self.toggleFocussed)
+		self.inputMode = '' #Set to empty, 'jogWheel', or 'touch'. Used for defocus event handling behaviour.
+		
+		self.jogWheelClick.connect(self.jogWheelClicked)
 		self.jogWheelLowResolutionRotation.connect(self.onLowResRotate)
+		
+		self.touchEnd.connect(self.editTapped)
+		self.findChild(QLineEdit).installEventFilter(self) #Make touchEnd fire when our sub-edit is tapped. Otherwise, the keyboard only opens when the touch margins are tapped. The event filter itself is inherited from FocusablePlugin.
+		self.doneEditing.connect(self.doneEditingCallback)
+		
+		#When we tap an input, we deselect selected text. But we want to
+		#select all text. So, select it again after we've tapped it. Note:
+		#This only applies if the keyboard hasn't bumped the text out of the
+		#way first.
+		self.selectAllTimer = QtCore.QTimer()
+		self.selectAllTimer.timeout.connect(self.selectAll)
+		self.selectAllTimer.setSingleShot(True)
 	
 	
 	def sizeHint(self):
@@ -76,24 +91,30 @@ class SpinBox(QSpinBox, TouchMarginPlugin, DirectAPILinkPlugin, FocusablePlugin)
 			""" + self.originalStyleSheet())
 	
 	
-	@pyqtProperty(str)
-	def units(self):
-		return self._units
-	@units.setter
-	def units(self, newUnitCSVList):
-		self._units = newUnitCSVList
-	
-	
 	def onLowResRotate(self, delta, pressed):
-		if self.isFocused:
-			if pressed:
-				self.injectKeystrokes(
-					Qt.Key_PageUp if delta > 0 else Qt.Key_PageDown,
-					count=abs(delta) )
+		if self.isFocused or self.inputMode == 'touch':
+			if self.inputMode == 'touch':
+				if pressed:
+					if delta > 0: #TODO: Make this, and spin_box, and line_edit, select instead of moving by word.
+						self.findChild(QLineEdit).cursorWordForward(False)
+					else:
+						self.findChild(QLineEdit).cursorWordBackward(False)
+				else:
+					self.findChild(QLineEdit).cursorForward(False, delta)
+				
+				#An important detail - reset the cursor flash so it's always visible while moving, so we can see where we have moved it to.
+				cursorFlashTime = self.window().app.cursorFlashTime()
+				self.window().app.setCursorFlashTime(-1)
+				self.window().app.setCursorFlashTime(cursorFlashTime)
 			else:
-				self.injectKeystrokes(
-					Qt.Key_Up if delta > 0 else Qt.Key_Down,
-					count=abs(delta) )
+				if pressed:
+					self.injectKeystrokes(
+						Qt.Key_PageUp if delta > 0 else Qt.Key_PageDown,
+						count=abs(delta) )
+				else:
+					self.injectKeystrokes(
+						Qt.Key_Up if delta > 0 else Qt.Key_Down,
+						count=abs(delta) )
 		else:
 			if pressed:
 				self.injectKeystrokes(
@@ -103,9 +124,47 @@ class SpinBox(QSpinBox, TouchMarginPlugin, DirectAPILinkPlugin, FocusablePlugin)
 				self.selectWidget(delta)
 	
 	
-	def toggleFocussed(self):
+	def jogWheelClicked(self):
 		self.isFocused = not self.isFocused
+		
 		if self.isFocused:
+			self.inputMode = 'jogWheel'
 			self.window().focusRing.focusIn()
 		else:
+			self.inputMode = ''
 			self.window().focusRing.focusOut()
+	
+	
+	def editTapped(self):
+		if self.inputMode == 'touch':
+			return
+		
+		self.inputMode = 'touch'
+		self.window().app.window.showInput(
+			'numeric_with_units' if self.units else 'numeric_without_units', 
+			focus=False,
+		)
+		self.window().focusRing.focusIn()
+		
+		self.selectAll()
+		self.selectAllTimer.start(16)
+	
+	
+	def doneEditingCallback(self):
+		self.inputMode = ''
+		self.window().app.window.hideInput()
+	
+	
+	def handleJogWheelRotation(self, delta, pressed):
+		if self.inputMode:
+			if pressed:
+				self.cursorWordForward(False) if delta > 0 else self.cursorWordBackward(False)
+			else:
+				self.cursorForward(False, delta)
+			
+			#An important detail - reset the cursor flash so it's always visible while moving, so we can see where we have moved it to.
+			cursorFlashTime = self.window().app.cursorFlashTime()
+			self.window().app.setCursorFlashTime(-1)
+			self.window().app.setCursorFlashTime(cursorFlashTime)
+		else:
+			self.selectWidget(delta)

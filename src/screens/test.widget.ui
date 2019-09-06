@@ -95,6 +95,9 @@
      <height>81</height>
     </rect>
    </property>
+   <property name="value">
+    <double>99.989999999999995</double>
+   </property>
    <property name="clickMarginLeft" stdset="0">
     <enum>DecimalSpinBox::full</enum>
    </property>
@@ -107,6 +110,9 @@
    <property name="clickMarginBottom" stdset="0">
     <enum>DecimalSpinBox::full</enum>
    </property>
+   <property name="units" stdset="0">
+    <string>ks,s,ms,µs</string>
+   </property>
   </widget>
   <widget class="SpinBox" name="spinbox">
    <property name="geometry">
@@ -118,10 +124,10 @@
     </rect>
    </property>
    <property name="suffix">
-    <string>fps</string>
+    <string>t</string>
    </property>
    <property name="prefix">
-    <string>$</string>
+    <string>&gt;</string>
    </property>
    <property name="singleStep">
     <number>16</number>
@@ -894,7 +900,7 @@
     <string/>
    </property>
    <property name="pixmap">
-    <pixmap>../../assets/images/rotating-triangle.svg</pixmap>
+    <pixmap>../../../../../assets/images/rotating-triangle.svg</pixmap>
    </property>
   </widget>
   <widget class="RadioButton" name="radiobutton_2">
@@ -959,9 +965,6 @@
      <width>181</width>
      <height>81</height>
     </rect>
-   </property>
-   <property name="suffix">
-    <string>µs</string>
    </property>
    <property name="maximum">
     <number>9999</number>

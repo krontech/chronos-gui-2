@@ -450,9 +450,6 @@
      <height>51</height>
     </rect>
    </property>
-   <property name="suffix">
-    <string>µs</string>
-   </property>
    <property name="maximum">
     <double>1000000000000000043845843045076197354634047651840.000000000000000</double>
    </property>
@@ -464,6 +461,12 @@
    </property>
    <property name="clickMarginBottom" stdset="0">
     <enum>DecimalSpinBox::half</enum>
+   </property>
+   <property name="units" stdset="0">
+    <string>ms,µs,ns</string>
+   </property>
+   <property name="unit" stdset="0">
+    <string>µs</string>
    </property>
   </widget>
   <widget class="DecimalSpinBox" name="uiFps">
