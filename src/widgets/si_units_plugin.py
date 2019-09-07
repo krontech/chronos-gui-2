@@ -20,6 +20,7 @@ class SIUnitsPlugin():
 		
 		self.unitList = []
 		self._unit = ''
+		self._artificialUnit = True
 	
 	
 	#Units are only really used for decimal spin boxes, but they affect the logic of the spin boxes, and the spin box logic is sort of shared with everything.
@@ -30,11 +31,15 @@ class SIUnitsPlugin():
 	@units.setter
 	def units(self, newUnitCSVList):
 		self.unitList = [s.strip() for s in newUnitCSVList.split(',') if s.strip()]
-		if not self.unit:
+		if self._artificialUnit: #Find a natural unit, if none is set.
 			if self.unitsPostfix in self.unitList:
 				self.unit = self.unitsPostfix
-			else:
+			elif self.unitList[1:2]:
 				self.unit = self.unitList[1] #¯\_(ツ)_/¯ TODO: Select most compact representation. TODO: How to deal with decimal rounding? Do we need to?
+			else:
+				self.unit = ''
+			
+			self._artificialUnit = True
 	
 	@pyqtProperty(str)
 	def unit(self):
@@ -44,6 +49,7 @@ class SIUnitsPlugin():
 	def unit(self, newUnit):
 		self._unit = newUnit.strip()
 		self.setSuffix(self._unit)
+		self._artificialUnit = False
 	
 	
 	@property
