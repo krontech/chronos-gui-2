@@ -48,13 +48,15 @@ class Test(QtWidgets.QWidget):
 		api2.set('exposurePeriod', newExposureNs)
 	
 	def afterAShortPeriodOftime(self):
+		return self.aShortPeriodOfTime.stop()
+		
 		self.state += 1
 		if self.state == 1:
 			self.decimalspinbox.setFocus()
 		elif self.state == 2:
-			#self.window_.app.window.showInput('alphanumeric', focus=False)
-			#self.window_.app.window.showInput('numeric_without_units', focus=False)
-			self.window_.app.window.showInput('numeric_with_units', focus=False)
+			#self.window_.app.window.showInput(self.decimalspinbox, 'alphanumeric', focus=False)
+			#self.window_.app.window.showInput(self.decimalspinbox, 'numeric_without_units', focus=False)
+			self.window_.app.window.showInput(self.decimalspinbox, 'numeric_with_units', focus=False)
 		elif self.state == 3:
 			self.aShortPeriodOfTime.stop()
 		else:

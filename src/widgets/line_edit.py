@@ -91,7 +91,7 @@ class LineEdit(QLineEdit, TouchMarginPlugin, DirectAPILinkPlugin, FocusablePlugi
 			self.doneEditing.emit()
 		else:
 			self.inputMode = 'jogWheel'
-			self.window().app.window.showInput('alphanumeric', focus=True)
+			self.window().app.window.showInput(self, 'alphanumeric', focus=True)
 		
 		self.selectAll()
 		self.selectAllTimer.start(16)
@@ -101,13 +101,14 @@ class LineEdit(QLineEdit, TouchMarginPlugin, DirectAPILinkPlugin, FocusablePlugi
 			return
 		
 		self.inputMode = 'touch'
-		self.window().app.window.showInput('alphanumeric', focus=False)
+		self.window().app.window.showInput(self, 'alphanumeric', focus=False)
 		self.window().focusRing.focusIn()
 		
 		self.selectAll()
 		self.selectAllTimer.start(16)
 	
 	def doneEditingCallback(self):
+		log.debug(f'{self.objectName()} done editing')
 		self.inputMode = ''
 		self.window().app.window.hideInput()
 		self.window().focusRing.focusOut()

@@ -514,31 +514,6 @@
      <string>Button { font-size: 22px; }</string>
     </property>
    </widget>
-   <widget class="Button" name="uiDot_2">
-    <property name="geometry">
-     <rect>
-      <x>100</x>
-      <y>260</y>
-      <width>81</width>
-      <height>101</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>.</string>
-    </property>
-    <property name="clickMarginLeft" stdset="0">
-     <enum>Button::none</enum>
-    </property>
-    <property name="clickMarginRight" stdset="0">
-     <enum>Button::none</enum>
-    </property>
-    <property name="clickMarginTop" stdset="0">
-     <enum>Button::none</enum>
-    </property>
-    <property name="customStyleSheet" stdset="0">
-     <string>Button { font-size: 22px; }</string>
-    </property>
-   </widget>
    <widget class="Button" name="uiBackspaceNarrow">
     <property name="geometry">
      <rect>
@@ -582,7 +557,6 @@
    <zorder>ui5</zorder>
    <zorder>ui0</zorder>
    <zorder>ui2</zorder>
-   <zorder>uiDot_2</zorder>
    <zorder>uiBackspaceNarrow</zorder>
    <zorder>uiBackspaceWide</zorder>
   </widget>

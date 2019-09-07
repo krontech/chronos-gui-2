@@ -265,7 +265,7 @@ class Window(QtCore.QObject):
 		self._screens[self.currentScreen].hide()
 		if hasattr(self._screens[self.currentScreen], 'onHide'):
 			self._screens[self.currentScreen].onHide()
-		# TODO: DDR 2018-06-11 Also hide the keyboard and anything else that needs cleanup.
+		self.hideInput()
 		
 		#Only set the setting value after everything has worked, to avoid trying to load a crashing screen.
 		self.currentScreen = screen
@@ -286,9 +286,12 @@ class Window(QtCore.QObject):
 	# Input panel functionality #
 	#############################
 	
-	def showInput(self, name: str, *, hints: list = [], focus: bool):
+	def showInput(self, forWidget, name: str, *, hints: list = [], focus: bool):
 		"""Display a soft keyboard on-screen.
 			
+			forWigdet: The widget to open the input for. This was
+				app.focusWidget(), but the focussed widget sometimes
+				lagged behind so we pass it explicitly now.
 			name: Identifier string in self._keyboards.
 			hints: Keyword, takes ['list', 'of', 'words'] to show as
 				soft buttons at the top of the keyboard. Only
@@ -296,14 +299,16 @@ class Window(QtCore.QObject):
 			focus: Determines if the keyboard takes focus or not.
 				Behaves like a modal dialog if it does focus."""
 		
-		if self.activeInput():
-			self.hideInput()
+		self.hideInput()
 		
+		log.debug(f'Emitting show to {name}, by {forWidget.objectName()}, with {hints}.')
+		
+		forWidget.setFocus(True)
 		self._activeKeyboard = name
 		panel = self._keyboards[self._activeKeyboard]
 		panel.setParent(self._screens[self.currentScreen])
 		panel.onShow.emit({
-			"opener": app.focusWidget(),
+			"opener": forWidget, #Can't use app.focusWidget() here, it seems to lag sometimes and returns the previously focussed widget.
 			"hints": hints,
 			"focus": focus,
 		})
@@ -312,16 +317,16 @@ class Window(QtCore.QObject):
 	def hideInput(self):
 		"""Hide the keyboard given by name, or the most recent keyboard."""
 		
-		if not self._activeKeyboard:
+		if not self.activeInput():
 			return #Well, that was easy. *causes horrendous problems down the road*
 		
-		panel = self._keyboards[self._activeKeyboard]
-		panel.onHide.emit()
+		log.debug(f"Emitting hide to {self._activeKeyboard}.")
+		self._keyboards[self._activeKeyboard].onHide.emit()
 		self._activeKeyboard = ''
 	
 	
 	def activeInput(self):
-		if self._activeKeyboard and self._keyboards[self._activeKeyboard].isVisible():
+		if self._activeKeyboard:
 			return self._keyboards[self._activeKeyboard]
 		else:
 			return None

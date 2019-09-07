@@ -40,8 +40,9 @@ class KeyboardBase(QtWidgets.QWidget):
 	
 	
 	def __handleFocusChange(self, old, new):
-		focussedOnInputOrKeyboard = new == self.opener or True in [new in child.children() for child in self.children()]
-		if not focussedOnInputOrKeyboard:
+		focusedOnInputOrKeyboard = new == self.opener or True in [new in child.children() for child in self.children()]
+		log.debug(f"Focus change: {self.objectName()}: focused is {focusedOnInputOrKeyboard}, on {new.objectName()}.")
+		if not focusedOnInputOrKeyboard:
 			self.opener.doneEditing.emit()
 	
 	
@@ -49,7 +50,7 @@ class KeyboardBase(QtWidgets.QWidget):
 		#eg, {'focus': False, 'hints': [], 'opener': <line_edit.LineEdit object at 0x46155cb0>}
 		self.show()
 		self.opener = options["opener"]
-		log.print('set opener')
+		log.debug(f'set opener {self.opener.objectName()}')
 		
 		#Set button focus policy.
 		for pane in self.children():
@@ -82,6 +83,8 @@ class KeyboardBase(QtWidgets.QWidget):
 			Note: May be called several times if multiple conditions would close.
 			"""
 		
+		log.debug(f"Hide event recieved by {self.objectName()}. (ignoring: {self.isHidden()})")
+		
 		#Debounce.
 		if self.isHidden():
 			return
@@ -95,11 +98,12 @@ class KeyboardBase(QtWidgets.QWidget):
 		try:
 			self.parent().app.focusChanged.disconnect(self.__handleFocusChange)
 		except TypeError:
-			print('Warning: __handleFocusChange for alphanumeric keyboard not connected.')
-			pass
+			log.warn('__handleFocusChange for alphanumeric keyboard not connected.')
 		
 		#Refresh focus ring position or focus on the thing that opened us, since the previously focussed button just disappeared.
 		self.opener.setFocus()
 		self.refocusFocusRingTimer.start(16) #Position of opener changes asynchronously.
-	
+		
+		#setFocus may not fire, so let whatever opened us know we're done with it.
+		self.opener.doneEditing.emit()
 	

@@ -140,7 +140,8 @@ class DecimalSpinBox(QDoubleSpinBox, TouchMarginPlugin, DirectAPILinkPlugin, Foc
 			return
 		
 		self.inputMode = 'touch'
-		self.window().app.window.showInput(
+		self.isFocused = True
+		self.window().app.window.showInput(self,
 			'numeric_with_units' if self.units else 'numeric_without_units', 
 			focus=False,
 		)
@@ -151,7 +152,9 @@ class DecimalSpinBox(QDoubleSpinBox, TouchMarginPlugin, DirectAPILinkPlugin, Foc
 	
 	
 	def doneEditingCallback(self):
+		log.debug(f'DONE EDITING {self.objectName()}')
 		self.inputMode = ''
+		self.isFocused = False
 		self.window().app.window.hideInput()
 	
 	
