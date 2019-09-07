@@ -143,6 +143,7 @@ class KeyboardNumericWithUnits(KeyboardNumericWithoutUnits):
 						if self.opener.unitList[i] == self.opener.unit:
 							buttons[i].setChecked(True)
 							break
+			self.opener.valueChanged.emitVerbatim(self.opener.value())
 		return unitToggledCallback
 	
 	
