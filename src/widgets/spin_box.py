@@ -6,6 +6,7 @@ from PyQt5.QtCore import Q_ENUMS, QSize, Qt
 from PyQt5.QtWidgets import QSpinBox, QLineEdit
 
 from debugger import *; dbg
+from signal_tap import signalTap
 
 from touch_margin_plugin import TouchMarginPlugin, MarginWidth
 from direct_api_link_plugin import DirectAPILinkPlugin
@@ -37,6 +38,11 @@ class SpinBox(QSpinBox, TouchMarginPlugin, DirectAPILinkPlugin, FocusablePlugin,
 		self.selectAllTimer = QtCore.QTimer()
 		self.selectAllTimer.timeout.connect(self.selectAll)
 		self.selectAllTimer.setSingleShot(True)
+		
+		valueChangedTap = signalTap(lambda val:
+			(val * self.unitValue[self.siUnit],) )
+		self.valueChanged.connect(valueChangedTap.emit)
+		self.valueChanged = valueChangedTap
 	
 	
 	def sizeHint(self):
@@ -171,3 +177,19 @@ class SpinBox(QSpinBox, TouchMarginPlugin, DirectAPILinkPlugin, FocusablePlugin,
 			self.window().app.setCursorFlashTime(cursorFlashTime)
 		else:
 			self.selectWidget(delta)
+	
+	
+	def value(self):
+		return self.realValue(super().value)
+	def setValue(self, val):
+		return self.setRealValue(super().setValue, val)
+	
+	def minimum(self):
+		return self.realMinimum(super().minimum)
+	def setMinimum(self, val):
+		return self.setRealMinimum(super().setMinimum, val)
+	
+	def maximum(self):
+		return self.realMaximum(super().maximum)
+	def setMaximum(self, val):
+		return self.setRealMaximum(super().setMaximum, val)

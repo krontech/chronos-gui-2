@@ -74,23 +74,60 @@ class SIUnitsPlugin():
 	def siUnit(self):
 		"""The current SI unit. (see allUnits)"""
 		
-		si = self.unit[-len(self.unitsPostfix):]
+		si = self.unit[0:-len(self.unitsPostfix)]
 		assert si in self.unitValue, f"Unrecognised SI unit, '{si}', calculated for {self.objectName} ({self}).\nCheck all postfixes are common? (Common postfix is currently '{self.unitsPostfix}').\nAll recognised SI units are:\n{self.allUnits}"
 		return si
 	
 	
-	def value(self) -> Union[float, int]:
+	def realValue(self, valueFunction) -> Union[float, int]:
 		"""Get real value of input, taking into account the SI units. (eg., 'k' or 'µs')"""
 		
 		if getattr(self, 'unitList', []):
-			return super().value() * self.unitValue[self.siUnit]
+			return valueFunction() * self.unitValue[self.siUnit]
 		else:
-			return super().value() * 1
+			return valueFunction() * 1
 	
-	def setValue(self, val) -> None:
+	def setRealValue(self, setValueFunction, val) -> None:
 		"""Set the value of the spinbox, taking into account the SI units."""
 		
+		log.print(f"srv {self.objectName()} → {val} at {self.unitValue[self.siUnit]} for {val / self.unitValue[self.siUnit]}")
 		if getattr(self, 'unitList', []):
-			return super().setValue(val / self.unitValue[self.siUnit])
+			return setValueFunction(val / self.unitValue[self.siUnit])
 		else:
-			return super().setValue(val / 1)
+			return setValueFunction(val / 1)
+	
+	
+	def realMinimum(self, valueFunction) -> Union[float, int]:
+		"""Get real value of input, taking into account the SI units. (eg., 'k' or 'µs')"""
+		
+		if getattr(self, 'unitList', []):
+			return valueFunction() * self.unitValue[self.siUnit]
+		else:
+			return valueFunction() * 1
+	
+	def setRealMinimum(self, setValueFunction, val) -> None:
+		"""Set the value of the spinbox, taking into account the SI units."""
+		
+		log.print(f"srv {self.objectName()} → {val}")
+		if getattr(self, 'unitList', []):
+			return setValueFunction(val / self.unitValue[self.siUnit])
+		else:
+			return setValueFunction(val / 1)
+	
+	
+	def realMaximum(self, valueFunction) -> Union[float, int]:
+		"""Get real value of input, taking into account the SI units. (eg., 'k' or 'µs')"""
+		
+		if getattr(self, 'unitList', []):
+			return valueFunction() * self.unitValue[self.siUnit]
+		else:
+			return valueFunction() * 1
+	
+	def setRealMaximum(self, setValueFunction, val) -> None:
+		"""Set the value of the spinbox, taking into account the SI units."""
+		
+		log.print(f"srv {self.objectName()} → {val}")
+		if getattr(self, 'unitList', []):
+			return setValueFunction(val / self.unitValue[self.siUnit])
+		else:
+			return setValueFunction(val / 1)
