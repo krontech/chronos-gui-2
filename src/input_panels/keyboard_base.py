@@ -41,7 +41,7 @@ class KeyboardBase(QtWidgets.QWidget):
 	
 	def __handleFocusChange(self, old, new):
 		focusedOnInputOrKeyboard = new == self.opener or True in [new in child.children() for child in self.children()]
-		log.debug(f"Focus change: {self.objectName()}: focused is {focusedOnInputOrKeyboard}, on {new.objectName()}.")
+		log.debug(f"Focus change: {self.objectName()}: focused is {focusedOnInputOrKeyboard}, on {new and new.objectName() or 'None'}.")
 		if not focusedOnInputOrKeyboard:
 			self.opener.doneEditing.emit()
 	
