@@ -26,8 +26,10 @@ class KeyboardNumericWithoutUnits(KeyboardBase):
 		self.onShow.connect(self.__handleShown)
 		
 		#We bounce the "done editing" idea through whatever opened us, so if whatever opened us is invalid it has the option of not closing us if it wants to. Is… is this spaghetti logic? I'm so sorry.
-		self.uiClose.clicked.connect(lambda: 
-			self.opener and self.opener.doneEditing.emit() )
+		self.uiClose.clicked.connect(lambda: self.opener and (
+			self.opener.interpretText(), #Old intermediate input can remain if still selected, explicitly interpret when keyboard closed.
+			self.opener.doneEditing.emit(),
+		))
 		
 		#Assign keystrokes for each alphanumeric key.
 		for key in [getattr(self, f'ui{digit}') for digit in digits]:
