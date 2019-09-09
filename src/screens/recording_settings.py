@@ -30,6 +30,10 @@ class RecordingSettings(QtWidgets.QDialog):
 		self.setWindowFlags(QtCore.Qt.FramelessWindowHint)
 		self.setAttribute(QtCore.Qt.WA_TranslucentBackground, True)
 		
+		settings.observe('debug controls enabled', False, lambda show:
+			self.uiDebug.show() if show else self.uiDebug.hide() )
+		self.uiDebug.clicked.connect(lambda: self and dbg())
+		
 		self.populatePresets()
 		self.uiPresets.currentIndexChanged.connect(self.applyPreset)
 		
@@ -58,7 +62,6 @@ class RecordingSettings(QtWidgets.QDialog):
 		#Frame rate fps/µs binding
 		self.uiFps.setMinimum(0.01)
 		self.uiFps.valueChanged.connect(self.updateFps)
-		self.uiFrameDuration.setMaximum(999999)
 		self.uiFrameDuration.valueChanged.connect(self.updateFrameDuration)
 		api2.observe('frameRate', self.updateFpsFromAPI)
 		
@@ -210,7 +213,7 @@ class RecordingSettings(QtWidgets.QDialog):
 		self.uiHOffset.setMaximum(999999)
 		self.uiVOffset.setMaximum(999999)
 		self.uiFps.setMaximum(999999)
-		self.uiFrameDuration.setMinimum(0)
+		self.uiFrameDuration.setMinimum(0) #TODO: This gets re-set, right?
 		for key, value in preset.get('values', {}).items():
 			elem = getattr(self, key)
 			elem.blockSignals(True) #Don't fire around a bunch of updates as we set values.
@@ -224,7 +227,7 @@ class RecordingSettings(QtWidgets.QDialog):
 		self.updatePassepartout()
 		
 		#Update frame duration and exposure from frame rate, which we just updated.
-		self.uiFrameDuration.setValue(1e6/self.uiFps.value())
+		self.uiFrameDuration.setValue(1/self.uiFps.value())
 		self.updateExposureLimits()
 		
 		self._dirty = True
@@ -393,9 +396,9 @@ class RecordingSettings(QtWidgets.QDialog):
 		framerateIsMaxed = abs(self.uiFps.maximum() - self.uiFps.value()) <= 1 #There is a bit of uncertainty here, occasionally, of about 0.1 fps.
 		self.uiFps.setMaximum(1e9 / limits['minFramePeriod'])
 		log.print(f"umf3 max/val {self.uiFps.maximum(), self.uiFps.value()}")
-		self.uiFrameDuration.setMinimum(1e-3 * limits['minFramePeriod'])
+		self.uiFrameDuration.setMinimum(limits['minFramePeriod'] / 1e9) #ns→s
 		framerateIsMaxed and self.uiFps.setValue(self.uiFps.maximum())
-		framerateIsMaxed and self.uiFrameDuration.setValue(1e6/self.uiFps.maximum())
+		framerateIsMaxed and self.uiFrameDuration.setValue(1/self.uiFps.maximum())
 		self.updateExposureLimits()
 		log.print(f"umf4 max/val {self.uiFps.maximum(), self.uiFps.value()}")
 	
@@ -448,7 +451,7 @@ class RecordingSettings(QtWidgets.QDialog):
 	
 	@pyqtSlot(float, name="updateFps")
 	def updateFps(self, fps: float):
-		self.uiFrameDuration.setValue(1e6/fps)
+		self.uiFrameDuration.setValue(1/fps)
 		self.selectCorrectPreset()
 		self._dirty = True
 		self.uiUnsavedChangesWarning.show()
@@ -457,8 +460,8 @@ class RecordingSettings(QtWidgets.QDialog):
 		
 		
 	@pyqtSlot(float, name="updateFrameDuration")
-	def updateFrameDuration(self, µs: float):
-		self.uiFps.setValue(1e6/µs)
+	def updateFrameDuration(self, seconds: float):
+		self.uiFps.setValue(1/seconds)
 		self.selectCorrectPreset()
 		self._dirty = True
 		self.uiUnsavedChangesWarning.show()
@@ -468,7 +471,7 @@ class RecordingSettings(QtWidgets.QDialog):
 	@pyqtSlot(float, name="updateFpsFromAPI")
 	def updateFpsFromAPI(self, fps):
 		self.uiFps.setValue(fps)
-		self.uiFrameDuration.setValue(1e6/fps)
+		self.uiFrameDuration.setValue(1/fps)
 		self.selectCorrectPreset()
 		self.updateExposureLimits()
 	
@@ -476,8 +479,7 @@ class RecordingSettings(QtWidgets.QDialog):
 	def updateExposureLimits(self):
 		exposureIsMaxed = self.uiExposure.value() == self.uiExposure.maximum()
 		self.uiExposure.setMaximum(
-			((self.uiFrameDuration.value() * 1e3) - self._lastKnownFramerateOverheadNs)
-		)
+			self.uiFrameDuration.value()*1e9 - self._lastKnownFramerateOverheadNs )
 		exposureIsMaxed and self.uiExposure.setValue(self.uiExposure.maximum())
 		
 	
@@ -538,5 +540,5 @@ class RecordingSettings(QtWidgets.QDialog):
 					'vOffset': self.uiVOffset.value(),
 					'minFrameTime': 1/self.uiFps.value(), #This locks the fps in at the lower framerate until you reset it.
 				},
-				'framePeriod': self.uiFrameDuration.value()*1e3,
+				'framePeriod': self.uiFrameDuration.value()*1e9, #s→ns
 			})
