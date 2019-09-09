@@ -73,7 +73,7 @@ class RecordingSettings(QtWidgets.QDialog):
 		# Button binding.
 		self.uiCenterRecording.clicked.connect(self.centerRecording)
 		
-		self.uiApply.clicked.connect(self.applySettings)
+		self.uiCancel.clicked.connect(self.revertSettings)
 		self.uiDone.clicked.connect(self.applySettings)
 		self.uiDone.clicked.connect(lambda: self.window_.back())
 		
@@ -103,11 +103,11 @@ class RecordingSettings(QtWidgets.QDialog):
 		#Set up ui writes after everything is done.
 		self._dirty = False
 		self.uiUnsavedChangesWarning.hide()
-		self.uiApply.hide()
+		self.uiCancel.hide()
 		def markDirty(*_):
 			self._dirty = True
 			self.uiUnsavedChangesWarning.show()
-			self.uiApply.show()
+			self.uiCancel.show()
 		self.uiHRes.valueChanged.connect(markDirty)
 		self.uiVRes.valueChanged.connect(markDirty)
 		self.uiHOffset.valueChanged.connect(markDirty)
@@ -232,7 +232,7 @@ class RecordingSettings(QtWidgets.QDialog):
 		
 		self._dirty = True
 		self.uiUnsavedChangesWarning.show()
-		self.uiApply.show()
+		self.uiCancel.show()
 		
 	
 	def updatePresetDropdownButtons(self):
@@ -371,8 +371,6 @@ class RecordingSettings(QtWidgets.QDialog):
 	
 	_lastKnownFramerateOverheadNs = 5000
 	def updateMaximumFramerate(self, minFrameTime=None):
-		log.print('entered updateMaximumFramerate')
-		log.print(f"umf1 max/val {self.uiFps.maximum(), self.uiFps.value()}")
 		if minFrameTime:
 			#Shortcut. We can do this because the exposure values set below by the real call are not required when an API-driven update is fired, since the API-driven update will also update the exposure. I think. 🤞
 			limits = {'minFramePeriod': minFrameTime*1e9}
@@ -392,16 +390,12 @@ class RecordingSettings(QtWidgets.QDialog):
 		
 		log.debug(f"Framerate for {self.uiHRes.value()}×{self.uiVRes.value()}: {1e9 / limits['minFramePeriod']}")
 		
-		log.print(f"umf2 max/val {self.uiFps.maximum(), self.uiFps.value()}")
 		framerateIsMaxed = abs(self.uiFps.maximum() - self.uiFps.value()) <= 1 #There is a bit of uncertainty here, occasionally, of about 0.1 fps.
 		self.uiFps.setMaximum(1e9 / limits['minFramePeriod'])
-		log.print(f"umf3 max/val {self.uiFps.maximum(), self.uiFps.value()}")
 		self.uiFrameDuration.setMinimum(limits['minFramePeriod'] / 1e9) #ns→s
 		framerateIsMaxed and self.uiFps.setValue(self.uiFps.maximum())
 		framerateIsMaxed and self.uiFrameDuration.setValue(1/self.uiFps.maximum())
 		self.updateExposureLimits()
-		log.print(f"umf4 max/val {self.uiFps.maximum(), self.uiFps.value()}")
-	
 	
 	
 	_sensorWidth = api2.getSync('sensorHMax')
@@ -455,7 +449,7 @@ class RecordingSettings(QtWidgets.QDialog):
 		self.selectCorrectPreset()
 		self._dirty = True
 		self.uiUnsavedChangesWarning.show()
-		self.uiApply.show()
+		self.uiCancel.show()
 		self.updateExposureLimits()
 		
 		
@@ -465,7 +459,7 @@ class RecordingSettings(QtWidgets.QDialog):
 		self.selectCorrectPreset()
 		self._dirty = True
 		self.uiUnsavedChangesWarning.show()
-		self.uiApply.show()
+		self.uiCancel.show()
 		self.updateExposureLimits()
 		
 	@pyqtSlot(float, name="updateFpsFromAPI")
@@ -527,10 +521,12 @@ class RecordingSettings(QtWidgets.QDialog):
 	
 	
 	def applySettings(self):
+		"""Save all setting to the API, which will take some time applying them."""
+		
 		if self._dirty:
 			self._dirty = False
 			self.uiUnsavedChangesWarning.hide()
-			self.uiApply.hide()
+			self.uiCancel.hide()
 			api2.control.call('set', {
 				'resolution': {
 					#'vDarkRows': 0, #Don't reset what we don't show. That's annoying if you did manually set it.
@@ -542,3 +538,18 @@ class RecordingSettings(QtWidgets.QDialog):
 				},
 				'framePeriod': self.uiFrameDuration.value()*1e9, #s→ns
 			})
+	
+	
+	def revertSettings(self):
+		"""Set resolution settings back to the API."""
+		
+		self.updateUiHRes(api2.apiValues.get('resolution')['hRes'])
+		self.updateUiVRes(api2.apiValues.get('resolution')['vRes'])
+		self.updateUiHOffset(api2.apiValues.get('resolution')['hOffset'])
+		self.updateUiVOffset(api2.apiValues.get('resolution')['vOffset'])
+		self.updateMaximumFramerate(api2.apiValues.get('resolution')['minFrameTime'])
+		self.updateFpsFromAPI(api2.apiValues.get('frameRate'))
+		
+		self._dirty = False
+		self.uiUnsavedChangesWarning.hide()
+		self.uiCancel.hide()

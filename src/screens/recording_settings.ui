@@ -513,7 +513,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>*Press Done to apply changes.</string>
+    <string>*Press Done to use new resolution.</string>
    </property>
    <property name="alignment">
     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -593,7 +593,7 @@
     <string>border-image: url(../../assets/images/picture-small.jpg); border-image: url(assets/images/picture-small.jpg);</string>
    </property>
   </widget>
-  <widget class="Button" name="uiApply">
+  <widget class="Button" name="uiCancel">
    <property name="geometry">
     <rect>
      <x>460</x>
@@ -603,7 +603,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>Apply</string>
+    <string>Cancel</string>
    </property>
    <property name="clickMarginRight" stdset="0">
     <enum>Button::half</enum>
@@ -659,7 +659,7 @@
   <zorder>headerlabel_7</zorder>
   <zorder>uiSavePreset</zorder>
   <zorder>uiDeletePreset</zorder>
-  <zorder>uiApply</zorder>
+  <zorder>uiCancel</zorder>
   <zorder>uiDebug</zorder>
  </widget>
  <customwidgets>
