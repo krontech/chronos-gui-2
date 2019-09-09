@@ -14,6 +14,8 @@ from focusable_plugin import FocusablePlugin
 from si_units_plugin import SIUnitsPlugin
 
 
+JOG_WHEEL_MOVES_CURSOR = False
+
 class DecimalSpinBox(QDoubleSpinBox, TouchMarginPlugin, DirectAPILinkPlugin, FocusablePlugin, SIUnitsPlugin):
 	Q_ENUMS(MarginWidth) #This is needed here. I don't know why the definition in the TouchMarginPlugin doesn't work.
 	
@@ -98,7 +100,7 @@ class DecimalSpinBox(QDoubleSpinBox, TouchMarginPlugin, DirectAPILinkPlugin, Foc
 	
 	def onLowResRotate(self, delta, pressed):
 		if self.isFocused or self.inputMode == 'touch':
-			if self.inputMode == 'touch':
+			if self.inputMode == 'touch' and JOG_WHEEL_MOVES_CURSOR:
 				if pressed:
 					if delta > 0: #TODO: Make this, and spin_box, and line_edit, select instead of moving by word.
 						self.findChild(QLineEdit).cursorWordForward(False)
@@ -161,21 +163,6 @@ class DecimalSpinBox(QDoubleSpinBox, TouchMarginPlugin, DirectAPILinkPlugin, Foc
 		self.inputMode = ''
 		self.isFocused = False
 		self.window().app.window.hideInput()
-	
-	
-	def handleJogWheelRotation(self, delta, pressed):
-		if self.inputMode:
-			if pressed:
-				self.cursorWordForward(False) if delta > 0 else self.cursorWordBackward(False)
-			else:
-				self.cursorForward(False, delta)
-			
-			#An important detail - reset the cursor flash so it's always visible while moving, so we can see where we have moved it to.
-			cursorFlashTime = self.window().app.cursorFlashTime()
-			self.window().app.setCursorFlashTime(-1)
-			self.window().app.setCursorFlashTime(cursorFlashTime)
-		else:
-			self.selectWidget(delta)
 	
 	
 	def value(self):
