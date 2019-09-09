@@ -130,6 +130,10 @@ class KeyboardNumericWithUnits(KeyboardNumericWithoutUnits):
 	
 	def unitToggled(self, unitIndex, button):
 		def unitToggledCallback(isChecked):
+			min_ = self.opener.minimum()
+			max_ = self.opener.maximum()
+			val_ = self.opener.value()
+			
 			buttons = [self.uiMega, self.uiKilo, self.uiMilli, self.uiMicro]
 			if isChecked: #Wait. I have created radio buttons. … This is easier than reskinning the actual things, I guess. :p
 				self.opener.unit = self.opener.unitList[unitIndex]
@@ -143,7 +147,11 @@ class KeyboardNumericWithUnits(KeyboardNumericWithoutUnits):
 						if self.opener.unitList[i] == self.opener.unit:
 							buttons[i].setChecked(True)
 							break
-			self.opener.valueChanged.emitVerbatim(self.opener.value())
+			
+			#Set the min/max/value to take into account the new unit.
+			self.opener.setMinimum(min_)
+			self.opener.setMaximum(max_)
+			self.opener.setValue(val_)
 		return unitToggledCallback
 	
 	

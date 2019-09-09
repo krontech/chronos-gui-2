@@ -90,7 +90,6 @@ class SIUnitsPlugin():
 	def setRealValue(self, setValueFunction, val) -> None:
 		"""Set the value of the spinbox, taking into account the SI units."""
 		
-		log.print(f"srv {self.objectName()} → {val} at {self.unitValue[self.siUnit]} for {val / self.unitValue[self.siUnit]}")
 		if getattr(self, 'unitList', []):
 			return setValueFunction(val / self.unitValue[self.siUnit])
 		else:
@@ -108,7 +107,6 @@ class SIUnitsPlugin():
 	def setRealMinimum(self, setValueFunction, val) -> None:
 		"""Set the value of the spinbox, taking into account the SI units."""
 		
-		log.print(f"srv {self.objectName()} → {val}")
 		if getattr(self, 'unitList', []):
 			return setValueFunction(val / self.unitValue[self.siUnit])
 		else:
@@ -126,7 +124,6 @@ class SIUnitsPlugin():
 	def setRealMaximum(self, setValueFunction, val) -> None:
 		"""Set the value of the spinbox, taking into account the SI units."""
 		
-		log.print(f"srv {self.objectName()} → {val}")
 		if getattr(self, 'unitList', []):
 			return setValueFunction(val / self.unitValue[self.siUnit])
 		else:
