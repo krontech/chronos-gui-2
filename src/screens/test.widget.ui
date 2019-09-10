@@ -998,6 +998,9 @@
    <property name="text">
     <string>type here</string>
    </property>
+   <property name="hints" stdset="0">
+    <string>/,\,\\,test,toast,🦇</string>
+   </property>
   </widget>
   <widget class="LineEdit" name="lineedit_3">
    <property name="geometry">

@@ -2,7 +2,7 @@
 
 from random import randint
 
-from PyQt5.QtCore import Q_ENUMS, QSize, Qt
+from PyQt5.QtCore import Q_ENUMS, QSize, Qt, pyqtProperty
 from PyQt5.QtGui import QPainter
 from PyQt5.QtWidgets import QLineEdit
 
@@ -19,6 +19,8 @@ class LineEdit(QLineEdit, TouchMarginPlugin, DirectAPILinkPlugin, FocusablePlugi
 		self.keepActiveLook = False
 
 		super().__init__(parent, showHitRects=showHitRects)
+		
+		self.hintList = []
 		
 		# Set some default text, so we can see the widget.
 		if not self.text():
@@ -47,7 +49,17 @@ class LineEdit(QLineEdit, TouchMarginPlugin, DirectAPILinkPlugin, FocusablePlugi
 	
 	def sizeHint(self):
 		return QSize(361, 81)
-		
+	
+	
+	@pyqtProperty(str)
+	def hints(self):
+		return ','.join(self.hintList)
+	
+	@hints.setter
+	def hints(self, newCSVHintList: str):
+		self.hintList = [s.strip() for s in newCSVHintList.split(',') if s.strip()]
+	
+	
 	def refreshStyle(self):
 		if self.showHitRects:
 			self.setStyleSheet(f"""
@@ -91,7 +103,7 @@ class LineEdit(QLineEdit, TouchMarginPlugin, DirectAPILinkPlugin, FocusablePlugi
 			self.doneEditing.emit()
 		else:
 			self.inputMode = 'jogWheel'
-			self.window().app.window.showInput(self, 'alphanumeric', focus=True)
+			self.window().app.window.showInput(self, 'alphanumeric', focus=True, hints=self.hintList)
 		
 		self.selectAll()
 		self.selectAllTimer.start(16)
@@ -101,7 +113,7 @@ class LineEdit(QLineEdit, TouchMarginPlugin, DirectAPILinkPlugin, FocusablePlugi
 			return
 		
 		self.inputMode = 'touch'
-		self.window().app.window.showInput(self, 'alphanumeric', focus=False)
+		self.window().app.window.showInput(self, 'alphanumeric', focus=False, hints=self.hintList)
 		self.window().focusRing.focusIn()
 		
 		self.selectAll()

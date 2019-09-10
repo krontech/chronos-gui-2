@@ -7,6 +7,7 @@ from PyQt5 import uic, QtCore, QtGui
 from debugger import *; dbg
 
 from input_panels.keyboard_base import KeyboardBase
+from widgets.button import Button
 
 padding = 10
 
@@ -51,20 +52,45 @@ class KeyboardAlphanumeric(KeyboardBase):
 	
 	def __handleShown(self, options):
 		#eg, {'focus': False, 'hints': [], 'opener': <line_edit.LineEdit object at 0x46155cb0>}
+		hints = options["hints"]
 		
-		if not options["hints"]:
+		if not hints:
 			self.uiSuggestionBar.hide()
-			inputGeometry = QtCore.QRect(0,padding, self.uiKeyPanel.width(), self.uiKeyPanel.height())
+			inputGeometry = QtCore.QRect(0, padding, self.uiKeyPanel.width(), self.uiKeyPanel.height())
 			self.uiKeyPanel.setGeometry(inputGeometry)
 			inputGeometry.setHeight(inputGeometry.height() + padding) #This is like the opposite of a good API. It is minimally expressive.
 			self.setGeometry(inputGeometry)
 		else:
 			self.uiSuggestionBar.show()
-			inputGeometry = QtCore.QRect(0,self.uiSuggestionBar.height(), self.uiKeyPanel.width(), self.uiKeyPanel.height())
+			inputGeometry = QtCore.QRect(0, self.uiSuggestionBar.height(), self.uiKeyPanel.width(), self.uiKeyPanel.height())
 			self.uiKeyPanel.setGeometry(inputGeometry)
-			inputGeometry.setHeight(inputGeometry.height() + self.uiSuggestionBar.height() + padding)
+			inputGeometry.setHeight(inputGeometry.height() + self.uiSuggestionBar.height()) #The lack of padding here is worrying, but works. I think something in the input panel is covering for it.
 			self.setGeometry(inputGeometry)
-			print('SUGGESTION BAR NOT IMPLEMENTED (check it works correctly with tap VS jog wheel focus modes)')
+			
+			for i in range(self.uiSuggestionBarLayout.count()): #Clear the existing widgets.
+				self.uiSuggestionBarLayout.itemAt(i).widget.deleteLater()
+			
+			for hint in hints:
+				print('adding hint', hint)
+				hintButton = Button(self.uiSuggestionBarLayout.parentWidget())
+				hintButton.setText(hint)
+				hintButton.setFocusPolicy(
+					QtCore.Qt.StrongFocus
+					if options["focus"]
+					else QtCore.Qt.NoFocus )
+				hintButton.clicked.connect(lambda: 
+					self.sendKeystroke(126, hint) )
+				hintButton.clickMarginLeft = 0
+				hintButton.clickMarginRight = 0
+				hintButton.clickMarginTop = hintButton.half
+				hintButton.clickMarginBottom = 0
+				hintButton.setCustomStyleSheet("Button { border-left-width: 0px; }")
+				self.uiSuggestionBarLayout.addWidget(hintButton)
+				self.uiSuggestionBarLayout.parentWidget().raise_()
+				hintButton.raise_()
+				hintButton.show()
+			
+			
 		
 		self.setGeometry(0, self.parentWidget().height() - self.height(), self.width(), self.height())
 		
@@ -113,12 +139,12 @@ class KeyboardAlphanumeric(KeyboardBase):
 			keycap.setText(getattr(keycap.text(), 
 				'upper' if self.uiShift.keepActiveLook else 'lower')())
 	
-	def sendKeystroke(self, code):
+	def sendKeystroke(self, code, text=''):
 		print(f'emitting key #{code}')
 		
 		#The QLineEdit backing widget for text input relies on the text value of the key event, so we need to synthesize a text for the event to take effect.
 		try:
-			eventText = chr(code)
+			eventText = text or chr(code)
 		except ValueError:
 			eventText = ''
 		

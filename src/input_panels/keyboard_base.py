@@ -37,8 +37,6 @@ class KeyboardBase(QtWidgets.QWidget):
 		self.onHide.connect(self.__handleHide)
 	
 	
-	
-	
 	def __handleFocusChange(self, old, new):
 		focusedOnInputOrKeyboard = new == self.opener or True in [new in child.children() for child in self.children()]
 		log.debug(f"Focus change: {self.objectName()}: focused is {focusedOnInputOrKeyboard}, on {new and new.objectName() or 'None'}.")

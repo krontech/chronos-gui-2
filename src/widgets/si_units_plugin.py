@@ -29,7 +29,7 @@ class SIUnitsPlugin():
 		return ','.join(self.unitList)
 	
 	@units.setter
-	def units(self, newUnitCSVList):
+	def units(self, newUnitCSVList: str):
 		self.unitList = [s.strip() for s in newUnitCSVList.split(',') if s.strip()]
 		if self._artificialUnit: #Find a natural unit, if none is set.
 			if self.unitsPostfix in self.unitList:

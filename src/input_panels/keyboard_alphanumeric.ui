@@ -49,10 +49,14 @@
      <x>0</x>
      <y>0</y>
      <width>801</width>
-     <height>45</height>
+     <height>51</height>
     </rect>
    </property>
-   <layout class="QHBoxLayout" name="uiSuggestionBarLayout"/>
+   <layout class="QHBoxLayout" name="uiSuggestionBarLayout">
+    <property name="spacing">
+     <number>0</number>
+    </property>
+   </layout>
   </widget>
   <widget class="QWidget" name="uiKeyPanel" native="true">
    <property name="geometry">
