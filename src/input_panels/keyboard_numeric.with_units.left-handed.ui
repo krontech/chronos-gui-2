@@ -36,7 +36,7 @@
     <string>background: qlineargradient(x1:0 y1:0, x2:1 y2:0, stop:0 transparent, stop:1 rgba(0,0,0,128));</string>
    </property>
   </widget>
-  <widget class="QWidget" name="widget" native="true">
+  <widget class="QWidget" name="uiKeyPanel" native="true">
    <property name="geometry">
     <rect>
      <x>10</x>
@@ -561,7 +561,7 @@
    <zorder>uiBackspaceWide</zorder>
   </widget>
   <zorder>backdrop</zorder>
-  <zorder>widget</zorder>
+  <zorder>uiKeyPanel</zorder>
   <zorder>uiDropshadow</zorder>
  </widget>
  <customwidgets>

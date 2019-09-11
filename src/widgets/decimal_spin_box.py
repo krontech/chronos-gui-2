@@ -171,15 +171,15 @@ class DecimalSpinBox(QDoubleSpinBox, TouchMarginPlugin, DirectAPILinkPlugin, Foc
 	def value(self):
 		return self.realValue(super().value)
 	def setValue(self, val):
-		return self.setRealValue(super().setValue, val)
+		self.setRealValue(super().setValue, val)
 	
 	def minimum(self):
 		return self.realMinimum(super().minimum)
 	def setMinimum(self, val):
-		return self.setRealMinimum(super().setMinimum, val)
+		self.setRealMinimum(super().setMinimum, val)
 	
 	def maximum(self):
 		return self.realMaximum(super().maximum)
 	def setMaximum(self, val):
-		return self.setRealMaximum(super().setMaximum, val)
+		self.setRealMaximum(super().setMaximum, val)
 	

@@ -7,7 +7,13 @@ from PyQt5.QtCore import pyqtProperty
 from debugger import *; dbg
 
 class SIUnitsPlugin():
-	"""A mixin for numeric widgets which gives them an SI unit value."""
+	"""A mixin for numeric widgets which gives them an SI unit value.
+		
+		Note: If you're using units on a whole-number spinbox, the
+			maximum must be expressible in terms of whole numbers of the
+			largest unit. If it is closest to 0 of the maximum, it *will*
+			get rounded to 0 and it *will not* come back when you set the
+			unit smaller."""
 	
 	#Specify the widget property "units", on numeric inputs, to provide a list of units to choose from. It is recommended to stick to 4, since that's how many unit buttons are on the numeric keyboard.
 	allUnits = ['y', 'z', 'a', 'f', 'p', 'n', 'µ', 'm', '', 'k', 'M', 'G', 'T', 'P', 'E', 'Z', 'Y']
