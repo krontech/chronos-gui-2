@@ -9,6 +9,7 @@ from debugger import *; dbg
 
 from input_panels.keyboard_base import KeyboardBase
 
+padding = 10
 
 
 class KeyboardNumericWithoutUnits(KeyboardBase):
@@ -78,6 +79,32 @@ class KeyboardNumericWithoutUnits(KeyboardBase):
 		#Show or hide the dot key by putting a wide backspace key over it.
 		self.uiBackspaceWide.setVisible(
 			not issubclass(type(self.opener), QDoubleSpinBox) )
+		
+		inputGeometry = QtCore.QRect(padding, 0, self.uiKeyPanel.width(), self.uiKeyPanel.height())
+		inputGeometry.setHeight(inputGeometry.height() + padding) #This is like the opposite of a good API. It is minimally expressive.
+		
+		#Calculate content position.
+		
+		openerGeometry = options["opener"].geometry() #Three syntaxes for "give me the member data".
+		contentsGeometry = self.parentWidget().screenContents.geometry()
+		screenGeometry = self.parentWidget().geometry()
+		
+		availableArea = QtCore.QRect(0,0, 
+			screenGeometry.width() - inputGeometry.width(), screenGeometry.height())
+		
+		targetHorizontalLocationForInput = availableArea.width()//2 - openerGeometry.width()//2 #Calculate ideal side of *widget*, since we can't set widget center.
+		idealContentsDeltaToCenter = targetHorizontalLocationForInput - openerGeometry.left()
+		
+		#Clamp the screen delta so it never leaves part of the screen undrawn.
+		if contentsGeometry.left() + idealContentsDeltaToCenter >= screenGeometry.left():
+			contentsDeltaToCenter = screenGeometry.left() #We're already as low as we can go. Go no lower.
+		elif contentsGeometry.right() + idealContentsDeltaToCenter <= availableArea.right():
+			contentsDeltaToCenter = availableArea.width() - screenGeometry.width() + padding #Go as high as we can go, less padding so the fade still works. ;)
+		else:
+			contentsDeltaToCenter = idealContentsDeltaToCenter
+		contentsGeometry.moveLeft(
+			0+contentsDeltaToCenter)
+		self.parentWidget().screenContents.setGeometry(contentsGeometry)
 	
 	
 	def sendKeystroke(self, code):

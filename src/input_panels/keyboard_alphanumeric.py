@@ -73,9 +73,10 @@ class KeyboardAlphanumeric(KeyboardBase):
 			self.uiKeyPanel.setGeometry(inputGeometry)
 			inputGeometry.setHeight(inputGeometry.height() + self.uiSuggestionBar.height()) #The lack of padding here is worrying, but works. I think something in the input panel is covering for it.
 			self.setGeometry(inputGeometry)
+			self.uiSuggestionBarLayout.parentWidget().raise_()
 			
 			for i in range(self.uiSuggestionBarLayout.count()): #Clear the existing widgets.
-				self.uiSuggestionBarLayout.itemAt(i).widget.deleteLater()
+				self.uiSuggestionBarLayout.itemAt(i).widget().deleteLater()
 			
 			for hint in options["hints"]:
 				print('adding hint', hint)
@@ -94,8 +95,6 @@ class KeyboardAlphanumeric(KeyboardBase):
 				hintButton.clickMarginBottom = 0
 				hintButton.setCustomStyleSheet("Button { border-left-width: 0px; }") #We can't set a border of -1, which is what we actually need, so we remove one border from our buttons to maintain the 1px-wide lines.
 				self.uiSuggestionBarLayout.addWidget(hintButton)
-				self.uiSuggestionBarLayout.parentWidget().raise_()
-				hintButton.raise_()
 				hintButton.show()
 			
 			

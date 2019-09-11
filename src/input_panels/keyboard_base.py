@@ -90,7 +90,7 @@ class KeyboardBase(QtWidgets.QWidget):
 		self.hide()
 		
 		contentsGeometry = self.parentWidget().screenContents.geometry()
-		contentsGeometry.moveTop(0)
+		contentsGeometry.moveTop(0), contentsGeometry.moveLeft(0)
 		self.parentWidget().screenContents.setGeometry(contentsGeometry)
 		
 		try:
