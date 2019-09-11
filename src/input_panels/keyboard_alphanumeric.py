@@ -51,10 +51,17 @@ class KeyboardAlphanumeric(KeyboardBase):
 		self.uiRight.pressed.connect(lambda: self.adjustCarat(1))
 	
 	def __handleShown(self, options):
-		#eg, {'focus': False, 'hints': [], 'opener': <line_edit.LineEdit object at 0x46155cb0>}
-		hints = options["hints"]
+		"""Set to fire when keyboard is shown.
 		
-		if not hints:
+			options is like:
+				{
+					'focus': False,
+					'hints': /,\\,\\\\,test,toast,🦇,﷽,ﷺ,
+					'opener': <line_edit.LineEdit object at 0x46155cb0>,
+				}
+			"""
+		
+		if not options["hints"]:
 			self.uiSuggestionBar.hide()
 			inputGeometry = QtCore.QRect(0, padding, self.uiKeyPanel.width(), self.uiKeyPanel.height())
 			self.uiKeyPanel.setGeometry(inputGeometry)
@@ -70,7 +77,7 @@ class KeyboardAlphanumeric(KeyboardBase):
 			for i in range(self.uiSuggestionBarLayout.count()): #Clear the existing widgets.
 				self.uiSuggestionBarLayout.itemAt(i).widget.deleteLater()
 			
-			for hint in hints:
+			for hint in options["hints"]:
 				print('adding hint', hint)
 				hintButton = Button(self.uiSuggestionBarLayout.parentWidget())
 				hintButton.setText(hint)
@@ -78,13 +85,14 @@ class KeyboardAlphanumeric(KeyboardBase):
 					QtCore.Qt.StrongFocus
 					if options["focus"]
 					else QtCore.Qt.NoFocus )
-				hintButton.clicked.connect(lambda: 
-					self.sendKeystroke(126, hint) )
+				hintButton.clicked.connect(
+					#We can't inject keystrokes directly, it seems - `self.sendKeystroke(ord(hint[0]), hint) )` is broken?
+					(lambda hint: lambda: options['opener'].insert(hint))(hint) ) #Bind hint from for loop.
 				hintButton.clickMarginLeft = 0
 				hintButton.clickMarginRight = 0
 				hintButton.clickMarginTop = hintButton.half
 				hintButton.clickMarginBottom = 0
-				hintButton.setCustomStyleSheet("Button { border-left-width: 0px; }")
+				hintButton.setCustomStyleSheet("Button { border-left-width: 0px; }") #We can't set a border of -1, which is what we actually need, so we remove one border from our buttons to maintain the 1px-wide lines.
 				self.uiSuggestionBarLayout.addWidget(hintButton)
 				self.uiSuggestionBarLayout.parentWidget().raise_()
 				hintButton.raise_()

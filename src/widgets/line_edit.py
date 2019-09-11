@@ -1,6 +1,7 @@
 # -*- coding: future_fstrings -*-
 
 from random import randint
+import re
 
 from PyQt5.QtCore import Q_ENUMS, QSize, Qt, pyqtProperty
 from PyQt5.QtGui import QPainter
@@ -53,11 +54,19 @@ class LineEdit(QLineEdit, TouchMarginPlugin, DirectAPILinkPlugin, FocusablePlugi
 	
 	@pyqtProperty(str)
 	def hints(self):
-		return ','.join(self.hintList)
+		return ','.join(
+			hint.replace('\\', r'\\').replace(r',', r'\,')
+			for hint in
+			self.hintList
+		)
 	
 	@hints.setter
 	def hints(self, newCSVHintList: str):
-		self.hintList = [s.strip() for s in newCSVHintList.split(',') if s.strip()]
+		self.hintList = [
+			re.sub(r'\\(.)', r'\1', hint)
+			for hint in
+			re.findall(r"(?:\\.|[^,])+", newCSVHintList.strip())
+		]
 	
 	
 	def refreshStyle(self):
