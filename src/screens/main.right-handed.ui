@@ -200,6 +200,20 @@ Save</string>
    <property name="clickMarginBottom" stdset="0">
     <enum>Button::none</enum>
    </property>
+   <property name="customStyleSheet" stdset="0">
+    <string>
+      Button { 
+        background-color: rgb(255,0,0); 
+        border-radius: 70%; 
+        font-size: 24px; 
+        border: 10px solid white;
+      }
+      Button:pressed { 
+        background-color: rgb(155,0,0);
+        border: 12px solid white;
+      }
+    </string>
+   </property>
   </widget>
   <widget class="Slider" name="uiExposureSlider">
    <property name="geometry">
@@ -257,66 +271,6 @@ Save</string>
    </property>
    <property name="orientation">
     <enum>Qt::Vertical</enum>
-   </property>
-  </widget>
-  <widget class="Label" name="uiNotification1">
-   <property name="geometry">
-    <rect>
-     <x>0</x>
-     <y>0</y>
-     <width>361</width>
-     <height>20</height>
-    </rect>
-   </property>
-   <property name="styleSheet">
-    <string notr="true">
-			font-size: 16px;
-			color: white;
-			background: rgba(0,0,0, 64);
-		</string>
-   </property>
-   <property name="text">
-    <string>No video available; waiting for gated burst.</string>
-   </property>
-  </widget>
-  <widget class="Label" name="uiNotification2">
-   <property name="geometry">
-    <rect>
-     <x>0</x>
-     <y>20</y>
-     <width>361</width>
-     <height>20</height>
-    </rect>
-   </property>
-   <property name="styleSheet">
-    <string notr="true">
-			font-size: 16px;
-			color: white;
-			background: rgba(0,0,0, 64);
-		</string>
-   </property>
-   <property name="text">
-    <string>No video available; exposure trigger low.</string>
-   </property>
-  </widget>
-  <widget class="Label" name="uiNotification3">
-   <property name="geometry">
-    <rect>
-     <x>0</x>
-     <y>40</y>
-     <width>361</width>
-     <height>20</height>
-    </rect>
-   </property>
-   <property name="styleSheet">
-    <string notr="true">
-			font-size: 16px;
-			color: white;
-			background: rgba(0,0,0, 64);
-		</string>
-   </property>
-   <property name="text">
-    <string>You are zoomed in.</string>
    </property>
   </widget>
   <widget class="Label" name="uiResolutionOverlay">
@@ -715,10 +669,10 @@ Clipping</string>
 					background: rgba(255,255,255,127); /* The background is drawn under the button borders, so they are opaque if the background is opaque. */
 					
 					/* use borders instead of margins so we can see what we're doing */
-					border-left:   21px solid rgba(19, 17, 141, 74);
-					border-right:  1px solid rgba(19, 17, 141, 74);
-					border-top:    11px solid rgba(19, 17, 141, 74);
-					border-bottom: 1px solid rgba(19, 17, 141, 74);
+					border-left:   21px solid rgba(31, 26, 145, 35);
+					border-right:  1px solid rgba(31, 26, 145, 35);
+					border-top:    11px solid rgba(31, 26, 145, 35);
+					border-bottom: 1px solid rgba(31, 26, 145, 35);
 				}
 			Button { background: #7a70f7 }</string>
     </property>
@@ -1007,7 +961,7 @@ Clipping</string>
      <x>0</x>
      <y>0</y>
      <width>601</width>
-     <height>481</height>
+     <height>461</height>
     </rect>
    </property>
    <property name="focusPolicy">
@@ -1142,15 +1096,13 @@ Calibration</string>
     <string>No AA; QT botches blending on alpha backgrounds.</string>
    </property>
   </widget>
+  <zorder>uiSidebarBackdropAlsoUsedForMeasuringWidth</zorder>
+  <zorder>uiRecord</zorder>
   <zorder>uiPinchToZoomGestureInterceptionPanel</zorder>
   <zorder>uiExposureOverlay</zorder>
-  <zorder>uiSidebarBackdropAlsoUsedForMeasuringWidth</zorder>
   <zorder>uiExposureSlider</zorder>
   <zorder>label</zorder>
   <zorder>line</zorder>
-  <zorder>uiNotification1</zorder>
-  <zorder>uiNotification2</zorder>
-  <zorder>uiNotification3</zorder>
   <zorder>uiResolutionOverlay</zorder>
   <zorder>uiDebugControls</zorder>
   <zorder>uiRecordingAndTriggersMenu</zorder>
@@ -1163,7 +1115,6 @@ Calibration</string>
   <zorder>uiPlayAndSave</zorder>
   <zorder>uiBattery</zorder>
   <zorder>uiCalibrationOrBlackCal</zorder>
-  <zorder>uiRecord</zorder>
   <zorder>comment</zorder>
   <zorder>comment_2</zorder>
   <zorder>comment_3</zorder>

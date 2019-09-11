@@ -244,10 +244,10 @@ class Main(QWidget):
 	
 	def onShow(self):
 		api2.video.call('configure', {
-			'xoff': self.x(),
-			'yoff': self.y(),
-			'hres': self.width() - self.uiSidebarBackdropAlsoUsedForMeasuringWidth.width(),
-			'vres': self.height(),
+			'xoff': self.uiPinchToZoomGestureInterceptionPanel.x(),
+			'yoff': self.uiPinchToZoomGestureInterceptionPanel.y(),
+			'hres': self.uiPinchToZoomGestureInterceptionPanel.width(),
+			'vres': self.uiPinchToZoomGestureInterceptionPanel.height(),
 		})
 		api2.video.call('livedisplay', {})
 		self._batteryChargeUpdateTimer.start() #ms
