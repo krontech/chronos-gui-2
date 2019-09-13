@@ -18,6 +18,7 @@ class FeedbackLabel(QLabel):
 		super().__init__(parent)
 		
 		self._customStyleSheet = ''
+		self.setWordWrap(True)
 		
 		# Set some default text, so we can see the widget.
 		if not self.text():
