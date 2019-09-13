@@ -28,6 +28,7 @@ class ServiceScreenLocked(QtWidgets.QDialog):
 		self._delayedUnlockTimer.timeout.connect(self.unlock)
 		
 		# Button binding.
+		self.uiPassword.setText('')
 		self.uiPassword.textChanged.connect(self.unlock)
 			
 		self.uiDone.clicked.connect(window.back)
