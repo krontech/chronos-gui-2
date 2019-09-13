@@ -100,17 +100,21 @@ class Storage(QtWidgets.QWidget):
 	
 	
 	def testNetworkStorage(self):
-		self.uiTestNetworkStorage.setEnabled(False)
-		self.uiTestNetworkStorageFeedback.showMessage('Connecting…')
-		self._testNetworkStorageTimer.start(16*2) #Next frame, hopefully, so the above message displays. The connect call can block for some time.
-	
-	def finishTestNetworkStorage(self):
-		result = api.control('testNetworkStorageCredentials')
-		if result:
-			self.uiTestNetworkStorageFeedback.showError(result)
-		else:
-			self.uiTestNetworkStorageFeedback.showMessage('Connection successful.')
-		self.uiTestNetworkStorage.setEnabled(True)
+		self.uiNetworkStorageFeedback.showMessage(f'Working…'),
+		
+		#TODO: This needs to be exposed to the web app, so it needs to go through the API.
+		self.run(
+			['mount', '-t', 'cifs', '-o', 
+				f'user={self.uiNetworkStorageUsername.text()},password={self.uiNetworkStoragePassoword.text()}', 
+				f'//{self.uiNetworkStorageAddress.text()}/', '/mnt/cam' ],
+			
+			lambda exitStatus: 
+				self.uiNetworkStorageFeedback.showError(f'Could not connect.'), #Mm, cryptic.
+			
+			lambda *_:
+				self.uiNetworkStorageFeedback.showMessage(
+					f'Network storage connected successfully!' ),
+		)
 	
 	
 	def updateMountedDeviceList(self, *_):
@@ -126,7 +130,7 @@ class Storage(QtWidgets.QWidget):
 			
 			lambda exitStatus: 
 				self.uiMountedDeviceList.setText(
-					f'⚠ Could not read storage devices.\n("df" exited with code {exitStatus}.)' ),
+					f'Could not read storage devices.\n("df" exited with code {exitStatus}.)' ),
 			
 			self.uiMountedDeviceList.setText,
 		)
@@ -140,7 +144,7 @@ class Storage(QtWidgets.QWidget):
 		self.run(['lsblk', '--pairs', '--output=NAME,SIZE,TYPE'],
 			lambda exitStatus: 
 				self.uiLocalMediaFeedback.showError(
-					f'⚠ Could not read storage devices.\n("lsblk" exited with code {exitStatus}.)' ),
+					f'Could not read storage devices.\n("lsblk" exited with code {exitStatus}.)' ),
 			self.pollDevices2 )
 		
 		#Yields a bunch of lines like:

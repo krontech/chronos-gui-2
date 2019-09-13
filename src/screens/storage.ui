@@ -70,6 +70,9 @@
       <height>61</height>
      </rect>
     </property>
+    <property name="text">
+     <string/>
+    </property>
     <property name="clickMarginTop" stdset="0">
      <enum>LineEdit::half</enum>
     </property>
@@ -85,6 +88,9 @@
       <width>291</width>
       <height>61</height>
      </rect>
+    </property>
+    <property name="text">
+     <string/>
     </property>
     <property name="echoMode">
      <enum>QLineEdit::PasswordEchoOnEdit</enum>
@@ -135,7 +141,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>smb://</string>
+     <string/>
     </property>
     <property name="clickMarginBottom" stdset="0">
      <enum>LineEdit::none</enum>
@@ -167,7 +173,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>Test Connection</string>
+     <string>Connect</string>
     </property>
     <property name="clickMarginTop" stdset="0">
      <enum>Button::half</enum>
@@ -244,9 +250,9 @@ mmcblk0     179:0    0   7.4G  0 disk
   <widget class="Button" name="uiUnmountMedia">
    <property name="geometry">
     <rect>
-     <x>150</x>
+     <x>180</x>
      <y>140</y>
-     <width>141</width>
+     <width>171</width>
      <height>71</height>
     </rect>
    </property>
@@ -265,7 +271,7 @@ mmcblk0     179:0    0   7.4G  0 disk
     <rect>
      <x>10</x>
      <y>140</y>
-     <width>141</width>
+     <width>171</width>
      <height>71</height>
     </rect>
    </property>
@@ -366,7 +372,7 @@ will go here»</string>
     <rect>
      <x>10</x>
      <y>70</y>
-     <width>281</width>
+     <width>341</width>
      <height>71</height>
     </rect>
    </property>
