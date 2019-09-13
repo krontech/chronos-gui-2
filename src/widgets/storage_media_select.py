@@ -15,7 +15,21 @@ except Exception:
 	api = None
 
 class StorageMediaSelect(ComboBox):
-	"""Specialised combo box which is autopopulated with mounted partitions."""
+	"""Specialised combo box which is autopopulated with mounted partitions.
+		
+		The current partition can be retrieved from the data attribute, like:
+		`self.uiStorageMediaSelect.currentData()`. This returns a struct like
+			
+		```python
+			{
+				'size': 3976200192, 
+				'interface': 'other', 
+				'path': b'/media/mmcblk1p1', 
+				'device': '/org/freedesktop/UDisks2/block_devices/mmcblk1p1', 
+				'uuid': '0E7D-5426',
+				'name': '4GB Storage Device',
+			}
+		```"""
 	
 	def __init__(self, parent=None, showHitRects=False):
 		super().__init__(parent, showHitRects=showHitRects)

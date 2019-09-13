@@ -186,7 +186,7 @@
      <string>Network Storage:</string>
     </property>
    </widget>
-   <widget class="FeedbackLabel" name="uiTestNetworkStorageFeedback">
+   <widget class="FeedbackLabel" name="uiNetworkStorageFeedback">
     <property name="geometry">
      <rect>
       <x>130</x>
@@ -209,16 +209,16 @@
    <zorder>uiNetworkStoragePassoword</zorder>
    <zorder>uiNetworkStorageAddress</zorder>
    <zorder>subheader_3</zorder>
-   <zorder>uiTestNetworkStorageFeedback</zorder>
+   <zorder>uiNetworkStorageFeedback</zorder>
    <zorder>uiTestNetworkStorage</zorder>
   </widget>
   <widget class="Label" name="uiMountedDeviceList">
    <property name="geometry">
     <rect>
      <x>20</x>
-     <y>330</y>
+     <y>280</y>
      <width>591</width>
-     <height>151</height>
+     <height>201</height>
     </rect>
    </property>
    <property name="styleSheet">
@@ -241,29 +241,13 @@ mmcblk0     179:0    0   7.4G  0 disk
     <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
    </property>
   </widget>
-  <widget class="Button" name="uiFormatUSB">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>110</y>
-     <width>141</width>
-     <height>81</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Format</string>
-   </property>
-   <property name="clickMarginRight" stdset="0">
-    <enum>Button::half</enum>
-   </property>
-  </widget>
-  <widget class="Button" name="uiEjectUSB">
+  <widget class="Button" name="uiUnmountMedia">
    <property name="geometry">
     <rect>
      <x>150</x>
-     <y>110</y>
+     <y>140</y>
      <width>141</width>
-     <height>81</height>
+     <height>71</height>
     </rect>
    </property>
    <property name="text">
@@ -272,36 +256,26 @@ mmcblk0     179:0    0   7.4G  0 disk
    <property name="clickMarginLeft" stdset="0">
     <enum>Button::half</enum>
    </property>
-  </widget>
-  <widget class="Button" name="uiEjectSD">
-   <property name="geometry">
-    <rect>
-     <x>150</x>
-     <y>210</y>
-     <width>141</width>
-     <height>81</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Unmount</string>
-   </property>
-   <property name="clickMarginLeft" stdset="0">
+   <property name="clickMarginTop" stdset="0">
     <enum>Button::half</enum>
    </property>
   </widget>
-  <widget class="Button" name="uiFormatSD">
+  <widget class="Button" name="uiFormatMedia">
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>210</y>
+     <y>140</y>
      <width>141</width>
-     <height>81</height>
+     <height>71</height>
     </rect>
    </property>
    <property name="text">
     <string>Format</string>
    </property>
    <property name="clickMarginRight" stdset="0">
+    <enum>Button::half</enum>
+   </property>
+   <property name="clickMarginTop" stdset="0">
     <enum>Button::half</enum>
    </property>
   </widget>
@@ -309,13 +283,13 @@ mmcblk0     179:0    0   7.4G  0 disk
    <property name="geometry">
     <rect>
      <x>20</x>
-     <y>57</y>
+     <y>67</y>
      <width>361</width>
      <height>21</height>
     </rect>
    </property>
    <property name="text">
-    <string>Configure places files can be saved to.</string>
+    <string>Configure and format save media.</string>
    </property>
   </widget>
   <widget class="Button" name="uiFileSaving">
@@ -337,8 +311,8 @@ mmcblk0     179:0    0   7.4G  0 disk
   <widget class="Comment" name="comment">
    <property name="geometry">
     <rect>
-     <x>58</x>
-     <y>404</y>
+     <x>50</x>
+     <y>370</y>
      <width>231</width>
      <height>71</height>
     </rect>
@@ -347,37 +321,11 @@ mmcblk0     179:0    0   7.4G  0 disk
     <string>⭎ Make sure this is Monospace font! Designer tends to forget if it's not set in the CSS. Also, it prints QFont::setPointSize errors. 😒</string>
    </property>
   </widget>
-  <widget class="Subheader" name="subheader">
-   <property name="geometry">
-    <rect>
-     <x>20</x>
-     <y>100</y>
-     <width>241</width>
-     <height>24</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>USB/SATA Storage:</string>
-   </property>
-  </widget>
-  <widget class="Subheader" name="subheader_2">
-   <property name="geometry">
-    <rect>
-     <x>20</x>
-     <y>200</y>
-     <width>241</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>SD Card Storage:</string>
-   </property>
-  </widget>
   <widget class="Subheader" name="subheader_4">
    <property name="geometry">
     <rect>
      <x>20</x>
-     <y>300</y>
+     <y>250</y>
      <width>241</width>
      <height>21</height>
     </rect>
@@ -386,43 +334,13 @@ mmcblk0     179:0    0   7.4G  0 disk
     <string>Mounted Devices:</string>
    </property>
   </widget>
-  <widget class="Comment" name="comment_2">
+  <widget class="FeedbackLabel" name="uiLocalMediaFeedback">
    <property name="geometry">
     <rect>
-     <x>190</x>
-     <y>90</y>
-     <width>151</width>
+     <x>30</x>
+     <y>200</y>
+     <width>241</width>
      <height>51</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Pop up a choose dialog if more than one drive plugged in?</string>
-   </property>
-  </widget>
-  <widget class="FeedbackLabel" name="uiUSBStorageFeedback">
-   <property name="geometry">
-    <rect>
-     <x>30</x>
-     <y>170</y>
-     <width>241</width>
-     <height>41</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Multiple USB drives available.
-Disconnect all but one.</string>
-   </property>
-   <property name="alignment">
-    <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
-   </property>
-  </widget>
-  <widget class="FeedbackLabel" name="uiSDStorageFeedback">
-   <property name="geometry">
-    <rect>
-     <x>30</x>
-     <y>270</y>
-     <width>241</width>
-     <height>41</height>
     </rect>
    </property>
    <property name="text">
@@ -443,25 +361,33 @@ will go here»</string>
     </rect>
    </property>
   </widget>
+  <widget class="ComboBox" name="uiDeviceSelect">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>70</y>
+     <width>281</width>
+     <height>71</height>
+    </rect>
+   </property>
+   <property name="clickMarginBottom" stdset="0">
+    <enum>ComboBox::half</enum>
+   </property>
+  </widget>
   <zorder>backdrop</zorder>
   <zorder>headerlabel</zorder>
   <zorder>uiMountedDeviceList</zorder>
-  <zorder>uiFormatUSB</zorder>
-  <zorder>uiEjectUSB</zorder>
-  <zorder>uiEjectSD</zorder>
-  <zorder>uiFormatSD</zorder>
+  <zorder>uiUnmountMedia</zorder>
+  <zorder>uiFormatMedia</zorder>
   <zorder>label_10</zorder>
   <zorder>comment</zorder>
-  <zorder>subheader</zorder>
-  <zorder>subheader_2</zorder>
   <zorder>subheader_4</zorder>
-  <zorder>comment_2</zorder>
-  <zorder>uiUSBStorageFeedback</zorder>
-  <zorder>uiSDStorageFeedback</zorder>
+  <zorder>uiLocalMediaFeedback</zorder>
   <zorder>widget</zorder>
   <zorder>uiButtonWhiteBorder</zorder>
   <zorder>uiFileSaving</zorder>
   <zorder>uiDone</zorder>
+  <zorder>uiDeviceSelect</zorder>
  </widget>
  <customwidgets>
   <customwidget>
@@ -473,6 +399,11 @@ will go here»</string>
    <class>Button</class>
    <extends>QPushButton</extends>
    <header>button</header>
+  </customwidget>
+  <customwidget>
+   <class>ComboBox</class>
+   <extends>QComboBox</extends>
+   <header>combo_box</header>
   </customwidget>
   <customwidget>
    <class>Comment</class>
@@ -507,10 +438,8 @@ will go here»</string>
  </customwidgets>
  <tabstops>
   <tabstop>uiDone</tabstop>
-  <tabstop>uiFormatUSB</tabstop>
-  <tabstop>uiEjectUSB</tabstop>
-  <tabstop>uiFormatSD</tabstop>
-  <tabstop>uiEjectSD</tabstop>
+  <tabstop>uiFormatMedia</tabstop>
+  <tabstop>uiUnmountMedia</tabstop>
   <tabstop>uiNetworkStorageAddress</tabstop>
   <tabstop>uiNetworkStorageUsername</tabstop>
   <tabstop>uiNetworkStoragePassoword</tabstop>
