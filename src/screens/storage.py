@@ -42,6 +42,9 @@ class Storage(QtWidgets.QWidget):
 		
 		self.uiFileSaving.clicked.connect(lambda: window.show('file_settings'))
 		self.uiDone.clicked.connect(window.back)
+		
+		# Hide network storage until we get SMB working through the API. (pychronos/issues/40)
+		self.uiNetworkStoragePanel.hide()
 	
 	
 	def onShow(self):

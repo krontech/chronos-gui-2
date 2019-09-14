@@ -52,7 +52,7 @@
     <enum>Button::half</enum>
    </property>
   </widget>
-  <widget class="QWidget" name="widget" native="true">
+  <widget class="QWidget" name="uiNetworkStoragePanel" native="true">
    <property name="geometry">
     <rect>
      <x>350</x>
@@ -196,9 +196,9 @@
     <property name="geometry">
      <rect>
       <x>130</x>
-      <y>250</y>
-      <width>251</width>
-      <height>151</height>
+      <y>260</y>
+      <width>261</width>
+      <height>131</height>
      </rect>
     </property>
     <property name="alignment">
@@ -324,7 +324,7 @@ mmcblk0     179:0    0   7.4G  0 disk
     </rect>
    </property>
    <property name="text">
-    <string>⭎ Make sure this is Monospace font! Designer tends to forget if it's not set in the CSS. Also, it prints QFont::setPointSize errors. 😒</string>
+    <string>Make sure this is Monospace font! Designer tends to forget if it's not set in the CSS. Also, it prints QFont::setPointSize errors. 😒</string>
    </property>
   </widget>
   <widget class="Subheader" name="subheader_4">
@@ -380,6 +380,19 @@ will go here»</string>
     <enum>ComboBox::half</enum>
    </property>
   </widget>
+  <widget class="Comment" name="comment_2">
+   <property name="geometry">
+    <rect>
+     <x>250</x>
+     <y>410</y>
+     <width>161</width>
+     <height>71</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>This should also probably scroll if there are many entries, but it's not that important.</string>
+   </property>
+  </widget>
   <zorder>backdrop</zorder>
   <zorder>headerlabel</zorder>
   <zorder>uiMountedDeviceList</zorder>
@@ -389,11 +402,12 @@ will go here»</string>
   <zorder>comment</zorder>
   <zorder>subheader_4</zorder>
   <zorder>uiLocalMediaFeedback</zorder>
-  <zorder>widget</zorder>
+  <zorder>uiNetworkStoragePanel</zorder>
   <zorder>uiButtonWhiteBorder</zorder>
   <zorder>uiFileSaving</zorder>
   <zorder>uiDone</zorder>
   <zorder>uiDeviceSelect</zorder>
+  <zorder>comment_2</zorder>
  </widget>
  <customwidgets>
   <customwidget>
