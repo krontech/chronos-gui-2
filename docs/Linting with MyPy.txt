@@ -1,0 +1,17 @@
+Linting with MyPy
+2019-09-13 - DDR
+
+Docs at https://mypy.readthedocs.io/en/latest
+
+Summary: "This ain't gonna work."
+
+
+Installation:
+	- sudo apt install python3-mypy
+
+Running: (in project root)
+	- python3 -m mypy src/screens/about_camera.minimal.py
+
+Notes:
+	- Linting with MyPy requires Python 3.6, which means we can't annotate types quite correctly with 3.4 because it's not supported. It might be possible to post-process this, but that seems like a lot of work.
+	- MyPy can't seem to figure out how to resolve any of our module imports, such as "screens.about_camera", despite being explicitly told where the folder is multiple times.
