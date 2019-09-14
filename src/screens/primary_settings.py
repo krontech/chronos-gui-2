@@ -62,7 +62,10 @@ class PrimarySettings(QtWidgets.QDialog):
 		self.uiStorage.clicked.connect(lambda: window.show('storage'))
 		self.uiUpdateCamera.clicked.connect(lambda: window.show('update_firmware'))
 		self.uiUserSettings.clicked.connect(lambda: window.show('user_settings'))
+		self.uiReplay.clicked.connect(lambda: window.show('replay'))
 		self.uiDone.clicked.connect(window.back)
+		
+		self.uiReplay.hide() #Not implemented yet.
 		
 	
 	def updateInterfaceSide(self, *_):
