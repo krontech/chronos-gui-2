@@ -142,6 +142,7 @@ class KeyboardAlphanumeric(KeyboardBase):
 		self.uiShift.keepActiveLook = not self.uiShift.keepActiveLook
 		self.uiShift.refreshStyle()
 		
+		self.uiDot.setText(',' if self.uiShift.keepActiveLook else '.')
 		for keycap in [getattr(self, f'ui{letter}') for letter in ascii_uppercase]:
 			keycap.setText(getattr(keycap.text(), 
 				'upper' if self.uiShift.keepActiveLook else 'lower')())
