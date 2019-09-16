@@ -4,13 +4,12 @@ from datetime import datetime
 
 from PyQt5 import uic, QtWidgets, QtCore
 from PyQt5.QtGui import QPixmap
-from PyQt5.QtCore import pyqtSlot
+from PyQt5.QtCore import pyqtSlot, Qt
+from PyQt5.QtGui import QStandardItemModel
 
 from debugger import *; dbg
-
-import api
-from api import silenceCallbacks
 import settings
+import api2
 
 
 class PrimarySettings(QtWidgets.QDialog):
@@ -24,6 +23,7 @@ class PrimarySettings(QtWidgets.QDialog):
 		self.setAttribute(QtCore.Qt.WA_TranslucentBackground, True)
 		
 		# Button binding.
+		self.window_ = window
 		
 		#Side and rotated are not quite correct, as askBeforeDiscarding is, but they are correct enough for now. Having the final result come from two values confused things a bit.
 		self.uiInterfaceSide.setCurrentIndex(
@@ -47,26 +47,49 @@ class PrimarySettings(QtWidgets.QDialog):
 				["always", "if not reviewed", "never"][index] ) )
 		
 		
-		api.observe('datetime', self.stopEditingDate) #When the date is changed, always display the update even if an edit is in progress. Someone probably set the date some other way instead of this, or this was being edited in error.
+		api2.observe('dateTime', self.stopEditingDate) #When the date is changed, always display the update even if an edit is in progress. Someone probably set the date some other way instead of this, or this was being edited in error.
 		self.uiSystemTime.focusInEvent = self.sysTimeFocusIn
-		self.uiSystemTime.focusOutEvent = self.sysTimeFocusOut
-		self.updateDisplayedSystemTime()
-		self.timeUpdateTimer = QtCore.QTimer()
-		self.timeUpdateTimer.timeout.connect(self.updateDisplayedSystemTime)
-		self.timeUpdateTimer.start(1000)
+		self.uiSystemTime.editingFinished.connect(self.sysTimeFocusOut)
+		self._timeUpdateTimer = QtCore.QTimer()
+		self._timeUpdateTimer.timeout.connect(self.updateDisplayedSystemTime)
 		
-		self.uiAboutCamera.clicked.connect(lambda: window.show('about_camera'))
-		self.uiRemoteAccess.clicked.connect(lambda: window.show('remote_access'))
-		self.uiFactoryUtilities.clicked.connect(lambda: window.show('service_screen.locked'))
-		self.uiFileSaving.clicked.connect(lambda: window.show('file_settings'))
-		self.uiStorage.clicked.connect(lambda: window.show('storage'))
-		self.uiUpdateCamera.clicked.connect(lambda: window.show('update_firmware'))
-		self.uiUserSettings.clicked.connect(lambda: window.show('user_settings'))
-		self.uiReplay.clicked.connect(lambda: window.show('replay'))
+		
+		#Set up Other Options
+		self.otherOptions = [
+			{'name':"About Camera",      'open':lambda: window.show('about_camera'),          'synonyms':"kickstarter thanks me name"},
+			{'name':"App & Internet",    'open':lambda: window.show('remote_access'),         'synonyms':"remote access web client"},
+			{'name':"Storage",           'open':lambda: window.show('storage'),               'synonyms':"file saving"},
+			{'name':"Factory Utilities", 'open':lambda: window.show('service_screen.locked'), 'synonyms':"utils"},
+			{'name':"Video Saving",      'open':lambda: window.show('file_settings'),         'synonyms':"file saving"},
+			{'name':"Update Camera",     'open':lambda: window.show('update_firmware'),       'synonyms':"firmware"},
+			{'name':"Camera Settings",   'open':lambda: window.show('user_settings'),         'synonyms':"user operator"},
+			{'name':"Review Videos",     'open':lambda: window.show('replay'),                'synonyms':"playback show footage saved card movie"},
+		]
+		#Populate uiOptionsList from actions.
+		otherOptionsModel = QStandardItemModel(
+			len(self.otherOptions), 1, self.uiOptionsList )
+		for i in range(len(self.otherOptions)):
+			otherOptionsModel.setItemData(otherOptionsModel.index(i, 0), {
+				Qt.DisplayRole: self.otherOptions[i]['name'],
+				Qt.UserRole: self.otherOptions[i],
+				Qt.DecorationRole: None, #Icon would go here.
+			})
+		self.uiOptionsList.setModel(otherOptionsModel)
+		self.uiOptionsList.clicked.connect(self.showOptionOnTap)
+		self.uiOptionsList.jogWheelClick.connect(self.showOptionOnJogWheelClick)
+		
+		self.uiOptionsFilter.textChanged.connect(self.filterOptions)
+		
+		#Finally…
 		self.uiDone.clicked.connect(window.back)
-		
-		self.uiReplay.hide() #Not implemented yet.
-		
+	
+	def onShow(self):
+		self.updateDisplayedSystemTime()
+		self._timeUpdateTimer.start(1000)
+	
+	def onHide(self):
+		self._timeUpdateTimer.stop()
+	
 	
 	def updateInterfaceSide(self, *_):
 		self.uiLayoutPreview.setPixmap(QPixmap(
@@ -82,28 +105,34 @@ class PrimarySettings(QtWidgets.QDialog):
 		# 	"assets/images/right-handed-interface.svg"
 		# ).transformed(rotation))
 	
-	@silenceCallbacks('uiAskBeforeDiscarding')
 	def updateAskBeforeDiscarding(self, answer):
 		self.uiAskBeforeDiscarding.setCurrentIndex(
 			["always", "if not reviewed", "never"].index(answer))
 	
 	
 	@pyqtSlot(str, name="stopEditingDate")
-	@silenceCallbacks()
 	def stopEditingDate(self, date: str=''):
 		self.editingSystemTime = False
 	
-	def sysTimeFocusIn(self, evt):
+	def sysTimeFocusIn(self, *_):
 		self.editingSystemTime = True
 		
-	def sysTimeFocusOut(self, evt):
-		try:
-			newTime = datetime.strptime(self.uiSystemTime.text(), "%Y-%m-%d %I:%M:%S %p")
-		except ValueError: #Probably means we couldn't parse the date.
-			return self.uiSystemClockFeedback.showError("Date not formatted correctly; format is YYYY-MM-DD HH:MM:SS AM or PM.")
+	def sysTimeFocusOut(self, *_):
+		#try:
+		#	newTime = datetime.strptime(self.uiSystemTime.text(), "%Y-%m-%d %I:%M:%S %p")
+		#except ValueError: #Probably means we couldn't parse the date.
+		#	return self.uiSystemClockFeedback.showError("Date not formatted correctly; format is YYYY-MM-DD HH:MM:SS AM or PM.")
 		
-		api.set({'datetime': newTime.isoformat()}) #This causes stopEditingDate to be called, when datetime is updated.
-		self.uiSystemClockFeedback.showMessage("System date updated.")
+		(api2.set({'dateTime': self.uiSystemTime.text()}) #newTime.isoformat()})
+			.then(lambda status: 
+				self.uiSystemClockFeedback.showMessage(
+					"System date updated." ) )
+			.catch(lambda error:
+				self.uiSystemClockFeedback.showError(
+					error ) )
+		)
+		
+		self.stopEditingDate()
 		
 	def sysTimeBeingEdited(self):
 		return self.editingSystemTime #self.uiSystemTime.hasFocus() doesn't work if invalid
@@ -113,6 +142,23 @@ class PrimarySettings(QtWidgets.QDialog):
 			#Prevent changes from being overwritten.
 			return
 		
-		self.uiSystemTime.setText(
-			datetime.now().strftime(
-				"%Y-%m-%d %I:%M:%S %p" ) ) #TODO DDR 2018-09-24: Convert this into a series of plain number inputs.
+		#TODO DDR 2018-09-24: Convert this into a series of plain number inputs.
+		api2.get('dateTime').then(self.uiSystemTime.setText)
+	
+	
+	def showOptionOnTap(self, pos: QtCore.QModelIndex):
+		self.otherOptions[pos.row()]['open']()
+		self.uiOptionsList.selectionModel().clear()
+	
+	def showOptionOnJogWheelClick(self):
+		self.uiOptionsList.selectionModel().currentIndex().data(Qt.UserRole)['open']()
+		self.uiOptionsList.selectionModel().clear()
+	
+	def filterOptions(self):
+		model = self.uiOptionsList.model()
+		search = self.uiOptionsFilter.text().casefold()
+		
+		for row in range(model.rowCount()):
+			data = model.data(model.index(row, 0), Qt.UserRole) #eg. {'name':"About Camera", 'open':lambda: window.show('about_camera'), 'synonyms':"kickstarter thanks me name"},
+			self.uiOptionsList.setRowHidden(row,
+				not (search in data['name'].casefold() or search in data['synonyms']) )

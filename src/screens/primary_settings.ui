@@ -26,8 +26,8 @@
   <widget class="HeaderLabel" name="headerlabel">
    <property name="geometry">
     <rect>
-     <x>20</x>
-     <y>20</y>
+     <x>330</x>
+     <y>10</y>
      <width>241</width>
      <height>31</height>
     </rect>
@@ -36,11 +36,11 @@
     <string>Interface Options</string>
    </property>
   </widget>
-  <widget class="Label" name="label">
+  <widget class="Subheader" name="label">
    <property name="geometry">
     <rect>
-     <x>20</x>
-     <y>70</y>
+     <x>330</x>
+     <y>50</y>
      <width>231</width>
      <height>21</height>
     </rect>
@@ -49,11 +49,11 @@
     <string>Interface Position</string>
    </property>
   </widget>
-  <widget class="Label" name="label_2">
+  <widget class="Subheader" name="label_2">
    <property name="geometry">
     <rect>
-     <x>20</x>
-     <y>150</y>
+     <x>330</x>
+     <y>120</y>
      <width>231</width>
      <height>21</height>
     </rect>
@@ -62,25 +62,24 @@
     <string>Interface Orientation</string>
    </property>
   </widget>
-  <widget class="Label" name="label_3">
+  <widget class="Subheader" name="label_3">
    <property name="geometry">
     <rect>
-     <x>20</x>
-     <y>250</y>
-     <width>231</width>
-     <height>41</height>
+     <x>330</x>
+     <y>200</y>
+     <width>451</width>
+     <height>21</height>
     </rect>
    </property>
    <property name="text">
-    <string>Ask Before Discarding
-Unsaved Video in RAM</string>
+    <string>Ask Before Discarding Unsaved Video in RAM</string>
    </property>
   </widget>
   <widget class="Label" name="label_4">
    <property name="geometry">
     <rect>
-     <x>20</x>
-     <y>330</y>
+     <x>330</x>
+     <y>260</y>
      <width>441</width>
      <height>51</height>
     </rect>
@@ -98,11 +97,11 @@ Unsaved Video in RAM</string>
     <bool>true</bool>
    </property>
   </widget>
-  <widget class="Label" name="label_5">
+  <widget class="Subheader" name="label_5">
    <property name="geometry">
     <rect>
-     <x>20</x>
-     <y>400</y>
+     <x>330</x>
+     <y>320</y>
      <width>231</width>
      <height>21</height>
     </rect>
@@ -110,123 +109,21 @@ Unsaved Video in RAM</string>
    <property name="text">
     <string>System Clock</string>
    </property>
-  </widget>
-  <widget class="Label" name="label_6">
-   <property name="geometry">
-    <rect>
-     <x>280</x>
-     <y>70</y>
-     <width>141</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Example</string>
+   <property name="wordWrap">
+    <bool>true</bool>
    </property>
   </widget>
   <widget class="HeaderLabel" name="headerlabel_2">
    <property name="geometry">
     <rect>
-     <x>590</x>
-     <y>20</y>
-     <width>211</width>
+     <x>20</x>
+     <y>10</y>
+     <width>281</width>
      <height>31</height>
     </rect>
    </property>
    <property name="text">
-    <string>Other Options</string>
-   </property>
-  </widget>
-  <widget class="Button" name="uiFileSaving">
-   <property name="geometry">
-    <rect>
-     <x>570</x>
-     <y>260</y>
-     <width>211</width>
-     <height>41</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Video Saving</string>
-   </property>
-   <property name="clickMarginTop" stdset="0">
-    <enum>Button::none</enum>
-   </property>
-   <property name="clickMarginBottom" stdset="0">
-    <enum>Button::none</enum>
-   </property>
-  </widget>
-  <widget class="Button" name="uiUserSettings">
-   <property name="geometry">
-    <rect>
-     <x>570</x>
-     <y>300</y>
-     <width>211</width>
-     <height>41</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Camera Settings</string>
-   </property>
-   <property name="clickMarginTop" stdset="0">
-    <enum>Button::none</enum>
-   </property>
-   <property name="clickMarginBottom" stdset="0">
-    <enum>Button::none</enum>
-   </property>
-  </widget>
-  <widget class="Button" name="uiAboutCamera">
-   <property name="geometry">
-    <rect>
-     <x>570</x>
-     <y>40</y>
-     <width>211</width>
-     <height>61</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>About Camera</string>
-   </property>
-   <property name="clickMarginBottom" stdset="0">
-    <enum>Button::none</enum>
-   </property>
-  </widget>
-  <widget class="Button" name="uiUpdateCamera">
-   <property name="geometry">
-    <rect>
-     <x>570</x>
-     <y>220</y>
-     <width>211</width>
-     <height>41</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Update Camera</string>
-   </property>
-   <property name="clickMarginTop" stdset="0">
-    <enum>Button::none</enum>
-   </property>
-   <property name="clickMarginBottom" stdset="0">
-    <enum>Button::none</enum>
-   </property>
-  </widget>
-  <widget class="Button" name="uiFactoryUtilities">
-   <property name="geometry">
-    <rect>
-     <x>570</x>
-     <y>180</y>
-     <width>211</width>
-     <height>41</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Factory Utilities</string>
-   </property>
-   <property name="clickMarginTop" stdset="0">
-    <enum>Button::none</enum>
-   </property>
-   <property name="clickMarginBottom" stdset="0">
-    <enum>Button::none</enum>
+    <string>Utilities &amp; Options</string>
    </property>
   </widget>
   <widget class="Button" name="uiDone">
@@ -245,9 +142,9 @@ Unsaved Video in RAM</string>
   <widget class="LineEdit" name="uiSystemTime">
    <property name="geometry">
     <rect>
-     <x>0</x>
-     <y>400</y>
-     <width>321</width>
+     <x>310</x>
+     <y>320</y>
+     <width>301</width>
      <height>81</height>
     </rect>
    </property>
@@ -258,8 +155,8 @@ Unsaved Video in RAM</string>
   <widget class="ComboBox" name="uiAskBeforeDiscarding">
    <property name="geometry">
     <rect>
-     <x>0</x>
-     <y>270</y>
+     <x>310</x>
+     <y>200</y>
      <width>271</width>
      <height>81</height>
     </rect>
@@ -283,8 +180,8 @@ Unsaved Video in RAM</string>
   <widget class="ComboBox" name="uiInterfaceRotated">
    <property name="geometry">
     <rect>
-     <x>0</x>
-     <y>150</y>
+     <x>310</x>
+     <y>120</y>
      <width>271</width>
      <height>81</height>
     </rect>
@@ -303,11 +200,14 @@ Unsaved Video in RAM</string>
   <widget class="ComboBox" name="uiInterfaceSide">
    <property name="geometry">
     <rect>
-     <x>0</x>
-     <y>70</y>
+     <x>310</x>
+     <y>50</y>
      <width>271</width>
-     <height>81</height>
+     <height>71</height>
     </rect>
+   </property>
+   <property name="clickMarginBottom" stdset="0">
+    <enum>ComboBox::half</enum>
    </property>
    <item>
     <property name="text">
@@ -323,81 +223,75 @@ Unsaved Video in RAM</string>
   <widget class="QLabel" name="uiLayoutPreview">
    <property name="geometry">
     <rect>
-     <x>280</x>
-     <y>90</y>
+     <x>590</x>
+     <y>70</y>
      <width>191</width>
-     <height>111</height>
+     <height>101</height>
     </rect>
    </property>
    <property name="pixmap">
     <pixmap>../../assets/images/right-handed-interface.svg</pixmap>
    </property>
   </widget>
-  <widget class="Button" name="uiRemoteAccess">
-   <property name="geometry">
-    <rect>
-     <x>570</x>
-     <y>100</y>
-     <width>211</width>
-     <height>41</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>App &amp;&amp; Internet</string>
-   </property>
-   <property name="clickMarginTop" stdset="0">
-    <enum>Button::none</enum>
-   </property>
-   <property name="clickMarginBottom" stdset="0">
-    <enum>Button::none</enum>
-   </property>
-  </widget>
   <widget class="FeedbackLabel" name="uiSystemClockFeedback">
    <property name="geometry">
     <rect>
-     <x>20</x>
-     <y>460</y>
-     <width>531</width>
-     <height>21</height>
+     <x>330</x>
+     <y>380</y>
+     <width>261</width>
+     <height>101</height>
     </rect>
    </property>
    <property name="text">
     <string>Date not formatted correctly; format is YYYY-MM-DD HH:MM:SS AM or PM.</string>
    </property>
   </widget>
-  <widget class="Button" name="uiStorage">
+  <widget class="ScrollList" name="uiOptionsList">
    <property name="geometry">
     <rect>
-     <x>570</x>
-     <y>140</y>
-     <width>211</width>
-     <height>41</height>
+     <x>20</x>
+     <y>130</y>
+     <width>271</width>
+     <height>331</height>
     </rect>
    </property>
-   <property name="text">
-    <string>Storage</string>
+   <property name="editTriggers">
+    <set>QAbstractItemView::NoEditTriggers</set>
    </property>
-   <property name="clickMarginTop" stdset="0">
-    <enum>Button::none</enum>
+   <property name="tabKeyNavigation">
+    <bool>true</bool>
    </property>
-   <property name="clickMarginBottom" stdset="0">
-    <enum>Button::none</enum>
+   <property name="useInlineSelectMode" stdset="0">
+    <bool>true</bool>
    </property>
   </widget>
-  <widget class="Button" name="uiReplay">
+  <widget class="LineEdit" name="uiOptionsFilter">
    <property name="geometry">
     <rect>
-     <x>570</x>
-     <y>340</y>
-     <width>211</width>
-     <height>61</height>
+     <x>0</x>
+     <y>50</y>
+     <width>311</width>
+     <height>81</height>
     </rect>
    </property>
    <property name="text">
-    <string>Review Saved Files</string>
+    <string/>
    </property>
-   <property name="clickMarginTop" stdset="0">
-    <enum>Button::none</enum>
+   <property name="clearButtonEnabled">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="Subheader" name="subheader">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>50</y>
+     <width>241</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Filter</string>
    </property>
   </widget>
   <zorder>backdrop</zorder>
@@ -407,23 +301,17 @@ Unsaved Video in RAM</string>
   <zorder>label_3</zorder>
   <zorder>label_4</zorder>
   <zorder>label_5</zorder>
-  <zorder>label_6</zorder>
   <zorder>headerlabel_2</zorder>
-  <zorder>uiFileSaving</zorder>
-  <zorder>uiUserSettings</zorder>
-  <zorder>uiAboutCamera</zorder>
-  <zorder>uiUpdateCamera</zorder>
-  <zorder>uiFactoryUtilities</zorder>
-  <zorder>uiDone</zorder>
   <zorder>uiAskBeforeDiscarding</zorder>
   <zorder>uiInterfaceRotated</zorder>
   <zorder>uiInterfaceSide</zorder>
   <zorder>uiLayoutPreview</zorder>
-  <zorder>uiRemoteAccess</zorder>
   <zorder>uiSystemClockFeedback</zorder>
+  <zorder>subheader</zorder>
+  <zorder>uiOptionsFilter</zorder>
+  <zorder>uiOptionsList</zorder>
   <zorder>uiSystemTime</zorder>
-  <zorder>uiStorage</zorder>
-  <zorder>uiReplay</zorder>
+  <zorder>uiDone</zorder>
  </widget>
  <customwidgets>
   <customwidget>
@@ -461,20 +349,25 @@ Unsaved Video in RAM</string>
    <extends>QLineEdit</extends>
    <header>line_edit</header>
   </customwidget>
+  <customwidget>
+   <class>ScrollList</class>
+   <extends>QListView</extends>
+   <header>scroll_list</header>
+  </customwidget>
+  <customwidget>
+   <class>Subheader</class>
+   <extends>QLabel</extends>
+   <header>subheader</header>
+  </customwidget>
  </customwidgets>
  <tabstops>
   <tabstop>uiDone</tabstop>
+  <tabstop>uiOptionsFilter</tabstop>
+  <tabstop>uiOptionsList</tabstop>
   <tabstop>uiInterfaceSide</tabstop>
   <tabstop>uiInterfaceRotated</tabstop>
   <tabstop>uiAskBeforeDiscarding</tabstop>
   <tabstop>uiSystemTime</tabstop>
-  <tabstop>uiAboutCamera</tabstop>
-  <tabstop>uiRemoteAccess</tabstop>
-  <tabstop>uiStorage</tabstop>
-  <tabstop>uiFactoryUtilities</tabstop>
-  <tabstop>uiUpdateCamera</tabstop>
-  <tabstop>uiFileSaving</tabstop>
-  <tabstop>uiUserSettings</tabstop>
  </tabstops>
  <resources/>
  <connections/>

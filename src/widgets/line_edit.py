@@ -4,10 +4,11 @@ from random import randint
 import re
 
 from PyQt5.QtCore import Q_ENUMS, QSize, Qt, pyqtProperty
-from PyQt5.QtGui import QPainter
-from PyQt5.QtWidgets import QLineEdit
+from PyQt5.QtGui import QPainter, QIcon
+from PyQt5.QtWidgets import QLineEdit, QToolButton
 
 from debugger import *; dbg
+from animate import delay
 from touch_margin_plugin import TouchMarginPlugin, MarginWidth
 from direct_api_link_plugin import DirectAPILinkPlugin
 from focusable_plugin import FocusablePlugin
@@ -31,6 +32,13 @@ class LineEdit(QLineEdit, TouchMarginPlugin, DirectAPILinkPlugin, FocusablePlugi
 			
 		self.clickMarginColor = f"rgba({randint(128, 255)}, {randint(64, 128)}, {randint(0, 32)}, {randint(32,96)})"
 		
+		if self.isClearButtonEnabled():
+			log.print('AAAAAAAAA')
+			clearButton = self.findChild(QToolButton)
+			clearButtonGeom = clearButton.geometry()
+			clearButtonGeom.moveLeft(clearButtonGeom.left() - self.touchMargins['left'])
+			clearButton.setGeometry(clearButtonGeom)
+		
 		self.inputMode = '' #Set to empty, 'jogWheel', or 'touch'. Used for defocus event handling behaviour.
 		
 		self.jogWheelLowResolutionRotation.connect(self.handleJogWheelRotation)
@@ -47,6 +55,9 @@ class LineEdit(QLineEdit, TouchMarginPlugin, DirectAPILinkPlugin, FocusablePlugi
 		self.selectAllTimer = QtCore.QTimer()
 		self.selectAllTimer.timeout.connect(self.selectAll)
 		self.selectAllTimer.setSingleShot(True)
+		
+		delay(self, 0, #Must be delayed until after creation for isClearButtonEnabled to be set.
+			self.__hackMoveClearButtonToCompensateForIncreasedMargin )
 	
 	def sizeHint(self):
 		return QSize(361, 81)
@@ -85,6 +96,10 @@ class LineEdit(QLineEdit, TouchMarginPlugin, DirectAPILinkPlugin, FocusablePlugi
 					border-top:    {self.clickMarginTop    * 10 + 1}px solid {self.clickMarginColor};
 					border-bottom: {self.clickMarginBottom * 10 + 1}px solid {self.clickMarginColor};
 				}}
+				
+				QToolButton {{ /*This does not work.*/
+					padding-right: {self.clickMarginRight*10 + 40}px;
+				}}
 			""" + self.originalStyleSheet())
 		else:
 			self.setStyleSheet(f"""
@@ -104,7 +119,22 @@ class LineEdit(QLineEdit, TouchMarginPlugin, DirectAPILinkPlugin, FocusablePlugi
 					margin-top: {self.clickMarginTop*10}px;
 					margin-bottom: {self.clickMarginBottom*10}px;
 				}}
+				
+				QToolButton {{ /*This does not work.*/
+					padding-right: {self.clickMarginRight*10 + 40}px;
+				}}
 			""" + self.originalStyleSheet())
+	
+	#TODO DDR 2019-09-13: Figure out a better way to do this. 😒
+	def __hackMoveClearButtonToCompensateForIncreasedMargin(self):
+		"""We can't move QToolButton via QSS, apparently, and clear button is not enabled in __init__ so we can't just check there."""
+		if self.isClearButtonEnabled():
+			magic = 5
+			clearButton = self.findChild(QToolButton)
+			clearButtonGeom = clearButton.geometry()
+			clearButtonGeom.moveLeft(clearButtonGeom.left() - self.touchMargins()['left'] + magic)
+			clearButton.setGeometry(clearButtonGeom)
+			clearButton.setIcon(QIcon('assets/images/red-close-button.png')) #32×32px icon
 	
 	def jogWheelClicked(self):
 		if self.window().focusRing.isFocussedIn:
