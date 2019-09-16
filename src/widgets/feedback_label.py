@@ -1,7 +1,7 @@
 # -*- coding: future_fstrings -*-
 
 from PyQt5.QtWidgets import QLabel
-from PyQt5.QtCore import QSize, pyqtProperty
+from PyQt5.QtCore import QSize, pyqtProperty, Qt
 
 from debugger import *; dbg
 
@@ -19,6 +19,7 @@ class FeedbackLabel(QLabel):
 		
 		self._customStyleSheet = ''
 		self.setWordWrap(True)
+		self.setAlignment(Qt.AlignTop | Qt.AlignLeft)
 		
 		# Set some default text, so we can see the widget.
 		if not self.text():
