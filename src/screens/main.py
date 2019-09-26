@@ -241,6 +241,9 @@ class Main(QWidget):
 		
 		#Oh god this is gonna mess up scroll wheel selection so badly. 😭
 		self.uiShowWhiteClipping.stateChanged.connect(self.uiShotAssistMenu.setFocus)
+		
+		self.uiErrantClickCatcher.mousePressEvent = (lambda evt:
+			log.warn('Errant click blocked. [WpeWCY]'))
 	
 	def onShow(self):
 		api2.video.call('configure', {
