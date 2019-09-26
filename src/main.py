@@ -93,7 +93,7 @@ class Window(QtCore.QObject):
 		
 		from screens.about_camera import AboutCamera
 		from screens.file_settings import FileSettings
-		from screens.main import Main
+		from screens.main2 import Main
 		from screens.play_and_save import PlayAndSave
 		from screens.power import Power
 		from screens.primary_settings import PrimarySettings
