@@ -6,6 +6,7 @@ from typing import Callable, Any, Dict
 import sys, os
 import subprocess
 from time import perf_counter
+from difflib import get_close_matches
 
 from PyQt5.QtCore import pyqtSlot, QObject
 from PyQt5.QtDBus import QDBusConnection, QDBusInterface, QDBusReply, QDBusPendingCallWatcher, QDBusPendingReply
@@ -634,6 +635,7 @@ class APIValues(QObject):
 	def observe(self, key, callback):
 		"""Add a function to get called when a value is updated."""
 		assert callable(callback), f"Callback is not callable. (Expected function, got {callback}.)"
+		assert key in self._callbacks, f"Unknown value, '{key}', to observe.\n\nAvailable keys are: \n{chr(10).join(self._callbacks.keys())}\n\nDid you mean to observe '{(get_close_matches(key, self._callbacks.keys(), n=1) or ['???'])[0]}' instead of '{key}'?\n"
 		self._callbacks[key].append(callback)
 	
 	def unobserve(self, key, callback):
