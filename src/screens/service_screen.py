@@ -20,27 +20,18 @@ class ServiceScreenLocked(QtWidgets.QDialog):
 		self.move(0, 0)
 		self.setWindowFlags(QtCore.Qt.FramelessWindowHint)
 		self.setAttribute(QtCore.Qt.WA_TranslucentBackground, True)
-		self.showEvent = self.delayedUnlock
-		self.windowControl = window
+		self.window_ = window
 		
-		self._delayedUnlockTimer = QtCore.QTimer()
-		self._delayedUnlockTimer.setSingleShot(True)
-		self._delayedUnlockTimer.timeout.connect(self.unlock)
+		self.uiPassword.setText('') #Clear placeholder text.
+		self.uiPassword.textChanged.connect(lambda text:
+			text == "4242" and window.show('service_screen.unlocked') )
 		
-		# Button binding.
-		self.uiPassword.setText('')
-		self.uiPassword.textChanged.connect(self.unlock)
-			
 		self.uiDone.clicked.connect(window.back)
-
-	def unlock(self, *_):
-		if self.uiPassword.text() == "4242" or settings.value('skip factory authentication', True):
-			settings.setValue('skip factory authentication', False) #First entry is free. Saves one password for production when they set serial and run cal.
-			self.windowControl.show('service_screen.unlocked')
 	
-	def delayedUnlock(self, *_):
-		"""Hack around self.show during self.showEvent not behaving."""
-		self._delayedUnlockTimer.start(0) #ms
+	
+	def onShow(self):
+		api.get('cameraSerial').then(lambda serial:
+			serial or self.window_.show('service_screen.unlocked'))
 
 
 
