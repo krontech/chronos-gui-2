@@ -669,10 +669,10 @@ Clipping</string>
 					background: rgba(255,255,255,127); /* The background is drawn under the button borders, so they are opaque if the background is opaque. */
 					
 					/* use borders instead of margins so we can see what we're doing */
-					border-left:   21px solid rgba(4, 12, 244, 35);
-					border-right:  1px solid rgba(4, 12, 244, 35);
-					border-top:    11px solid rgba(4, 12, 244, 35);
-					border-bottom: 1px solid rgba(4, 12, 244, 35);
+					border-left:   21px solid rgba(28, 24, 250, 37);
+					border-right:  1px solid rgba(28, 24, 250, 37);
+					border-top:    11px solid rgba(28, 24, 250, 37);
+					border-bottom: 1px solid rgba(28, 24, 250, 37);
 				}
 			Button { background: #7a70f7 }</string>
     </property>
@@ -1096,16 +1096,6 @@ Calibration</string>
     <string>No AA; QT botches blending on alpha backgrounds.</string>
    </property>
   </widget>
-  <widget class="QWidget" name="widget" native="true">
-   <property name="geometry">
-    <rect>
-     <x>550</x>
-     <y>0</y>
-     <width>271</width>
-     <height>491</height>
-    </rect>
-   </property>
-  </widget>
   <widget class="QWidget" name="uiErrantClickCatcher" native="true">
    <property name="geometry">
     <rect>
@@ -1139,7 +1129,6 @@ Calibration</string>
   <zorder>comment_2</zorder>
   <zorder>comment_3</zorder>
   <zorder>comment_4</zorder>
-  <zorder>widget</zorder>
   <zorder>uiErrantClickCatcher</zorder>
  </widget>
  <customwidgets>
