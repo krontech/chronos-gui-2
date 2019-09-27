@@ -296,7 +296,7 @@ Peaking</string>
     </rect>
    </property>
    <property name="autoFillBackground">
-    <bool>true</bool>
+    <bool>false</bool>
    </property>
   </widget>
   <widget class="QWidget" name="uiErrantClickCatcher" native="true">
@@ -488,6 +488,24 @@ Peaking</string>
    <header>interactive_video_area</header>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>uiMenu</tabstop>
+  <tabstop>uiBattery</tabstop>
+  <tabstop>uiExternalMedia</tabstop>
+  <tabstop>uiPlayAndSave</tabstop>
+  <tabstop>uiRecord</tabstop>
+  <tabstop>uiDebugA</tabstop>
+  <tabstop>uiDebugB</tabstop>
+  <tabstop>uiDebugC</tabstop>
+  <tabstop>uiDebugD</tabstop>
+  <tabstop>uiResolution</tabstop>
+  <tabstop>uiExposure</tabstop>
+  <tabstop>uiWhiteBalance</tabstop>
+  <tabstop>uiBlackCal</tabstop>
+  <tabstop>uiZebraStripes</tabstop>
+  <tabstop>uiFocusPeaking</tabstop>
+  <tabstop>uiFocusPeakingColor</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

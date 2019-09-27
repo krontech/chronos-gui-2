@@ -8,7 +8,7 @@ from PyQt5.QtWidgets import QWidget, QApplication
 
 from debugger import *; dbg
 #import animate
-#import api2 as api
+import api2 as api
 
 
 class Main(QWidget):
@@ -29,6 +29,35 @@ class Main(QWidget):
 		
 		self.uiErrantClickCatcher.mousePressEvent = (lambda evt:
 			log.warn('Errant click blocked. [WpeWCY]'))
+		
+		
+		#Button action binding
+		
+		api.observe('zebraLevel', lambda intensity:
+			self.uiZebraStripes.setCheckState(
+				0 if not intensity else 2 ) )
+		
+		self.uiZebraStripes.stateChanged.connect(lambda state: 
+			api.set({'zebraLevel': state/2}) )
+		
+		
+		#Use for focus peaking drop-down.
+		#api.observe('focusPeakingLevel', lambda intensity:
+		#	self.uiFocusPeakingIntensity.setCurrentIndex(
+		#		round((1-intensity) * (self.uiFocusPeakingIntensity.count()-1)) ) )
+		#
+		#self.uiFocusPeakingIntensity.currentIndexChanged.connect(lambda index:
+		#	api.set({'focusPeakingLevel': 1-(index/(self.uiFocusPeakingIntensity.count()-1))} ) )
+		
+		
+		api.observe('focusPeakingLevel', lambda intensity:
+			self.uiFocusPeaking.setCheckState(
+				0 if not intensity else 2 ) )
+		
+		self.uiFocusPeaking.stateChanged.connect(lambda state: 
+			api.set({'focusPeakingLevel': state/2 * 0.5}) )
+		
+		
 		
 	
 	def onShow(self):
