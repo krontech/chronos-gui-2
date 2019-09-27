@@ -55,7 +55,7 @@ class Main(QWidget):
 				0 if not intensity else 2 ) )
 		
 		self.uiFocusPeaking.stateChanged.connect(lambda state: 
-			api.set({'focusPeakingLevel': state/2 * 0.5}) )
+			api.set({'focusPeakingLevel': (state/2) * 0.001}) )
 		
 		
 		
