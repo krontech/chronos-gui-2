@@ -789,6 +789,7 @@ class ExternalPartitions(QObject):
 				"uuid": "a14d610d-b524-4af2-9a1a-fa3dd1184258",
 				"path": bytes("/dev/sda", 'utf8'),
 				"size": 1294839100, #bytes, 64-bit positive integer
+				"readOnly": False,
 				"interface": "usb", #"usb" or "sd"
 			}
 		"""
@@ -897,6 +898,7 @@ class ExternalPartitions(QObject):
 				'uuid': data['org.freedesktop.UDisks2.Block']['IdUUID'], #Found at `/dev/disk/by-uuid/`.
 				'path': bytes(data['org.freedesktop.UDisks2.Filesystem']['MountPoints'][0])[:-1], #Trim off a null byte at the end, we don't need it in python.
 				'size': data['org.freedesktop.UDisks2.Block']['Size'], #number of bytes, 64-bit positive integer
+				'readOnly': data['org.freedesktop.UDisks2.Block']['ReadOnly'],
 				'interface': 'usb' if True in [b'usb' in symlink for symlink in data['org.freedesktop.UDisks2.Block']['Symlinks']] else 'other', #This data comes in one message earlier, but it would be enough complexity to link the two that it makes more sense to just string match here.
 			}]
 			for callback in self._callbacks:
