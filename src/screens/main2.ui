@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>800</width>
-    <height>480</height>
+    <height>729</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -283,7 +283,7 @@ Peaking</string>
     <enum>Button::none</enum>
    </property>
    <property name="customStyleSheet" stdset="0">
-    <string>Button { border-width: 0px; }</string>
+    <string>Button { border-width: 0px }</string>
    </property>
   </widget>
   <widget class="InteractiveVideoArea" name="uiVideo">
@@ -443,6 +443,210 @@ Peaking</string>
     <string notr="true">background: black;</string>
    </property>
   </widget>
+  <widget class="Comment" name="comment">
+   <property name="geometry">
+    <rect>
+     <x>300</x>
+     <y>480</y>
+     <width>141</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>^ end of visible screen here ^</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignHCenter|Qt::AlignTop</set>
+   </property>
+  </widget>
+  <widget class="QWidget" name="uiFocusPeakingColorMenu" native="true">
+   <property name="geometry">
+    <rect>
+     <x>360</x>
+     <y>520</y>
+     <width>441</width>
+     <height>91</height>
+    </rect>
+   </property>
+   <widget class="Button" name="uiMagentaFocusPeaking">
+    <property name="geometry">
+     <rect>
+      <x>370</x>
+      <y>0</y>
+      <width>71</width>
+      <height>91</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="clickMarginLeft" stdset="0">
+     <enum>Button::none</enum>
+    </property>
+    <property name="clickMarginRight" stdset="0">
+     <enum>Button::none</enum>
+    </property>
+    <property name="clickMarginBottom" stdset="0">
+     <enum>Button::none</enum>
+    </property>
+    <property name="customStyleSheet" stdset="0">
+     <string>Button { background: #f770f2 }</string>
+    </property>
+   </widget>
+   <widget class="Button" name="uiBlueFocusPeaking">
+    <property name="geometry">
+     <rect>
+      <x>300</x>
+      <y>0</y>
+      <width>71</width>
+      <height>91</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">
+				/* Editor style. Use border to show were click margin is, so we don't mess it up during layout. */
+				Button {
+					font-size: 16px;
+					background: rgba(255,255,255,127); /* The background is drawn under the button borders, so they are opaque if the background is opaque. */
+					
+					/* use borders instead of margins so we can see what we're doing */
+					border-left:   1px solid rgba(0, 10, 144, 77);
+					border-right:  1px solid rgba(0, 10, 144, 77);
+					border-top:    21px solid rgba(0, 10, 144, 77);
+					border-bottom: 1px solid rgba(0, 10, 144, 77);
+				}
+			Button { background: #7a70f7 }</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="clickMarginLeft" stdset="0">
+     <enum>Button::none</enum>
+    </property>
+    <property name="clickMarginRight" stdset="0">
+     <enum>Button::none</enum>
+    </property>
+    <property name="clickMarginBottom" stdset="0">
+     <enum>Button::none</enum>
+    </property>
+    <property name="customStyleSheet" stdset="0">
+     <string>Button { background: #7a70f7 }</string>
+    </property>
+   </widget>
+   <widget class="Button" name="uiCyanFocusPeaking">
+    <property name="geometry">
+     <rect>
+      <x>230</x>
+      <y>0</y>
+      <width>71</width>
+      <height>91</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="clickMarginLeft" stdset="0">
+     <enum>Button::none</enum>
+    </property>
+    <property name="clickMarginRight" stdset="0">
+     <enum>Button::none</enum>
+    </property>
+    <property name="clickMarginBottom" stdset="0">
+     <enum>Button::none</enum>
+    </property>
+    <property name="customStyleSheet" stdset="0">
+     <string>Button { background: #70f7c8 }</string>
+    </property>
+   </widget>
+   <widget class="Button" name="uiGreenFocusPeaking">
+    <property name="geometry">
+     <rect>
+      <x>160</x>
+      <y>0</y>
+      <width>71</width>
+      <height>91</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="clickMarginLeft" stdset="0">
+     <enum>Button::none</enum>
+    </property>
+    <property name="clickMarginRight" stdset="0">
+     <enum>Button::none</enum>
+    </property>
+    <property name="clickMarginBottom" stdset="0">
+     <enum>Button::none</enum>
+    </property>
+    <property name="customStyleSheet" stdset="0">
+     <string>Button { background: #7ef770 }</string>
+    </property>
+   </widget>
+   <widget class="Button" name="uiYellowFocusPeaking">
+    <property name="geometry">
+     <rect>
+      <x>90</x>
+      <y>0</y>
+      <width>71</width>
+      <height>91</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="clickMarginLeft" stdset="0">
+     <enum>Button::none</enum>
+    </property>
+    <property name="clickMarginRight" stdset="0">
+     <enum>Button::none</enum>
+    </property>
+    <property name="clickMarginBottom" stdset="0">
+     <enum>Button::none</enum>
+    </property>
+    <property name="customStyleSheet" stdset="0">
+     <string>Button { background: #f7d270 }</string>
+    </property>
+   </widget>
+   <widget class="Button" name="uiRedFocusPeaking">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>0</y>
+      <width>91</width>
+      <height>91</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="clickMarginLeft" stdset="0">
+     <enum>Button::full</enum>
+    </property>
+    <property name="clickMarginRight" stdset="0">
+     <enum>Button::none</enum>
+    </property>
+    <property name="clickMarginBottom" stdset="0">
+     <enum>Button::none</enum>
+    </property>
+    <property name="customStyleSheet" stdset="0">
+     <string>Button { background: #f77070 }</string>
+    </property>
+   </widget>
+   <widget class="QWidget" name="uiFocusPeakingColorSelectionIndicator" native="true">
+    <property name="geometry">
+     <rect>
+      <x>50</x>
+      <y>10</y>
+      <width>71</width>
+      <height>71</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">border: 4px solid black</string>
+    </property>
+   </widget>
+  </widget>
   <zorder>backdrop</zorder>
   <zorder>backdrop_2</zorder>
   <zorder>uiVideo</zorder>
@@ -465,6 +669,8 @@ Peaking</string>
   <zorder>uiDebugA</zorder>
   <zorder>uiBottomVerticalLine</zorder>
   <zorder>uiBottomVerticalLine_2</zorder>
+  <zorder>comment</zorder>
+  <zorder>uiFocusPeakingColorMenu</zorder>
  </widget>
  <customwidgets>
   <customwidget>
@@ -481,6 +687,11 @@ Peaking</string>
    <class>CheckBox</class>
    <extends>QCheckBox</extends>
    <header>check_box</header>
+  </customwidget>
+  <customwidget>
+   <class>Comment</class>
+   <extends>QLabel</extends>
+   <header>comment</header>
   </customwidget>
   <customwidget>
    <class>InteractiveVideoArea</class>
