@@ -9,6 +9,7 @@ from PyQt5.QtWidgets import QWidget, QApplication
 from PyQt5.QtGui import QPainter, QPen, QBrush, QColor
 
 from debugger import *; dbg
+import settings
 #import animate
 import api2 as api
 
@@ -70,8 +71,10 @@ class Main(QWidget):
 		self.uiFocusPeakingColor.clicked.connect(
 			self.toggleFocusPeakingColorMenu)
 		
+		
+		#Focus peaking colour
 		focusColor = ''
-		def setFocusColor(color):
+		def updateFocusColor(color):
 			nonlocal focusColor
 			target = getattr(self, f"ui{color.title()}FocusPeaking", None)
 			if target: #Find the colour of the panel to be highlighted.
@@ -82,8 +85,8 @@ class Main(QWidget):
 				focusColor = color
 			
 			self.uiFocusPeakingColor.update()
+		api.observe('focusPeakingColor', updateFocusColor)
 			
-		api.observe('focusPeakingColor', setFocusColor)
 		def uiFocusPeakingColorPaintEvent(evt, rectSize=24):
 			"""Draw the little coloured square on the focus peaking button."""
 			midpoint = self.uiFocusPeakingColor.geometry().size()/2 + QSize(0, self.uiFocusPeakingColor.touchMargins()['top']/2)
@@ -108,14 +111,225 @@ class Main(QWidget):
 				)(match.group(1).lower()) )
 		
 		
+		#Black Cal
+		self.uiBlackCal.clicked.connect(lambda:
+			api.control.call('startCalibration', {
+				'blackCal': True }) )
 		
 		
+		#White Bal
+		self.uiWhiteBalance.clicked.connect(lambda:
+			api.control.call('startCalibration', {
+				'startAutoWhiteBalance': True }) )
+		
+		#You can't adjust the colour of a monochromatic image.
+		#Hide white balance, revealing trigger/io button.
+		if api.getSync('sensorColorPattern') == 'mono':
+			self.uiWhiteBalance.hide()
+		
+		
+		#Trigger/IO
+		self.uiTriggers.clicked.connect(lambda:
+			window.show('triggers_and_io') )
+		
+		
+		#Exposure
+		exposureUnit = 'ms' #One of 'ms', 'deg', or 'pct'.
+		exposureTemplate = self.uiExposure.text()
+		
+		exposureNsMin = 0
+		exposureNs = 0
+		exposureNsMax = 0
+		
+		def updateExposureText():
+			self.uiExposure.setText(
+				exposureTemplate.format(
+					name = {
+						'ms': 'Exposure',
+						'pct': 'Exposure',
+						'deg': 'Shutter Angle',
+					}[exposureUnit],
+					exposure = {
+						'ms': f'{exposureNs/1e3:0.2f}ms',
+						'pct': f'{round(exposureNs/(exposureNsMax-exposureNsMin)*100)}%',
+						'deg': f'{round(exposureNs/(exposureNsMax-exposureNsMin)*360)}%', #TODO DDR 2019-09-27: Is this actually the way to calculate shutter angle?
+					}[exposureUnit],
+				)
+			)
+		
+		#In Python 3.7: Use api.observe('exposureMin', lambda ns: exposureNSMin := ns) and give exposureNSMin a setter?
+		def updateExposureNsMin(ns):
+			nonlocal exposureNsMin
+			exposureNsMin = ns
+			updateExposureText()
+		api.observe('exposureMin', updateExposureNsMin)
+		
+		def updateExposureNs(ns):
+			nonlocal exposureNs
+			exposureNs = ns
+			updateExposureText()
+		api.observe('exposurePeriod', updateExposureNs)
+		
+		def updateExposureNsMax(ns):
+			nonlocal exposureNsMax
+			exposureNsMax = ns
+			updateExposureText()
+		api.observe('exposureMax', updateExposureNsMax)
+		
+		#TODO DDR 2019-09-27: Make this pop up the exposure menu.
+		self.uiExposure.clicked.connect(lambda:
+			window.show('recording_settings') )
+		
+		
+		#Resolution
+		resolutionTemplate = self.uiResolution.text()
+		
+		hRes = 0
+		vRes = 0
+		fps = 0
+		
+		def updateResolutionText():
+			self.uiResolution.setText(
+				resolutionTemplate.format(
+					hRes=hRes, vRes=vRes, fps=fps ) )
+		
+		def updateFps(framePeriodNs):
+			nonlocal fps
+			fps = 1e9 / framePeriodNs
+			updateResolutionText()
+		api.observe('framePeriod', updateFps)
+		
+		def updateResolution(resolution):
+			nonlocal hRes, vRes
+			hRes = resolution['hRes']
+			vRes = resolution['vRes']
+			updateResolutionText()
+		api.observe('resolution', updateResolution)
+		
+		self.uiResolution.clicked.connect(lambda:
+			window.show('recording_settings') )
+		
+		
+		#Menu
+		#TODO DDR 2019-09-27 make dropdown menu
+		
+		
+		#Battery
+		self._batteryTemplate = self.uiBattery.text()
+		self._batteryCharge = self.uiBattery.text()
+		
+		self._batteryPollTimer = QtCore.QTimer()
+		self._batteryPollTimer.timeout.connect(self.updateBatteryCharge)
+		self._batteryPollTimer.setTimerType(QtCore.Qt.VeryCoarseTimer) #Infrequent, wake as little as possible.
+		self._batteryPollTimer.setInterval(3600) #We display percentages. We update in tenth-percentage increments.
+		
+		
+		#Record / stop
+		
+		
+		#Play & save
+		
+		
+		#Storage media
+		uiExternalMediaTemplate = self.uiExternalMedia.text()
+		externalMediaUUID = ''
+		externalMediaRatioFull = -1 #Don't draw the bar if negative.
+		
+		def updateExternalMediaPercentFull(percent):
+			nonlocal externalMediaRatioFull
+			if externalMediaRatioFull != percent:
+				externalMediaRatioFull = percent
+				self.uiExternalMedia.update()
+		
+		
+		self.uiExternalMedia.setText("No Save\nMedia Found") #Without this, there is an unavoidable FOUC unless we call df sychronously. So we lie and just don't detect it at first. 😬
+		def updateExternalMediaText():
+			"""Update the external media text. This will called every few seconds to update the %-free display. Also repaints %-bar."""
+			partitions = ([
+				partition
+				for partition in api.externalPartitions.list()
+				if partition['uuid'] == externalMediaUUID
+			] or api.externalPartitions.list())[:1]
+			if not partitions:
+				updateExternalMediaPercentFull(-1)
+				self.uiExternalMedia.setText(
+					"No Save\nMedia Found" )
+			else:
+				partition = partitions[0]
+				api.externalPartitions.usageFor(partition['device'], lambda space: (
+					updateExternalMediaPercentFull(space['used']/space['total']),
+					self.uiExternalMedia.setText(
+						uiExternalMediaTemplate.format(
+							externalStorageIdentifier = partition['name'] or f"{round(partition['size'] / 1e9):1.0f}GB Storage Device",
+							percentFull = round(space['used']/space['total'] * 100),
+							hoursSaved = -1, minutesSaved = 0, secondsSaved = 0, #TODO: Calculate bits per second recorded and apply it here to the partition usage and total.
+							hoursTotal = -1, minutesTotal = 0, secondsTotal = 0,
+						)
+					)
+				))
+		self.updateExternalMediaText = updateExternalMediaText #oops, assign this to self so we can pre-call the timer on show.
+		
+		def updateExternalMediaUUID(uuid):
+			self.externalMediaUUID = uuid
+			updateExternalMediaText()
+		settings.observe('preferredFileSavingUUID', '', updateExternalMediaUUID)
+		
+		api.externalPartitions.observe(lambda partitions:
+			updateExternalMediaText() )
+		
+		self._externalMediaUsagePollTimer = QtCore.QTimer()
+		self._externalMediaUsagePollTimer.timeout.connect(updateExternalMediaText)
+		self._externalMediaUsagePollTimer.setTimerType(QtCore.Qt.VeryCoarseTimer) #Infrequent, wake as little as possible.
+		self._externalMediaUsagePollTimer.setInterval(15000) #This should almost never be needed, it just covers if another program is writing or deleting something from the disk.
+		
+		def uiExternalMediaPaintEvent(evt, meterPaddingX=15, meterOffsetY=2, meterHeight=10):
+			"""Draw the disk usage bar on the external media button."""
+			if externalMediaRatioFull == -1:
+				return
+			
+			midpoint = self.uiExternalMedia.geometry().size()/2 + QSize(0, self.uiExternalMedia.touchMargins()['top']/2)
+			type(self.uiExternalMedia).paintEvent(self.uiExternalMedia, evt) #Invoke the superclass to - hopefully - paint the rest of the button before we deface it with our square.
+			p = QPainter(self.uiExternalMedia)
+			p.fillRect( #xywh
+				meterPaddingX,
+				midpoint.height() + meterOffsetY,
+				#TODO DDR 2019-09-27: When we know how long the current recorded clip is, in terms of external media capacity, add it as a white rectangle here.
+				0, #(midpoint.width() - meterPaddingX) * 2 * externalMediaRatioFull + ???,
+				meterHeight,
+				QColor('white')
+			)
+			p.fillRect( #xywh
+				meterPaddingX,
+				midpoint.height() + meterOffsetY,
+				(midpoint.width() - meterPaddingX) * 2 * externalMediaRatioFull,
+				meterHeight,
+				QColor('#00b800')
+			)
+			p.setPen(QPen(QColor('black')))
+			p.setBrush(QBrush(QColor('transparent')))
+			p.drawRect( #xywh
+				meterPaddingX,
+				midpoint.height() + meterOffsetY,
+				(midpoint.width() - meterPaddingX) * 2,
+				meterHeight
+			)
+		self.uiExternalMedia.paintEvent = uiExternalMediaPaintEvent
+		
+		self.uiExternalMedia.clicked.connect(lambda:
+			window.show('file_settings') )
+	
+	
 	
 	def onShow(self):
-		pass
+		self.updateBatteryCharge2(api.getSync('batteryChargeNormalized'))
+		self._batteryPollTimer.start()
+		
+		self.updateExternalMediaText()
+		self._externalMediaUsagePollTimer.start()
 	
 	def onHide(self):
-		pass
+		self._batteryPollTimer.stop()
+		self._externalMediaUsagePollTimer.stop()
 	
 	
 	
@@ -164,3 +378,14 @@ class Main(QWidget):
 		else:
 			log.warn(f'unknown focus peaking color {color}')
 			box.hide()
+	
+	
+	def updateBatteryCharge(self):
+		api.get('batteryChargeNormalized').then(
+			self.updateBatteryCharge2 )
+	def updateBatteryCharge2(self, charge):
+		self._batteryCharge = charge #0..1
+		
+		self.uiBattery.setText(
+			self._batteryTemplate.format(
+				round(charge*100) ) )

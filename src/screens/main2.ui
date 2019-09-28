@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>800</width>
-    <height>729</height>
+    <height>911</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -46,8 +46,8 @@
    </property>
    <property name="text">
     <string>
-
-{:d}%</string>
+🔋
+{:1.0f}%</string>
    </property>
    <property name="clickMarginLeft" stdset="0">
     <enum>Button::none</enum>
@@ -62,15 +62,15 @@
   <widget class="Button" name="uiExternalMedia">
    <property name="geometry">
     <rect>
-     <x>270</x>
+     <x>620</x>
      <y>0</y>
      <width>181</width>
      <height>81</height>
     </rect>
    </property>
    <property name="text">
-    <string>{externalStorageIdentifier:s} ({percentFull:d}%)
-{hoursSaved}:{minutesSaved}:{secondsSaved} / {hoursTotal}:{minutesTotal}:{secondsTotal}
+    <string>{externalStorageIdentifier:s} ({percentFull:1.0f}%)
+{hoursSaved:02.0f}:{minutesSaved:02.0f}:{secondsSaved:02.0f} / {hoursTotal:02.0f}:{minutesTotal:02.0f}:{secondsTotal:02.0f}
 </string>
    </property>
    <property name="clickMarginLeft" stdset="0">
@@ -86,7 +86,7 @@
   <widget class="Button" name="uiPlayAndSave">
    <property name="geometry">
     <rect>
-     <x>450</x>
+     <x>480</x>
      <y>0</y>
      <width>141</width>
      <height>81</height>
@@ -110,7 +110,7 @@
   <widget class="Button" name="uiRecord">
    <property name="geometry">
     <rect>
-     <x>590</x>
+     <x>270</x>
      <y>0</y>
      <width>211</width>
      <height>81</height>
@@ -139,8 +139,8 @@
     </rect>
    </property>
    <property name="text">
-    <string>{hRes:d}×{vRes:d}
-@{fps:d}fps</string>
+    <string>{hRes:1.0f}×{vRes:1.0f}
+@{fps:1.2f}fps</string>
    </property>
    <property name="clickMarginLeft" stdset="0">
     <enum>Button::none</enum>
@@ -463,7 +463,7 @@ Peaking</string>
    <property name="geometry">
     <rect>
      <x>360</x>
-     <y>520</y>
+     <y>550</y>
      <width>441</width>
      <height>91</height>
     </rect>
@@ -647,6 +647,41 @@ Peaking</string>
     </property>
    </widget>
   </widget>
+  <widget class="Button" name="uiTriggers">
+   <property name="geometry">
+    <rect>
+     <x>240</x>
+     <y>400</y>
+     <width>131</width>
+     <height>81</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Triggers/IO</string>
+   </property>
+   <property name="clickMarginLeft" stdset="0">
+    <enum>Button::none</enum>
+   </property>
+   <property name="clickMarginRight" stdset="0">
+    <enum>Button::none</enum>
+   </property>
+   <property name="clickMarginBottom" stdset="0">
+    <enum>Button::none</enum>
+   </property>
+  </widget>
+  <widget class="Comment" name="comment_2">
+   <property name="geometry">
+    <rect>
+     <x>360</x>
+     <y>530</y>
+     <width>441</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Colour menu for focus peaking. The black square shows what is active.</string>
+   </property>
+  </widget>
   <zorder>backdrop</zorder>
   <zorder>backdrop_2</zorder>
   <zorder>uiVideo</zorder>
@@ -657,7 +692,6 @@ Peaking</string>
   <zorder>uiRecord</zorder>
   <zorder>uiResolution</zorder>
   <zorder>uiExposure</zorder>
-  <zorder>uiWhiteBalance</zorder>
   <zorder>uiBlackCal</zorder>
   <zorder>uiZebraStripes</zorder>
   <zorder>uiFocusPeaking</zorder>
@@ -671,6 +705,9 @@ Peaking</string>
   <zorder>uiBottomVerticalLine_2</zorder>
   <zorder>comment</zorder>
   <zorder>uiFocusPeakingColorMenu</zorder>
+  <zorder>uiTriggers</zorder>
+  <zorder>uiWhiteBalance</zorder>
+  <zorder>comment_2</zorder>
  </widget>
  <customwidgets>
   <customwidget>
