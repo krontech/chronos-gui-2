@@ -951,8 +951,9 @@ class ExternalPartitions(QObject):
 							.split() #Each output is now in a list.
 						)
 						callback({
-							'available': int(info[0]) + int(info[1]),
-							'used': int(info[1])
+							'available': int(info[0]),
+							'used': int(info[1]),
+							'total': int(info[0]) + int(info[1]),
 						})
 				delay(self, 0.20, lambda: #Initial delay, df usually runs in .17s.
 					checkDf(timeout=0.05) )

@@ -1,12 +1,12 @@
 # -*- coding: future_fstrings -*-
-import subprocess, re
+import re
 from os import system
 
 from PyQt5 import uic, QtWidgets, QtCore
 
 from debugger import *; dbg
-from animate import delay
 import api2
+from external_process import run
 
 
 class Storage(QtWidgets.QWidget):
@@ -106,7 +106,7 @@ class Storage(QtWidgets.QWidget):
 		self.uiNetworkStorageFeedback.showMessage(f'Working…'),
 		
 		#TODO: This needs to be exposed to the web app, so it needs to go through the API.
-		self.run(
+		run(
 			['mount', '-t', 'cifs', '-o', 
 				f'user={self.uiNetworkStorageUsername.text()},password={self.uiNetworkStoragePassoword.text()}', 
 				f'//{self.uiNetworkStorageAddress.text()}/', '/mnt/cam' ],
@@ -126,7 +126,7 @@ class Storage(QtWidgets.QWidget):
 			We observe externalStorage for this, since it changes
 			when the mounted devices change."""
 		
-		self.run(
+		run(
 			['df', '--human-readable', 
 				'--exclude=tmpfs', '--exclude=devtmpfs', 
 				'--output=source,avail,used,pcent,target' ],
@@ -144,7 +144,7 @@ class Storage(QtWidgets.QWidget):
 			Note: We can't use a storageMediaSelect here, because the
 				device may not be usable storage media."""
 		
-		self.run(['lsblk', '--pairs', '--output=NAME,SIZE,TYPE'],
+		run(['lsblk', '--pairs', '--output=NAME,SIZE,TYPE'],
 			lambda exitStatus: 
 				self.uiLocalMediaFeedback.showError(
 					f'Could not read storage devices.\n("lsblk" exited with code {exitStatus}.)' ),
@@ -184,38 +184,3 @@ class Storage(QtWidgets.QWidget):
 			for device in newDevicesList:
 				self.uiDeviceSelect.insertItem(
 					0, f"{device.group('size')}B Storage Device", device )
-	
-	
-	def run(self, command: list, error: callable, success: callable):
-		"""Run the command, passing stdout to success.
-			
-			command: a list of [command, ...args]
-			success: Called with stdout on a zero exit-status.
-			error: Called with the exit status if 1-255.
-			
-			Note: This function exists because Python 3.5 grew equivalent,
-				but we don't have access to it yet here in 3.4.
-			
-			Note: Non-static method, because something must own the QTimer
-				behind delay()."""
-		
-		assert command and error and success
-		
-		proc = subprocess.Popen(
-			command,
-			stdout=subprocess.PIPE,
-			stderr=subprocess.DEVNULL,
-		)
-		
-		def checkProc(*, timeout):
-			exitStatus = proc.poll()
-			if exitStatus is None: #Still running, check again later.
-				#Standard clamped exponential decay. Keeps polling to a reasonable amount, frequent at first then low.
-				delay(self, timeout, lambda:
-					checkProc(timeout=max(1, timeout*2)) )
-			elif exitStatus:
-				error(exitStatus)
-			else:
-				success(str(proc.communicate()[0], 'utf8'))
-		delay(self, 0.20, lambda: #Initial delay, df et al usually run in .17-.20s.
-			checkProc(timeout=0.05) )

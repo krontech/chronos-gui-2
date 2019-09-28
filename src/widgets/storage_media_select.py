@@ -76,7 +76,7 @@ class StorageMediaSelect(ComboBox):
 				if self.itemData(i):
 					if self.itemData(i)["path"] == partitionList[i]["path"]: #Check we're still current after async call.
 						self.setItemText(i,
-							f"{partitionList[i]['name']} ({round(space['used']/space['available']*100):1.0f}% full)" )
+							f"{partitionList[i]['name']} ({round(space['used']/space['total']*100):1.0f}% full)" )
 			return updateTextWith
 		
 		for i in range(len(partitionList)):
