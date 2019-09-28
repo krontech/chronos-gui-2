@@ -377,7 +377,7 @@ class Main(QWidget):
 	
 	
 	@pyqtSlot(str, name="updateFocusPeakingColor")
-	def updateFocusPeakingColor(self, color: int):
+	def updateFocusPeakingColor(self, color: str):
 		QPoint = QtCore.QPoint
 		
 		box = self.uiFocusPeakingColorSelectionIndicator
