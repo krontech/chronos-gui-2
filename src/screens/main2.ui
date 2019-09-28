@@ -117,7 +117,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>    Record</string>
+    <string>    {state}</string>
    </property>
    <property name="clickMarginLeft" stdset="0">
     <enum>Button::none</enum>
