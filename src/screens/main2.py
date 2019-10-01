@@ -4,9 +4,9 @@ import logging; log = logging.getLogger('Chronos.gui')
 from re import match as regex_match, search as regex_search
 
 from PyQt5 import uic, QtCore
-from PyQt5.QtCore import QPoint, QSize
+from PyQt5.QtCore import QPoint, QSize, Qt
 from PyQt5.QtWidgets import QWidget, QApplication
-from PyQt5.QtGui import QPainter, QPen, QBrush, QColor
+from PyQt5.QtGui import QPainter, QPen, QBrush, QColor, QStandardItemModel
 
 from debugger import *; dbg
 import settings
@@ -215,7 +215,44 @@ class Main(QWidget):
 		
 		
 		#Menu
-		#TODO DDR 2019-09-27 make dropdown menu
+		self.uiMenuDropdown.hide()
+		self.uiMenuDropdown.move(
+			self.uiMenuButton.x(),
+			self.uiMenuButton.y() + self.uiMenuButton.height() -  self.uiMenuButton.touchMargins()['bottom'] - self.uiMenuFilter.touchMargins()['top'] - 1, #-1 to merge margins.
+		)
+		self.uiMenuButton.clicked.connect(lambda:
+			getattr(
+				self.uiMenuDropdown, 
+				'hide' if self.uiMenuDropdown.isVisible() else 'show'
+			)()
+		)
+		
+		#Populate uiMenuScroll from actions.
+		main_menu_items = [
+			{'name':"About Camera",        'open':lambda: window.show('about_camera'),          'synonyms':"kickstarter thanks me name"},
+			{'name':"App & Internet",      'open':lambda: window.show('remote_access'),         'synonyms':"remote access web client"},
+			{'name':"Camera Settings",     'open':lambda: window.show('user_settings'),         'synonyms':"user operator"},
+			{'name':"Factory Utilities",   'open':lambda: window.show('service_screen.locked'), 'synonyms':"utils"},
+			{'name':"Review Saved Videos", 'open':lambda: window.show('replay'),                'synonyms':"playback show footage saved card movie"},
+			{'name':"Storage",             'open':lambda: window.show('storage'),               'synonyms':"file saving"},
+			{'name':"Triggers and IO",     'open':lambda: window.show('triggers_and_io'),       'synonyms':"bnc green ~a1 ~a2 trig1 trig2 trig3 signal input output trigger delay"},
+			{'name':"Update Camera",       'open':lambda: window.show('update_firmware'),       'synonyms':"firmware"},
+			{'name':"Video Saving",        'open':lambda: window.show('file_settings'),         'synonyms':"file saving"},
+		]
+		
+		menuScrollModel = QStandardItemModel(
+			len(main_menu_items), 1, self.uiMenuScroll )
+		for i in range(len(main_menu_items)):
+			menuScrollModel.setItemData(menuScrollModel.index(i, 0), {
+				Qt.DisplayRole: main_menu_items[i]['name'],
+				Qt.UserRole: main_menu_items[i],
+				Qt.DecorationRole: None, #Icon would go here.
+			})
+		self.uiMenuScroll.setModel(menuScrollModel)
+		self.uiMenuScroll.clicked.connect(self.showOptionOnTap)
+		self.uiMenuScroll.jogWheelClick.connect(self.showOptionOnJogWheelClick)
+		
+		self.uiMenuFilter.textChanged.connect(self.filterMenu)
 		
 		
 		#Battery
@@ -235,7 +272,12 @@ class Main(QWidget):
 		api.observe('state', self.onStateChange)
 		
 		#Play & save
+		#TODO DDR 2019-09-27 fill in play and save
+		uiPlayAndSaveTemplate = self.uiPlayAndSave.text()
+		self.uiPlayAndSave.setText("Play && Save\n-1s RAM\n-1s Avail.")
 		
+		self.uiPlayAndSave.clicked.connect(lambda:
+			window.show('play_and_save')) #This should prompt to record if no footage is recorded, and explain itself.
 		
 		#Storage media
 		uiExternalMediaTemplate = self.uiExternalMedia.text()
@@ -334,6 +376,8 @@ class Main(QWidget):
 		
 		self.updateExternalMediaText()
 		self._externalMediaUsagePollTimer.start()
+		
+		api.video.call('livedisplay', {})
 	
 	def onHide(self):
 		self._batteryPollTimer.stop()
@@ -472,7 +516,7 @@ class Main(QWidget):
 	def onStateChange(self, state):
 		#This text update takes a little while to fire, so we do it in the start and stop recording functions as well so it's more responsive when the operator clicks.
 		self.uiRecord.setText(
-			self.uiRecordTemplate.format(
+			self.uiRecordTemplate.format( #Spaces to alight Stop with Record
 				state = 'Record' if state == 'idle' else 'Stop    ' ) )
 		
 		if state == 'idle' and settings.value('autoSaveVideo', False): #[autosave]
@@ -488,3 +532,21 @@ class Main(QWidget):
 		self.uiRecord.setText(
 			self.uiRecordTemplate.format(state='Record') )
 		api.control.callSync('stopRecording')
+	
+	
+	def showOptionOnTap(self, pos: QtCore.QModelIndex):
+		self.uiMenuScroll.model().itemData(pos)[Qt.UserRole]['open']()
+		self.uiMenuScroll.selectionModel().clear()
+	
+	def showOptionOnJogWheelClick(self):
+		self.uiMenuScroll.selectionModel().currentIndex().data(Qt.UserRole)['open']()
+		self.uiMenuScroll.selectionModel().clear()
+	
+	def filterMenu(self):
+		model = self.uiMenuScroll.model()
+		search = self.uiMenuFilter.text().casefold()
+		
+		for row in range(model.rowCount()):
+			data = model.data(model.index(row, 0), Qt.UserRole) #eg. {'name':"About Camera", 'open':lambda: window.show('about_camera'), 'synonyms':"kickstarter thanks me name"},
+			self.uiMenuScroll.setRowHidden(row,
+				not (search in data['name'].casefold() or search in data['synonyms']) )

@@ -62,6 +62,7 @@ class TouchMarginPlugin(MarginWidth):
 	
 	#Different than contentsMargins. This one is clickable!
 	def touchMargins(self):
+		"""Get the size, in pixels, of the touch margins."""
 		return {
 			"top": self._clickMarginTop * 10,
 			"left": self._clickMarginLeft * 10,

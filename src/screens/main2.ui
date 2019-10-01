@@ -7,13 +7,13 @@
     <x>0</x>
     <y>0</y>
     <width>800</width>
-    <height>911</height>
+    <height>988</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string notr="true">Chronos Screen</string>
   </property>
-  <widget class="Button" name="uiMenu">
+  <widget class="Button" name="uiMenuButton">
    <property name="geometry">
     <rect>
      <x>0</x>
@@ -69,7 +69,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>{externalStorageIdentifier:s} ({percentFull:1.0f}%)
+    <string>{externalStorageIdentifier:s}
 {hoursSaved:02.0f}:{minutesSaved:02.0f}:{secondsSaved:02.0f} / {hoursTotal:02.0f}:{minutesTotal:02.0f}:{secondsTotal:02.0f}
 </string>
    </property>
@@ -295,9 +295,6 @@ Peaking</string>
      <height>361</height>
     </rect>
    </property>
-   <property name="autoFillBackground">
-    <bool>false</bool>
-   </property>
   </widget>
   <widget class="QWidget" name="uiErrantClickCatcher" native="true">
    <property name="geometry">
@@ -510,10 +507,10 @@ Peaking</string>
 					background: rgba(255,255,255,127); /* The background is drawn under the button borders, so they are opaque if the background is opaque. */
 					
 					/* use borders instead of margins so we can see what we're doing */
-					border-left:   1px solid rgba(0, 10, 144, 77);
-					border-right:  1px solid rgba(0, 10, 144, 77);
-					border-top:    21px solid rgba(0, 10, 144, 77);
-					border-bottom: 1px solid rgba(0, 10, 144, 77);
+					border-left:   1px solid rgba(25, 13, 214, 49);
+					border-right:  1px solid rgba(25, 13, 214, 49);
+					border-top:    21px solid rgba(25, 13, 214, 49);
+					border-bottom: 1px solid rgba(25, 13, 214, 49);
 				}
 			Button { background: #7a70f7 }</string>
     </property>
@@ -636,8 +633,8 @@ Peaking</string>
    <widget class="QWidget" name="uiFocusPeakingColorSelectionIndicator" native="true">
     <property name="geometry">
      <rect>
-      <x>50</x>
-      <y>10</y>
+      <x>90</x>
+      <y>20</y>
       <width>71</width>
       <height>71</height>
      </rect>
@@ -682,10 +679,100 @@ Peaking</string>
     <string>Colour menu for focus peaking. The black square shows what is active.</string>
    </property>
   </widget>
+  <widget class="QWidget" name="uiMenuDropdown" native="true">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>500</y>
+     <width>311</width>
+     <height>421</height>
+    </rect>
+   </property>
+   <widget class="ScrollList" name="uiMenuScroll">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>40</y>
+      <width>311</width>
+      <height>381</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="LineEdit" name="uiMenuFilter">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>0</y>
+      <width>311</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="maxLength">
+     <number>50</number>
+    </property>
+    <property name="placeholderText">
+     <string>All Screens</string>
+    </property>
+    <property name="clickMarginLeft" stdset="0">
+     <enum>LineEdit::none</enum>
+    </property>
+    <property name="clickMarginRight" stdset="0">
+     <enum>LineEdit::none</enum>
+    </property>
+    <property name="clickMarginTop" stdset="0">
+     <enum>LineEdit::none</enum>
+    </property>
+    <property name="clickMarginBottom" stdset="0">
+     <enum>LineEdit::none</enum>
+    </property>
+   </widget>
+   <widget class="Backdrop" name="uiMenuBackdrop">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>0</y>
+      <width>311</width>
+      <height>421</height>
+     </rect>
+    </property>
+   </widget>
+   <zorder>uiMenuBackdrop</zorder>
+   <zorder>uiMenuScroll</zorder>
+   <zorder>uiMenuFilter</zorder>
+  </widget>
+  <widget class="Comment" name="comment_3">
+   <property name="geometry">
+    <rect>
+     <x>100</x>
+     <y>860</y>
+     <width>201</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Backdrop is needed, otherwise the scroll list will show the video behind it.</string>
+   </property>
+  </widget>
+  <widget class="Comment" name="comment_4">
+   <property name="geometry">
+    <rect>
+     <x>80</x>
+     <y>280</y>
+     <width>201</width>
+     <height>51</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>← These buttons are hidden when debug is not enabled in factory utils.</string>
+   </property>
+  </widget>
   <zorder>backdrop</zorder>
   <zorder>backdrop_2</zorder>
   <zorder>uiVideo</zorder>
-  <zorder>uiMenu</zorder>
+  <zorder>uiMenuButton</zorder>
   <zorder>uiBattery</zorder>
   <zorder>uiExternalMedia</zorder>
   <zorder>uiPlayAndSave</zorder>
@@ -708,6 +795,9 @@ Peaking</string>
   <zorder>uiTriggers</zorder>
   <zorder>uiWhiteBalance</zorder>
   <zorder>comment_2</zorder>
+  <zorder>uiMenuDropdown</zorder>
+  <zorder>comment_3</zorder>
+  <zorder>comment_4</zorder>
  </widget>
  <customwidgets>
   <customwidget>
@@ -735,9 +825,19 @@ Peaking</string>
    <extends>QWidget</extends>
    <header>interactive_video_area</header>
   </customwidget>
+  <customwidget>
+   <class>LineEdit</class>
+   <extends>QLineEdit</extends>
+   <header>line_edit</header>
+  </customwidget>
+  <customwidget>
+   <class>ScrollList</class>
+   <extends>QListView</extends>
+   <header>scroll_list</header>
+  </customwidget>
  </customwidgets>
  <tabstops>
-  <tabstop>uiMenu</tabstop>
+  <tabstop>uiMenuButton</tabstop>
   <tabstop>uiBattery</tabstop>
   <tabstop>uiExternalMedia</tabstop>
   <tabstop>uiPlayAndSave</tabstop>
