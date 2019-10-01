@@ -15,7 +15,7 @@ class AboutCamera(QtWidgets.QDialog):
 		uic.loadUi("screens/about_camera.ui", self)
 		
 		# Panel init.
-		self.move(0, 0)
+		self.setGeometry(0,0, 800,480)
 		self.setWindowFlags(QtCore.Qt.FramelessWindowHint)
 		
 		self.uiDone.clicked.connect(QtWidgets.QApplication.closeAllWindows)

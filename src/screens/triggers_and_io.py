@@ -129,7 +129,7 @@ class TriggersAndIO(QtWidgets.QDialog):
 		uic.loadUi('src/screens/triggers_and_io.ui', self)
 		
 		# Panel init.
-		self.move(0, 0)
+		self.setGeometry(0,0, 800,480)
 		self.setWindowFlags(QtCore.Qt.FramelessWindowHint)
 		self.setAttribute(QtCore.Qt.WA_TranslucentBackground, True)
 		

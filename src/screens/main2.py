@@ -23,7 +23,7 @@ class Main(QWidget):
 		uic.loadUi("src/screens/main2.ui", self)
 		
 		# Panel init.
-		self.move(0, 0)
+		self.setGeometry(0,0, 800,480) #This is not a responsive design.
 		self.setWindowFlags(QtCore.Qt.FramelessWindowHint)
 		self.setAttribute(QtCore.Qt.WA_TranslucentBackground, True)
 		

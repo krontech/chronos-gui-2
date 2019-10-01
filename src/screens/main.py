@@ -22,7 +22,7 @@ class Main(QWidget):
 		uic.loadUi('src/screens/main.right-handed.ui', self)
 		
 		# Panel init.
-		self.move(0, 0)
+		self.setGeometry(0,0, 800,480)
 		self.setFixedSize(800, 480) #hide menus, which are defined off-screen to the right
 		self.setWindowFlags(QtCore.Qt.FramelessWindowHint)
 		self.setAttribute(QtCore.Qt.WA_TranslucentBackground, True)

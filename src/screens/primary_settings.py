@@ -18,7 +18,7 @@ class PrimarySettings(QtWidgets.QDialog):
 		uic.loadUi("src/screens/primary_settings.ui", self)
 		
 		# Panel init.
-		self.move(0, 0)
+		self.setGeometry(0,0, 800,480)
 		self.setWindowFlags(QtCore.Qt.FramelessWindowHint)
 		self.setAttribute(QtCore.Qt.WA_TranslucentBackground, True)
 		

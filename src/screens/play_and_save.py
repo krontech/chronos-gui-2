@@ -78,7 +78,7 @@ class PlayAndSave(QtWidgets.QDialog):
 		self.markedEnd = None
 		
 		# Panel init.
-		self.move(0, 0)
+		self.setGeometry(0,0, 800,480)
 		self.setWindowFlags(QtCore.Qt.FramelessWindowHint)
 		self.setAttribute(QtCore.Qt.WA_TranslucentBackground, True)
 		
