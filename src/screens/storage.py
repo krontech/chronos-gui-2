@@ -106,7 +106,7 @@ class Storage(QtWidgets.QWidget):
 		self.uiNetworkStorageFeedback.showMessage(f'Working…'),
 		
 		#TODO: This needs to be exposed to the web app, so it needs to go through the API.
-		run(
+		run(self,
 			['mount', '-t', 'cifs', '-o', 
 				f'user={self.uiNetworkStorageUsername.text()},password={self.uiNetworkStoragePassoword.text()}', 
 				f'//{self.uiNetworkStorageAddress.text()}/', '/mnt/cam' ],
@@ -126,7 +126,7 @@ class Storage(QtWidgets.QWidget):
 			We observe externalStorage for this, since it changes
 			when the mounted devices change."""
 		
-		run(
+		run(self,
 			['df', '--human-readable', 
 				'--exclude=tmpfs', '--exclude=devtmpfs', 
 				'--output=source,avail,used,pcent,target' ],
@@ -144,7 +144,8 @@ class Storage(QtWidgets.QWidget):
 			Note: We can't use a storageMediaSelect here, because the
 				device may not be usable storage media."""
 		
-		run(['lsblk', '--pairs', '--output=NAME,SIZE,TYPE'],
+		run(self,
+			['lsblk', '--pairs', '--output=NAME,SIZE,TYPE'],
 			lambda exitStatus: 
 				self.uiLocalMediaFeedback.showError(
 					f'Could not read storage devices.\n("lsblk" exited with code {exitStatus}.)' ),
