@@ -157,7 +157,7 @@ class MenuToggle():
 
 
 
-def delay(parent, timeout: int, callback: Callable[[], None], paused: bool = False):
+def delay(parent, timeout: int, callback: Callable[[], None], *, paused: bool = False):
 	"""Delay ms before calling timeout.
 		
 		Args:
@@ -168,11 +168,8 @@ def delay(parent, timeout: int, callback: Callable[[], None], paused: bool = Fal
 		Yield:
 			The underlying QTimer object."""
 	
-	timer = QTimer()
-	timerId = f'__delayTimer{hex(randint(0,99999999))}'
-	setattr(parent, timerId, timer)  #keep minimal reference without explicitly parenting
+	timer = QTimer(parent)
 	timer.timeout.connect(callback)
-	timer.timeout.connect(lambda: delattr(parent, timerId))
 	timer.setInterval(timeout) #ms
 	timer.setSingleShot(True)
 	paused or timer.start()
