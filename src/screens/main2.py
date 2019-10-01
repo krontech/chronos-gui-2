@@ -264,6 +264,8 @@ class Main(QWidget):
 		self._batteryPollTimer.setTimerType(QtCore.Qt.VeryCoarseTimer) #Infrequent, wake as little as possible.
 		self._batteryPollTimer.setInterval(3600) #We display percentages. We update in tenth-percentage increments.
 		
+		self.uiBattery.clicked.connect(lambda: window.show('power'))
+		
 		
 		#Record / stop
 		self.uiRecordTemplate = self.uiRecord.text()
