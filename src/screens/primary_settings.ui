@@ -26,7 +26,7 @@
   <widget class="HeaderLabel" name="headerlabel">
    <property name="geometry">
     <rect>
-     <x>330</x>
+     <x>20</x>
      <y>10</y>
      <width>241</width>
      <height>31</height>
@@ -39,7 +39,7 @@
   <widget class="Subheader" name="label">
    <property name="geometry">
     <rect>
-     <x>330</x>
+     <x>20</x>
      <y>50</y>
      <width>231</width>
      <height>21</height>
@@ -52,7 +52,7 @@
   <widget class="Subheader" name="label_2">
    <property name="geometry">
     <rect>
-     <x>330</x>
+     <x>20</x>
      <y>120</y>
      <width>231</width>
      <height>21</height>
@@ -65,7 +65,7 @@
   <widget class="Subheader" name="label_3">
    <property name="geometry">
     <rect>
-     <x>330</x>
+     <x>20</x>
      <y>200</y>
      <width>451</width>
      <height>21</height>
@@ -78,7 +78,7 @@
   <widget class="Label" name="label_4">
    <property name="geometry">
     <rect>
-     <x>330</x>
+     <x>20</x>
      <y>260</y>
      <width>441</width>
      <height>51</height>
@@ -100,7 +100,7 @@
   <widget class="Subheader" name="label_5">
    <property name="geometry">
     <rect>
-     <x>330</x>
+     <x>20</x>
      <y>320</y>
      <width>231</width>
      <height>21</height>
@@ -111,19 +111,6 @@
    </property>
    <property name="wordWrap">
     <bool>true</bool>
-   </property>
-  </widget>
-  <widget class="HeaderLabel" name="headerlabel_2">
-   <property name="geometry">
-    <rect>
-     <x>20</x>
-     <y>10</y>
-     <width>281</width>
-     <height>31</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Utilities &amp; Options</string>
    </property>
   </widget>
   <widget class="Button" name="uiDone">
@@ -142,7 +129,7 @@
   <widget class="LineEdit" name="uiSystemTime">
    <property name="geometry">
     <rect>
-     <x>310</x>
+     <x>0</x>
      <y>320</y>
      <width>301</width>
      <height>81</height>
@@ -155,7 +142,7 @@
   <widget class="ComboBox" name="uiAskBeforeDiscarding">
    <property name="geometry">
     <rect>
-     <x>310</x>
+     <x>0</x>
      <y>200</y>
      <width>271</width>
      <height>81</height>
@@ -180,7 +167,7 @@
   <widget class="ComboBox" name="uiInterfaceRotated">
    <property name="geometry">
     <rect>
-     <x>310</x>
+     <x>0</x>
      <y>120</y>
      <width>271</width>
      <height>81</height>
@@ -200,7 +187,7 @@
   <widget class="ComboBox" name="uiInterfaceSide">
    <property name="geometry">
     <rect>
-     <x>310</x>
+     <x>0</x>
      <y>50</y>
      <width>271</width>
      <height>71</height>
@@ -223,7 +210,7 @@
   <widget class="QLabel" name="uiLayoutPreview">
    <property name="geometry">
     <rect>
-     <x>590</x>
+     <x>280</x>
      <y>70</y>
      <width>191</width>
      <height>101</height>
@@ -236,7 +223,7 @@
   <widget class="FeedbackLabel" name="uiSystemClockFeedback">
    <property name="geometry">
     <rect>
-     <x>330</x>
+     <x>20</x>
      <y>380</y>
      <width>261</width>
      <height>101</height>
@@ -246,54 +233,6 @@
     <string>Date not formatted correctly; format is YYYY-MM-DD HH:MM:SS AM or PM.</string>
    </property>
   </widget>
-  <widget class="ScrollList" name="uiOptionsList">
-   <property name="geometry">
-    <rect>
-     <x>20</x>
-     <y>130</y>
-     <width>271</width>
-     <height>331</height>
-    </rect>
-   </property>
-   <property name="editTriggers">
-    <set>QAbstractItemView::NoEditTriggers</set>
-   </property>
-   <property name="tabKeyNavigation">
-    <bool>true</bool>
-   </property>
-   <property name="useInlineSelectMode" stdset="0">
-    <bool>true</bool>
-   </property>
-  </widget>
-  <widget class="LineEdit" name="uiOptionsFilter">
-   <property name="geometry">
-    <rect>
-     <x>0</x>
-     <y>50</y>
-     <width>311</width>
-     <height>81</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string/>
-   </property>
-   <property name="clearButtonEnabled">
-    <bool>true</bool>
-   </property>
-  </widget>
-  <widget class="Subheader" name="subheader">
-   <property name="geometry">
-    <rect>
-     <x>20</x>
-     <y>50</y>
-     <width>241</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Filter</string>
-   </property>
-  </widget>
   <zorder>backdrop</zorder>
   <zorder>headerlabel</zorder>
   <zorder>label</zorder>
@@ -301,15 +240,11 @@
   <zorder>label_3</zorder>
   <zorder>label_4</zorder>
   <zorder>label_5</zorder>
-  <zorder>headerlabel_2</zorder>
   <zorder>uiAskBeforeDiscarding</zorder>
   <zorder>uiInterfaceRotated</zorder>
   <zorder>uiInterfaceSide</zorder>
   <zorder>uiLayoutPreview</zorder>
   <zorder>uiSystemClockFeedback</zorder>
-  <zorder>subheader</zorder>
-  <zorder>uiOptionsFilter</zorder>
-  <zorder>uiOptionsList</zorder>
   <zorder>uiSystemTime</zorder>
   <zorder>uiDone</zorder>
  </widget>
@@ -350,11 +285,6 @@
    <header>line_edit</header>
   </customwidget>
   <customwidget>
-   <class>ScrollList</class>
-   <extends>QListView</extends>
-   <header>scroll_list</header>
-  </customwidget>
-  <customwidget>
    <class>Subheader</class>
    <extends>QLabel</extends>
    <header>subheader</header>
@@ -362,8 +292,6 @@
  </customwidgets>
  <tabstops>
   <tabstop>uiDone</tabstop>
-  <tabstop>uiOptionsFilter</tabstop>
-  <tabstop>uiOptionsList</tabstop>
   <tabstop>uiInterfaceSide</tabstop>
   <tabstop>uiInterfaceRotated</tabstop>
   <tabstop>uiAskBeforeDiscarding</tabstop>

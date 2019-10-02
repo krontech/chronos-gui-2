@@ -54,33 +54,6 @@ class PrimarySettings(QtWidgets.QDialog):
 		self._timeUpdateTimer.timeout.connect(self.updateDisplayedSystemTime)
 		
 		
-		#Set up Other Options
-		self.otherOptions = [
-			{'name':"About Camera",      'open':lambda: window.show('about_camera'),          'synonyms':"kickstarter thanks me name"},
-			{'name':"App & Internet",    'open':lambda: window.show('remote_access'),         'synonyms':"remote access web client"},
-			{'name':"Storage",           'open':lambda: window.show('storage'),               'synonyms':"file saving"},
-			{'name':"Factory Utilities", 'open':lambda: window.show('service_screen.locked'), 'synonyms':"utils"},
-			{'name':"Video Saving",      'open':lambda: window.show('file_settings'),         'synonyms':"file saving"},
-			{'name':"Update Camera",     'open':lambda: window.show('update_firmware'),       'synonyms':"firmware"},
-			{'name':"Camera Settings",   'open':lambda: window.show('user_settings'),         'synonyms':"user operator"},
-			{'name':"Review Videos",     'open':lambda: window.show('replay'),                'synonyms':"playback show footage saved card movie"},
-		]
-		#Populate uiOptionsList from actions.
-		otherOptionsModel = QStandardItemModel(
-			len(self.otherOptions), 1, self.uiOptionsList )
-		for i in range(len(self.otherOptions)):
-			otherOptionsModel.setItemData(otherOptionsModel.index(i, 0), {
-				Qt.DisplayRole: self.otherOptions[i]['name'],
-				Qt.UserRole: self.otherOptions[i],
-				Qt.DecorationRole: None, #Icon would go here.
-			})
-		self.uiOptionsList.setModel(otherOptionsModel)
-		self.uiOptionsList.clicked.connect(self.showOptionOnTap)
-		self.uiOptionsList.jogWheelClick.connect(self.showOptionOnJogWheelClick)
-		
-		self.uiOptionsFilter.textChanged.connect(self.filterOptions)
-		
-		#Finally…
 		self.uiDone.clicked.connect(window.back)
 	
 	def onShow(self):
@@ -144,21 +117,3 @@ class PrimarySettings(QtWidgets.QDialog):
 		
 		#TODO DDR 2018-09-24: Convert this into a series of plain number inputs.
 		api2.get('dateTime').then(self.uiSystemTime.setText)
-	
-	
-	def showOptionOnTap(self, pos: QtCore.QModelIndex):
-		self.otherOptions[pos.row()]['open']()
-		self.uiOptionsList.selectionModel().clear()
-	
-	def showOptionOnJogWheelClick(self):
-		self.uiOptionsList.selectionModel().currentIndex().data(Qt.UserRole)['open']()
-		self.uiOptionsList.selectionModel().clear()
-	
-	def filterOptions(self):
-		model = self.uiOptionsList.model()
-		search = self.uiOptionsFilter.text().casefold()
-		
-		for row in range(model.rowCount()):
-			data = model.data(model.index(row, 0), Qt.UserRole) #eg. {'name':"About Camera", 'open':lambda: window.show('about_camera'), 'synonyms':"kickstarter thanks me name"},
-			self.uiOptionsList.setRowHidden(row,
-				not (search in data['name'].casefold() or search in data['synonyms']) )

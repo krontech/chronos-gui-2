@@ -10,7 +10,7 @@ from PyQt5.QtGui import QPainter, QPen, QBrush, QColor, QStandardItemModel
 
 from debugger import *; dbg
 import settings
-#import animate
+import animate
 import api2 as api
 
 RECORDING_MODES = {'START/STOP':1, 'SOFT_TRIGGER':2, 'VIRTUAL_TRIGGER':3}
@@ -63,6 +63,10 @@ class Main(QWidget):
 		#
 		#self.uiFocusPeakingIntensity.currentIndexChanged.connect(lambda index:
 		#	api.set({'focusPeakingLevel': 1-(index/(self.uiFocusPeakingIntensity.count()-1))} ) )
+		
+		# Hack around API always setting focus peaking high.
+		animate.delay(self, 5000, lambda: log.warn('Overriding focus peaking to 0 to work around pychronos/issues/49.'))
+		animate.delay(self, 5000, lambda: api.setSync({'focusPeakingLevel': 0}))
 		
 		api.observe('focusPeakingLevel', lambda intensity:
 			self.uiFocusPeaking.setCheckState(
@@ -126,10 +130,12 @@ class Main(QWidget):
 			api.control.call('startCalibration', {
 				'startAutoWhiteBalance': True }) )
 		
-		#You can't adjust the colour of a monochromatic image.
-		#Hide white balance, revealing trigger/io button.
-		if api.getSync('sensorColorPattern') == 'mono':
+		# You can't adjust the colour of a monochromatic image.
+		# Hide white balance, revealing trigger/io button.
+		if api.apiValues.get('sensorColorPattern') == 'mono':
 			self.uiWhiteBalance.hide()
+		else:
+			self.uiTriggers.hide()
 		
 		
 		#Trigger/IO
@@ -161,7 +167,7 @@ class Main(QWidget):
 				)
 			)
 		
-		#In Python 3.7: Use api.observe('exposureMin', lambda ns: exposureNSMin := ns) and give exposureNSMin a setter?
+		# In Python 3.7: Use api.observe('exposureMin', lambda ns: exposureNSMin := ns) and give exposureNSMin a setter?
 		def updateExposureNsMin(ns):
 			nonlocal exposureNsMin
 			exposureNsMin = ns
@@ -227,18 +233,32 @@ class Main(QWidget):
 			)()
 		)
 		
-		#Populate uiMenuScroll from actions.
+		# Populate uiMenuScroll from actions.
+		# Generally, anything which has a button on the main screen will be
+		# hidden in this menu, which means it won't come up unless we search
+		# for it. This should -- hopefully -- keep the clutter down without
+		# being confusing.
+		_triggersHidden = api.apiValues.get('sensorColorPattern') == 'mono'
 		main_menu_items = [
-			{'name':"About Camera",        'open':lambda: window.show('about_camera'),          'synonyms':"kickstarter thanks me name"},
-			{'name':"App & Internet",      'open':lambda: window.show('remote_access'),         'synonyms':"remote access web client"},
-			{'name':"Camera Settings",     'open':lambda: window.show('user_settings'),         'synonyms':"user operator"},
-			{'name':"Factory Utilities",   'open':lambda: window.show('service_screen.locked'), 'synonyms':"utils"},
-			{'name':"Review Saved Videos", 'open':lambda: window.show('replay'),                'synonyms':"playback show footage saved card movie"},
-			{'name':"Storage",             'open':lambda: window.show('storage'),               'synonyms':"file saving"},
-			{'name':"Triggers and IO",     'open':lambda: window.show('triggers_and_io'),       'synonyms':"bnc green ~a1 ~a2 trig1 trig2 trig3 signal input output trigger delay"},
-			{'name':"Update Camera",       'open':lambda: window.show('update_firmware'),       'synonyms':"firmware"},
-			{'name':"Video Saving",        'open':lambda: window.show('file_settings'),         'synonyms':"file saving"},
+			{'name':"About Camera",          'open':lambda: window.show('about_camera'),          'hidden': False,           'synonyms':"kickstarter thanks me name"},
+			{'name':"App & Internet",        'open':lambda: window.show('remote_access'),         'hidden': False,           'synonyms':"remote access web client"},
+			{'name':"Battery and Power",     'open':lambda: window.show('power'),                 'hidden': True,            'synonyms':"charge wake turn off power down"},
+			{'name':"Camera Settings",       'open':lambda: window.show('user_settings'),         'hidden': False,           'synonyms':"user operator save settings"},
+			{'name':"Factory Utilities",     'open':lambda: window.show('service_screen.locked'), 'hidden': False,           'synonyms':"utils"},
+			{'name':"Interface Options",     'open':lambda: window.show('primary_settings'),      'hidden': False,           'synonyms':"rotate rotation screen set time set date"},
+			{'name':"Play & Save Recording", 'open':lambda: window.show('play_and_save'),         'hidden': True,            'synonyms':"mark region saving"},
+			{'name':"Record Mode",           'open':lambda: window.show('record_mode'),           'hidden': False,           'synonyms':"segmented run n gun normal"},
+			{'name':"Recording Settings",    'open':lambda: window.show('recording_settings'),    'hidden': True,            'synonyms':"resolution framerate offset gain boost brightness exposure"},
+			{'name':"Review Saved Videos",   'open':lambda: window.show('replay'),                'hidden': False,           'synonyms':"playback show footage saved card movie replay"},
+			{'name':"Stamp / Overlay",       'open':lambda: window.show('stamp'),                 'hidden': False,           'synonyms':"watermark"},
+			{'name':"Storage",               'open':lambda: window.show('storage'),               'hidden': False,           'synonyms':"file saving save media format df mounts mounted devices thumb drive ssd sd card usb stick filesystem"},
+			{'name':"Trigger Delay",         'open':lambda: window.show('trigger_delay'),         'hidden': False,           'synonyms':"wait"},
+			{'name':"Triggers and IO",       'open':lambda: window.show('triggers_and_io'),       'hidden': _triggersHidden, 'synonyms':"bnc green ~a1 ~a2 trig1 trig2 trig3 signal input output trigger delay"},
+			{'name':"Update Camera",         'open':lambda: window.show('update_firmware'),       'hidden': False,           'synonyms':"firmware"},
+			{'name':"Video Save Settings",   'open':lambda: window.show('file_settings'),         'hidden': True,            'synonyms':"file saving"},
 		]
+		
+
 		
 		menuScrollModel = QStandardItemModel(
 			len(main_menu_items), 1, self.uiMenuScroll )
@@ -252,7 +272,9 @@ class Main(QWidget):
 		self.uiMenuScroll.clicked.connect(self.showOptionOnTap)
 		self.uiMenuScroll.jogWheelClick.connect(self.showOptionOnJogWheelClick)
 		
+		self.uiMenuFilterIcon.setAttribute(Qt.WA_TransparentForMouseEvents) #Allow clicking on the filter icon, 🔎, to filter.
 		self.uiMenuFilter.textChanged.connect(self.filterMenu)
+		self.filterMenu()
 		
 		
 		#Battery
@@ -550,5 +572,6 @@ class Main(QWidget):
 		
 		for row in range(model.rowCount()):
 			data = model.data(model.index(row, 0), Qt.UserRole) #eg. {'name':"About Camera", 'open':lambda: window.show('about_camera'), 'synonyms':"kickstarter thanks me name"},
+			searchMatches = (search in data['name'].casefold() or search in data['synonyms'])
 			self.uiMenuScroll.setRowHidden(row,
-				not (search in data['name'].casefold() or search in data['synonyms']) )
+				not searchMatches if search else data['hidden'])
