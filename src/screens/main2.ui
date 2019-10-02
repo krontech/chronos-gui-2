@@ -46,7 +46,7 @@
    </property>
    <property name="text">
     <string>
-🔋
+
 {:1.0f}%</string>
    </property>
    <property name="clickMarginLeft" stdset="0">
@@ -745,7 +745,7 @@ Peaking</string>
      </rect>
     </property>
    </widget>
-   <widget class="HeaderLabel" name="uiMenuFilterIcon">
+   <widget class="Subheader" name="uiMenuFilterIcon">
     <property name="geometry">
      <rect>
       <x>0</x>
@@ -815,6 +815,19 @@ Peaking</string>
     </rect>
    </property>
   </widget>
+  <widget class="Label" name="uiBatteryIcon">
+   <property name="geometry">
+    <rect>
+     <x>230</x>
+     <y>5</y>
+     <width>16</width>
+     <height>32</height>
+    </rect>
+   </property>
+   <property name="pixmap">
+    <pixmap>../../assets/images/battery-light-charging.svg</pixmap>
+   </property>
+  </widget>
   <zorder>backdrop</zorder>
   <zorder>backdrop_2</zorder>
   <zorder>uiVideo</zorder>
@@ -846,6 +859,7 @@ Peaking</string>
   <zorder>comment_4</zorder>
   <zorder>headerlabel</zorder>
   <zorder>label</zorder>
+  <zorder>uiBatteryIcon</zorder>
  </widget>
  <customwidgets>
   <customwidget>

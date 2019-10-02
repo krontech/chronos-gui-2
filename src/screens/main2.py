@@ -258,7 +258,6 @@ class Main(QWidget):
 			{'name':"Video Save Settings",   'open':lambda: window.show('file_settings'),         'hidden': True,            'synonyms':"file saving"},
 		]
 		
-
 		
 		menuScrollModel = QStandardItemModel(
 			len(main_menu_items), 1, self.uiMenuScroll )
@@ -278,15 +277,60 @@ class Main(QWidget):
 		
 		
 		#Battery
+		self._batteryCharge   = 1
+		self._batteryCharging = 0
+		self._batteryPresent  = 0
+		self._batteryBlink = False
+		self._theme = 'light'
+		
 		self._batteryTemplate = self.uiBattery.text()
-		self._batteryCharge = self.uiBattery.text()
 		
 		self._batteryPollTimer = QtCore.QTimer()
 		self._batteryPollTimer.timeout.connect(self.updateBatteryCharge)
 		self._batteryPollTimer.setTimerType(QtCore.Qt.VeryCoarseTimer) #Infrequent, wake as little as possible.
-		self._batteryPollTimer.setInterval(3600) #We display percentages. We update in tenth-percentage increments.
+		self._batteryPollTimer.setInterval(3600)
+		
+		self._batteryBlinkTimer = QtCore.QTimer()
+		self._batteryBlinkTimer.timeout.connect(lambda: (
+			setattr(self, '_batteryBlink', not self._batteryBlink),
+			self.updateBatteryIcon(),
+		))
+		self._batteryBlinkTimer.setInterval(500) #We display percentages. We update in tenth-percentage increments.
 		
 		self.uiBattery.clicked.connect(lambda: window.show('power'))
+		
+		self.uiBatteryIcon.setAttribute(Qt.WA_TransparentForMouseEvents)
+		api.observe('externalPower', lambda state: (
+			setattr(self, '_batteryCharging', state),
+			state and (
+				self._batteryBlinkTimer.stop(),
+				setattr(self, '_batteryBlink', False),
+			),
+			self.updateBatteryIcon(),
+		) )
+		api.observe('batteryPresent', lambda state: (
+			setattr(self, '_batteryPresent', state),
+			state and (
+				self._batteryBlinkTimer.stop(),
+				setattr(self, '_batteryBlink', False),
+			),
+			self.updateBatteryIcon(),
+		) )
+		def uiBatteryIconPaintEvent(evt, rectSize=24):
+			"""Draw the little coloured square on the focus peaking button."""
+			if self._batteryPresent and (self._batteryCharging or not self._batteryBlink):
+				powerDownLevel = api.apiValues.get("saveAndPowerDownLowBatteryLevelNormalized")
+				p = QPainter(self.uiBatteryIcon)
+				p.setPen(QPen(QColor('transparent')))
+				if self._batteryCharge > powerDownLevel + 0.15 or self._batteryCharging:
+					p.setBrush(QBrush(QColor('#00b800')))
+				else:
+					p.setBrush(QBrush(QColor('#f20000')))
+				p.drawRect( #xywh
+					1, 1 + (self.uiBatteryIcon.height() - 1) * (1-self._batteryCharge),
+					self.uiBatteryIcon.width() - 2, (self.uiBatteryIcon.height() - 1) * self._batteryCharge )
+			type(self.uiBatteryIcon).paintEvent(self.uiBatteryIcon, evt) #Invoke the superclass to paint the battery overlay image on our new rect.
+		self.uiBatteryIcon.paintEvent = uiBatteryIconPaintEvent
 		
 		
 		#Record / stop
@@ -460,12 +504,44 @@ class Main(QWidget):
 		api.get('batteryChargeNormalized').then(
 			self.updateBatteryCharge2 )
 	def updateBatteryCharge2(self, charge):
+		powerDownLevel = api.apiValues.get("saveAndPowerDownLowBatteryLevelNormalized")
+		warningLevel = powerDownLevel + 0.15
+		criticalLevel = powerDownLevel + 0.05
+		if not charge > warningLevel and self._batteryCharge > warningLevel:
+			self.blinkBatteryAFewTimes()
+		if not charge > criticalLevel and self._batteryCharge > criticalLevel:
+			self._batteryBlinkTimer.start()
 		self._batteryCharge = charge #0..1
 		
 		self.uiBattery.setText(
 			self._batteryTemplate.format(
 				round(charge*100) ) )
 	
+	def blinkBatteryAFewTimes(self):
+		animate.delay(self, 750*1, lambda: (setattr(self, '_batteryBlink', True),  self.updateBatteryIcon()))
+		animate.delay(self, 750*2, lambda: (setattr(self, '_batteryBlink', False), self.updateBatteryIcon()))
+		animate.delay(self, 750*3, lambda: (setattr(self, '_batteryBlink', True),  self.updateBatteryIcon()))
+		animate.delay(self, 750*4, lambda: (setattr(self, '_batteryBlink', False), self.updateBatteryIcon()))
+		animate.delay(self, 750*5, lambda: (setattr(self, '_batteryBlink', True),  self.updateBatteryIcon()))
+		animate.delay(self, 750*6, lambda: (setattr(self, '_batteryBlink', False), self.updateBatteryIcon()))
+		animate.delay(self, 750*7, lambda: (setattr(self, '_batteryBlink', True),  self.updateBatteryIcon()))
+		animate.delay(self, 750*8, lambda: (setattr(self, '_batteryBlink', False), self.updateBatteryIcon()))
+	
+	def updateBatteryIcon(self):
+		if not self._batteryPresent:
+			iconState = 'missing'
+		elif self._batteryCharging:
+			iconState = 'charging'
+		else:
+			if self._batteryBlink: #DDR 2019-10-02: So, *several* hours later, I have determined that you can't actually blink the charging icon in synchrony with the background. _batteryBlink is an override, so we can only override to the opposite of the natural state - which is shown and hidden, respectfully. We could introduce another variable to solve this, but the effort to track the state is more trouble than it's worth for now.
+				iconState = 'charging'
+			else:
+				iconState = 'discharging'
+		
+		self.uiBatteryIcon.pixmap().load(
+			f"./assets/images/battery-{self._theme}-{iconState}.svg" )
+		self.uiBatteryIcon.update()
+		
 	
 	def toggleRecording(self, *_):
 		"""Hard start or stop recording. Doesn't use trigger/io signals."""

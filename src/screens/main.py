@@ -22,7 +22,7 @@ class Main(QWidget):
 		uic.loadUi('src/screens/main.right-handed.ui', self)
 		
 		# Panel init.
-		self.setGeometry(0,0, 800,480)
+		self.move(0, 0)
 		self.setFixedSize(800, 480) #hide menus, which are defined off-screen to the right
 		self.setWindowFlags(QtCore.Qt.FramelessWindowHint)
 		self.setAttribute(QtCore.Qt.WA_TranslucentBackground, True)
@@ -241,9 +241,6 @@ class Main(QWidget):
 		
 		#Oh god this is gonna mess up scroll wheel selection so badly. 😭
 		self.uiShowWhiteClipping.stateChanged.connect(self.uiShotAssistMenu.setFocus)
-		
-		self.uiErrantClickCatcher.mousePressEvent = (lambda evt:
-			log.warn('Errant click blocked. [WpeWCY]'))
 	
 	def onShow(self):
 		api2.video.call('configure', {
@@ -377,7 +374,7 @@ class Main(QWidget):
 	
 	
 	@pyqtSlot(str, name="updateFocusPeakingColor")
-	def updateFocusPeakingColor(self, color: str):
+	def updateFocusPeakingColor(self, color: int):
 		QPoint = QtCore.QPoint
 		
 		box = self.uiFocusPeakingColorSelectionIndicator
