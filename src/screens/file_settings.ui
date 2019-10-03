@@ -398,7 +398,7 @@
 After Save Complete</string>
    </property>
   </widget>
-  <widget class="Button" name="uiStampData">
+  <widget class="Button" name="uiFormatStorage">
    <property name="geometry">
     <rect>
      <x>460</x>
@@ -408,7 +408,7 @@ After Save Complete</string>
     </rect>
    </property>
    <property name="text">
-    <string>Stamp Data</string>
+    <string>Format Storage</string>
    </property>
    <property name="clickMarginRight" stdset="0">
     <enum>Button::half</enum>
@@ -534,7 +534,7 @@ After Save Complete</string>
   <zorder>headerlabel_5</zorder>
   <zorder>uiAutoSaveVideo</zorder>
   <zorder>uiResumeRecordingAfterSave</zorder>
-  <zorder>uiStampData</zorder>
+  <zorder>uiFormatStorage</zorder>
   <zorder>uiDone</zorder>
   <zorder>label_9</zorder>
   <zorder>label_10</zorder>
@@ -608,7 +608,7 @@ After Save Complete</string>
   <tabstop>uiSavedFileMaxBitrate</tabstop>
   <tabstop>uiAutoSaveVideo</tabstop>
   <tabstop>uiResumeRecordingAfterSave</tabstop>
-  <tabstop>uiStampData</tabstop>
+  <tabstop>uiFormatStorage</tabstop>
   <tabstop>uiDone</tabstop>
  </tabstops>
  <resources/>

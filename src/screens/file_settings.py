@@ -81,7 +81,7 @@ class FileSettings(QtWidgets.QDialog):
 			settings.setValue('resumeRecordingAfterSave', bool(value)) )
 		
 		
-		self.uiStampData.clicked.connect(lambda: window.show('stamp'))
+		self.uiFormatStorage.clicked.connect(lambda: window.show('storage'))
 		self.uiDone.clicked.connect(window.back)
 	
 	
