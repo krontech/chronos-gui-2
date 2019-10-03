@@ -319,10 +319,12 @@ class Main(QWidget):
 		def uiBatteryIconPaintEvent(evt, rectSize=24):
 			"""Draw the little coloured square on the focus peaking button."""
 			if self._batteryPresent and (self._batteryCharging or not self._batteryBlink):
-				powerDownLevel = api.apiValues.get("saveAndPowerDownLowBatteryLevelNormalized")
+				powerDownLevel = api.apiValues.get('saveAndPowerDownWhenLowBattery') * api.apiValues.get("saveAndPowerDownLowBatteryLevelNormalized")
+				warningLevel = powerDownLevel + 0.15
+				
 				p = QPainter(self.uiBatteryIcon)
 				p.setPen(QPen(QColor('transparent')))
-				if self._batteryCharge > powerDownLevel + 0.15 or self._batteryCharging:
+				if self._batteryCharge > warningLevel or self._batteryCharging:
 					p.setBrush(QBrush(QColor('#00b800')))
 				else:
 					p.setBrush(QBrush(QColor('#f20000')))
@@ -504,15 +506,19 @@ class Main(QWidget):
 		api.get('batteryChargeNormalized').then(
 			self.updateBatteryCharge2 )
 	def updateBatteryCharge2(self, charge):
-		powerDownLevel = api.apiValues.get("saveAndPowerDownLowBatteryLevelNormalized")
+		powerDownLevel = api.apiValues.get('saveAndPowerDownWhenLowBattery') * api.apiValues.get("saveAndPowerDownLowBatteryLevelNormalized")
 		warningLevel = powerDownLevel + 0.15
 		criticalLevel = powerDownLevel + 0.05
 		if not charge > warningLevel and self._batteryCharge > warningLevel:
 			self.blinkBatteryAFewTimes()
 		if not charge > criticalLevel and self._batteryCharge > criticalLevel:
 			self._batteryBlinkTimer.start()
+		if charge > criticalLevel and not self._batteryCharge > criticalLevel:
+			self._batteryBlinkTimer.stop(),
+			setattr(self, '_batteryBlink', False),
 		self._batteryCharge = charge #0..1
 		
+		self.uiBatteryIcon.update()
 		self.uiBattery.setText(
 			self._batteryTemplate.format(
 				round(charge*100) ) )

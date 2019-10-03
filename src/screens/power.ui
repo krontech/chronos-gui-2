@@ -38,7 +38,7 @@
     <rect>
      <x>15</x>
      <y>11</y>
-     <width>191</width>
+     <width>221</width>
      <height>31</height>
     </rect>
    </property>
@@ -108,10 +108,13 @@
     </rect>
    </property>
    <property name="text">
-    <string>Dim screen when not in use</string>
+    <string>Dim screen</string>
    </property>
    <property name="clickMarginBottom" stdset="0">
     <enum>CheckBox::half</enum>
+   </property>
+   <property name="linkedValueName" stdset="0">
+    <string>backlightEnabled</string>
    </property>
   </widget>
   <widget class="CheckBox" name="uiSafelyPowerDown">
