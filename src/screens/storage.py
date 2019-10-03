@@ -40,7 +40,6 @@ class Storage(QtWidgets.QWidget):
 		
 		self.uiTestNetworkStorage.clicked.connect(self.testNetworkStorage)
 		
-		self.uiFileSaving.clicked.connect(lambda: window.show('file_settings'))
 		self.uiDone.clicked.connect(window.back)
 		
 		# Hide network storage until we get SMB working through the API. (pychronos/issues/40)
@@ -69,8 +68,9 @@ class Storage(QtWidgets.QWidget):
 		name = self.uiDeviceSelect.currentData().group('name')
 		system(f"umount /dev/{name}*")
 		system(f"echo -e \"o\\nn\\n\\n\\n\\n\\nw\\n\" > fdisk /dev/{name}")
-		system(f"mkfs.fat -F32 -I -v /dev/{name}p1") #The above doesn't seem to work, so format it again and then it works. \o/
-		system(f"fatlabel /dev/{name}p1 \"SLOW VIDEOS\"")
+		system(f"mkfs.fat -F32 -I -v /dev/{name}*1") #The above doesn't seem to work, so format it again and then it works. \o/
+		system(f"fatlabel /dev/{name}*1 \"SLOW VIDEOS\"")
+		system(f"mount /dev/{name}*1 /media/{name}1")
 		
 		#fdisk commands:
 		#o↵ #DOS partition table

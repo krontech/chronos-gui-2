@@ -298,22 +298,6 @@ mmcblk0     179:0    0   7.4G  0 disk
     <string>Configure and format save media.</string>
    </property>
   </widget>
-  <widget class="Button" name="uiFileSaving">
-   <property name="geometry">
-    <rect>
-     <x>460</x>
-     <y>400</y>
-     <width>171</width>
-     <height>81</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Video Saving</string>
-   </property>
-   <property name="clickMarginRight" stdset="0">
-    <enum>Button::half</enum>
-   </property>
-  </widget>
   <widget class="Comment" name="comment">
    <property name="geometry">
     <rect>
@@ -357,16 +341,6 @@ will go here»</string>
     <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
    </property>
   </widget>
-  <widget class="Backdrop" name="uiButtonWhiteBorder">
-   <property name="geometry">
-    <rect>
-     <x>470</x>
-     <y>410</y>
-     <width>331</width>
-     <height>71</height>
-    </rect>
-   </property>
-  </widget>
   <widget class="ComboBox" name="uiDeviceSelect">
    <property name="geometry">
     <rect>
@@ -383,7 +357,7 @@ will go here»</string>
   <widget class="Comment" name="comment_2">
    <property name="geometry">
     <rect>
-     <x>250</x>
+     <x>280</x>
      <y>410</y>
      <width>161</width>
      <height>71</height>
@@ -403,8 +377,6 @@ will go here»</string>
   <zorder>subheader_4</zorder>
   <zorder>uiLocalMediaFeedback</zorder>
   <zorder>uiNetworkStoragePanel</zorder>
-  <zorder>uiButtonWhiteBorder</zorder>
-  <zorder>uiFileSaving</zorder>
   <zorder>uiDone</zorder>
   <zorder>uiDeviceSelect</zorder>
   <zorder>comment_2</zorder>
