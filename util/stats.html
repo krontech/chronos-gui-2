@@ -3,6 +3,7 @@
 	<head>
 		<meta charset="utf-8">
 		<title>Chronos GUI2 Readme</title>
+		
 		<style>
 			/* from http://bettermotherfuckingwebsite.com */
 			body {
@@ -17,26 +18,76 @@
 			h1,h2,h3 {
 				line-height: 1.2;
 			}
+			
+			canvas {
+				width: 650px;
+				max-width: 100%
+				height: 400px;
+				background: #333;
+				border: 1px solid black;
+			}
 		</style>
+		
+		<script>
+			drawGraph('#screenCacheTimes', '/screen_cache_time.jsonl')
+			drawGraph('#startUpTimes', '/start_up_time.jsonl')
+			
+			async function drawGraph(canvasId, url) {
+				let data = (await (await fetch(url)).text())
+					.split('\n').filter(x=>x)
+					.map(line => JSON.parse(line))
+				
+				//Convert timestamps from ISO to Unix, which is more useful here.
+				data.forEach(data =>
+					data.timestamp = new Date(data.timestamp).getTime()/1000)
+				
+				data = data.filter(data => data.timestamp && data.seconds)
+				
+				const minDate = Math.min.apply(Math, data.map(data => data.timestamp))
+				const maxDate = Math.max.apply(Math, data.map(data => data.timestamp))
+				const minSec  = Math.min.apply(Math, data.map(data => data.seconds))
+				const maxSec  = 10 //Math.max.apply(Math, data.map(data => data.seconds))
+				
+				const canvas = document.querySelector(canvasId)
+				const c = canvas.getContext('2d')
+				const canvasVisualRect = canvas.getBoundingClientRect();
+				canvas.width = canvasVisualRect.width * devicePixelRatio
+				canvas.height = canvasVisualRect.height * devicePixelRatio
+				c.scale(devicePixelRatio, devicePixelRatio)
+				c.fillStyle = '#fff'
+				c.strokeStyle = '#000'
+				c.lineWidth = 2
+				
+				const toXY = (date, sec) => [
+					((date-minDate)/(maxDate-minDate)) * canvas.width,
+					canvas.height - ((sec-minSec)/(maxSec-minSec)) * canvas.height,
+				]
+				
+				data.forEach(data => {
+					c.beginPath()
+					c.arc(
+						...toXY(data.timestamp, data.seconds),
+						3, 0, 6.283185307179586, //Radius, start rad, end rad.
+					)
+					c.stroke()
+				})
+				
+				data.forEach(data => {
+					c.beginPath()
+					c.arc(
+						...toXY(data.timestamp, data.seconds),
+						3, 0, 6.283185307179586, //Radius, start rad, end rad.
+					)
+					c.fill()
+				})
+			}
+		</script>
 	</head>
 	<body>
 		<h1>Startup Times</h1>
-		<canvas id=startupTimes></canvas>
-		<script>
-			(async function() {
-				(
-					await (await fetch('stats_reported/screen_cache_time.jsonl')).text() 
-					+ await (await fetch('stats_reported/start_up_time.jsonl')).text()
-				)
-				.split('\n').filter(x=>x)
-				.map(line => JSON.parse(line))
-				.map(data => { //Convert timestamp to unix time.
-					data.timestamp = new Date(data.timestamp).getTime()/1000
-					console.log(data)
-					return data
-				})
-				//Now, group and chart the data here?
-			})()
-		</script>
+		<h2>Time To First Screen</h2>
+		<canvas id=startUpTimes></canvas>
+		<h2>Screen Cache Full</h2>
+		<canvas id=screenCacheTimes></canvas>
 	</body>
 </html>
