@@ -33,7 +33,6 @@ class LineEdit(QLineEdit, TouchMarginPlugin, DirectAPILinkPlugin, FocusablePlugi
 		self.clickMarginColor = f"rgba({randint(128, 255)}, {randint(64, 128)}, {randint(0, 32)}, {randint(32,96)})"
 		
 		if self.isClearButtonEnabled():
-			log.print('AAAAAAAAA')
 			clearButton = self.findChild(QToolButton)
 			clearButtonGeom = clearButton.geometry()
 			clearButtonGeom.moveLeft(clearButtonGeom.left() - self.touchMargins['left'])
