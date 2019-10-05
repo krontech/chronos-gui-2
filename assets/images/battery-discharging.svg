@@ -13,7 +13,7 @@
    version="1.1"
    id="svg1074"
    inkscape:version="1.0beta1 (fe3e306, 2019-09-17)"
-   sodipodi:docname="battery-light-missing.svg">
+   sodipodi:docname="battery-discharging.svg">
   <defs
      id="defs1068" />
   <sodipodi:namedview
@@ -23,15 +23,15 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="22.4"
-     inkscape:cx="18.157571"
-     inkscape:cy="23.47924"
+     inkscape:zoom="31.678384"
+     inkscape:cx="4.2600215"
+     inkscape:cy="15.048406"
      inkscape:document-units="mm"
      inkscape:current-layer="g83964"
      inkscape:document-rotation="0"
-     showgrid="true"
+     showgrid="false"
      units="px"
-     showguides="false"
+     showguides="true"
      fit-margin-top="0"
      fit-margin-left="0"
      fit-margin-right="0"
@@ -40,12 +40,7 @@
      inkscape:window-height="2049"
      inkscape:window-x="0"
      inkscape:window-y="0"
-     inkscape:window-maximized="1"
-     inkscape:object-paths="true">
-    <inkscape:grid
-       type="xygrid"
-       id="grid1798" />
-  </sodipodi:namedview>
+     inkscape:window-maximized="1" />
   <metadata
      id="metadata1071">
     <rdf:RDF>
@@ -67,22 +62,6 @@
        style="display:inline;stroke:#000000"
        transform="matrix(0,-0.56130308,0.69450738,0,-416.29317,182.84715)"
        id="g83964">
-      <rect
-         style="display:inline;stroke:none;fill:#ffffff;fill-opacity:1;stroke-width:1.60415;stroke-miterlimit:7"
-         id="rect1715"
-         width="6.542717"
-         height="6.1861916"
-         x="598.45728"
-         y="-326.18619"
-         transform="rotate(90,5.4475548,2.2475833)" />
-      <rect
-         style="display:inline;stroke:none;fill:#ffffff;fill-opacity:1;stroke-width:1.60415;stroke-miterlimit:7"
-         id="rect1717"
-         width="6.4563718"
-         height="6.1861916"
-         x="615"
-         y="-326.18619"
-         transform="rotate(90,5.4475548,2.2475833)" />
       <g
          style="display:inline;stroke:#000000"
          transform="translate(7.6951388,-3.1999707)"
@@ -130,18 +109,6 @@
            x="300"
            y="600" />
       </g>
-      <path
-         sodipodi:nodetypes="cc"
-         inkscape:connector-curvature="0"
-         id="path2454"
-         d="m 280.32179,599.57692 44.53922,14.3987"
-         style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1.60163px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
-      <path
-         sodipodi:nodetypes="cc"
-         inkscape:connector-curvature="0"
-         id="path2456"
-         d="m 324.86101,599.57692 -44.53922,14.3987"
-         style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1.60163px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
     </g>
   </g>
 </svg>

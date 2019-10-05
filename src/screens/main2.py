@@ -6,7 +6,7 @@ from re import match as regex_match, search as regex_search
 from PyQt5 import uic, QtCore
 from PyQt5.QtCore import QPoint, QSize, Qt
 from PyQt5.QtWidgets import QWidget, QApplication
-from PyQt5.QtGui import QPainter, QPen, QBrush, QColor, QStandardItemModel
+from PyQt5.QtGui import QPainter, QPen, QBrush, QColor, QStandardItemModel, QPainterPath, QPolygonF
 
 from debugger import *; dbg
 import settings
@@ -322,15 +322,44 @@ class Main(QWidget):
 				powerDownLevel = api.apiValues.get('saveAndPowerDownWhenLowBattery') * api.apiValues.get("saveAndPowerDownLowBatteryLevelNormalized")
 				warningLevel = powerDownLevel + 0.15
 				
+				x,y,w,h = (
+					1,
+					1,
+					self.uiBatteryIcon.width() - 2,
+					self.uiBatteryIcon.height() - 1,
+				)
+				
 				p = QPainter(self.uiBatteryIcon)
+				
+				#Cut out the battery outline, so the battery fill level doesn't show by
+				#outside the "nub". Previously, this was taken care of by an opaque box
+				#outside the battery nub in the SVG image, but this didn't work so well
+				#when the button was pressed or when themes were changed. We can't fill
+				#a polygon a percentage of the way very easily, and we can't just go in
+				#and muck with the SVG to achieve this either like we would in browser.
+				batteryOutline = QPainterPath()
+				batteryOutline.addPolygon(QPolygonF([
+					QPoint(x+3,y),
+					QPoint(x+3,y+2), #Left battery nub chunk.
+					QPoint(x,y+2),
+					QPoint(x,y+h), #Bottom
+					QPoint(x+w,y+h),
+					QPoint(x+w,y+2),
+					QPoint(x+w-2,y+2), #Right battery nub chunk.
+					QPoint(x+w-2,y),
+				]))
+				batteryOutline.closeSubpath() #Top of battery nub.
+				p.setClipPath(batteryOutline, Qt.IntersectClip)
+				
 				p.setPen(QPen(QColor('transparent')))
+				
 				if self._batteryCharge > warningLevel or self._batteryCharging:
 					p.setBrush(QBrush(QColor('#00b800')))
 				else:
 					p.setBrush(QBrush(QColor('#f20000')))
-				p.drawRect( #xywh
-					1, 1 + (self.uiBatteryIcon.height() - 1) * (1-self._batteryCharge),
-					self.uiBatteryIcon.width() - 2, (self.uiBatteryIcon.height() - 1) * self._batteryCharge )
+				p.drawRect(
+					x, y + h * (1-self._batteryCharge),
+					w, h * self._batteryCharge )
 			type(self.uiBatteryIcon).paintEvent(self.uiBatteryIcon, evt) #Invoke the superclass to paint the battery overlay image on our new rect.
 		self.uiBatteryIcon.paintEvent = uiBatteryIconPaintEvent
 		
@@ -545,7 +574,7 @@ class Main(QWidget):
 				iconState = 'discharging'
 		
 		self.uiBatteryIcon.pixmap().load(
-			f"./assets/images/battery-{self._theme}-{iconState}.svg" )
+			f"./assets/images/battery-{iconState}.svg" )
 		self.uiBatteryIcon.update()
 		
 	

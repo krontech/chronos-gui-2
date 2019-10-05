@@ -7,7 +7,7 @@
    xmlns="http://www.w3.org/2000/svg"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   sodipodi:docname="battery-dark-discharging.svg"
+   sodipodi:docname="battery-missing.svg"
    inkscape:version="1.0beta1 (fe3e306, 2019-09-17)"
    id="svg1074"
    version="1.1"
@@ -17,6 +17,7 @@
   <defs
      id="defs1068" />
   <sodipodi:namedview
+     inkscape:object-paths="true"
      inkscape:window-maximized="1"
      inkscape:window-y="0"
      inkscape:window-x="0"
@@ -26,21 +27,25 @@
      fit-margin-right="0"
      fit-margin-left="0"
      fit-margin-top="0"
-     showguides="true"
+     showguides="false"
      units="px"
-     showgrid="false"
+     showgrid="true"
      inkscape:document-rotation="0"
      inkscape:current-layer="g83964"
      inkscape:document-units="mm"
-     inkscape:cy="15.048406"
-     inkscape:cx="4.2600215"
-     inkscape:zoom="31.678384"
+     inkscape:cy="16.155589"
+     inkscape:cx="8.2060611"
+     inkscape:zoom="44.8"
      inkscape:pageshadow="2"
      inkscape:pageopacity="0.0"
      borderopacity="1.0"
      bordercolor="#666666"
      pagecolor="#ffffff"
-     id="base" />
+     id="base">
+    <inkscape:grid
+       id="grid1798"
+       type="xygrid" />
+  </sodipodi:namedview>
   <metadata
      id="metadata1071">
     <rdf:RDF>
@@ -62,22 +67,6 @@
        id="g83964"
        transform="matrix(0,-0.56130308,0.69450738,0,-416.29317,182.84715)"
        style="display:inline;stroke:#000000">
-      <rect
-         transform="rotate(90,5.4475548,2.2475833)"
-         y="-326.18619"
-         x="598.45728"
-         height="6.1861916"
-         width="6.542717"
-         id="rect1715"
-         style="display:inline;stroke:none;fill:#333333;fill-opacity:1;stroke-width:1.60415;stroke-miterlimit:7" />
-      <rect
-         transform="rotate(90,5.4475548,2.2475833)"
-         y="-326.18619"
-         x="615"
-         height="6.1861916"
-         width="6.4563718"
-         id="rect1717"
-         style="display:inline;stroke:none;fill:#333333;fill-opacity:1;stroke-width:1.60415;stroke-miterlimit:7" />
       <g
          id="g83964-3"
          transform="translate(7.6951388,-3.1999707)"
@@ -125,6 +114,18 @@
            id="rect14338"
            style="opacity:1;vector-effect:none;fill:none;fill-opacity:1;fill-rule:nonzero;stroke:#000000;stroke-width:1;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:normal" />
       </g>
+      <path
+         style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1.60163px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         d="m 280.32179,599.57692 44.53922,14.3987"
+         id="path2454"
+         inkscape:connector-curvature="0"
+         sodipodi:nodetypes="cc" />
+      <path
+         style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1.60163px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         d="m 324.86101,599.57692 -44.53922,14.3987"
+         id="path2456"
+         inkscape:connector-curvature="0"
+         sodipodi:nodetypes="cc" />
     </g>
   </g>
 </svg>
