@@ -125,22 +125,31 @@ class Main(QWidget):
 				'blackCal': True }) )
 		
 		
-		#White Bal
+		#White Bal & Trigger/IO
+		try:
+			whiteBalanceTemplate = self.uiWhiteBalance.text()
+			api.observe('wbTemperature', lambda temp:
+				self.uiWhiteBalance.setText(
+					whiteBalanceTemplate.format(temp) ))
+			self.uiWhiteBalance.clicked.connect(lambda:
+				api.control.call('startCalibration', {
+					'startAutoWhiteBalance': True }) )
+		except AssertionError:
+			log.warn('Failed to observe wbTemperature. (Is it implemented yet?) Patching uiWhiteBalance…')
+			self.uiWhiteBalance.setText("White\nBalance")
+		
 		self.uiWhiteBalance.clicked.connect(lambda:
-			api.control.call('startCalibration', {
-				'startAutoWhiteBalance': True }) )
+			window.show('white_balance') )
+		
+		self.uiTriggers.clicked.connect(lambda:
+			window.show('triggers_and_io') )
 		
 		# You can't adjust the colour of a monochromatic image.
-		# Hide white balance, revealing trigger/io button.
+		# Hide white balance in favour of trigger/io button.
 		if api.apiValues.get('sensorColorPattern') == 'mono':
 			self.uiWhiteBalance.hide()
 		else:
 			self.uiTriggers.hide()
-		
-		
-		#Trigger/IO
-		self.uiTriggers.clicked.connect(lambda:
-			window.show('triggers_and_io') )
 		
 		
 		#Exposure
