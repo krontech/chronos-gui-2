@@ -18,7 +18,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>211</width>
+     <width>201</width>
      <height>81</height>
     </rect>
    </property>
@@ -38,7 +38,7 @@
   <widget class="Button" name="uiBattery">
    <property name="geometry">
     <rect>
-     <x>210</x>
+     <x>200</x>
      <y>0</y>
      <width>61</width>
      <height>81</height>
@@ -62,7 +62,7 @@
   <widget class="Button" name="uiExternalMedia">
    <property name="geometry">
     <rect>
-     <x>620</x>
+     <x>440</x>
      <y>0</y>
      <width>181</width>
      <height>81</height>
@@ -86,9 +86,9 @@
   <widget class="Button" name="uiPlayAndSave">
    <property name="geometry">
     <rect>
-     <x>480</x>
+     <x>620</x>
      <y>0</y>
-     <width>141</width>
+     <width>181</width>
      <height>81</height>
     </rect>
    </property>
@@ -110,14 +110,14 @@
   <widget class="Button" name="uiRecord">
    <property name="geometry">
     <rect>
-     <x>270</x>
+     <x>260</x>
      <y>0</y>
-     <width>211</width>
+     <width>181</width>
      <height>81</height>
     </rect>
    </property>
    <property name="text">
-    <string>    {state}</string>
+    <string>      {state}</string>
    </property>
    <property name="clickMarginLeft" stdset="0">
     <enum>Button::none</enum>
@@ -185,8 +185,8 @@
     </rect>
    </property>
    <property name="text">
-    <string>White Bal
-{}°K</string>
+    <string>White Bal.
+{0.0f}°K</string>
    </property>
    <property name="clickMarginLeft" stdset="0">
     <enum>Button::none</enum>
@@ -507,10 +507,10 @@ Peaking</string>
 					background: rgba(255,255,255,127); /* The background is drawn under the button borders, so they are opaque if the background is opaque. */
 					
 					/* use borders instead of margins so we can see what we're doing */
-					border-left:   1px solid rgba(7, 12, 165, 72);
-					border-right:  1px solid rgba(7, 12, 165, 72);
-					border-top:    21px solid rgba(7, 12, 165, 72);
-					border-bottom: 1px solid rgba(7, 12, 165, 72);
+					border-left:   1px solid rgba(29, 2, 211, 34);
+					border-right:  1px solid rgba(29, 2, 211, 34);
+					border-top:    21px solid rgba(29, 2, 211, 34);
+					border-bottom: 1px solid rgba(29, 2, 211, 34);
 				}
 			Button { background: #7a70f7 }</string>
     </property>
@@ -818,7 +818,7 @@ Peaking</string>
   <widget class="Label" name="uiBatteryIcon">
    <property name="geometry">
     <rect>
-     <x>230</x>
+     <x>222</x>
      <y>5</y>
      <width>16</width>
      <height>32</height>

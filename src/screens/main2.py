@@ -377,6 +377,48 @@ class Main(QWidget):
 		self.uiRecordTemplate = self.uiRecord.text()
 		self.uiRecord.clicked.connect(self.toggleRecording)
 		
+		def uiRecordPaintEventRecord(evt, iconSize=24, offsetX=32):
+			midpoint = self.uiRecord.geometry().size()/2 - QSize(0, self.uiRecord.touchMargins()['bottom']/2)
+			p = QPainter(self.uiRecord)
+			p.setPen(QPen(QColor('#000000')))
+			p.setBrush(QBrush(QColor('#f20000')))
+			p.setRenderHint(QPainter.Antialiasing, True)
+			p.drawChord( #xy/wh
+				midpoint.width()-iconSize/2-offsetX, midpoint.height()-iconSize/2,
+				iconSize, iconSize,
+				0, 16*360, #start, end angle
+			)
+		def uiRecordPaintEventPause(evt, iconSize=20, offsetX=20):
+			midpoint = self.uiRecord.geometry().size()/2 - QSize(0, self.uiRecord.touchMargins()['bottom']/2)
+			p = QPainter(self.uiRecord)
+			p.setPen(QPen(QColor('#ffffff')))
+			p.setBrush(QBrush(QColor('#000000')))
+			p.drawRect( #xy/wh
+				midpoint.width()-iconSize/2-offsetX, midpoint.height()-iconSize/2,
+				iconSize/3, iconSize,
+			)
+			p.drawRect( #xy/wh
+				midpoint.width()-iconSize/2-offsetX+iconSize/3*2, midpoint.height()-iconSize/2,
+				iconSize/3, iconSize,
+			)
+		def uiRecordPaintEventStop(evt, iconSize=20, offsetX=20):
+			midpoint = self.uiRecord.geometry().size()/2 - QSize(0, self.uiRecord.touchMargins()['bottom']/2)
+			p = QPainter(self.uiRecord)
+			p.setPen(QPen(QColor('#ffffff')))
+			p.setBrush(QBrush(QColor('#000000')))
+			p.drawRect( #xy/wh
+				midpoint.width()-iconSize/2-offsetX, midpoint.height()-iconSize/2,
+				iconSize, iconSize,
+			)
+		def uiRecordPaintEvent(evt):
+			type(self.uiRecord).paintEvent(self.uiRecord, evt)
+			#TODO DDR 2019-10-07: Add pause icon, when we are able to pause recording and resume again, for run 'n' gun mode.
+			if self.uiRecord.isRecording:
+				uiRecordPaintEventRecord(evt)
+			else:
+				uiRecordPaintEventStop(evt)
+		self.uiRecord.paintEvent = uiRecordPaintEvent
+		
 		api.observe('state', self.onStateChange)
 		
 		#Play & save
@@ -417,7 +459,7 @@ class Main(QWidget):
 					updateExternalMediaPercentFull(space['used']/space['total']),
 					self.uiExternalMedia.setText(
 						uiExternalMediaTemplate.format(
-							externalStorageIdentifier = partition['name'] or f"{round(partition['size'] / 1e9):1.0f}GB Storage Device",
+							externalStorageIdentifier = partition['name'] or f"{round(partition['size'] / 1e9):1.0f}GB Storage Media",
 							percentFull = round(space['used']/space['total'] * 100),
 							hoursSaved = -1, minutesSaved = 0, secondsSaved = 0, #TODO: Calculate bits per second recorded and apply it here to the partition usage and total.
 							hoursTotal = -1, minutesTotal = 0, secondsTotal = 0,
@@ -659,20 +701,26 @@ class Main(QWidget):
 	
 	def onStateChange(self, state):
 		#This text update takes a little while to fire, so we do it in the start and stop recording functions as well so it's more responsive when the operator clicks.
+		self.uiRecord.isRecording = state == 'idle'
+		self.uiRecord.update() #Redraw the icon.
 		self.uiRecord.setText(
 			self.uiRecordTemplate.format( #Spaces to alight Stop with Record
-				state = 'Record' if state == 'idle' else 'Stop    ' ) )
+				state = 'Record' if self.uiRecord.isRecording else 'Stop' ) )
 		
 		if state == 'idle' and settings.value('autoSaveVideo', False): #[autosave]
 			self._window.show('play_and_save')
 	
 	
 	def startRecording(self):
+		self.uiRecord.isRecording = False
+		self.uiRecord.update()
 		self.uiRecord.setText(
-			self.uiRecordTemplate.format(state='Stop    ') ) #Show feedback quick, the signal takes a noticable amount of time.
+			self.uiRecordTemplate.format(state='Stop') ) #Show feedback quick, the signal takes a noticable amount of time.
 		api.control.callSync('startRecording')
 	
 	def stopRecording(self):
+		self.uiRecord.isRecording = True
+		self.uiRecord.update()
 		self.uiRecord.setText(
 			self.uiRecordTemplate.format(state='Record') )
 		api.control.callSync('stopRecording')
