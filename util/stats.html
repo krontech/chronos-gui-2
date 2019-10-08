@@ -43,96 +43,90 @@
 		</style>
 		
 		<script>
-			"use strict";
-			const colorCache = new Map()
-			const colorForSerial = serial =>
-				colorCache[serial] || (
-					colorCache[serial] = `hsl(${Math.round(Math.random()*360)}, 78%, 84%)`
-				)
-			
-			async function drawGraph({title, url}) {
-				let data = (await (await fetch(url)).text()) //Note: This is technically a race condition with document.ready, but we will probably always win it.
-					.split('\n').filter(x=>x)
-					.map(line => JSON.parse(line))
-				//Convert timestamps from ISO to Unix, which is more useful here.
-				data.forEach(data =>
-					data.timestamp = new Date(data.timestamp).getTime()/1000)
-				data = data.filter(data => data.timestamp && data.seconds)
-				
-				const dates = data.map(data => data.timestamp).sort((a,b)=>a-b)
-				const minDate = dates[0]
-				const maxDate = dates[dates.length-1]
-				const duration = data.map(data => data.seconds).sort((a,b)=>a-b)
-				const minSec = duration[0]
-				const maxSec = duration[duration.length - 20]
-				//console.log({url, dates, minDate, maxDate, duration, minSec, maxSec})
-				
-				const template = document.importNode(
-					document.querySelector('template').content, true)
-				const [labelTitle, , canvas, labelMaxTime, , labelMinTime, labelMinDate, , labelMaxDate]
-					= template.querySelector('.chart').children
-				document.body.appendChild(template) //Must be appended here - emptying the template - so the canvas setup code knows how big it needs to be as it relies on layout.
-				
-				labelTitle.textContent = title
-				
-				const c = canvas.getContext('2d')
-				const canvasVisualRect = canvas.getBoundingClientRect();
-				canvas.width = canvasVisualRect.width * devicePixelRatio
-				canvas.height = canvasVisualRect.height * devicePixelRatio
-				c.scale(devicePixelRatio, devicePixelRatio)
-				
-				const toXY = (date, sec) => [
-					Math.max(0, Math.min(((date-minDate)/(maxDate-minDate)) * canvas.width, canvas.width)),
-					Math.max(0, Math.min(canvas.height - ((sec-minSec)/(maxSec-minSec)) * canvas.height, canvas.height)),
-				]
-				
-				c.strokeStyle = '#000'
-				c.lineWidth = 2
-				data.forEach(data => {
-					c.beginPath()
-					c.arc(
-						...toXY(data.timestamp, data.seconds),
-						3, 0, 6.283185307179586, //Radius, start rad, end rad.
+			addEventListener('DOMContentLoaded', () => {
+				"use strict"
+				const colorCache = new Map()
+				const colorForSerial = serial =>
+					colorCache[serial] || (
+						colorCache[serial] = `hsl(${Math.round(Math.random()*360)}, 78%, 84%)`
 					)
-					c.stroke()
-				})
 				
-				data.forEach(data => {
-					c.fillStyle = colorForSerial(data.serial)
-					c.beginPath()
-					c.arc(
-						...toXY(data.timestamp, data.seconds),
-						3, 0, 6.283185307179586, //Radius, start rad, end rad.
-					)
-					c.fill()
-				})
-				
-				labelMinTime.textContent = `${Math.round(minSec*10)/10}s`
-				labelMaxTime.textContent = `${Math.round(maxSec*10)/10}s`
-				labelMinDate.textContent = `${
-					new Date(minDate*1000).getFullYear()
-				}-${
-					(new Date(minDate*1000).getMonth()+1).toString().padStart(2,0)
-				}-${
-					(new Date(minDate*1000).getDate()+1).toString().padStart(2,0)
-				}`
-				labelMaxDate.textContent = `${
-					new Date(maxDate*1000).getFullYear()
-				}-${
-					(new Date(maxDate*1000).getMonth()+1).toString().padStart(2,0)
-				}-${
-					(new Date(maxDate*1000).getDate()+1).toString().padStart(2,0)
-				}`
-			}
-			
-			drawGraph({
-				title: 'Time To First Screen',
-				url: '/screen_cache_time.jsonl',
-			})
-			
-			drawGraph({
-				title: 'Screen Cache Full',
-				url: '/start_up_time.jsonl',
+				drawGraph({ title:'Time To First Screen', url:'/start_up_time.jsonl' })
+				drawGraph({ title:'Screen Cache Full', url:'/screen_cache_time.jsonl' })
+				async function drawGraph({title, url}) {
+					const template = document.importNode(
+						document.querySelector('template').content, true)
+					const [labelTitle, , canvas, labelMaxTime, , labelMinTime, labelMinDate, , labelMaxDate]
+						= template.querySelector('.chart').children
+					document.body.appendChild(template) //Must be appended here - emptying the template - so the canvas setup code knows how big it needs to be as it relies on layout.
+					
+					labelTitle.textContent = title
+					
+					let data = (await (await fetch(url)).text()) //Note: This is technically a race condition with document.ready, but we will probably always win it.
+						.split('\n').filter(x=>x)
+						.map(line => JSON.parse(line))
+					//Convert timestamps from ISO to Unix, which is more useful here.
+					data.forEach(data =>
+						data.timestamp = new Date(data.timestamp).getTime()/1000)
+					data = data.filter(data => data.timestamp && data.seconds)
+					
+					const dates = data.map(data => data.timestamp).sort((a,b)=>a-b)
+					const minDate = dates[0]
+					const maxDate = dates[dates.length-1]
+					const duration = data.map(data => data.seconds).sort((a,b)=>a-b)
+					const minSec = duration[0]
+					const maxSec = duration[duration.length - 20]
+					console.log({url, dates, minDate, maxDate, duration, minSec, maxSec})
+					
+					const c = canvas.getContext('2d')
+					const canvasVisualRect = canvas.getBoundingClientRect();
+					canvas.width = canvasVisualRect.width * devicePixelRatio
+					canvas.height = canvasVisualRect.height * devicePixelRatio
+					c.scale(devicePixelRatio, devicePixelRatio)
+					
+					const toXY = (date, sec) => [
+						Math.max(0, Math.min(((date-minDate)/(maxDate-minDate)) * canvas.width, canvas.width)),
+						Math.max(0, Math.min(canvas.height - ((sec-minSec)/(maxSec-minSec)) * canvas.height, canvas.height)),
+					]
+					
+					c.strokeStyle = '#000'
+					c.lineWidth = 2
+					data.forEach(data => {
+						c.beginPath()
+						c.arc(
+							...toXY(data.timestamp, data.seconds),
+							3, 0, 6.283185307179586, //Radius, start rad, end rad.
+						)
+						c.stroke()
+					})
+					
+					data.forEach(data => {
+						c.fillStyle = colorForSerial(data.serial)
+						c.beginPath()
+						c.arc(
+							...toXY(data.timestamp, data.seconds),
+							3, 0, 6.283185307179586, //Radius, start rad, end rad.
+						)
+						c.fill()
+					})
+					
+					labelMinTime.textContent = `${Math.round(minSec*10)/10}s`
+					labelMaxTime.textContent = `${Math.round(maxSec*10)/10}s`
+					labelMinDate.textContent = `${
+						new Date(minDate*1000).getFullYear()
+					}-${
+						(new Date(minDate*1000).getMonth()+1).toString().padStart(2,0)
+					}-${
+						(new Date(minDate*1000).getDate()+1).toString().padStart(2,0)
+					}`
+					labelMaxDate.textContent = `${
+						new Date(maxDate*1000).getFullYear()
+					}-${
+						(new Date(maxDate*1000).getMonth()+1).toString().padStart(2,0)
+					}-${
+						(new Date(maxDate*1000).getDate()+1).toString().padStart(2,0)
+					}`
+				}
 			})
 		</script>
 	</head>
