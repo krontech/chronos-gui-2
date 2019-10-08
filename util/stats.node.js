@@ -3,6 +3,8 @@
 
 //run server with:
 //	nohup node stats.node.js & disown
+//watch files with:
+//	ls stats\.* | entr scp stats\.* stats:camera_stats/
 
 const addr='192.168.1.55', port = 19861;
 const output_folder='stats_reported';

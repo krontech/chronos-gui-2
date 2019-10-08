@@ -20,49 +20,74 @@
 			}
 			
 			canvas {
-				width: 650px;
-				max-width: 100%
-				height: 400px;
 				background: #333;
 				border: 1px solid black;
+			}
+			.canvasAspectRatioHelper {
+				height: 0;
+				padding-top: 56.25%;
+			}
+			
+			.chart {
+				min-width: 0;
+				width: 650px;
+				max-width: 100%;
+				display: grid;
+				grid-template-columns: auto min-content;
+				grid-template-rows: min-content auto min-content;
+				grid-template-areas:
+					"header header"
+					"chart left-axis"
+					"bottom-axis ."
 			}
 		</style>
 		
 		<script>
-			drawGraph('#screenCacheTimes', '/screen_cache_time.jsonl')
-			drawGraph('#startUpTimes', '/start_up_time.jsonl')
+			"use strict";
+			const colorCache = new Map()
+			const colorForSerial = serial =>
+				colorCache[serial] || (
+					colorCache[serial] = `hsl(${Math.round(Math.random()*360)}, 78%, 84%)`
+				)
 			
-			async function drawGraph(canvasId, url) {
-				let data = (await (await fetch(url)).text())
+			async function drawGraph({title, url}) {
+				let data = (await (await fetch(url)).text()) //Note: This is technically a race condition with document.ready, but we will probably always win it.
 					.split('\n').filter(x=>x)
 					.map(line => JSON.parse(line))
-				
 				//Convert timestamps from ISO to Unix, which is more useful here.
 				data.forEach(data =>
 					data.timestamp = new Date(data.timestamp).getTime()/1000)
-				
 				data = data.filter(data => data.timestamp && data.seconds)
 				
-				const minDate = Math.min.apply(Math, data.map(data => data.timestamp))
-				const maxDate = Math.max.apply(Math, data.map(data => data.timestamp))
-				const minSec  = Math.min.apply(Math, data.map(data => data.seconds))
-				const maxSec  = 10 //Math.max.apply(Math, data.map(data => data.seconds))
+				const dates = data.map(data => data.timestamp).sort((a,b)=>a-b)
+				const minDate = dates[0]
+				const maxDate = dates[dates.length-1]
+				const duration = data.map(data => data.seconds).sort((a,b)=>a-b)
+				const minSec = duration[0]
+				const maxSec = duration[duration.length - 20]
+				//console.log({url, dates, minDate, maxDate, duration, minSec, maxSec})
 				
-				const canvas = document.querySelector(canvasId)
+				const template = document.importNode(
+					document.querySelector('template').content, true)
+				const [labelTitle, , canvas, labelMaxTime, , labelMinTime, labelMinDate, , labelMaxDate]
+					= template.querySelector('.chart').children
+				document.body.appendChild(template) //Must be appended here - emptying the template - so the canvas setup code knows how big it needs to be as it relies on layout.
+				
+				labelTitle.textContent = title
+				
 				const c = canvas.getContext('2d')
 				const canvasVisualRect = canvas.getBoundingClientRect();
 				canvas.width = canvasVisualRect.width * devicePixelRatio
 				canvas.height = canvasVisualRect.height * devicePixelRatio
 				c.scale(devicePixelRatio, devicePixelRatio)
-				c.fillStyle = '#fff'
-				c.strokeStyle = '#000'
-				c.lineWidth = 2
 				
 				const toXY = (date, sec) => [
-					((date-minDate)/(maxDate-minDate)) * canvas.width,
-					canvas.height - ((sec-minSec)/(maxSec-minSec)) * canvas.height,
+					Math.max(0, Math.min(((date-minDate)/(maxDate-minDate)) * canvas.width, canvas.width)),
+					Math.max(0, Math.min(canvas.height - ((sec-minSec)/(maxSec-minSec)) * canvas.height, canvas.height)),
 				]
 				
+				c.strokeStyle = '#000'
+				c.lineWidth = 2
 				data.forEach(data => {
 					c.beginPath()
 					c.arc(
@@ -73,6 +98,7 @@
 				})
 				
 				data.forEach(data => {
+					c.fillStyle = colorForSerial(data.serial)
 					c.beginPath()
 					c.arc(
 						...toXY(data.timestamp, data.seconds),
@@ -80,14 +106,50 @@
 					)
 					c.fill()
 				})
+				
+				labelMinTime.textContent = `${Math.round(minSec*10)/10}s`
+				labelMaxTime.textContent = `${Math.round(maxSec*10)/10}s`
+				labelMinDate.textContent = `${
+					new Date(minDate*1000).getFullYear()
+				}-${
+					(new Date(minDate*1000).getMonth()+1).toString().padStart(2,0)
+				}-${
+					(new Date(minDate*1000).getDate()+1).toString().padStart(2,0)
+				}`
+				labelMaxDate.textContent = `${
+					new Date(maxDate*1000).getFullYear()
+				}-${
+					(new Date(maxDate*1000).getMonth()+1).toString().padStart(2,0)
+				}-${
+					(new Date(maxDate*1000).getDate()+1).toString().padStart(2,0)
+				}`
 			}
+			
+			drawGraph({
+				title: 'Time To First Screen',
+				url: '/screen_cache_time.jsonl',
+			})
+			
+			drawGraph({
+				title: 'Screen Cache Full',
+				url: '/start_up_time.jsonl',
+			})
 		</script>
 	</head>
 	<body>
 		<h1>Startup Times</h1>
-		<h2>Time To First Screen</h2>
-		<canvas id=startUpTimes></canvas>
-		<h2>Screen Cache Full</h2>
-		<canvas id=screenCacheTimes></canvas>
+		<template>
+			<div class=chart>
+				<h2 style="grid-area: header;">Time To First Screen</h2>
+				<div style="grid-area: chart;" class="canvasAspectRatioHelper"></div>
+				<canvas style="grid-area: chart; place-self: stretch;"></canvas>
+				<div style="grid-area: left-axis; align-self: start;">minTime</div>
+				<div style="grid-area: left-axis; align-self: center; text-orientation: sideways-right; writing-mode: vertical-lr;">Duration</div>
+				<div style="grid-area: left-axis; align-self: end;">maxTime</div>
+				<div style="grid-area: bottom-axis; justify-self: start;">minDate</div>
+				<div style="grid-area: bottom-axis; justify-self: center;">Date</div>
+				<div style="grid-area: bottom-axis; justify-self: end;">maxDate</div>
+			</div>
+		</template>
 	</body>
 </html>
