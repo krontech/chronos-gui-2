@@ -79,15 +79,6 @@
     <property name="text">
      <string>9</string>
     </property>
-    <property name="autoRepeat">
-     <bool>true</bool>
-    </property>
-    <property name="autoRepeatDelay">
-     <number>500</number>
-    </property>
-    <property name="autoRepeatInterval">
-     <number>200</number>
-    </property>
     <property name="clickMarginLeft" stdset="0">
      <enum>Button::none</enum>
     </property>
@@ -144,15 +135,6 @@
     <property name="text">
      <string>.</string>
     </property>
-    <property name="autoRepeat">
-     <bool>true</bool>
-    </property>
-    <property name="autoRepeatDelay">
-     <number>500</number>
-    </property>
-    <property name="autoRepeatInterval">
-     <number>200</number>
-    </property>
     <property name="clickMarginLeft" stdset="0">
      <enum>Button::none</enum>
     </property>
@@ -177,15 +159,6 @@
     </property>
     <property name="text">
      <string>x</string>
-    </property>
-    <property name="autoRepeat">
-     <bool>true</bool>
-    </property>
-    <property name="autoRepeatDelay">
-     <number>500</number>
-    </property>
-    <property name="autoRepeatInterval">
-     <number>200</number>
     </property>
     <property name="clickMarginLeft" stdset="0">
      <enum>Button::none</enum>
@@ -215,15 +188,6 @@
     <property name="text">
      <string>t</string>
     </property>
-    <property name="autoRepeat">
-     <bool>true</bool>
-    </property>
-    <property name="autoRepeatDelay">
-     <number>500</number>
-    </property>
-    <property name="autoRepeatInterval">
-     <number>200</number>
-    </property>
     <property name="clickMarginLeft" stdset="0">
      <enum>Button::none</enum>
     </property>
@@ -251,15 +215,6 @@
     </property>
     <property name="text">
      <string>Space</string>
-    </property>
-    <property name="autoRepeat">
-     <bool>true</bool>
-    </property>
-    <property name="autoRepeatDelay">
-     <number>500</number>
-    </property>
-    <property name="autoRepeatInterval">
-     <number>200</number>
     </property>
     <property name="clickMarginLeft" stdset="0">
      <enum>Button::none</enum>
@@ -289,9 +244,6 @@
     <property name="text">
      <string>▶</string>
     </property>
-    <property name="autoRepeat">
-     <bool>true</bool>
-    </property>
     <property name="clickMarginLeft" stdset="0">
      <enum>Button::none</enum>
     </property>
@@ -316,15 +268,6 @@
     </property>
     <property name="text">
      <string>f</string>
-    </property>
-    <property name="autoRepeat">
-     <bool>true</bool>
-    </property>
-    <property name="autoRepeatDelay">
-     <number>500</number>
-    </property>
-    <property name="autoRepeatInterval">
-     <number>200</number>
     </property>
     <property name="clickMarginLeft" stdset="0">
      <enum>Button::none</enum>
@@ -354,15 +297,6 @@
     <property name="text">
      <string>w</string>
     </property>
-    <property name="autoRepeat">
-     <bool>true</bool>
-    </property>
-    <property name="autoRepeatDelay">
-     <number>500</number>
-    </property>
-    <property name="autoRepeatInterval">
-     <number>200</number>
-    </property>
     <property name="clickMarginLeft" stdset="0">
      <enum>Button::none</enum>
     </property>
@@ -390,15 +324,6 @@
     </property>
     <property name="text">
      <string>6</string>
-    </property>
-    <property name="autoRepeat">
-     <bool>true</bool>
-    </property>
-    <property name="autoRepeatDelay">
-     <number>500</number>
-    </property>
-    <property name="autoRepeatInterval">
-     <number>200</number>
     </property>
     <property name="clickMarginLeft" stdset="0">
      <enum>Button::none</enum>
@@ -428,15 +353,6 @@
     <property name="text">
      <string>q</string>
     </property>
-    <property name="autoRepeat">
-     <bool>true</bool>
-    </property>
-    <property name="autoRepeatDelay">
-     <number>500</number>
-    </property>
-    <property name="autoRepeatInterval">
-     <number>200</number>
-    </property>
     <property name="clickMarginLeft" stdset="0">
      <enum>Button::half</enum>
     </property>
@@ -464,15 +380,6 @@
     </property>
     <property name="text">
      <string>m</string>
-    </property>
-    <property name="autoRepeat">
-     <bool>true</bool>
-    </property>
-    <property name="autoRepeatDelay">
-     <number>500</number>
-    </property>
-    <property name="autoRepeatInterval">
-     <number>200</number>
     </property>
     <property name="clickMarginLeft" stdset="0">
      <enum>Button::none</enum>
@@ -502,15 +409,6 @@
     <property name="text">
      <string>u</string>
     </property>
-    <property name="autoRepeat">
-     <bool>true</bool>
-    </property>
-    <property name="autoRepeatDelay">
-     <number>500</number>
-    </property>
-    <property name="autoRepeatInterval">
-     <number>200</number>
-    </property>
     <property name="clickMarginLeft" stdset="0">
      <enum>Button::none</enum>
     </property>
@@ -538,15 +436,6 @@
     </property>
     <property name="text">
      <string>p</string>
-    </property>
-    <property name="autoRepeat">
-     <bool>true</bool>
-    </property>
-    <property name="autoRepeatDelay">
-     <number>500</number>
-    </property>
-    <property name="autoRepeatInterval">
-     <number>200</number>
     </property>
     <property name="clickMarginLeft" stdset="0">
      <enum>Button::none</enum>
@@ -576,15 +465,6 @@
     <property name="text">
      <string>5</string>
     </property>
-    <property name="autoRepeat">
-     <bool>true</bool>
-    </property>
-    <property name="autoRepeatDelay">
-     <number>500</number>
-    </property>
-    <property name="autoRepeatInterval">
-     <number>200</number>
-    </property>
     <property name="clickMarginLeft" stdset="0">
      <enum>Button::none</enum>
     </property>
@@ -613,9 +493,6 @@
     <property name="text">
      <string>⌫</string>
     </property>
-    <property name="autoRepeat">
-     <bool>true</bool>
-    </property>
     <property name="clickMarginRight" stdset="0">
      <enum>Button::none</enum>
     </property>
@@ -640,15 +517,6 @@
     </property>
     <property name="text">
      <string>r</string>
-    </property>
-    <property name="autoRepeat">
-     <bool>true</bool>
-    </property>
-    <property name="autoRepeatDelay">
-     <number>500</number>
-    </property>
-    <property name="autoRepeatInterval">
-     <number>200</number>
     </property>
     <property name="clickMarginLeft" stdset="0">
      <enum>Button::none</enum>
@@ -706,9 +574,6 @@
     <property name="text">
      <string>◀</string>
     </property>
-    <property name="autoRepeat">
-     <bool>true</bool>
-    </property>
     <property name="clickMarginLeft" stdset="0">
      <enum>Button::none</enum>
     </property>
@@ -736,15 +601,6 @@
     </property>
     <property name="text">
      <string>e</string>
-    </property>
-    <property name="autoRepeat">
-     <bool>true</bool>
-    </property>
-    <property name="autoRepeatDelay">
-     <number>500</number>
-    </property>
-    <property name="autoRepeatInterval">
-     <number>200</number>
     </property>
     <property name="clickMarginLeft" stdset="0">
      <enum>Button::none</enum>
@@ -774,15 +630,6 @@
     <property name="text">
      <string>b</string>
     </property>
-    <property name="autoRepeat">
-     <bool>true</bool>
-    </property>
-    <property name="autoRepeatDelay">
-     <number>500</number>
-    </property>
-    <property name="autoRepeatInterval">
-     <number>200</number>
-    </property>
     <property name="clickMarginLeft" stdset="0">
      <enum>Button::none</enum>
     </property>
@@ -810,15 +657,6 @@
     </property>
     <property name="text">
      <string>7</string>
-    </property>
-    <property name="autoRepeat">
-     <bool>true</bool>
-    </property>
-    <property name="autoRepeatDelay">
-     <number>500</number>
-    </property>
-    <property name="autoRepeatInterval">
-     <number>200</number>
     </property>
     <property name="clickMarginLeft" stdset="0">
      <enum>Button::none</enum>
@@ -848,15 +686,6 @@
     <property name="text">
      <string>2</string>
     </property>
-    <property name="autoRepeat">
-     <bool>true</bool>
-    </property>
-    <property name="autoRepeatDelay">
-     <number>500</number>
-    </property>
-    <property name="autoRepeatInterval">
-     <number>200</number>
-    </property>
     <property name="clickMarginLeft" stdset="0">
      <enum>Button::none</enum>
     </property>
@@ -885,15 +714,6 @@
     <property name="text">
      <string>1</string>
     </property>
-    <property name="autoRepeat">
-     <bool>true</bool>
-    </property>
-    <property name="autoRepeatDelay">
-     <number>500</number>
-    </property>
-    <property name="autoRepeatInterval">
-     <number>200</number>
-    </property>
     <property name="clickMarginRight" stdset="0">
      <enum>Button::none</enum>
     </property>
@@ -918,15 +738,6 @@
     </property>
     <property name="text">
      <string>z</string>
-    </property>
-    <property name="autoRepeat">
-     <bool>true</bool>
-    </property>
-    <property name="autoRepeatDelay">
-     <number>500</number>
-    </property>
-    <property name="autoRepeatInterval">
-     <number>200</number>
     </property>
     <property name="clickMarginLeft" stdset="0">
      <enum>Button::none</enum>
@@ -956,15 +767,6 @@
     <property name="text">
      <string>g</string>
     </property>
-    <property name="autoRepeat">
-     <bool>true</bool>
-    </property>
-    <property name="autoRepeatDelay">
-     <number>500</number>
-    </property>
-    <property name="autoRepeatInterval">
-     <number>200</number>
-    </property>
     <property name="clickMarginLeft" stdset="0">
      <enum>Button::none</enum>
     </property>
@@ -992,15 +794,6 @@
     </property>
     <property name="text">
      <string>3</string>
-    </property>
-    <property name="autoRepeat">
-     <bool>true</bool>
-    </property>
-    <property name="autoRepeatDelay">
-     <number>500</number>
-    </property>
-    <property name="autoRepeatInterval">
-     <number>200</number>
     </property>
     <property name="clickMarginLeft" stdset="0">
      <enum>Button::none</enum>
@@ -1030,15 +823,6 @@
     <property name="text">
      <string>h</string>
     </property>
-    <property name="autoRepeat">
-     <bool>true</bool>
-    </property>
-    <property name="autoRepeatDelay">
-     <number>500</number>
-    </property>
-    <property name="autoRepeatInterval">
-     <number>200</number>
-    </property>
     <property name="clickMarginLeft" stdset="0">
      <enum>Button::none</enum>
     </property>
@@ -1067,15 +851,6 @@
     <property name="text">
      <string>a</string>
     </property>
-    <property name="autoRepeat">
-     <bool>true</bool>
-    </property>
-    <property name="autoRepeatDelay">
-     <number>500</number>
-    </property>
-    <property name="autoRepeatInterval">
-     <number>200</number>
-    </property>
     <property name="clickMarginRight" stdset="0">
      <enum>Button::none</enum>
     </property>
@@ -1100,15 +875,6 @@
     </property>
     <property name="text">
      <string>k</string>
-    </property>
-    <property name="autoRepeat">
-     <bool>true</bool>
-    </property>
-    <property name="autoRepeatDelay">
-     <number>500</number>
-    </property>
-    <property name="autoRepeatInterval">
-     <number>200</number>
     </property>
     <property name="clickMarginLeft" stdset="0">
      <enum>Button::none</enum>
@@ -1138,15 +904,6 @@
     <property name="text">
      <string>d</string>
     </property>
-    <property name="autoRepeat">
-     <bool>true</bool>
-    </property>
-    <property name="autoRepeatDelay">
-     <number>500</number>
-    </property>
-    <property name="autoRepeatInterval">
-     <number>200</number>
-    </property>
     <property name="clickMarginLeft" stdset="0">
      <enum>Button::none</enum>
     </property>
@@ -1174,15 +931,6 @@
     </property>
     <property name="text">
      <string>c</string>
-    </property>
-    <property name="autoRepeat">
-     <bool>true</bool>
-    </property>
-    <property name="autoRepeatDelay">
-     <number>500</number>
-    </property>
-    <property name="autoRepeatInterval">
-     <number>200</number>
     </property>
     <property name="clickMarginLeft" stdset="0">
      <enum>Button::none</enum>
@@ -1212,15 +960,6 @@
     <property name="text">
      <string>o</string>
     </property>
-    <property name="autoRepeat">
-     <bool>true</bool>
-    </property>
-    <property name="autoRepeatDelay">
-     <number>500</number>
-    </property>
-    <property name="autoRepeatInterval">
-     <number>200</number>
-    </property>
     <property name="clickMarginLeft" stdset="0">
      <enum>Button::none</enum>
     </property>
@@ -1248,15 +987,6 @@
     </property>
     <property name="text">
      <string>s</string>
-    </property>
-    <property name="autoRepeat">
-     <bool>true</bool>
-    </property>
-    <property name="autoRepeatDelay">
-     <number>500</number>
-    </property>
-    <property name="autoRepeatInterval">
-     <number>200</number>
     </property>
     <property name="clickMarginLeft" stdset="0">
      <enum>Button::none</enum>
@@ -1286,15 +1016,6 @@
     <property name="text">
      <string>y</string>
     </property>
-    <property name="autoRepeat">
-     <bool>true</bool>
-    </property>
-    <property name="autoRepeatDelay">
-     <number>500</number>
-    </property>
-    <property name="autoRepeatInterval">
-     <number>200</number>
-    </property>
     <property name="clickMarginLeft" stdset="0">
      <enum>Button::none</enum>
     </property>
@@ -1323,15 +1044,6 @@
     <property name="text">
      <string>0</string>
     </property>
-    <property name="autoRepeat">
-     <bool>true</bool>
-    </property>
-    <property name="autoRepeatDelay">
-     <number>500</number>
-    </property>
-    <property name="autoRepeatInterval">
-     <number>200</number>
-    </property>
     <property name="clickMarginRight" stdset="0">
      <enum>Button::none</enum>
     </property>
@@ -1357,15 +1069,6 @@
     <property name="text">
      <string>4</string>
     </property>
-    <property name="autoRepeat">
-     <bool>true</bool>
-    </property>
-    <property name="autoRepeatDelay">
-     <number>500</number>
-    </property>
-    <property name="autoRepeatInterval">
-     <number>200</number>
-    </property>
     <property name="clickMarginRight" stdset="0">
      <enum>Button::none</enum>
     </property>
@@ -1390,15 +1093,6 @@
     </property>
     <property name="text">
      <string>v</string>
-    </property>
-    <property name="autoRepeat">
-     <bool>true</bool>
-    </property>
-    <property name="autoRepeatDelay">
-     <number>500</number>
-    </property>
-    <property name="autoRepeatInterval">
-     <number>200</number>
     </property>
     <property name="clickMarginLeft" stdset="0">
      <enum>Button::none</enum>
@@ -1428,15 +1122,6 @@
     <property name="text">
      <string>n</string>
     </property>
-    <property name="autoRepeat">
-     <bool>true</bool>
-    </property>
-    <property name="autoRepeatDelay">
-     <number>500</number>
-    </property>
-    <property name="autoRepeatInterval">
-     <number>200</number>
-    </property>
     <property name="clickMarginLeft" stdset="0">
      <enum>Button::none</enum>
     </property>
@@ -1465,15 +1150,6 @@
     <property name="text">
      <string>l</string>
     </property>
-    <property name="autoRepeat">
-     <bool>true</bool>
-    </property>
-    <property name="autoRepeatDelay">
-     <number>500</number>
-    </property>
-    <property name="autoRepeatInterval">
-     <number>200</number>
-    </property>
     <property name="clickMarginLeft" stdset="0">
      <enum>Button::none</enum>
     </property>
@@ -1498,15 +1174,6 @@
     </property>
     <property name="text">
      <string>j</string>
-    </property>
-    <property name="autoRepeat">
-     <bool>true</bool>
-    </property>
-    <property name="autoRepeatDelay">
-     <number>500</number>
-    </property>
-    <property name="autoRepeatInterval">
-     <number>200</number>
     </property>
     <property name="clickMarginLeft" stdset="0">
      <enum>Button::none</enum>
@@ -1536,15 +1203,6 @@
     <property name="text">
      <string>i</string>
     </property>
-    <property name="autoRepeat">
-     <bool>true</bool>
-    </property>
-    <property name="autoRepeatDelay">
-     <number>500</number>
-    </property>
-    <property name="autoRepeatInterval">
-     <number>200</number>
-    </property>
     <property name="clickMarginLeft" stdset="0">
      <enum>Button::none</enum>
     </property>
@@ -1572,15 +1230,6 @@
     </property>
     <property name="text">
      <string>8</string>
-    </property>
-    <property name="autoRepeat">
-     <bool>true</bool>
-    </property>
-    <property name="autoRepeatDelay">
-     <number>500</number>
-    </property>
-    <property name="autoRepeatInterval">
-     <number>200</number>
     </property>
     <property name="clickMarginLeft" stdset="0">
      <enum>Button::none</enum>
