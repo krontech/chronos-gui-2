@@ -250,7 +250,7 @@ class Main(QWidget):
 		_triggersHidden = api.apiValues.get('sensorColorPattern') == 'mono'
 		main_menu_items = [
 			{'name':"About Camera",          'open':lambda: window.show('about_camera'),          'hidden': False,           'synonyms':"kickstarter thanks me name"},
-			{'name':"App & Internet",        'open':lambda: window.show('remote_access'),         'hidden': False,           'synonyms':"remote access web client"},
+			{'name':"App & Internet",        'open':lambda: window.show('remote_access'),         'hidden': False,           'synonyms':"remote access web client network control api"},
 			{'name':"Battery and Power",     'open':lambda: window.show('power'),                 'hidden': True,            'synonyms':"charge wake turn off power down"},
 			{'name':"Camera Settings",       'open':lambda: window.show('user_settings'),         'hidden': False,           'synonyms':"user operator save settings"},
 			{'name':"Factory Utilities",     'open':lambda: window.show('service_screen.locked'), 'hidden': False,           'synonyms':"utils"},
