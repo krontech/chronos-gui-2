@@ -153,7 +153,7 @@ class SpinBox(QSpinBox, TouchMarginPlugin, DirectAPILinkPlugin, FocusablePlugin,
 		self.inputMode = 'touch'
 		self.isFocused = True
 		self.window().app.window.showInput(self,
-			'numeric_with_units' if self.units else 'numeric_without_units', 
+			'numeric_with_units' if self.units[1:] else 'numeric_without_units', 
 			focus=False,
 		)
 		self.window().focusRing.focusIn()
