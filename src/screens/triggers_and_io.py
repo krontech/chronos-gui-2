@@ -198,13 +198,13 @@ class TriggersAndIO(QtWidgets.QDialog):
 		#TODO: Add little visualisation showing what connects and what is connected to the current action.
 		self.uiPreview.paintEvent = self.paintPreview
 	
-	def markStateClean(self):
+	def markStateClean(self, *_):
 		self.uiUnsavedChangesWarning.hide()
 		self.uiSave.hide()
 		self.uiDone.show()
 		self.uiCancel.hide()
 		
-	def markStateDirty(self):
+	def markStateDirty(self, *_):
 		self.uiUnsavedChangesWarning.show()
 		self.uiSave.show()
 		self.uiDone.hide()
