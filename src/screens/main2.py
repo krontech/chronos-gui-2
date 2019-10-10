@@ -251,7 +251,7 @@ class Main(QWidget):
 		main_menu_items = [
 			{'name':"About Camera",          'open':lambda: window.show('about_camera'),          'hidden': False,           'synonyms':"kickstarter thanks me name"},
 			{'name':"App & Internet",        'open':lambda: window.show('remote_access'),         'hidden': False,           'synonyms':"remote access web client network control api"},
-			{'name':"Battery and Power",     'open':lambda: window.show('power'),                 'hidden': True,            'synonyms':"charge wake turn off power down"},
+			{'name':"Battery & Power",       'open':lambda: window.show('power'),                 'hidden': True,            'synonyms':"charge wake turn off power down"},
 			{'name':"Camera Settings",       'open':lambda: window.show('user_settings'),         'hidden': False,           'synonyms':"user operator save settings"},
 			{'name':"Factory Utilities",     'open':lambda: window.show('service_screen.locked'), 'hidden': False,           'synonyms':"utils"},
 			{'name':"Format Storage",        'open':lambda: window.show('storage'),               'hidden': False,           'synonyms':"file saving save media df mounts mounted devices thumb drive ssd sd card usb stick filesystem reformat"},
@@ -260,9 +260,9 @@ class Main(QWidget):
 			{'name':"Record Mode",           'open':lambda: window.show('record_mode'),           'hidden': False,           'synonyms':"segmented run n gun normal"},
 			{'name':"Recording Settings",    'open':lambda: window.show('recording_settings'),    'hidden': True,            'synonyms':"resolution framerate offset gain boost brightness exposure"},
 			{'name':"Review Saved Videos",   'open':lambda: window.show('replay'),                'hidden': False,           'synonyms':"playback show footage saved card movie replay"},
-			{'name':"Stamp / Overlay",       'open':lambda: window.show('stamp'),                 'hidden': False,           'synonyms':"watermark"},
+			{'name':"Stamp Overlay",         'open':lambda: window.show('stamp'),                 'hidden': False,           'synonyms':"watermark"},
 			{'name':"Trigger Delay",         'open':lambda: window.show('trigger_delay'),         'hidden': False,           'synonyms':"wait"},
-			{'name':"Triggers and IO",       'open':lambda: window.show('triggers_and_io'),       'hidden': _triggersHidden, 'synonyms':"bnc green ~a1 ~a2 trig1 trig2 trig3 signal input output trigger delay"},
+			{'name':"Triggers & IO",         'open':lambda: window.show('triggers_and_io'),       'hidden': _triggersHidden, 'synonyms':"bnc green ~a1 ~a2 trig1 trig2 trig3 signal input output trigger delay"},
 			{'name':"Update Camera",         'open':lambda: window.show('update_firmware'),       'hidden': False,           'synonyms':"firmware"},
 			{'name':"Video Save Settings",   'open':lambda: window.show('file_settings'),         'hidden': True,            'synonyms':"file saving"},
 		]
