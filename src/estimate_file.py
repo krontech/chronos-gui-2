@@ -1,8 +1,56 @@
 from typing import Optional
 from datetime import timedelta
+
+from debugger import *; dbg
 import api2 as api
 import settings
 
+
+
+def sizeForRaw12(frames: int, hRes: Optional[int] = None, vRes: Optional[int] = None) -> int:
+	"""Estimate the size of a video saved as 12-bit RAW.
+		
+		Args:
+			frames (int): Number of frames in the video.
+			hRes (int, optional): Horizontal size of the video. Defaults to
+				the current size of video being recorded.
+			vRes (int, optional): Vertical size of the video. Defaults to
+				the current size of video being recorded.
+
+		Yields:
+			int: The estimated size, in bytes, that the saved video will be.
+	"""
+	
+	if hRes is None:
+		hRes = api.apiValues.get('resolution')['hRes']
+	if vRes is None:
+		vRes = api.apiValues.get('resolution')['vRes']
+	
+	#Foobar, [11.10.19 16:22] The size of a DNG frame should be exactly (hres*vres*2) + 4096 bytes
+	return (hRes*vRes*2) * frames + 200 #Add a little bit, 200 bytes, for file overhead.
+
+
+def sizeForRaw16(frames: int, hRes: Optional[int] = None, vRes: Optional[int] = None) -> int:
+	"""Estimate the size of a video saved as 16-bit RAW.
+		
+		Args:
+			frames (int): Number of frames in the video.
+			hRes (int, optional): Horizontal size of the video. Defaults to
+				the current size of video being recorded.
+			vRes (int, optional): Vertical size of the video. Defaults to
+				the current size of video being recorded.
+
+		Yields:
+			int: The estimated size, in bytes, that the saved video will be.
+	"""
+	
+	if hRes is None:
+		hRes = api.apiValues.get('resolution')['hRes']
+	if vRes is None:
+		vRes = api.apiValues.get('resolution')['vRes']
+	
+	#Foobar, [11.10.19 16:22] The size of a DNG frame should be exactly (hres*vres*2) + 4096 bytes
+	return (hRes*vRes*3) * frames + 200 #Add a little bit, 200 bytes, for file overhead.
 
 
 def sizeForDng(frames: int, hRes: Optional[int] = None, vRes: Optional[int] = None) -> int:
@@ -160,6 +208,7 @@ def size(frames: int, hRes: Optional[int] = None, vRes: Optional[int] = None) ->
 	
 	return (
 		{
+			'.raw': sizeForRaw12,
 			'.dng': sizeForDng,
 			'.tiff': 
 				sizeForMonoTiff
@@ -173,6 +222,56 @@ def size(frames: int, hRes: Optional[int] = None, vRes: Optional[int] = None) ->
 	)
 
 
+
+
+def durationForRaw12(filesize: int, hRes: Optional[int] = None, vRes: Optional[int] = None, frameRate: Optional[float] = None) -> timedelta:
+	"""Estimate the duration of a 12-bit RAW video of a known filesize.
+		
+		Args:
+			size (int): Number of bytes in the video file.
+			hRes (int, optional): Horizontal size of the video. Defaults to
+				the current size of video being recorded.
+			vRes (int, optional): Vertical size of the video. Defaults to
+				the current size of video being recorded.
+			frameRate (float, optional): The number of frames per second the
+				video being estimated plays back at. Defaults to settings'
+				savedFileFramerate, which defaults to 30.
+
+		Yields:
+			timedelta: The estimated run time of the video.
+	"""
+	
+	if frameRate is None:
+		frameRate =  settings.value('savedFileFramerate', 30)
+	
+	sizeOfOneFrame = sizeForRaw12(2000, hRes, vRes)/2000 #Lower error due to nonscaling overhead, ie, one-off headers are a significant chunk of a one-frame video, but irrelevant for a 100,000 frame video.
+	totalFrames = int(filesize / sizeOfOneFrame)
+	return timedelta(seconds=totalFrames / frameRate)
+
+
+def durationForRaw16(filesize: int, hRes: Optional[int] = None, vRes: Optional[int] = None, frameRate: Optional[float] = None) -> timedelta:
+	"""Estimate the duration of a 16-bit RAW video of a known filesize.
+		
+		Args:
+			size (int): Number of bytes in the video file.
+			hRes (int, optional): Horizontal size of the video. Defaults to
+				the current size of video being recorded.
+			vRes (int, optional): Vertical size of the video. Defaults to
+				the current size of video being recorded.
+			frameRate (float, optional): The number of frames per second the
+				video being estimated plays back at. Defaults to settings'
+				savedFileFramerate, which defaults to 30.
+
+		Yields:
+			timedelta: The estimated run time of the video.
+	"""
+	
+	if frameRate is None:
+		frameRate =  settings.value('savedFileFramerate', 30)
+	
+	sizeOfOneFrame = sizeForRaw16(2000, hRes, vRes)/2000 #Lower error due to nonscaling overhead, ie, one-off headers are a significant chunk of a one-frame video, but irrelevant for a 100,000 frame video.
+	totalFrames = int(filesize / sizeOfOneFrame)
+	return timedelta(seconds=totalFrames / frameRate)
 
 
 def durationForDng(filesize: int, hRes: Optional[int] = None, vRes: Optional[int] = None, frameRate: Optional[float] = None) -> timedelta:
@@ -197,7 +296,7 @@ def durationForDng(filesize: int, hRes: Optional[int] = None, vRes: Optional[int
 	
 	sizeOfOneFrame = sizeForDng(2000, hRes, vRes)/2000 #Lower error due to nonscaling overhead, ie, one-off headers are a significant chunk of a one-frame video, but irrelevant for a 100,000 frame video.
 	totalFrames = int(filesize / sizeOfOneFrame)
-	return timedelta(totalFrames / frameRate)
+	return timedelta(seconds=totalFrames / frameRate)
 
 
 def durationForRgbTiff(filesize: int, hRes: Optional[int] = None, vRes: Optional[int] = None, frameRate: Optional[float] = None) -> timedelta:
@@ -222,7 +321,7 @@ def durationForRgbTiff(filesize: int, hRes: Optional[int] = None, vRes: Optional
 	
 	sizeOfOneFrame = sizeForRgbTiff(2000, hRes, vRes)/2000 #Lower error due to nonscaling overhead, ie, one-off headers are a significant chunk of a one-frame video, but irrelevant for a 100,000 frame video.
 	totalFrames = int(filesize / sizeOfOneFrame)
-	return timedelta(totalFrames / frameRate)
+	return timedelta(seconds=totalFrames / frameRate)
 
 
 def durationForMonoTiff(filesize: int, hRes: Optional[int] = None, vRes: Optional[int] = None, frameRate: Optional[float] = None) -> timedelta:
@@ -247,7 +346,7 @@ def durationForMonoTiff(filesize: int, hRes: Optional[int] = None, vRes: Optiona
 	
 	sizeOfOneFrame = sizeForMonoTiff(2000, hRes, vRes)/2000 #Lower error due to nonscaling overhead, ie, one-off headers are a significant chunk of a one-frame video, but irrelevant for a 100,000 frame video.
 	totalFrames = int(filesize / sizeOfOneFrame)
-	return timedelta(totalFrames / frameRate)
+	return timedelta(seconds=totalFrames / frameRate)
 
 
 def durationForTiffraw(filesize: int, hRes: Optional[int] = None, vRes: Optional[int] = None, frameRate: Optional[float] = None) -> timedelta:
@@ -276,7 +375,7 @@ def durationForTiffraw(filesize: int, hRes: Optional[int] = None, vRes: Optional
 	
 	sizeOfOneFrame = sizeForTiffraw(2000, hRes, vRes)/2000 #Lower error due to nonscaling overhead, ie, one-off headers are a significant chunk of a one-frame video, but irrelevant for a 100,000 frame video.
 	totalFrames = int(filesize / sizeOfOneFrame)
-	return timedelta(totalFrames / frameRate)
+	return timedelta(seconds=totalFrames / frameRate)
 
 
 def durationForMp4(filesize: int, hRes: Optional[int] = None, vRes: Optional[int] = None, frameRate: Optional[float] = None, *, bpp: Optional[float] = None, maxBitrate: Optional[float] = None) -> timedelta:
@@ -307,7 +406,7 @@ def durationForMp4(filesize: int, hRes: Optional[int] = None, vRes: Optional[int
 	
 	sizeOfOneFrame = sizeForMp4(2000, hRes, vRes, frameRate=frameRate, bpp=bpp, maxBitrate=maxBitrate)/2000 #Lower error due to nonscaling overhead, ie, one-off headers are a significant chunk of a one-frame video, but irrelevant for a 100,000 frame video.
 	totalFrames = int(filesize / sizeOfOneFrame)
-	return timedelta(totalFrames / frameRate)
+	return timedelta(seconds=totalFrames / frameRate)
 
 
 def duration(filesize: int, hRes: Optional[int] = None, vRes: Optional[int] = None) -> timedelta:
@@ -329,6 +428,7 @@ def duration(filesize: int, hRes: Optional[int] = None, vRes: Optional[int] = No
 	
 	return (
 		{
+			'.raw': durationForRaw12,
 			'.dng': durationForDng,
 			'.tiff': 
 				durationForMonoTiff
