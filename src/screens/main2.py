@@ -31,6 +31,30 @@ class Main(QWidget):
 		
 		self._window = window
 		
+		
+		#Note start/end recording times, to display the timers.
+		recordingStartTime = 0
+		recordingEndTime = 0
+		def updateRecordingStartTime(state):
+			nonlocal recordingStartTime, recordingEndTime
+			if state == 'recording':
+				recordingStartTime = time()
+				recordingEndTime = 0
+				self.uiPlayAndSave.update()
+				self.uiRecord.update()
+			elif state == 'idle' and not recordingEndTime:
+				recordingEndTime = time()
+				self.uiPlayAndSave.update()
+				self.uiRecord.update()
+		api.observe('state', updateRecordingStartTime)
+		
+		totalFrames = api.getSync('totalFrames')
+		if totalFrames == 0: #Set the length of the recording to 0, if nothing has been recorded. Otherwise, calculate what we've recorded.
+			recordingStartTime = recordingEndTime
+		else:
+			recordingEndTime = recordingStartTime + totalFrames/api.getSync('frameRate')
+		
+		
 		#############################
 		#   Button action binding   #
 		#############################
@@ -376,7 +400,8 @@ class Main(QWidget):
 		
 		
 		#Record / stop
-		self.uiRecordTemplate = self.uiRecord.text()
+		self.uiRecordTemplateWithTime = self.uiRecord.text()
+		self.uiRecordTemplateNoTime = self.uiRecordTemplateWithTime.split('\n')[0][2:]
 		self.uiRecord.clicked.connect(self.toggleRecording)
 		
 		def uiRecordPaintEventRecord(evt, iconSize=24, offsetX=32):
@@ -390,7 +415,7 @@ class Main(QWidget):
 				iconSize, iconSize,
 				0, 16*360, #start, end angle
 			)
-		def uiRecordPaintEventPause(evt, iconSize=20, offsetX=20):
+		def uiRecordPaintEventPause(evt, iconSize=20, offsetX=24):
 			midpoint = self.uiRecord.geometry().size()/2 - QSize(0, self.uiRecord.touchMargins()['bottom']/2)
 			p = QPainter(self.uiRecord)
 			p.setPen(QPen(QColor('#ffffff')))
@@ -403,7 +428,7 @@ class Main(QWidget):
 				midpoint.width()-iconSize/2-offsetX+iconSize/3*2, midpoint.height()-iconSize/2,
 				iconSize/3, iconSize,
 			)
-		def uiRecordPaintEventStop(evt, iconSize=20, offsetX=20):
+		def uiRecordPaintEventStop(evt, iconSize=20, offsetX=24):
 			midpoint = self.uiRecord.geometry().size()/2 - QSize(0, self.uiRecord.touchMargins()['bottom']/2)
 			p = QPainter(self.uiRecord)
 			p.setPen(QPen(QColor('#ffffff')))
@@ -411,6 +436,12 @@ class Main(QWidget):
 			p.drawRect( #xy/wh
 				midpoint.width()-iconSize/2-offsetX, midpoint.height()-iconSize/2,
 				iconSize, iconSize,
+			)
+			self.uiRecord.setText( #Do the timer.
+				self.uiRecordTemplateWithTime.format(
+					state="Stop",
+					timeRecorded=(recordingEndTime or time()) - recordingStartTime,
+				)
 			)
 		def uiRecordPaintEvent(evt):
 			type(self.uiRecord).paintEvent(self.uiRecord, evt)
@@ -428,30 +459,14 @@ class Main(QWidget):
 		uiPlayAndSaveTemplate = self.uiPlayAndSave.text()
 		self.uiPlayAndSave.setText("Play && Save\n-1s RAM\n-1s Avail.")
 		
-		recordingStartTime = 0
-		recordingEndTime = 0
-		def updateRecordingStartTime(state):
-			nonlocal recordingStartTime, recordingEndTime
-			if state == 'recording':
-				recordingStartTime = time()
-				recordingEndTime = 0
-				self.uiPlayAndSave.update()
-			elif state == 'idle' and not recordingEndTime:
-				self.uiPlayAndSave.update()
-				recordingEndTime = time()
-		api.observe('state', updateRecordingStartTime)
-		
-		totalFrames = api.getSync('totalFrames')
-		if totalFrames == 0: #Set the length of the recording to 0, if nothing has been recorded. Otherwise, calculate what we've recorded.
-			recordingStartTime = recordingEndTime
-		else:
-			recordingEndTime = recordingStartTime + totalFrames/api.getSync('frameRate')
-		
 		playAndSaveData = api.getSync(['cameraMaxFrames', 'frameRate', 'recSegments'])
 		def updatePlayAndSaveText(*_):
 			data = playAndSaveData
 			segmentMaxRecTime = data['cameraMaxFrames'] / data['frameRate'] / data['recSegments']
-			segmentCurrentRecTime = ((recordingEndTime or time()) - recordingStartTime)
+			segmentCurrentRecTime = min(
+				segmentMaxRecTime, 
+				(recordingEndTime or time()) - recordingStartTime
+			)
 			self.uiPlayAndSave.setText(
 				uiPlayAndSaveTemplate.format(
 					ramUsed=segmentCurrentRecTime, ramTotal=segmentMaxRecTime ) )
@@ -479,6 +494,7 @@ class Main(QWidget):
 		
 		self.uiPlayAndSave.clicked.connect(lambda:
 			window.show('play_and_save')) #This should prompt to record if no footage is recorded, and explain itself.
+		
 		
 		#Storage media
 		uiExternalMediaTemplate = self.uiExternalMedia.text()
@@ -762,10 +778,10 @@ class Main(QWidget):
 	def onStateChange(self, state):
 		#This text update takes a little while to fire, so we do it in the start and stop recording functions as well so it's more responsive when the operator clicks.
 		self.uiRecord.isRecording = state == 'idle'
-		self.uiRecord.update() #Redraw the icon.
-		self.uiRecord.setText(
-			self.uiRecordTemplate.format( #Spaces to alight Stop with Record
-				state = 'Record' if self.uiRecord.isRecording else 'Stop' ) )
+		self.uiRecord.update() #Redraw the icon, maybe start the timer.
+		if self.uiRecord.isRecording:
+			self.uiRecord.setText(
+				self.uiRecordTemplateNoTime.format(state='Record') )
 		
 		if state == 'idle' and settings.value('autoSaveVideo', False): #[autosave]
 			self._window.show('play_and_save')
@@ -774,15 +790,13 @@ class Main(QWidget):
 	def startRecording(self):
 		self.uiRecord.isRecording = False
 		self.uiRecord.update()
-		self.uiRecord.setText(
-			self.uiRecordTemplate.format(state='Stop') ) #Show feedback quick, the signal takes a noticable amount of time.
 		api.control.callSync('startRecording')
 	
 	def stopRecording(self):
 		self.uiRecord.isRecording = True
 		self.uiRecord.update()
 		self.uiRecord.setText(
-			self.uiRecordTemplate.format(state='Record') )
+			self.uiRecordTemplateNoTime.format(state='Record') )
 		api.control.callSync('stopRecording')
 	
 	
