@@ -135,8 +135,8 @@ class RecordingSettings(QtWidgets.QDialog):
 		[336, 96],
 	]
 	presets = []
-	for geometry in __potentialPresetGeometries:
-		hRes, vRes = geometry[0], geometry[1]
+	for geometry_ in __potentialPresetGeometries: #Fix bug where this overrode the screen's geometry property, preventing any keyboard from opening.
+		hRes, vRes = geometry_[0], geometry_[1]
 		geometryTimingLimits = api2.control.callSync('getResolutionTimingLimits', {'hRes':hRes, 'vRes':vRes})
 		if 'error' not in geometryTimingLimits:
 			presets += [{
