@@ -2,6 +2,7 @@
 
 import logging; log = logging.getLogger('Chronos.gui')
 from re import match as regex_match, search as regex_search
+from time import time
 
 from PyQt5 import uic, QtCore
 from PyQt5.QtCore import QPoint, QSize, Qt
@@ -425,6 +426,54 @@ class Main(QWidget):
 		#TODO DDR 2019-09-27 fill in play and save
 		uiPlayAndSaveTemplate = self.uiPlayAndSave.text()
 		self.uiPlayAndSave.setText("Play && Save\n-1s RAM\n-1s Avail.")
+		
+		recordingStartTime = 0
+		recordingEndTime = 0
+		def updateRecordingStartTime(state):
+			nonlocal recordingStartTime, recordingEndTime
+			if state == 'recording':
+				recordingStartTime = time()
+				recordingEndTime = 0
+				self.uiPlayAndSave.update()
+			elif recordingStartTime:
+				recordingEndTime = time()
+		api.observe('state', updateRecordingStartTime)
+		
+		totalFrames = api.getSync('totalFrames')
+		if totalFrames == 0: #Set the length of the recording to 0, if nothing has been recorded. Otherwise, calculate what we've recorded.
+			recordingStartTime = recordingEndTime
+		else:
+			recordingEndTime = recordingStartTime + totalFrames/api.getSync('frameRate')
+		
+		playAndSaveData = api.getSync(['cameraMaxFrames', 'frameRate', 'recSegments'])
+		def updatePlayAndSaveText(*_):
+			data = playAndSaveData
+			segmentMaxRecTime = data['cameraMaxFrames'] / data['frameRate'] / data['recSegments']
+			segmentCurrentRecTime = ((recordingEndTime or time()) - recordingStartTime)
+			self.uiPlayAndSave.setText(
+				uiPlayAndSaveTemplate.format(
+					ramUsed=segmentCurrentRecTime, ramTotal=segmentMaxRecTime ) )
+		updatePlayAndSaveText()
+			
+		def updatePlayAndSaveDataMaxFrames(value):
+			playAndSaveData['cameraMaxFrames'] = value
+		api.observe_future_only('cameraMaxFrames', updatePlayAndSaveDataMaxFrames)
+		api.observe_future_only('cameraMaxFrames', updatePlayAndSaveText)
+		
+		def updatePlayAndSaveDataFrameRate(_):
+			playAndSaveData['frameRate'] = api.getSync('frameRate')
+		api.observe_future_only('framePeriod', updatePlayAndSaveDataFrameRate)
+		api.observe_future_only('framePeriod', updatePlayAndSaveText)
+		
+		def updatePlayAndSaveDataRecSegments(value):
+			playAndSaveData['recSegments'] = value
+		api.observe_future_only('recSegments', updatePlayAndSaveDataRecSegments)
+		api.observe_future_only('recSegments', updatePlayAndSaveText)
+		
+		def uiPlayAndSaveDraw(evt):
+			type(self.uiPlayAndSave).paintEvent(self.uiPlayAndSave, evt)
+			updatePlayAndSaveText()
+		self.uiPlayAndSave.paintEvent = uiPlayAndSaveDraw
 		
 		self.uiPlayAndSave.clicked.connect(lambda:
 			window.show('play_and_save')) #This should prompt to record if no footage is recorded, and explain itself.
