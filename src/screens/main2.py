@@ -2,10 +2,10 @@
 
 import logging; log = logging.getLogger('Chronos.gui')
 from re import match as regex_match, search as regex_search
-from time import time
+from time import time, strftime
 
 from PyQt5 import uic, QtCore
-from PyQt5.QtCore import QPoint, QSize, Qt
+from PyQt5.QtCore import QPoint, QSize, Qt, QDateTime
 from PyQt5.QtWidgets import QWidget, QApplication
 from PyQt5.QtGui import QPainter, QPen, QBrush, QColor, QStandardItemModel, QPainterPath, QPolygonF
 
@@ -13,6 +13,7 @@ from debugger import *; dbg
 import settings
 import animate
 import api2 as api
+import estimate_file as estimateFile
 
 RECORDING_MODES = {'START/STOP':1, 'SOFT_TRIGGER':2, 'VIRTUAL_TRIGGER':3}
 RECORDING_MODE = RECORDING_MODES['START/STOP']
@@ -435,7 +436,8 @@ class Main(QWidget):
 				recordingStartTime = time()
 				recordingEndTime = 0
 				self.uiPlayAndSave.update()
-			elif recordingStartTime:
+			elif state == 'idle' and not recordingEndTime:
+				self.uiPlayAndSave.update()
 				recordingEndTime = time()
 		api.observe('state', updateRecordingStartTime)
 		
@@ -472,7 +474,7 @@ class Main(QWidget):
 		
 		def uiPlayAndSaveDraw(evt):
 			type(self.uiPlayAndSave).paintEvent(self.uiPlayAndSave, evt)
-			updatePlayAndSaveText()
+			updatePlayAndSaveText() #Gotta schedule updates like this, because using a timer clogs the event pipeline full of repaints and updates wind up being extremely slow.
 		self.uiPlayAndSave.paintEvent = uiPlayAndSaveDraw
 		
 		self.uiPlayAndSave.clicked.connect(lambda:
@@ -504,17 +506,26 @@ class Main(QWidget):
 					"No Save\nMedia Found" )
 			else:
 				partition = partitions[0]
-				api.externalPartitions.usageFor(partition['device'], lambda space: (
+				def updateExternalMediaTextCallback(space):
+					saved = estimateFile.duration(space['used'] * 1000)
+					total = estimateFile.duration(space['total'] * 1000)
 					updateExternalMediaPercentFull(space['used']/space['total']),
+					
 					self.uiExternalMedia.setText(
 						uiExternalMediaTemplate.format(
 							externalStorageIdentifier = partition['name'] or f"{round(partition['size'] / 1e9):1.0f}GB Storage Media",
 							percentFull = round(space['used']/space['total'] * 100),
-							hoursSaved = -1, minutesSaved = 0, secondsSaved = 0, #TODO: Calculate bits per second recorded and apply it here to the partition usage and total.
-							hoursTotal = -1, minutesTotal = 0, secondsTotal = 0,
+							footageSavedDuration = '-1', #TODO: Calculate bits per second recorded and apply it here to the partition usage and total.
+							hoursSaved = saved.days*24 + saved.seconds/60/60,
+							minutesSaved = (saved.seconds/60) % 60,
+							secondsSaved = saved.seconds % 60,
+							hoursTotal = total.days*24 + total.seconds/60/60,
+							minutesTotal = (total.seconds/60) % 60,
+							secondsTotal = total.seconds % 60,
 						)
 					)
-				))
+				api.externalPartitions.usageFor(partition['device'], 
+					updateExternalMediaTextCallback )
 		self.updateExternalMediaText = updateExternalMediaText #oops, assign this to self so we can pre-call the timer on show.
 		
 		def updateExternalMediaUUID(uuid):

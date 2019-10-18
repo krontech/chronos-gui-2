@@ -70,7 +70,7 @@
    </property>
    <property name="text">
     <string>{externalStorageIdentifier:s}
-{hoursSaved:02.0f}:{minutesSaved:02.0f}:{secondsSaved:02.0f} / {hoursTotal:02.0f}:{minutesTotal:02.0f}:{secondsTotal:02.0f}
+{hoursSaved:1.0f}:{minutesSaved:02.0f}:{secondsSaved:02.0f} / {hoursTotal:1.0f}:{minutesTotal:02.0f}:{secondsTotal:02.0f}
 </string>
    </property>
    <property name="clickMarginLeft" stdset="0">
