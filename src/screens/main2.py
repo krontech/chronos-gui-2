@@ -221,9 +221,17 @@ class Main(QWidget):
 			updateExposureText()
 		api.observe('exposureMax', updateExposureNsMax)
 		
-		#TODO DDR 2019-09-27: Make this pop up the exposure menu.
+		self.uiExposureMenu.hide()
+		self.uiExposureMenu.move(
+			self.x(),
+			self.uiExposure.y() - self.uiExposureMenu.height() + self.uiExposure.touchMargins()['top'] + 1, #-1 to merge margins.
+		)
 		self.uiExposure.clicked.connect(lambda:
-			window.show('recording_settings') )
+			getattr(
+				self.uiExposureMenu, 
+				'hide' if self.uiExposureMenu.isVisible() else 'show'
+			)()
+		)
 		
 		
 		#Resolution

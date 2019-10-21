@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>800</width>
-    <height>988</height>
+    <height>1068</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -831,6 +831,116 @@ Peaking</string>
     <pixmap>../../assets/images/battery-light-charging.svg</pixmap>
    </property>
   </widget>
+  <widget class="QWidget" name="uiExposureMenu" native="true">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>950</y>
+     <width>801</width>
+     <height>80</height>
+    </rect>
+   </property>
+   <widget class="Button" name="uiExposureInDegrees">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>0</y>
+      <width>121</width>
+      <height>81</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Show
+{degrees:1.0f}</string>
+    </property>
+    <property name="clickMarginLeft" stdset="0">
+     <enum>Button::none</enum>
+    </property>
+    <property name="clickMarginRight" stdset="0">
+     <enum>Button::none</enum>
+    </property>
+    <property name="clickMarginBottom" stdset="0">
+     <enum>Button::none</enum>
+    </property>
+   </widget>
+   <widget class="Button" name="uiExposureInPercent">
+    <property name="geometry">
+     <rect>
+      <x>120</x>
+      <y>0</y>
+      <width>121</width>
+      <height>81</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Show
+{percent:1.10f}</string>
+    </property>
+    <property name="clickMarginLeft" stdset="0">
+     <enum>Button::none</enum>
+    </property>
+    <property name="clickMarginRight" stdset="0">
+     <enum>Button::none</enum>
+    </property>
+    <property name="clickMarginBottom" stdset="0">
+     <enum>Button::none</enum>
+    </property>
+   </widget>
+   <widget class="Button" name="uiExposureInPercent_2">
+    <property name="geometry">
+     <rect>
+      <x>240</x>
+      <y>0</y>
+      <width>121</width>
+      <height>81</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Show
+{percent:1.10f}</string>
+    </property>
+    <property name="clickMarginLeft" stdset="0">
+     <enum>Button::none</enum>
+    </property>
+    <property name="clickMarginRight" stdset="0">
+     <enum>Button::none</enum>
+    </property>
+    <property name="clickMarginBottom" stdset="0">
+     <enum>Button::none</enum>
+    </property>
+   </widget>
+   <widget class="Slider" name="uiExposureSlider">
+    <property name="geometry">
+     <rect>
+      <x>360</x>
+      <y>0</y>
+      <width>441</width>
+      <height>101</height>
+     </rect>
+    </property>
+    <property name="orientation">
+     <enum>Qt::Horizontal</enum>
+    </property>
+   </widget>
+   <widget class="Backdrop" name="backdrop_3">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>20</y>
+      <width>801</width>
+      <height>61</height>
+     </rect>
+    </property>
+    <property name="customStyleSheet" stdset="0">
+     <string>border-top: 1px solid black;</string>
+    </property>
+   </widget>
+   <zorder>backdrop_3</zorder>
+   <zorder>uiExposureInDegrees</zorder>
+   <zorder>uiExposureInPercent</zorder>
+   <zorder>uiExposureInPercent_2</zorder>
+   <zorder>uiExposureSlider</zorder>
+  </widget>
   <zorder>backdrop</zorder>
   <zorder>backdrop_2</zorder>
   <zorder>uiVideo</zorder>
@@ -863,6 +973,7 @@ Peaking</string>
   <zorder>headerlabel</zorder>
   <zorder>label</zorder>
   <zorder>uiBatteryIcon</zorder>
+  <zorder>uiExposureMenu</zorder>
  </widget>
  <customwidgets>
   <customwidget>
@@ -909,6 +1020,11 @@ Peaking</string>
    <class>ScrollList</class>
    <extends>QListView</extends>
    <header>scroll_list</header>
+  </customwidget>
+  <customwidget>
+   <class>Slider</class>
+   <extends>QSlider</extends>
+   <header>slider</header>
   </customwidget>
   <customwidget>
    <class>Subheader</class>
