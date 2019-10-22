@@ -54,6 +54,40 @@ class Main(QWidget):
 		else:
 			recordingEndTime = recordingStartTime + totalFrames/api.getSync('frameRate')
 		
+		self.uiMenuBackground.hide()
+		self.uiMenuBackground.move(0,0)
+		
+		lastOpenerButton = None
+		
+		def showMenu(button: QWidget, menu: QWidget, *_):
+			nonlocal lastOpenerButton
+			lastOpenerButton = button
+			
+			self.uiMenuBackground.show(),
+			self.uiMenuBackground.raise_(),
+			button.raise_(),
+			menu.show(),
+			menu.raise_(),
+			self.focusRing.raise_(),
+		self.showMenu = showMenu
+			
+		def hideMenu(*_):
+			nonlocal lastOpenerButton
+			if not lastOpenerButton:
+				return
+			
+			self.uiMenuBackground.hide()
+			self.uiFocusPeakingColorMenu.hide()
+			self.uiMenuDropdown.hide()
+			self.uiExposureMenu.hide()
+			lastOpenerButton.setFocus()
+			
+			lastOpenerButton = None
+		self.hideMenu = hideMenu
+		
+		self.uiMenuBackground.mousePressEvent = hideMenu
+		self.uiMenuBackground.focusInEvent = hideMenu
+		
 		
 		#############################
 		#   Button action binding   #
@@ -62,7 +96,7 @@ class Main(QWidget):
 		#Debug buttons. (These are toggled on the factory settings screen.)
 		self.uiDebugA.clicked.connect(self.makeFailingCall)
 		self.uiDebugB.clicked.connect(lambda: window.show('test'))
-		self.uiDebugC.setFocusPolicy(QtCore.Qt.NoFocus) #Break into debugger without loosing focus, so you can debug focus issues.
+		self.uiDebugC.setFocusPolicy(QtCore.Qt.TabFocus) #Break into debugger without loosing focus, so you can debug focus issues.
 		self.uiDebugC.clicked.connect(lambda: self and window and dbg()) #"self" is needed here, won't be available otherwise.
 		self.uiDebugD.clicked.connect(QApplication.closeAllWindows)
 		
@@ -101,10 +135,6 @@ class Main(QWidget):
 		self.uiFocusPeaking.stateChanged.connect(lambda state: 
 			api.set({'focusPeakingLevel': (state/2) * 0.2}) )
 		
-		self.hideFocusPeakingColorMenu()
-		self.uiFocusPeakingColor.clicked.connect(
-			self.toggleFocusPeakingColorMenu)
-		
 		
 		#Focus peaking colour
 		focusColor = ''
@@ -133,6 +163,34 @@ class Main(QWidget):
 				rectSize, rectSize )
 		self.uiFocusPeakingColor.paintEvent = uiFocusPeakingColorPaintEvent
 		
+		self.uiFocusPeakingColor.clicked.connect(
+			self.toggleFocusPeakingColorMenu)
+		
+		self.uiFocusPeakingColorMenu.hide()
+		self.uiFocusPeakingColorMenu.move(360, 330)
+		
+		
+		#Loop focus peaking color menu focus, for the jog wheel.
+		self.uiMagentaFocusPeaking.nextInFocusChain = (lambda *_: 
+			self.uiFocusPeakingColor
+			if self.uiFocusPeakingColorMenu.isVisible() else
+			type(self.uiMagentaFocusPeaking).nextInFocusChain(self.uiMagentaFocusPeaking, *_)
+		)
+		self.uiRedFocusPeaking.previousInFocusChain = (lambda *_: 
+			self.uiFocusPeakingColor
+			if self.uiFocusPeakingColorMenu.isVisible() else
+			type(self.uiRedFocusPeaking).previousInFocusChain(self.uiRedFocusPeaking, *_)
+		)
+		self.uiFocusPeakingColor.nextInFocusChain = (lambda *_:
+			self.uiRedFocusPeaking
+			if self.uiFocusPeakingColorMenu.isVisible() else
+			type(self.uiFocusPeakingColor).nextInFocusChain(self.uiFocusPeakingColor, *_)
+		)
+		self.uiFocusPeakingColor.previousInFocusChain = (lambda *_:
+			self.uiMagentaFocusPeaking
+			if self.uiFocusPeakingColorMenu.isVisible() else
+			type(self.uiFocusPeakingColor).previousInFocusChain(self.uiFocusPeakingColor, *_)
+		)
 		
 		#Focus peaking color menu
 		api.observe('focusPeakingColor', self.updateFocusPeakingColor)
@@ -224,13 +282,34 @@ class Main(QWidget):
 		self.uiExposureMenu.hide()
 		self.uiExposureMenu.move(
 			self.x(),
-			self.uiExposure.y() - self.uiExposureMenu.height() + self.uiExposure.touchMargins()['top'] + 1, #-1 to merge margins.
+			self.uiExposure.y() - self.uiExposureMenu.height() + self.uiExposure.touchMargins()['top'],
 		)
-		self.uiExposure.clicked.connect(lambda:
-			getattr(
-				self.uiExposureMenu, 
-				'hide' if self.uiExposureMenu.isVisible() else 'show'
-			)()
+		self.uiExposure.clicked.connect(lambda *_: 
+			hideMenu()
+			if self.uiExposureMenu.isVisible() else
+			showMenu(self.uiExposure, self.uiExposureMenu)
+		)
+		
+		#Loop exposure menu focus, for the jog wheel.
+		self.uiExposureSlider.nextInFocusChain = (lambda *_: 
+			self.uiExposure
+			if self.uiExposureMenu.isVisible() else
+			type(self.uiExposureSlider).nextInFocusChain(self.uiExposureSlider, *_)
+		)
+		self.uiExposureInDegrees.previousInFocusChain = (lambda *_: 
+			self.uiExposure
+			if self.uiExposureMenu.isVisible() else
+			type(self.uiExposureInDegrees).previousInFocusChain(self.uiExposureInDegrees, *_)
+		)
+		self.uiExposure.nextInFocusChain = (lambda *_:
+			self.uiExposureInDegrees
+			if self.uiExposureMenu.isVisible() else
+			type(self.uiExposure).nextInFocusChain(self.uiExposure, *_)
+		)
+		self.uiExposure.previousInFocusChain = (lambda *_:
+			self.uiExposureSlider
+			if self.uiExposureMenu.isVisible() else
+			type(self.uiExposure).previousInFocusChain(self.uiExposure, *_)
 		)
 		
 		
@@ -269,11 +348,32 @@ class Main(QWidget):
 			self.uiMenuButton.x(),
 			self.uiMenuButton.y() + self.uiMenuButton.height() -  self.uiMenuButton.touchMargins()['bottom'] - self.uiMenuFilter.touchMargins()['top'] - 1, #-1 to merge margins.
 		)
-		self.uiMenuButton.clicked.connect(lambda:
-			getattr(
-				self.uiMenuDropdown, 
-				'hide' if self.uiMenuDropdown.isVisible() else 'show'
-			)()
+		self.uiMenuButton.clicked.connect((lambda:
+			hideMenu() 
+			if self.uiMenuDropdown.isVisible() else
+			showMenu(self.uiMenuButton, self.uiMenuDropdown)
+		))
+		
+		#Loop main menu focus, for the jog wheel.
+		self.uiMenuScroll.nextInFocusChain = (lambda *_: #DDR 2019-10-21: This doesn't work, and seems to break end-of-scroll progression in the menu scroll along the way.
+			self.uiMenuButton
+			if self.uiMenuDropdown.isVisible() else
+			type(self.uiMenuScroll).nextInFocusChain(self.uiMenuScroll, *_)
+		)
+		self.uiMenuFilter.previousInFocusChain = (lambda *_: 
+			self.uiMenuButton
+			if self.uiMenuDropdown.isVisible() else
+			type(self.uiMenuFilter).previousInFocusChain(self.uiMenuFilter, *_)
+		)
+		self.uiMenuButton.nextInFocusChain = (lambda *_:
+			self.uiMenuFilter
+			if self.uiMenuDropdown.isVisible() else
+			type(self.uiMenuButton).nextInFocusChain(self.uiMenuButton, *_)
+		)
+		self.uiMenuButton.previousInFocusChain = (lambda *_:
+			self.uiMenuScroll
+			if self.uiMenuDropdown.isVisible() else
+			type(self.uiMenuButton).previousInFocusChain(self.uiMenuButton, *_)
 		)
 		
 		# Populate uiMenuScroll from actions.
@@ -375,7 +475,7 @@ class Main(QWidget):
 				p = QPainter(self.uiBatteryIcon)
 				
 				#Cut out the battery outline, so the battery fill level doesn't show by
-				#outside the "nub". Previously, this was taken care of by an opaque box
+				#outside the "nub". Nextly, this was taken care of by an opaque box
 				#outside the battery nub in the SVG image, but this didn't work so well
 				#when the button was pressed or when themes were changed. We can't fill
 				#a polygon a percentage of the way very easily, and we can't just go in
@@ -612,6 +712,8 @@ class Main(QWidget):
 		self._externalMediaUsagePollTimer.start()
 		
 		api.video.call('livedisplay', {})
+		
+		self.hideMenu()
 	
 	def onHide(self):
 		self._batteryPollTimer.stop()
@@ -631,22 +733,12 @@ class Main(QWidget):
 		)
 	
 	
-	def hideFocusPeakingColorMenu(self):
-		#TODO DDR 2019-09-27: Make this work right.
-		self.uiFocusPeakingColorMenu.move(360, 480)
-		self.uiFocusPeakingColorMenu.hide()
-		
-	def showFocusPeakingColorMenu(self):
-		#TODO DDR 2019-09-27: Make this work right.
-		self.uiFocusPeakingColorMenu.move(360, 330)
-		self.uiFocusPeakingColorMenu.show()
-	
 	def toggleFocusPeakingColorMenu(self):
 		#TODO DDR 2019-09-27: Make this work right. ie, animate, close when you tap away, etc. Basically reword animate.
-		if dump('toggling', self.uiFocusPeakingColorMenu.isVisible()):
-			self.hideFocusPeakingColorMenu()
+		if not self.uiFocusPeakingColorMenu.isVisible():
+			self.showMenu(self.uiFocusPeakingColor, self.uiFocusPeakingColorMenu)
 		else:
-			self.showFocusPeakingColorMenu()
+			self.hideMenu()
 	
 	
 	def updateFocusPeakingColor(self, color: str):
