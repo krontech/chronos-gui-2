@@ -2,10 +2,11 @@
 
 import logging; log = logging.getLogger('Chronos.gui')
 from re import match as regex_match, search as regex_search
-from time import time, strftime
+from time import time
+import math
 
 from PyQt5 import uic, QtCore
-from PyQt5.QtCore import QPoint, QSize, Qt, QDateTime
+from PyQt5.QtCore import QPoint, QSize, Qt
 from PyQt5.QtWidgets import QWidget, QApplication
 from PyQt5.QtGui import QPainter, QPen, QBrush, QColor, QStandardItemModel, QPainterPath, QPolygonF
 
@@ -237,14 +238,46 @@ class Main(QWidget):
 		
 		
 		#Exposure
+		def updateExposureSliderLimits():
+			"""Update exposure text to match exposure slider, and sets the slider step so clicking the gutter always moves 1%."""
+			step1percent = (self.uiExposureSlider.minimum() + self.uiExposureSlider.maximum()) // 100
+			self.uiExposureSlider.setSingleStep(step1percent)
+			self.uiExposureSlider.setPageStep(step1percent*10)
+		
+		def onExposureSliderMoved(newExposureNs):
+			#startTime = time.perf_counter()
+			linearRatio = (newExposureNs-self.uiExposureSlider.minimum()) / (self.uiExposureSlider.maximum()-self.uiExposureSlider.minimum())
+			api.control.call('set', {
+				'exposurePeriod': math.pow(linearRatio, 2) * self.uiExposureSlider.maximum(),
+			})
+		
+		def updateExposureMax(newExposureNs):
+			self.uiExposureSlider.setMaximum(newExposureNs)
+			updateExposureSliderLimits()
+		
+		def updateExposureMin(newExposureNs):
+			self.uiExposureSlider.setMinimum(newExposureNs)
+			updateExposureSliderLimits()
+		
+		#Must set slider min/max before value.
+		api.observe('exposureMax', updateExposureMax)
+		api.observe('exposureMin', updateExposureMin)
+		
 		exposureUnit = 'ms' #One of 'ms', 'deg', or 'pct'.
 		exposureTemplate = self.uiExposure.text()
+		uiExposureInDegreesTemplate = self.uiExposureInDegrees.text()
+		uiExposureInMsTemplate = self.uiExposureInMs.text()
+		uiExposureInPercentTemplate = self.uiExposureInPercent.text()
 		
 		exposureNsMin = 0
 		exposureNs = 0
 		exposureNsMax = 0
 		
-		def updateExposureText():
+		def updateExposureText(*_):
+			exposureDeg = exposureNs/api.apiValues.get('framePeriod')*360
+			exposurePct = (exposureNs-exposureNsMin)/(exposureNsMax-exposureNsMin)*100
+			exposureMs = exposureNs/1e3
+			
 			self.uiExposure.setText(
 				exposureTemplate.format(
 					name = {
@@ -253,12 +286,33 @@ class Main(QWidget):
 						'deg': 'Shutter Angle',
 					}[exposureUnit],
 					exposure = {
-						'ms': f'{exposureNs/1e3:0.2f}ms',
-						'pct': f'{round(exposureNs/(exposureNsMax-exposureNsMin)*100)}%',
-						'deg': f'{round(exposureNs/(exposureNsMax-exposureNsMin)*360)}%', #TODO DDR 2019-09-27: Is this actually the way to calculate shutter angle?
+						'deg': f'{exposureDeg:1.0f}°', #TODO DDR 2019-09-27: Is this actually the way to calculate shutter angle?
+						'pct': f'{exposurePct:1.1f}%',
+						'ms': f'{exposureMs:1.1f}ms',
 					}[exposureUnit],
 				)
 			)
+			
+			self.uiExposureInDegrees.setText(
+				uiExposureInDegreesTemplate.format(
+					degrees = exposureDeg ) )
+			
+			self.uiExposureInPercent.setText(
+				uiExposureInPercentTemplate.format(
+					percent = exposurePct ) )
+			
+			self.uiExposureInMs.setText(
+				uiExposureInMsTemplate.format(
+					duration = exposureMs ) )
+			
+			linearRatio = exposureNs/(exposureNsMax-exposureNsMin)
+			try:
+				exponentialRatio = math.sqrt(linearRatio)
+			except ValueError:
+				exponentialRatio = 0
+			if not self.uiExposureSlider.beingHeld:
+				self.uiExposureSlider.setValue(exponentialRatio * (self.uiExposureSlider.maximum()-self.uiExposureSlider.minimum()) + self.uiExposureSlider.minimum())
+			updateExposureSliderLimits()
 		
 		# In Python 3.7: Use api.observe('exposureMin', lambda ns: exposureNSMin := ns) and give exposureNSMin a setter?
 		def updateExposureNsMin(ns):
@@ -278,6 +332,8 @@ class Main(QWidget):
 			exposureNsMax = ns
 			updateExposureText()
 		api.observe('exposureMax', updateExposureNsMax)
+		
+		api.observe('framePeriod', updateExposureText)
 		
 		self.uiExposureMenu.hide()
 		self.uiExposureMenu.move(
@@ -311,6 +367,50 @@ class Main(QWidget):
 			if self.uiExposureMenu.isVisible() else
 			type(self.uiExposure).previousInFocusChain(self.uiExposure, *_)
 		)
+		
+		def uiExposureInDegreesClicked(*_):
+			nonlocal exposureUnit
+			exposureUnit = 'deg'
+			updateExposureText()
+		self.uiExposureInDegrees.clicked.connect(
+			uiExposureInDegreesClicked )
+		
+		def uiExposureInMsClicked(*_):
+			nonlocal exposureUnit
+			exposureUnit = 'ms'
+			updateExposureText()
+		self.uiExposureInMs.clicked.connect(
+			uiExposureInMsClicked )
+		
+		def uiExposureInPercentClicked(*_):
+			nonlocal exposureUnit
+			exposureUnit = 'pct'
+			updateExposureText()
+		self.uiExposureInPercent.clicked.connect(
+			uiExposureInPercentClicked )
+		
+		
+		#Exposure Slider - copied from the original main.py.
+		self.uiExposureSlider.debounce.sliderMoved.connect(onExposureSliderMoved)
+		#self.uiExposureSlider.touchMargins = lambda: {
+		#	"top": 10, "left": 30, "bottom": 10, "right": 30
+		#}
+		#self.uiExposureSlider.focusGeometryNudge = (1,1,1,1)
+		
+		
+		def onExposureSliderMoved(self, newExposureNs):
+			#startTime = time.perf_counter()
+			linearRatio = (newExposureNs-self.uiExposureSlider.minimum()) / (self.uiExposureSlider.maximum()-self.uiExposureSlider.minimum())
+			log.print(f'lr {linearRatio}')
+			api.control.call('set', {
+				'exposurePeriod': math.pow(linearRatio, 2) * self.uiExposureSlider.maximum(),
+			})
+			
+			#TODO DDR 2019-10-22: Run updateExposureText with the new exposure period. (The signal takes too long to return, as it's masked by the new value the slider sets.)
+		
+		
+		
+		
 		
 		
 		#Resolution
