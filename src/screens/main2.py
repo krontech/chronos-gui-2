@@ -245,11 +245,15 @@ class Main(QWidget):
 			self.uiExposureSlider.setPageStep(step1percent*10)
 		
 		def onExposureSliderMoved(newExposureNs):
-			#startTime = time.perf_counter()
+			nonlocal exposureNs
+			
 			linearRatio = (newExposureNs-self.uiExposureSlider.minimum()) / (self.uiExposureSlider.maximum()-self.uiExposureSlider.minimum())
-			api.control.call('set', {
-				'exposurePeriod': math.pow(linearRatio, 2) * self.uiExposureSlider.maximum(),
-			})
+			newExposureNs = math.pow(linearRatio, 2) * self.uiExposureSlider.maximum()
+			api.control.call('set', {'exposurePeriod': newExposureNs})
+			
+			#The signal takes too long to return, as it's masked by the new value the slider sets.
+			exposureNs = newExposureNs
+			updateExposureText()
 		
 		def updateExposureMax(newExposureNs):
 			self.uiExposureSlider.setMaximum(newExposureNs)
@@ -275,8 +279,11 @@ class Main(QWidget):
 		
 		def updateExposureText(*_):
 			exposureDeg = exposureNs/api.apiValues.get('framePeriod')*360
-			exposurePct = (exposureNs-exposureNsMin)/(exposureNsMax-exposureNsMin)*100
+			exposurePct = exposureNs/(exposureNsMax or 1)*100
 			exposureMs = exposureNs/1e3
+			
+			if exposurePct < 0:
+				dbg()
 			
 			self.uiExposure.setText(
 				exposureTemplate.format(
@@ -392,22 +399,9 @@ class Main(QWidget):
 		
 		#Exposure Slider - copied from the original main.py.
 		self.uiExposureSlider.debounce.sliderMoved.connect(onExposureSliderMoved)
-		#self.uiExposureSlider.touchMargins = lambda: {
-		#	"top": 10, "left": 30, "bottom": 10, "right": 30
-		#}
-		#self.uiExposureSlider.focusGeometryNudge = (1,1,1,1)
-		
-		
-		def onExposureSliderMoved(self, newExposureNs):
-			#startTime = time.perf_counter()
-			linearRatio = (newExposureNs-self.uiExposureSlider.minimum()) / (self.uiExposureSlider.maximum()-self.uiExposureSlider.minimum())
-			log.print(f'lr {linearRatio}')
-			api.control.call('set', {
-				'exposurePeriod': math.pow(linearRatio, 2) * self.uiExposureSlider.maximum(),
-			})
-			
-			#TODO DDR 2019-10-22: Run updateExposureText with the new exposure period. (The signal takes too long to return, as it's masked by the new value the slider sets.)
-		
+		self.uiExposureSlider.touchMargins = lambda: {
+			"top": 10, "left": 10, "bottom": 10, "right": 10
+		}
 		
 		
 		
