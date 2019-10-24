@@ -6,6 +6,7 @@ from PyQt5.QtCore import Q_ENUMS, QSize, Qt
 from PyQt5.QtWidgets import QCheckBox
 
 from debugger import *; dbg
+import settings
 import logging; log = logging.getLogger('Chronos.gui')
 
 from touch_margin_plugin import TouchMarginPlugin, MarginWidth
@@ -19,10 +20,15 @@ class CheckBox(QCheckBox, TouchMarginPlugin, DirectAPILinkPlugin, FocusablePlugi
 	
 	def __init__(self, parent=None, showHitRects=False):
 		super().__init__(parent, showHitRects=showHitRects)
+		
+		self.theme = ''
 		self._clickMarginRight = MarginWidth.none
 		self.clickMarginColor = f"rgba({randint(128, 255)}, {randint(0, 32)}, {randint(128, 255)}, {randint(32,96)})"
 		
-		self.refreshStyle()
+		settings.observe('theme', 'dark', lambda theme: (
+			setattr(self, 'theme', theme),
+			self.refreshStyle(),
+		))
 		
 		self.setMouseTracking(True)
 		
@@ -77,7 +83,8 @@ class CheckBox(QCheckBox, TouchMarginPlugin, DirectAPILinkPlugin, FocusablePlugi
 				CheckBox {{
 					/* App style. Use margin to provide further click area outside the visual button. */
 					font-size: 16px;
-					background: white;
+					color: {'white' if self.theme == 'dark' else 'black'};
+					background-color: {'#333' if self.theme == 'dark' else 'white'};
 					
 					/* Add some touch space so this widget is easier to press. */
 					margin-left: {self.clickMarginLeft*10}px;

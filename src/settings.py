@@ -46,6 +46,7 @@ def setValue(key: str, value: any) -> None:
 	if not isinstance(key, str):
 		raise TypeError(f'settings.setValue(key, value) only accepts str keys, because that\'s what the underlying store accepts. It got passed the key {key}, a {type(key)}.')
 	
+	#Invoke callback first, so it can inspect the old value by getting it.
 	for callback in _callbacks[key]:
 		callback(value)
 	

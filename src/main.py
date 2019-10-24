@@ -497,15 +497,23 @@ def connectHardwareEvents(app, hardware):
 
 if __name__ == '__main__':
 	app = QtWidgets.QApplication(sys.argv)
-	app.setFont(QtGui.QFont("DejaVu Sans", 12)) #Fix fonts being just a little smaller by default than in Creator. This probably only applies to the old camApp .ui files.
 	
-	window = Window(app)
+	font = QtGui.QFont("Roboto", 12)
+	font.setLetterSpacing(QtGui.QFont.AbsoluteSpacing, 0.25)
+	#font.setLineSpacing(QtGui.QFont.PercentageSpacing, 120) #Not a thing. Wish it was. A line-height of 120% is used in the mockup main2.6d.svg.
+	font.setHintingPreference(QtGui.QFont.PreferNoHinting) #Hinting messes up letter-spacing so badly that it's not worth it.
+	app.setFont(font)
 	
 	#I don't think this is striiiiictly needed any more? Incurs 10ms penalty for slider fps.
 	#eventFilter = GlobalFilter(app, window)
 	#app.installEventFilter(eventFilter)
 	
 	app.setStyleSheet("""
+		/* This should set line-height to roughly 120%, as specified in the mockup main2.6d.svg, but it doesn't. (It is not supported by QFont.)*/
+		* {
+			line-height: 35px;
+		}
+		
 		/* Remove the little dotted focus ring. It's too hard to see, but still looks messy now that we've got our own. */
 		*:focus {
 			outline: 2px double blue; /*Debugging, show system focus ring.*/
@@ -515,6 +523,7 @@ if __name__ == '__main__':
 		}
 	""")
 	
+	window = Window(app)
 	def focusChanged(old, new):
 		if new:
 			window._screens[window.currentScreen].focusRing.focusOn(new)

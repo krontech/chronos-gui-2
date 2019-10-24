@@ -13,8 +13,9 @@ set -euxo pipefail #enable "safe mode"
     touch ~/.hushlogin
 
 # install deps
+    #Note: apt's python3-numpy python3-termcolor python3-dbus and pip3's python-periphery smbus2 are probably not needed.
     apt update && apt-get upgrade --yes
-    apt install ca-certificates cowsay vim rsync python3-pip python3-pyqt5 python3-pyqt5.qtsvg curl python3-numpy python3-termcolor python3-dbus udisks2 --yes
+    apt install ca-certificates cowsay vim rsync python3-pip python3-pyqt5 python3-pyqt5.qtsvg curl python3-numpy python3-termcolor python3-dbus udisks2 fonts-roboto --yes
     pip3 install --upgrade setuptools #required for smbus2
     pip3 install typing future-fstrings python-periphery smbus2 #Required for gui2 and pychronos.
     pip3 install pdbpp watchdog #Optional deps. "pdbpp" provides improvements to pdb. "watchdog" provides watchmedo, used for automatic deployment with util/watch-camera.

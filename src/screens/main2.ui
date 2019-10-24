@@ -116,8 +116,8 @@
     </rect>
    </property>
    <property name="text">
-    <string>                  {state}
-                 {timeRecorded:05.2f}s</string>
+    <string>                     {state}
+                    {timeRecorded:05.2f}s</string>
    </property>
    <property name="clickMarginLeft" stdset="0">
     <enum>Button::none</enum>
@@ -233,6 +233,29 @@ Sensor</string>
      <height>81</height>
     </rect>
    </property>
+   <property name="styleSheet">
+    <string notr="true">
+				CheckBox {
+					/* Editor style. Use border to show were click margin is, so we don't mess it up during layout. */
+					font-size: 16px;
+					background: rgba(255,255,255,127); /* The background is drawn under the button borders, so they are opaque if the background is opaque. */
+					
+					/* use borders instead of margins so we can see what we're doing */
+					border-left:   11px solid rgba(156, 7, 158, 87);
+					border-right:  1px solid rgba(156, 7, 158, 87);
+					border-top:    21px solid rgba(156, 7, 158, 87);
+					border-bottom: 1px solid rgba(156, 7, 158, 87);
+				}
+				
+				CheckBox::indicator:checked {
+					image: url(../../assets/images/checkbox-checked.svg.png);
+				}
+				CheckBox::indicator:unchecked {
+					image: url(../../assets/images/checkbox-unchecked.svg.png);
+				}
+				
+			CheckBox {  text-align: center; }</string>
+   </property>
    <property name="text">
     <string>Zebra
 Stripes</string>
@@ -242,6 +265,9 @@ Stripes</string>
    </property>
    <property name="clickMarginBottom" stdset="0">
     <enum>CheckBox::none</enum>
+   </property>
+   <property name="customStyleSheet" stdset="0">
+    <string>CheckBox {  text-align: center; }</string>
    </property>
   </widget>
   <widget class="CheckBox" name="uiFocusPeaking">
@@ -262,6 +288,9 @@ Peaking</string>
    </property>
    <property name="clickMarginBottom" stdset="0">
     <enum>CheckBox::none</enum>
+   </property>
+   <property name="customStyleSheet" stdset="0">
+    <string>CheckBox {  text-align: center; }</string>
    </property>
   </widget>
   <widget class="Button" name="uiFocusPeakingColor">

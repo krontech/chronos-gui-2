@@ -6,6 +6,7 @@ from PyQt5.QtCore import Q_ENUMS, QSize, Qt
 from PyQt5.QtWidgets import QPushButton
 
 from debugger import *; dbg
+import settings
 from show_paint_rect_plugin import ShowPaintRectsPlugin
 from touch_margin_plugin import TouchMarginPlugin, MarginWidth
 from focusable_plugin import FocusablePlugin
@@ -24,9 +25,14 @@ class Button(ShowPaintRectsPlugin, TouchMarginPlugin, FocusablePlugin, QPushButt
 		# Set some default text, so we can see the widget.
 		if not self.text():
 			self.setText('Button')
-			
+		
+		self.theme = ''
 		self.clickMarginColor = f"rgba({randint(0, 32)}, {randint(0, 32)}, {randint(128, 255)}, {randint(32,96)})"
 		
+		settings.observe('theme', 'dark', lambda theme: (
+			setattr(self, 'theme', theme),
+			self.refreshStyle(),
+		))
 		
 		self.jogWheelLowResolutionRotation.connect(lambda delta, pressed: 
 			not pressed and self.selectWidget(delta) )
@@ -65,14 +71,19 @@ class Button(ShowPaintRectsPlugin, TouchMarginPlugin, FocusablePlugin, QPushButt
 			""" + self.originalStyleSheet())
 		else:
 			self.setStyleSheet(f"""
+				/* App style. Use margin to provide further click area outside the visual button. */
 				Button {{
-					/* App style. Use margin to provide further click area outside the visual button. */
 					font-size: 16px;
-					background: white;
-					border: 1px solid black;
+					color: {
+						('white' if not self._fake_disability else 'lightgrey') 
+						if self.theme == 'dark' else 
+						('black' if not self._fake_disability else 'darkgrey')
+					};
+					background-color: {'#333' if self.theme == 'dark' else 'white'};
+					
+					border: 1px solid {'#333' if self.theme == 'dark' else 'black'};
 					border-left-color: rgb(50,50,50);
 					border-top-color: rgb(50,50,50); /* Add a subtle 3d-ness until we figure out drop-shadows. */
-					color: {'black' if not self._fake_disability else 'darkgrey'};
 					
 					/* Add some touch space so this widget is easier to press. */
 					margin-left: {self.clickMarginLeft*10}px;
