@@ -245,34 +245,40 @@ class Window(QtCore.QObject):
 		#the uncomfortable implication that *all* the signal handlers we've
 		#registered for buttons are reentrant, whether that's safe or not."""
 		if(self._screenStack[-1] != self.currentScreen):
-			print(f'Warning: Tried to open {screen}, but another screen ({self._screenStack[-1]}) is already in the process of being opened from {self.currentScreen}')
+			log.warn(f'Tried to open {screen}, but another screen ({self._screenStack[-1]}) is already in the process of being opened from {self.currentScreen}')
 			return
 		
 		# Prevent screen from disappearing entirely. Because we open the screen next screen then hide the current, if both are the same it shows then hides the screen so it goes away.
 		if(screen == self.currentScreen):
-			print(f'Warning: Tried to open {screen}, but it was already open. This probably indicates an application logic error.') # Also print a warning, because this probably indicates a logic error.
+			log.warn(f'Tried to open {screen}, but it was already open. This probably indicates an application logic error.') # Also print a warning, because this probably indicates a logic error.
 			return dbg() #This gets stubbed out in production, so it doesn't actually freeze the app.
 		
 		#If you loop through to a screen again, which can easily happen because we don't always use window.back() to return from screens, discard the loop to keep history from growing forever.
 		self._screenStack += [screen]
 		self._screenStack = self._screenStack[:self._screenStack.index(screen)+1]
 		
-		self._ensureInstantiated(screen)
-		
-		if hasattr(self._screens[screen], 'onShow'):
-			self._screens[screen].onShow()	
-		self._screens[screen].show()
-		
-		self._screens[self.currentScreen].hide()
-		if hasattr(self._screens[self.currentScreen], 'onHide'):
-			self._screens[self.currentScreen].onHide()
-		self.hideInput()
-		
-		#Only set the setting value after everything has worked, to avoid trying to load a crashing screen.
-		self.currentScreen = screen
-		settings.setValue('current screen', screen)
-		
-		#print(f'current breadcrumb: {self._screenStack}')
+		try:
+			self._ensureInstantiated(screen)
+			
+			if hasattr(self._screens[screen], 'onShow'):
+				self._screens[screen].onShow()	
+			self._screens[screen].show()
+			
+			self._screens[self.currentScreen].hide()
+			if hasattr(self._screens[self.currentScreen], 'onHide'):
+				self._screens[self.currentScreen].onHide()
+			self.hideInput()
+			
+			#Only set the setting value after everything has worked, to avoid trying to load a crashing screen.
+			self.currentScreen = screen
+			settings.setValue('current screen', screen)
+			
+			#print(f'current breadcrumb: {self._screenStack}')
+		except Exception as e:
+			#Add some resiliance: If the screen isn't openable, allow other screens to be. (Otherwise we always trip the double-opening protection.)
+			self._screenStack = self._screenStack[:-1]
+			raise e
+			
 		
 	def back(self):
 		"""Return to a previous screen."""
