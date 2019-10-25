@@ -103,7 +103,11 @@ class InteractiveVideoArea(QWidget):
 		def realZoomLevel(self):
 			return api.apiValues.get('videoZoom') / self.oneToOneZoomLevel()
 		
-		def updateVideoZoom(self, level):
+		def updateVideoZoom(self, *_):
 			self.zoomLabel.setText(
 				self.zoomLabelTemplate.format(
 					zoom=self.realZoomLevel() ) )
+		
+		def resizeEvent(self, evt):
+			self.updateVideoZoom()
+			return super().resizeEvent(evt)
