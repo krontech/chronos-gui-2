@@ -607,6 +607,9 @@ _camState['error'] = '' #Last error is reported inline sometimes.
 if 'videoSegments' not in _camState:
 	log.warn('videoSegments not found in availableKeys (pychronos/issues/31)')
 	_camState['videoSegments'] = []
+if 'videoZoom' not in _camState:
+	log.warn('videoZoom not found in availableKeys (pychronos/issues/52)')
+	_camState['videoZoom'] = 1
 _camStateAge = {k:0 for k,v in _camState.items()}
 
 class APIValues(QObject):

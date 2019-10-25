@@ -497,6 +497,7 @@ def connectHardwareEvents(app, hardware):
 
 if __name__ == '__main__':
 	app = QtWidgets.QApplication(sys.argv)
+	app.setDoubleClickInterval(5) #400 is default and hard to do with fingers. Also this doesn't work. "The default value on X11 is 400 milliseconds", but how do you change that? Since we only use it one place, we'll just ignore it and debounce our own.
 	
 	font = QtGui.QFont("Roboto", 12)
 	font.setLetterSpacing(QtGui.QFont.AbsoluteSpacing, 0.25)
