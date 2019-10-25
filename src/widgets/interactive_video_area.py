@@ -2,7 +2,7 @@
 
 from time import time
 
-from PyQt5.QtWidgets import QWidget, QLabel
+from PyQt5.QtWidgets import QWidget, QLabel, QGestureEvent
 from PyQt5.QtCore import QSize, QEvent, Qt
 import PyQt5.QtGui as QtGui
 
@@ -28,7 +28,7 @@ class InteractiveVideoArea(QWidget):
 		self._customStyleSheet = self.styleSheet() #always '' for some reason
 		if showHitRects:
 			self.setStyleSheet(f"""
-				background: rgba(0,0,0,128);
+				background: rgba(0,255,0,128);
 				border: 4px solid black;
 			""")
 		
@@ -41,17 +41,17 @@ class InteractiveVideoArea(QWidget):
 		self.zoomLabel.setText(self.zoomLabelTemplate.format(zoom=2))
 		self.zoomLabel.show()
 		
-		
 		if showHitRects: #Make black background show up in Designer. Must be async for some reason.
 			delay(self, 0, lambda: self.setAutoFillBackground(True))
 		
 		if api:
 			self.lastClickTime = 0
 			api.observe('videoZoom', self.updateVideoZoom)
+			
+			self.grabGesture(Qt.PinchGesture)
 	
 	
 	def showEvent(self, evt):
-		log.print('SHOW EVENT')
 		api.video.call('set', {'videoZoom': 1})
 		api.video.call('configure', {
 			'xoff': max(0, min(self.x(), 800-self.width())),
@@ -63,7 +63,8 @@ class InteractiveVideoArea(QWidget):
 		
 	if api:
 		def event(self, evt: QEvent):
-			#add zoom here
+			if type(evt) is QGestureEvent:
+				log.print(f'iva got gesture {evt.activeGestures()}')
 			
 			return super().event(evt)
 		
@@ -72,14 +73,14 @@ class InteractiveVideoArea(QWidget):
 			clickTimeDelta = time() - self.lastClickTime
 			self.lastClickTime = time()
 			if clickTimeDelta < 0.5:
-				self.lastClickTime = 0
-				self.doubleClickHandler(evt)
+				#self.lastClickTime = 0 #Uncomment to disable triple-tap to zoom out.
+				self.nextZoomLevel(evt)
 		
 		#Don't use this, because the timeout is too low for fingers. Set in x11 somewhere, writing mousePressEvent was easier that changing it (and deploying those changes reliably).
 		#def mouseDoubleClickEvent(self, evt):
 		#	print('double click!')
 		
-		def doubleClickHandler(self, evt): #This never gets called by Qt, so we have to call it ourselves.
+		def nextZoomLevel(self, *_):
 			"""When double-clicked, set the zoom level to the next."""
 			zoomLevels = sorted([1, 4, self.oneToOneZoomLevel()])
 			zoom = api.apiValues.get('videoZoom')
@@ -104,10 +105,20 @@ class InteractiveVideoArea(QWidget):
 			return api.apiValues.get('videoZoom') / self.oneToOneZoomLevel()
 		
 		def updateVideoZoom(self, *_):
+			if api.apiValues.get('videoZoom') == 1:
+				self.zoomLabel.hide()
+			else:
+				self.zoomLabel.show()
+			
 			self.zoomLabel.setText(
 				self.zoomLabelTemplate.format(
 					zoom=self.realZoomLevel() ) )
 		
 		def resizeEvent(self, evt):
+			"""Update the video zoom text on widget resize.
+				
+				Although we never resize widgets, they get placed after getting
+				constructed so the zoom calculation is incorrect the first go-around."""
+			
 			self.updateVideoZoom()
 			return super().resizeEvent(evt)
