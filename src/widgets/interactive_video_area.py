@@ -21,14 +21,14 @@ class InteractiveVideoArea(QWidget):
 	def sizeHint(self):
 		return QSize(141, 141)
 	
-	zoomLabelTemplate = "🔎 {zoom:0.1f}x Zoom"
+	zoomLabelTemplate = "🔎 {zoom:0.1f}x Preview Zoom"
 
 	def __init__(self, parent=None, showHitRects=False):
 		super().__init__(parent)
 		self._customStyleSheet = self.styleSheet() #always '' for some reason
 		if showHitRects:
 			self.setStyleSheet(f"""
-				background: rgba(0,255,0,128);
+				background: rgba(0,0,0,128);
 				border: 4px solid black;
 			""")
 		
@@ -36,7 +36,13 @@ class InteractiveVideoArea(QWidget):
 		self.zoomLabel = QLabel(self)
 		self.zoomLabel.setStyleSheet(f"""
 			color: white;
-			background-color: rgba(0,0,0,128);
+			color: black;
+			background-color: rgba(1,80,26,218);
+			background-color: rgba(255,255,255,192);
+			border: 1px solid black;
+			margin: 10px 5px;
+			padding: 5px 10px;
+			border-radius: 17px;
 		""")
 		self.zoomLabel.setText(self.zoomLabelTemplate.format(zoom=2))
 		self.zoomLabel.show()
@@ -51,17 +57,17 @@ class InteractiveVideoArea(QWidget):
 			self.grabGesture(Qt.PinchGesture)
 	
 	
-	def showEvent(self, evt):
-		api.video.call('set', {'videoZoom': 1})
-		api.video.call('configure', {
-			'xoff': max(0, min(self.x(), 800-self.width())),
-			'yoff': max(0, min(self.y(), 480-self.height())),
-			'hres': max(200, min(self.width(), 800)),
-			'vres': max(200, min(self.height(), 480)),
-		})
-		
-		
 	if api:
+		def showEvent(self, evt):
+			api.video.call('set', {'videoZoom': 1})
+			api.video.call('configure', {
+				'xoff': max(0, min(self.x(), 800-self.width())),
+				'yoff': max(0, min(self.y(), 480-self.height())),
+				'hres': max(200, min(self.width(), 800)),
+				'vres': max(200, min(self.height(), 480)),
+			})
+		
+		
 		def event(self, evt: QEvent):
 			if type(evt) is QGestureEvent:
 				log.print(f'iva got gesture {evt.activeGestures()}')
@@ -78,7 +84,7 @@ class InteractiveVideoArea(QWidget):
 		
 		#Don't use this, because the timeout is too low for fingers. Set in x11 somewhere, writing mousePressEvent was easier that changing it (and deploying those changes reliably).
 		#def mouseDoubleClickEvent(self, evt):
-		#	print('double click!')
+		
 		
 		def nextZoomLevel(self, *_):
 			"""When double-clicked, set the zoom level to the next."""
@@ -101,6 +107,7 @@ class InteractiveVideoArea(QWidget):
 				res['vRes'] / self.height(),
 			)
 		
+		
 		def realZoomLevel(self):
 			return api.apiValues.get('videoZoom') / self.oneToOneZoomLevel()
 		
@@ -113,6 +120,7 @@ class InteractiveVideoArea(QWidget):
 			self.zoomLabel.setText(
 				self.zoomLabelTemplate.format(
 					zoom=self.realZoomLevel() ) )
+		
 		
 		def resizeEvent(self, evt):
 			"""Update the video zoom text on widget resize.
