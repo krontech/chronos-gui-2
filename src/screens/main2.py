@@ -101,8 +101,16 @@ class Main(QWidget):
 		self.uiDebugC.clicked.connect(lambda: self and window and dbg()) #"self" is needed here, won't be available otherwise.
 		self.uiDebugD.clicked.connect(QApplication.closeAllWindows)
 		
+		#Only show the debug controls if enabled in factory settings.
+		settings.observe('debug controls enabled', False, lambda show: (
+			self.uiDebugA.show() if show else self.uiDebugA.hide(),
+			self.uiDebugB.show() if show else self.uiDebugB.hide(),
+			self.uiDebugC.show() if show else self.uiDebugC.hide(),
+			self.uiDebugD.show() if show else self.uiDebugD.hide(),
+		))
 		
-		#Occasionally, the touch screen will report a spurious touch event on the top-right corner. This should prevent that. Since the record button is there now, this is actually very important.
+		
+		#Occasionally, the touch screen seems to report a spurious touch event on the top-right corner. This should prevent that. (Since the record button is there now, this is actually very important!)
 		self.uiErrantClickCatcher.mousePressEvent = (lambda evt:
 			log.warn('Errant click blocked. [WpeWCY]'))
 		
