@@ -12,6 +12,8 @@ import settings
 
 
 class ServiceScreenLocked(QtWidgets.QDialog):
+	unlockPassword = "4242"
+	
 	def __init__(self, window):
 		super().__init__()
 		uic.loadUi("src/screens/service_screen.locked.ui", self)
@@ -23,15 +25,33 @@ class ServiceScreenLocked(QtWidgets.QDialog):
 		self.window_ = window
 		
 		self.uiPassword.setText('') #Clear placeholder text.
-		self.uiPassword.textChanged.connect(lambda text:
-			text == "4242" and window.show('service_screen.unlocked') )
+		self.uiPassword.textChanged.connect(self.checkPassword)
 		
 		self.uiDone.clicked.connect(window.back)
 	
 	
 	def onShow(self):
-		api.get('cameraSerial').then(lambda serial:
-			serial or self.window_.show('service_screen.unlocked'))
+		api.get('cameraSerial').then(self.onShow2)
+	def onShow2(self, serial):
+		#The camera has a serial number set before leaving the factory. If the
+		#camera doesn't have a serial number, then it must still be in the
+		#production process and we should unlock the service screen for the
+		#technologist working on it.
+		if not serial:
+			self.unlock()
+		
+		#Check the password, if it's already been set then just go on through.
+		#This resets when the camera is rebooted.
+		self.checkPassword(self.uiPassword.text())
+	
+	def checkPassword(self, guess):
+		if guess == self.unlockPassword:
+			self.unlock()
+	
+	def unlock(self):
+		self.window_.show('service_screen.unlocked')
+		
+		
 
 
 
@@ -59,7 +79,7 @@ class ServiceScreenUnlocked(QtWidgets.QDialog):
 		self.uiShowDebugControls.stateChanged.connect(lambda x:
 			settings.setValue('debug controls enabled', bool(x)) )
 		
-		self.uiDone.clicked.connect(lambda: window.show('primary_settings'))
+		self.uiDone.clicked.connect(lambda: window.show('main'))
 	
 	
 	
