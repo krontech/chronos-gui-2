@@ -27,10 +27,10 @@ def run(self, command: list, error: callable, success: callable):
 		if exitStatus is None: #Still running, check again later.
 			#Standard clamped exponential decay. Keeps polling to a reasonable amount, frequent at first then low.
 			delay(self, timeout, lambda:
-				checkProc(timeout=max(1, timeout*2)) )
+				checkProc(timeout=max(250, timeout*2)) )
 		elif exitStatus:
 			error(exitStatus)
 		else:
 			success(str(proc.communicate()[0], 'utf8'))
-	delay(self, 0.20, lambda: #Initial delay, df et al usually run in .17-.20s.
-		checkProc(timeout=0.05) )
+	delay(self, 200, lambda: #Initial delay, df et al usually run in .17-.20s.
+		checkProc(timeout=50) )
