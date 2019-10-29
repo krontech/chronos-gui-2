@@ -255,6 +255,8 @@ class Window(QtCore.QObject):
 			log.warn(f'Tried to open {screen}, but it was already open. This probably indicates an application logic error.') # Also print a warning, because this probably indicates a logic error.
 			return dbg() #This gets stubbed out in production, so it doesn't actually freeze the app.
 		
+		report("screen_transition", {"new": screen, "old": self.currentScreen})
+		
 		#If you loop through to a screen again, which can easily happen because we don't always use window.back() to return from screens, discard the loop to keep history from growing forever.
 		self._screenStack += [screen]
 		self._screenStack = self._screenStack[:self._screenStack.index(screen)+1]

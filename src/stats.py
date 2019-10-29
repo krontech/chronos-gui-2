@@ -15,6 +15,7 @@ except Exception:
 
 
 report_url = 'http://192.168.1.55:19861'
+contact_warned = False
 def report(tag: str, data: dict):
 	"""Report program statistics to an internal server, stats.node.js."""
 	assert tag
@@ -26,7 +27,10 @@ def report(tag: str, data: dict):
 	try:
 		urlopen(report_url, bytes(json.dumps(data), 'utf-8'), 0.1)
 	except Exception:
-		log.warn(f'Could not contact the stats server at {report_url}.')
+		global contact_warned
+		if not contact_warned:
+			contact_warned = True
+			log.warn(f'Could not contact the stats server at {report_url}.')
 		pass
 	
 def report_mock(tag: str, data: dict):
