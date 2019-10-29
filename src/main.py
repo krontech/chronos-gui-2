@@ -106,6 +106,7 @@ class Window(QtCore.QObject):
 		from screens.test import Test
 		from screens.service_screen import ServiceScreenLocked, ServiceScreenUnlocked
 		from screens.remote_access import RemoteAccess
+		from screens.scripts import Scripts
 		from screens.storage import Storage
 		from screens.replay import Replay
 		
@@ -120,6 +121,7 @@ class Window(QtCore.QObject):
 			'about_camera': AboutCamera,
 			'file_settings': FileSettings,
 			'power': Power,
+			'scripts': Scripts,
 			'stamp': Stamp,
 			'update_firmware': UpdateFirmware,
 			'user_settings': UserSettings,

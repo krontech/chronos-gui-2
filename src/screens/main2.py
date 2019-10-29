@@ -4,6 +4,7 @@ import logging; log = logging.getLogger('Chronos.gui')
 from re import match as regex_match, search as regex_search
 from time import time
 import math
+from glob import iglob
 
 from PyQt5 import uic, QtCore
 from PyQt5.QtCore import QPoint, QSize, Qt
@@ -483,14 +484,17 @@ class Main(QWidget):
 		# hidden in this menu, which means it won't come up unless we search
 		# for it. This should -- hopefully -- keep the clutter down without
 		# being confusing.
-		_triggersHidden = api.apiValues.get('sensorColorPattern') == 'mono'
+		_whiteBalAvail = api.apiValues.get('sensorColorPattern') == 'mono' #Black and white models of the Chronos do not have colour to balance, so don't show that screen ever.
+		_scriptsHidden = not [f for f in iglob('/var/camera/scripts/*')][:1] #Only show the scripts screen if there will be a script on it to run.
+		log.print(f'_scriptsHidden {_scriptsHidden}')
 		main_menu_items = [
 			{'name':"About Camera",          'open':lambda: window.show('about_camera'),          'hidden': False,           'synonyms':"kickstarter thanks me name"},
 			{'name':"App & Internet",        'open':lambda: window.show('remote_access'),         'hidden': False,           'synonyms':"remote access web client network control api"},
 			{'name':"Battery & Power",       'open':lambda: window.show('power'),                 'hidden': True,            'synonyms':"charge wake turn off power down"},
 			{'name':"Camera Settings",       'open':lambda: window.show('user_settings'),         'hidden': False,           'synonyms':"user operator save settings"},
+			{'name':"Custom Scripts",        'open':lambda: window.show('scripts'),               'hidden': _scriptsHidden,  'synonyms':"scripting bash python"},
 			{'name':"Factory Utilities",     'open':lambda: window.show('service_screen.locked'), 'hidden': False,           'synonyms':"utils"},
-			{'name':"Format Storage",        'open':lambda: window.show('storage'),               'hidden': False,           'synonyms':"file saving save media df mounts mounted devices thumb drive ssd sd card usb stick filesystem reformat"},
+			{'name':"Format Storage",        'open':lambda: window.show('storage'),               'hidden': True,            'synonyms':"file saving save media df mounts mounted devices thumb drive ssd sd card usb stick filesystem reformat"},
 			{'name':"Interface Options",     'open':lambda: window.show('primary_settings'),      'hidden': False,           'synonyms':"rotate rotation screen set time set date"},
 			{'name':"Play & Save Recording", 'open':lambda: window.show('play_and_save'),         'hidden': True,            'synonyms':"mark region saving"},
 			{'name':"Record Mode",           'open':lambda: window.show('record_mode'),           'hidden': False,           'synonyms':"segmented run n gun normal"},
@@ -498,10 +502,14 @@ class Main(QWidget):
 			{'name':"Review Saved Videos",   'open':lambda: window.show('replay'),                'hidden': False,           'synonyms':"playback show footage saved card movie replay"},
 			{'name':"Stamp Overlay",         'open':lambda: window.show('stamp'),                 'hidden': False,           'synonyms':"watermark"},
 			{'name':"Trigger Delay",         'open':lambda: window.show('trigger_delay'),         'hidden': False,           'synonyms':"wait"},
-			{'name':"Triggers & IO",         'open':lambda: window.show('triggers_and_io'),       'hidden': _triggersHidden, 'synonyms':"bnc green ~a1 ~a2 trig1 trig2 trig3 signal input output trigger delay"},
+			{'name':"Triggers & IO",         'open':lambda: window.show('triggers_and_io'),       'hidden': False,           'synonyms':"bnc green ~a1 ~a2 trig1 trig2 trig3 signal input output trigger delay"},
 			{'name':"Update Camera",         'open':lambda: window.show('update_firmware'),       'hidden': False,           'synonyms':"firmware"},
 			{'name':"Video Save Settings",   'open':lambda: window.show('file_settings'),         'hidden': True,            'synonyms':"file saving"},
 		]
+		if(_whiteBalAvail):
+			main_menu_items += [
+				{'name':"White Balance",     'open':lambda: window.show('white_balance'),         'hidden': True,            'synonyms':"matrix colour color"},
+			]
 		
 		
 		menuScrollModel = QStandardItemModel(
