@@ -82,6 +82,7 @@ class Main(QWidget):
 			self.uiFocusPeakingColorMenu.hide()
 			self.uiMenuDropdown.hide()
 			self.uiExposureMenu.hide()
+			self.uiWhiteBalanceMenu.hide()
 			lastOpenerButton.setFocus()
 			
 			lastOpenerButton = None
@@ -232,9 +233,6 @@ class Main(QWidget):
 			log.warn('Failed to observe wbTemperature. (Is it implemented yet?) Patching uiWhiteBalance…')
 			self.uiWhiteBalance.setText("White\nBalance")
 		
-		self.uiWhiteBalance.clicked.connect(lambda:
-			window.show('white_balance') )
-		
 		self.uiTriggers.clicked.connect(lambda:
 			window.show('triggers_and_io') )
 		
@@ -244,6 +242,51 @@ class Main(QWidget):
 			self.uiWhiteBalance.hide()
 		else:
 			self.uiTriggers.hide()
+		
+		self.uiWhiteBalanceMenu.hide()
+		self.uiWhiteBalanceMenu.move(
+			self.x(),
+			self.uiWhiteBalance.y() - self.uiWhiteBalanceMenu.height() + self.uiWhiteBalance.touchMargins()['top'],
+		)
+		self.uiWhiteBalance.clicked.connect(lambda *_: 
+			hideMenu()
+			if self.uiWhiteBalanceMenu.isVisible() else
+			showMenu(self.uiWhiteBalance, self.uiWhiteBalanceMenu)
+		)
+		
+		#Loop white balance menu focus, for the jog wheel.
+		self.uiFineTuneColor.nextInFocusChain = (lambda *_: 
+			self.uiWhiteBalance
+			if self.uiWhiteBalanceMenu.isVisible() else
+			type(self.uiFineTuneColor).nextInFocusChain(self.uiFineTuneColor, *_)
+		)
+		self.uiWBPreset1.previousInFocusChain = (lambda *_: 
+			self.uiWhiteBalance
+			if self.uiWhiteBalanceMenu.isVisible() else
+			type(self.uiWBPreset1).previousInFocusChain(self.uiWBPreset1, *_)
+		)
+		self.uiWhiteBalance.nextInFocusChain = (lambda *_:
+			self.uiWBPreset1
+			if self.uiWhiteBalanceMenu.isVisible() else
+			type(self.uiWhiteBalance).nextInFocusChain(self.uiWhiteBalance, *_)
+		)
+		self.uiWhiteBalance.previousInFocusChain = (lambda *_:
+			self.uiFineTuneColor
+			if self.uiWhiteBalanceMenu.isVisible() else
+			type(self.uiWhiteBalance).previousInFocusChain(self.uiWhiteBalance, *_)
+		)
+		
+		self.uiWBPreset1.clicked.connect(lambda evt:
+			api.set('wbTemperature', self.uiWBPreset1.property('temp')) )
+		self.uiWBPreset2.clicked.connect(lambda evt:
+			api.set('wbTemperature', self.uiWBPreset2.property('temp')) )
+		self.uiWBPreset3.clicked.connect(lambda evt:
+			api.set('wbTemperature', self.uiWBPreset3.property('temp')) )
+		self.uiWBPreset4.clicked.connect(lambda evt:
+			api.set('wbTemperature', self.uiWBPreset4.property('temp')) )
+		self.uiWBPreset5.clicked.connect(lambda evt:
+			api.set('wbTemperature', self.uiWBPreset5.property('temp')) )
+		self.uiFineTuneColor.clicked.connect(lambda: window.show('color'))
 		
 		
 		#Exposure

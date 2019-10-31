@@ -90,47 +90,49 @@ class Window(QtCore.QObject):
 		# Screen-loading functionality #
 		################################
 		
-		from screens.about_camera import AboutCamera
-		from screens.file_settings import FileSettings
 		from screens.main2 import Main
 		from screens.play_and_save import PlayAndSave
+		from screens.recording_settings import RecordingSettings
+		from screens.storage import Storage
+		from screens.color import Color
+		from screens.about_camera import AboutCamera
+		from screens.file_settings import FileSettings
 		from screens.power import Power
 		from screens.primary_settings import PrimarySettings
 		from screens.record_mode import RecordMode
-		from screens.recording_settings import RecordingSettings
+		from screens.remote_access import RemoteAccess
+		from screens.replay import Replay
+		from screens.scripts import Scripts
+		from screens.service_screen import ServiceScreenLocked, ServiceScreenUnlocked
 		from screens.stamp import Stamp
+		from screens.test import Test
 		from screens.trigger_delay import TriggerDelay
 		from screens.triggers_and_io import TriggersAndIO
 		from screens.update_firmware import UpdateFirmware
 		from screens.user_settings import UserSettings
-		from screens.test import Test
-		from screens.service_screen import ServiceScreenLocked, ServiceScreenUnlocked
-		from screens.remote_access import RemoteAccess
-		from screens.scripts import Scripts
-		from screens.storage import Storage
-		from screens.replay import Replay
 		
 		self._availableScreens = {
-			'main': Main, #load order, load items on main screen first, main screen submenus next, and it doesn't really matter after that. All screens get loaded in less than 10 seconds, so this is only a startup concern.
-			'primary_settings': PrimarySettings,
-			'recording_settings': RecordingSettings,
-			'triggers_and_io': TriggersAndIO,
-			'trigger_delay': TriggerDelay,
-			'record_mode': RecordMode,
+			'main': Main, #load order, load items on main screen first, main screen submenus next, and it doesn't really matter after that.
 			'play_and_save': PlayAndSave,
+			'recording_settings': RecordingSettings,
 			'about_camera': AboutCamera,
+			'color': Color,
+			'storage': Storage,
 			'file_settings': FileSettings,
 			'power': Power,
+			'primary_settings': PrimarySettings,
+			'record_mode': RecordMode,
+			'remote_access': RemoteAccess,
+			'replay': Replay,
 			'scripts': Scripts,
-			'stamp': Stamp,
-			'update_firmware': UpdateFirmware,
-			'user_settings': UserSettings,
-			'test': Test,
 			'service_screen.locked': ServiceScreenLocked,
 			'service_screen.unlocked': ServiceScreenUnlocked,
-			'remote_access': RemoteAccess,
-			'storage': Storage,
-			'replay': Replay,
+			'stamp': Stamp,
+			'test': Test,
+			'trigger_delay': TriggerDelay,
+			'triggers_and_io': TriggersAndIO,
+			'update_firmware': UpdateFirmware,
+			'user_settings': UserSettings,
 		}
 		
 		self._screens = {}
