@@ -4,7 +4,6 @@ from time import time
 
 from PyQt5.QtWidgets import QWidget, QLabel, QGestureEvent
 from PyQt5.QtCore import QSize, QEvent, Qt
-import PyQt5.QtGui as QtGui
 
 from debugger import *; dbg
 from animate import delay
