@@ -213,6 +213,12 @@
     <property name="text">
      <string>⌫</string>
     </property>
+    <property name="autoRepeat">
+     <bool>true</bool>
+    </property>
+    <property name="autoRepeatDelay">
+     <number>500</number>
+    </property>
     <property name="clickMarginLeft" stdset="0">
      <enum>Button::none</enum>
     </property>
@@ -394,6 +400,12 @@
     <property name="text">
      <string>▶</string>
     </property>
+    <property name="autoRepeat">
+     <bool>true</bool>
+    </property>
+    <property name="autoRepeatDelay">
+     <number>500</number>
+    </property>
     <property name="clickMarginLeft" stdset="0">
      <enum>Button::none</enum>
     </property>
@@ -437,6 +449,12 @@
     </property>
     <property name="text">
      <string>◀</string>
+    </property>
+    <property name="autoRepeat">
+     <bool>true</bool>
+    </property>
+    <property name="autoRepeatDelay">
+     <number>500</number>
     </property>
     <property name="clickMarginRight" stdset="0">
      <enum>Button::none</enum>
@@ -537,6 +555,12 @@
     </property>
     <property name="text">
      <string>⌫</string>
+    </property>
+    <property name="autoRepeat">
+     <bool>true</bool>
+    </property>
+    <property name="autoRepeatDelay">
+     <number>500</number>
     </property>
     <property name="clickMarginLeft" stdset="0">
      <enum>Button::none</enum>
