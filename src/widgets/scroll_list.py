@@ -52,7 +52,7 @@ class ScrollList(QListView, FocusablePlugin):
 		scroller = QScroller.scroller(self.viewport())
 		properties = scroller.scrollerProperties()
 		properties.setScrollMetric(properties.AxisLockThreshold, 0.0)
-		properties.setScrollMetric(properties.DragStartDistance, 0.003) #default: 0.005 - tweaked for "feel", the platform defaults are overly dramatic.
+		properties.setScrollMetric(properties.DragStartDistance, 0.010) #default: 0.005 - Set to 0.010, since if the scroll starts horizontally it goes into a weird selection mode. Initially tweaked for "feel" to 0.003, before knowledge of this issue.
 		properties.setScrollMetric(properties.OvershootDragDistanceFactor, 0.3) #default: 1
 		properties.setScrollMetric(properties.OvershootScrollDistanceFactor, 0.3) #default: 1
 		properties.setScrollMetric(properties.OvershootScrollTime, 0.5) #default: 0.7
