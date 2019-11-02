@@ -11,7 +11,7 @@ class Subheader(QLabel):
 		super().__init__(parent)
 		
 		self.setStyleSheet(f"""
-			font-size: 17px; /*Effectively 16pt bold. 🙄 15.5pt is better, but renders really small in Qt Designer.*/
+			font-size: 18px;
 			background: transparent; /*Don't mess with this, it affects font width.*/
 		""" + self.styleSheet())
 		
