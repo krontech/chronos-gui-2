@@ -41,7 +41,7 @@ class KeyboardAlphanumeric(KeyboardBase):
 		
 		#Assign keystrokes for the rest of the keys.
 		self.uiDot.pressed.connect(lambda: 
-			self.sendKeystroke(QtCore.Qt.Key_Period) )
+			self.sendKeystroke(QtCore.Qt.Key_Comma if self.uiShift.keepActiveLook else QtCore.Qt.Key_Period) )
 		self.uiBackspace.pressed.connect(lambda: 
 			self.sendKeystroke(QtCore.Qt.Key_Backspace) )
 		self.uiSpace.pressed.connect(lambda: 
