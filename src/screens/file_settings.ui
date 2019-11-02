@@ -189,6 +189,9 @@
    <property name="text">
     <string>vid_%date%_%time%</string>
    </property>
+   <property name="placeholderText">
+    <string>vid_%date%_%time%</string>
+   </property>
    <property name="clickMarginRight" stdset="0">
     <enum>LineEdit::half</enum>
    </property>
