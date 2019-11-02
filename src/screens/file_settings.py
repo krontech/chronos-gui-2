@@ -46,7 +46,7 @@ class FileSettings(QtWidgets.QDialog):
 		self.uiSavedVideoName.setText(
 			settings.value('savedVideoName', self.uiSavedVideoName.text()) )
 		self.uiSavedVideoName.textChanged.connect(lambda value:
-			settings.setText('savedVideoName', value) )
+			settings.setValue('savedVideoName', value) )
 		
 		self.uiSavedVideoFileExtention.setCurrentText(
 			settings.value('savedVideoFileExtention', self.uiSavedVideoFileExtention.currentText()) )
