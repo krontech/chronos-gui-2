@@ -49,6 +49,13 @@ class KeyboardAlphanumeric(KeyboardBase):
 		
 		self.uiLeft.pressed.connect(lambda: self.adjustCarat(-1))
 		self.uiRight.pressed.connect(lambda: self.adjustCarat(1))
+		
+		#Keystroke debouncing, because the event fires up to 3 times on one quick press. (Note: Does not occur if press held. I think it's got something to do with redraw and framerate and such, which Qt seems to have a really loose handle on in general.)
+		self._lastKey = 0 #If last key = this key, abort and restart the timer. Alternative, use an draw event, that seems to work well in these cases. … we _really_ shouldn't have to do this here.
+		self._clearLastKeyTimer = QtCore.QTimer()
+		self._clearLastKeyTimer.timeout.connect(lambda:
+			setattr(self, '_lastKey', 0) )
+		self._clearLastKeyTimer.setInterval(200) 
 	
 	def __handleShown(self, options):
 		"""Set to fire when keyboard is shown.
@@ -147,7 +154,13 @@ class KeyboardAlphanumeric(KeyboardBase):
 			keycap.setText(getattr(keycap.text(), 
 				'upper' if self.uiShift.keepActiveLook else 'lower')())
 	
-	def sendKeystroke(self, code, text=''):
+	def sendKeystroke(self, code, text=''): #Can this use QKeySequence?
+		if self._lastKey == code:
+			print(f'swallowing key #{code}')
+			return
+		self._clearLastKeyTimer.start()
+		self._lastKey = code
+		
 		print(f'emitting key #{code}')
 		
 		#The QLineEdit backing widget for text input relies on the text value of the key event, so we need to synthesize a text for the event to take effect.
