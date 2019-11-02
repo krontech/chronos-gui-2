@@ -14,6 +14,9 @@
    <string>Chronos Screen</string>
   </property>
   <widget class="InteractiveVideoArea" name="interactivevideoarea">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="geometry">
     <rect>
      <x>30</x>
@@ -52,22 +55,6 @@
     <enum>Button::half</enum>
    </property>
   </widget>
-  <widget class="Button" name="button_2">
-   <property name="geometry">
-    <rect>
-     <x>460</x>
-     <y>400</y>
-     <width>171</width>
-     <height>81</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Cancel</string>
-   </property>
-   <property name="clickMarginRight" stdset="0">
-    <enum>Button::half</enum>
-   </property>
-  </widget>
   <widget class="Subheader" name="subheader">
    <property name="geometry">
     <rect>
@@ -81,7 +68,7 @@
     <string>Color Temperature (White Balance)</string>
    </property>
   </widget>
-  <widget class="SpinBox" name="spinbox">
+  <widget class="SpinBox" name="uiColorTemperature">
    <property name="geometry">
     <rect>
      <x>10</x>
@@ -103,7 +90,7 @@
     <number>25</number>
    </property>
   </widget>
-  <widget class="ComboBox" name="combobox">
+  <widget class="ComboBox" name="uiColorMatrixPreset">
    <property name="geometry">
     <rect>
      <x>380</x>
@@ -168,7 +155,7 @@
      <height>241</height>
     </rect>
    </property>
-   <widget class="DecimalSpinBox" name="decimalspinbox_8">
+   <widget class="DecimalSpinBox" name="uiCMGreenGreen">
     <property name="geometry">
      <rect>
       <x>190</x>
@@ -215,7 +202,7 @@
      <string>Color Matrix</string>
     </property>
    </widget>
-   <widget class="DecimalSpinBox" name="decimalspinbox_3">
+   <widget class="DecimalSpinBox" name="uiCMGreenRed">
     <property name="geometry">
      <rect>
       <x>80</x>
@@ -246,7 +233,7 @@
      <enum>DecimalSpinBox::half</enum>
     </property>
    </widget>
-   <widget class="DecimalSpinBox" name="decimalspinbox_10">
+   <widget class="DecimalSpinBox" name="uiCMGreenBlue">
     <property name="geometry">
      <rect>
       <x>290</x>
@@ -277,7 +264,7 @@
      <enum>DecimalSpinBox::half</enum>
     </property>
    </widget>
-   <widget class="DecimalSpinBox" name="decimalspinbox_9">
+   <widget class="DecimalSpinBox" name="uiCMBlueGreen">
     <property name="geometry">
      <rect>
       <x>190</x>
@@ -311,7 +298,7 @@
      <enum>DecimalSpinBox::half</enum>
     </property>
    </widget>
-   <widget class="DecimalSpinBox" name="decimalspinbox_2">
+   <widget class="DecimalSpinBox" name="uiCMRedRed">
     <property name="geometry">
      <rect>
       <x>80</x>
@@ -339,7 +326,7 @@
      <enum>DecimalSpinBox::half</enum>
     </property>
    </widget>
-   <widget class="DecimalSpinBox" name="decimalspinbox_11">
+   <widget class="DecimalSpinBox" name="uiCMRedBlue">
     <property name="geometry">
      <rect>
       <x>290</x>
@@ -367,7 +354,7 @@
      <enum>DecimalSpinBox::half</enum>
     </property>
    </widget>
-   <widget class="DecimalSpinBox" name="decimalspinbox_12">
+   <widget class="DecimalSpinBox" name="uiCMBlueBlue">
     <property name="geometry">
      <rect>
       <x>290</x>
@@ -398,7 +385,7 @@
      <enum>DecimalSpinBox::half</enum>
     </property>
    </widget>
-   <widget class="DecimalSpinBox" name="decimalspinbox_4">
+   <widget class="DecimalSpinBox" name="uiCMBlueRed">
     <property name="geometry">
      <rect>
       <x>80</x>
@@ -429,7 +416,7 @@
      <enum>DecimalSpinBox::half</enum>
     </property>
    </widget>
-   <widget class="DecimalSpinBox" name="decimalspinbox_7">
+   <widget class="DecimalSpinBox" name="uiCMRedGreen">
     <property name="geometry">
      <rect>
       <x>190</x>
@@ -652,15 +639,15 @@
      <set>Qt::AlignCenter</set>
     </property>
    </widget>
-   <zorder>decimalspinbox_9</zorder>
-   <zorder>decimalspinbox_4</zorder>
-   <zorder>decimalspinbox_3</zorder>
-   <zorder>decimalspinbox_10</zorder>
-   <zorder>decimalspinbox_7</zorder>
-   <zorder>decimalspinbox_12</zorder>
-   <zorder>decimalspinbox_11</zorder>
-   <zorder>decimalspinbox_8</zorder>
-   <zorder>decimalspinbox_2</zorder>
+   <zorder>uiCMBlueGreen</zorder>
+   <zorder>uiCMBlueRed</zorder>
+   <zorder>uiCMGreenRed</zorder>
+   <zorder>uiCMGreenBlue</zorder>
+   <zorder>uiCMRedGreen</zorder>
+   <zorder>uiCMBlueBlue</zorder>
+   <zorder>uiCMRedBlue</zorder>
+   <zorder>uiCMGreenGreen</zorder>
+   <zorder>uiCMRedRed</zorder>
    <zorder>label_6</zorder>
    <zorder>subheader_3</zorder>
    <zorder>label_4</zorder>
@@ -678,7 +665,7 @@
   <widget class="QWidget" name="widget_2" native="true">
    <property name="geometry">
     <rect>
-     <x>10</x>
+     <x>20</x>
      <y>130</y>
      <width>361</width>
      <height>111</height>
@@ -700,7 +687,7 @@
      <set>Qt::AlignCenter</set>
     </property>
    </widget>
-   <widget class="DecimalSpinBox" name="decimalspinbox_6">
+   <widget class="DecimalSpinBox" name="uiWBBlue">
     <property name="geometry">
      <rect>
       <x>230</x>
@@ -719,7 +706,7 @@
      <double>0.010000000000000</double>
     </property>
    </widget>
-   <widget class="DecimalSpinBox" name="decimalspinbox_5">
+   <widget class="DecimalSpinBox" name="uiWBGreen">
     <property name="geometry">
      <rect>
       <x>120</x>
@@ -757,7 +744,7 @@
      <set>Qt::AlignCenter</set>
     </property>
    </widget>
-   <widget class="DecimalSpinBox" name="decimalspinbox">
+   <widget class="DecimalSpinBox" name="uiWBRed">
     <property name="geometry">
      <rect>
       <x>10</x>
@@ -782,7 +769,7 @@
    <widget class="Subheader" name="subheader_2">
     <property name="geometry">
      <rect>
-      <x>20</x>
+      <x>10</x>
       <y>10</y>
       <width>241</width>
       <height>21</height>
@@ -810,10 +797,10 @@
    </widget>
    <zorder>subheader_2</zorder>
    <zorder>label_2</zorder>
-   <zorder>decimalspinbox_6</zorder>
-   <zorder>decimalspinbox_5</zorder>
+   <zorder>uiWBBlue</zorder>
+   <zorder>uiWBGreen</zorder>
    <zorder>label_3</zorder>
-   <zorder>decimalspinbox</zorder>
+   <zorder>uiWBRed</zorder>
    <zorder>label</zorder>
   </widget>
   <widget class="Backdrop" name="backdrop">
@@ -846,11 +833,10 @@
   <zorder>headerlabel</zorder>
   <zorder>uiDone</zorder>
   <zorder>subheader</zorder>
-  <zorder>combobox</zorder>
-  <zorder>button_2</zorder>
+  <zorder>uiColorMatrixPreset</zorder>
   <zorder>subheader_5</zorder>
   <zorder>widget_2</zorder>
-  <zorder>spinbox</zorder>
+  <zorder>uiColorTemperature</zorder>
  </widget>
  <customwidgets>
   <customwidget>
@@ -899,6 +885,23 @@
    <header>subheader</header>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>uiDone</tabstop>
+  <tabstop>uiColorTemperature</tabstop>
+  <tabstop>uiColorMatrixPreset</tabstop>
+  <tabstop>uiWBRed</tabstop>
+  <tabstop>uiWBGreen</tabstop>
+  <tabstop>uiWBBlue</tabstop>
+  <tabstop>uiCMRedRed</tabstop>
+  <tabstop>uiCMRedGreen</tabstop>
+  <tabstop>uiCMRedBlue</tabstop>
+  <tabstop>uiCMGreenRed</tabstop>
+  <tabstop>uiCMGreenGreen</tabstop>
+  <tabstop>uiCMGreenBlue</tabstop>
+  <tabstop>uiCMBlueRed</tabstop>
+  <tabstop>uiCMBlueGreen</tabstop>
+  <tabstop>uiCMBlueBlue</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

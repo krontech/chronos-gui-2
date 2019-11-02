@@ -116,6 +116,11 @@ class Scripts(QtWidgets.QDialog):
 	
 	
 	def executeAndPoll(self, index: QtCore.QModelIndex):
+		"""Run the user script.
+			
+			See http://eyalarubas.com/python-subproc-nonblock.html
+			for commentary and additional approaches."""
+		
 		script = index.data(Qt.UserRole)
 		
 		proc = subprocess.Popen(

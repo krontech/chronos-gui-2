@@ -87,6 +87,9 @@ class InteractiveVideoArea(QWidget):
 		
 		def nextZoomLevel(self, *_):
 			"""When double-clicked, set the zoom level to the next."""
+			if not self.isEnabled(): #(But not if disabled.)
+				return
+			
 			zoomLevels = sorted([1, 4, self.oneToOneZoomLevel()])
 			zoom = api.apiValues.get('videoZoom')
 			closestZoom = sorted(zoomLevels, key=lambda zl:abs(zl-zoom))[0]

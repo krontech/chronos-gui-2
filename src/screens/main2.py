@@ -531,7 +531,7 @@ class Main(QWidget):
 		_scriptsHidden = not [f for f in iglob('/var/camera/scripts/*')][:1] #Only show the scripts screen if there will be a script on it to run.
 		log.print(f'_scriptsHidden {_scriptsHidden}')
 		main_menu_items = [
-			{'name':"About Camera",          'open':lambda: window.show('about_camera'),          'hidden': False,           'synonyms':"kickstarter thanks me name"},
+			{'name':"About Camera",          'open':lambda: window.show('about_camera'),          'hidden': False,           'synonyms':"kickstarter thanks name credits"},
 			{'name':"App & Internet",        'open':lambda: window.show('remote_access'),         'hidden': False,           'synonyms':"remote access web client network control api"},
 			{'name':"Battery & Power",       'open':lambda: window.show('power'),                 'hidden': True,            'synonyms':"charge wake turn off power down"},
 			{'name':"Camera Settings",       'open':lambda: window.show('user_settings'),         'hidden': False,           'synonyms':"user operator save settings"},
@@ -551,7 +551,7 @@ class Main(QWidget):
 		]
 		if(_whiteBalAvail):
 			main_menu_items += [
-				{'name':"White Balance",     'open':lambda: window.show('white_balance'),         'hidden': True,            'synonyms':"matrix colour color"},
+				{'name':"Color",             'open':lambda: window.show('white_balance'),         'hidden': True,            'synonyms':"matrix colour white balance temperature"},
 			]
 		
 		
