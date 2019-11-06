@@ -4,6 +4,7 @@ from PyQt5.QtWidgets import QLabel
 from PyQt5.QtCore import pyqtProperty, QSize
 
 from debugger import *; dbg
+import settings
 
 
 class Backdrop(QLabel):
@@ -12,9 +13,16 @@ class Backdrop(QLabel):
 
 	def __init__(self, parent=None, showHitRects=False):
 		super().__init__(parent)
+		self.theme = ''
 		self._customStyleSheet = self.styleSheet() #always '' for some reason
 		self._showHitRects = showHitRects
 		self.refreshStyle()
+		
+		settings.observe('theme', 'dark', lambda theme: (
+			setattr(self, 'theme', theme),
+			self.refreshStyle(),
+		))
+		
 
 	def refreshStyle(self):
 		if self._showHitRects:
@@ -27,7 +35,7 @@ class Backdrop(QLabel):
 		else:
 			# Full opaque white, don't need that grid now!
 			self.setStyleSheet(f"""
-				background: white;
+				background: {'#333' if self.theme == 'dark' else 'white'};
 				{self._customStyleSheet}
 			""")
 	
