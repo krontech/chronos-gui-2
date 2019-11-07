@@ -7,6 +7,8 @@ import sys, os
 import subprocess
 from time import perf_counter
 from difflib import get_close_matches
+from ipaddress import IPv4Address, IPv6Address, AddressValueError
+from collections import defaultdict
 
 from PyQt5.QtCore import pyqtSlot, QObject
 from PyQt5.QtDBus import QDBusConnection, QDBusInterface, QDBusReply, QDBusPendingCallWatcher, QDBusPendingReply
@@ -976,7 +978,7 @@ class NetworkInterfaces(QObject):
 				[{
 					"path": b"/org/freedesktop/NetworkManager/Devices/1"
 					"name": "Ethernet",
-					"ipAddr": "192.168.100.166" or "2001:0db8:85a3::8a2e:0370:7334"
+					"address": "192.168.100.166" or "2001:0db8:85a3::8a2e:0370:7334"
 				}, {
 					...
 				}]
@@ -1041,8 +1043,8 @@ class NetworkInterfaces(QObject):
 		#I cannot figure out how to port it to Python. So we do it manually
 		#with the `'* property interface'`s.
 		
-		#Oh, hunh, https://doc.qt.io/archives/qt-5.7/qnetworkinterface.html
-		#is a thing. Nice to find that right as I finish this… >_<
+		#Note: https://doc.qt.io/archives/qt-5.7/qnetworkinterface.html is
+		#a thing. Shame it doesn't have notification events.
 		
 		
 		self._networkInterfaces = [{
@@ -1052,17 +1054,17 @@ class NetworkInterfaces(QObject):
 				f"org.freedesktop.NetworkManager.Device", #Interface
 				QDBusConnection.systemBus(),
 			),
-			'property interface': QDBusInterface( #Provides interface to get properties of previous node, because `.property()` is broken.
-				"org.freedesktop.NetworkManager", #Service
-				devicePath, #Path
-				"org.freedesktop.DBus.Properties",#Interface
-				QDBusConnection.systemBus()
-			),
 			'Device.Wired': QDBusInterface( #Provides node.
 				f"org.freedesktop.NetworkManager", #Service
 				devicePath, #Path
 				f"org.freedesktop.NetworkManager.Device.Wired", #Interface
 				QDBusConnection.systemBus(),
+			),
+			'Device property interface': QDBusInterface( #Provides interface to get properties of previous node, because `.property()` is broken.
+				"org.freedesktop.NetworkManager", #Service
+				devicePath, #Path
+				"org.freedesktop.DBus.Properties",#Interface
+				QDBusConnection.systemBus()
 			),
 		} for devicePath in reply ]
 		
@@ -1076,49 +1078,76 @@ class NetworkInterfaces(QObject):
 			#Deadlock fix as above.
 			QDBusConnection.systemBus().registerObject(
 				interfaces['Device'].path(), self )
-		
-		print('ok → ', self.activeConnections())
-		#dbg()
+			
+			#Use above interface to look up the IP address interfaces.
+			interfaces['Ip4Config'] = QDBusInterface( #Provides interface to get properties of previous node, because `.property()` is broken.
+				"org.freedesktop.NetworkManager", #Service
+				QDBusReply(interfaces['Device property interface'].call('Get', #Method
+					'org.freedesktop.NetworkManager.Device', 'Ip4Config' )).value(), #Interface, Property → Path
+				"org.freedesktop.NetworkManager.IP4Config", #Interface
+				QDBusConnection.systemBus()
+			)
+			interfaces['Ip4Config property interface'] = QDBusInterface( #Provides interface to get properties of previous node, because `.property()` is broken.
+				"org.freedesktop.NetworkManager", #Service
+				interfaces['Ip4Config'].path(), #Path
+				"org.freedesktop.DBus.Properties",#Interface
+				QDBusConnection.systemBus()
+			)
+			
+			interfaces['Ip6Config'] = QDBusInterface( #Provides interface to get properties of previous node, because `.property()` is broken.
+				"org.freedesktop.NetworkManager", #Service
+				QDBusReply(interfaces['Device property interface'].call('Get', #Method
+					'org.freedesktop.NetworkManager.Device', 'Ip6Config' )).value(), #Interface, Property → Path
+				"org.freedesktop.NetworkManager.IP6Config", #Interface
+				QDBusConnection.systemBus()
+			)
+			interfaces['Ip6Config property interface'] = QDBusInterface( #Provides interface to get properties of previous node, because `.property()` is broken.
+				"org.freedesktop.NetworkManager", #Service
+				interfaces['Ip6Config'].path(), #Path
+				"org.freedesktop.DBus.Properties",#Interface
+				QDBusConnection.systemBus()
+			)
+			
+			#Subscribe to network update signals, for ip address and carrier status.
+			QDBusConnection.systemBus().connect(
+				f"org.freedesktop.NetworkManager", #Service
+				interfaces['Device'].path(),
+				f"org.freedesktop.NetworkManager.Device", #Interface
+				'PropertiesChanged', #Signal
+				self.__interfacePropertiesChangedEvent,
+			)
+			QDBusConnection.systemBus().connect(
+				f"org.freedesktop.NetworkManager", #Service
+				interfaces['Device'].path(),
+				f"org.freedesktop.NetworkManager.Device.Wired", #Interface
+				'PropertiesChanged', #Signal
+				self.__interfacePropertiesChangedEvent,
+			)
+			QDBusConnection.systemBus().connect( #untested, don't know how to change ip4 address
+				f"org.freedesktop.NetworkManager", #Service
+				QDBusReply(interfaces['Device property interface'].call('Get',
+					'org.freedesktop.NetworkManager.Device', 'Dhcp4Config' ) ).value(), #Interface, Property → Path
+				f"org.freedesktop.NetworkManager.Dhcp4Config", #Interface
+				'PropertiesChanged', #Signal
+				self.__interfacePropertiesChangedEvent,
+			)
+			QDBusConnection.systemBus().connect( #untested, don't know how to change ip6 address
+				f"org.freedesktop.NetworkManager", #Service
+				QDBusReply(interfaces['Device property interface'].call('Get',
+					'org.freedesktop.NetworkManager.Device', 'Dhcp6Config' ) ).value(), #Interface, Property → Path
+				f"org.freedesktop.NetworkManager.Dhcp6Config", #Interface
+				'PropertiesChanged', #Signal
+				self.__interfacePropertiesChangedEvent,
+			)
+			
+		self.__rescan()
 	
-	#	QDBusConnection.systemBus().connect(
-	#		f"org.freedesktop.UDisks2", #Service
-	#		f"/org/freedesktop/UDisks2", #Path
-	#		f"org.freedesktop.DBus.ObjectManager", #Interface
-	#		'InterfacesAdded', #Signal
-	#		self.__interfacesAddedEvent,
-	#	)
-	#	
-	#	QDBusConnection.systemBus().connect(
-	#		f"org.freedesktop.UDisks2", #Service
-	#		f"/org/freedesktop/UDisks2", #Path
-	#		f"org.freedesktop.DBus.ObjectManager", #Interface
-	#		'InterfacesRemoved', #Signal
-	#		self.__interfacesRemovedEvent,
-	#	)	
-	#	
-	#	for name, data in QDBusReply(self.uDisks2ObjectManager.call('GetManagedObjects')).value().items():
-	#		self.__interfacesAdded(name, data)
-	#
 	def __getitem__(self, i):
 		return self._connections[i]
 	
 	def __repr__(self):
 		#pdb uses repr instad of str (which imo is more appropriate for an interactive debugging session)
 		return f'{type(self)} ({self._connections})'
-	
-	def activeConnections(self):
-		connections = []
-		for interfaces in self._networkInterfaces:
-			carrier = QDBusReply(
-				interfaces['property interface'].call('Get',
-					'org.freedesktop.NetworkManager.Device.Wired', 'Carrier' ) ) #Interface, Property
-			if carrier.isValid() and carrier.value():
-				connections.append({
-					'name': QDBusReply(
-						interfaces['property interface'].call('Get',
-							'org.freedesktop.NetworkManager.Device', 'Interface' ) ).value() #Interface, Property
-				})
-		return connections
 		
 	
 	def observe(self, callback):
@@ -1136,95 +1165,72 @@ class NetworkInterfaces(QObject):
 		assert callable(callback), f"Callback is not callable. (Expected function, got {callback}.)"
 		self._callbacks = list(filter(
 			lambda existingCallback: existingCallback != callback, 
-			self._callbacks ) )
+			self._callbacks ))
 	
 	
 	
-	#@pyqtSlot('QDBusMessage')
-	#def __interfacesAddedEvent(self, msg):
-	#	self.__interfacesAdded(*msg.arguments())
-	#
-	#def __interfacesAdded(self, name, data):
-	#	if 'org.freedesktop.UDisks2.Filesystem' in data:
-	#		#"Now, for each file system which just got mounted, …"
-	#		
-	#		#Filter root, which is mounted on / and /media/mmcblk0p2.
-	#		if len(data['org.freedesktop.UDisks2.Filesystem']['MountPoints']) != 1:
-	#			return
-	#		
-	#		#Filter out whatever gets mounted to /boot.
-	#		if not bytes(data['org.freedesktop.UDisks2.Filesystem']['MountPoints'][0]).startswith(b'/media/'):
-	#			return
-	#		
-	#		log.debug(f"Partition mounted at {bytes(data['org.freedesktop.UDisks2.Filesystem']['MountPoints'][0]).decode('utf-8')}.") #toStdString() doesn't seem to exist, perhaps because we don't have std strings.
-	#		
-	#		self._connections += [{
-	#			'name': data['org.freedesktop.UDisks2.Block']['IdLabel'],
-	#			'device': name,
-	#			'uuid': data['org.freedesktop.UDisks2.Block']['IdUUID'], #Found at `/dev/disk/by-uuid/`.
-	#			'path': bytes(data['org.freedesktop.UDisks2.Filesystem']['MountPoints'][0])[:-1], #Trim off a null byte at the end, we don't need it in python.
-	#			'size': data['org.freedesktop.UDisks2.Block']['Size'], #number of bytes, 64-bit positive integer
-	#			'readOnly': data['org.freedesktop.UDisks2.Block']['ReadOnly'],
-	#			'interface': 'usb' if True in [b'usb' in symlink for symlink in data['org.freedesktop.UDisks2.Block']['Symlinks']] else 'other', #This data comes in one message earlier, but it would be enough complexity to link the two that it makes more sense to just string match here.
-	#		}]
-	#		for callback in self._callbacks:
-	#			callback(self._connections)
-	#
-	#
-	#@pyqtSlot('QDBusMessage')
-	#def __interfacesRemovedEvent(self, msg):
-	#	self.__interfacesRemoved(*msg.arguments())
-	#
-	#def __interfacesRemoved(self, name, data):
-	#	if 'org.freedesktop.UDisks2.Partition' == data[0]:
-	#		#"Now, for each file system which just got removed, …"
-	#		self._connections = list(filter(
-	#			lambda partition: partition["device"] != name, 
-	#			self._connections ) )
-	#		for callback in self._callbacks:
-	#			callback(self._connections)
-	#
-	#
-	#def list(self):
-	#	return self._connections
-	#
-	#def usageFor(self, device: str, callback: Callable[[], Dict[str,int]]):
-	#	for partition in self._connections:
-	#		if partition['device'] == device:
-	#			df = subprocess.Popen(
-	#				['df', partition['path'], '--output=avail,used'], #used+avail != 1k-blocks
-	#				stdout=subprocess.PIPE,
-	#				stderr=subprocess.DEVNULL )
-	#			
-	#			def checkDf(*, timeout):
-	#				exitStatus = df.poll()
-	#				if exitStatus is None: #Still running, check again later.
-	#					#Standard clamped exponential decay. Keeps polling to a reasonable amount, frequent at first then low.
-	#					delay(self, timeout, lambda:
-	#						checkDf(timeout=max(1, timeout*2)) )
-	#				elif exitStatus: #df failure, raise an error
-	#					if exitStatus == 1:
-	#						#When a storage device with multiple partitions is removed,
-	#						#the observer fires once for each partition. This means
-	#						#that, for one partition, the client will issue a spurious
-	#						#call to this function with the stale partition's device.
-	#						log.debug(f'Unknown device {device}.')
-	#						log.debug(f'Known devices are {[p["device"] for p in self._connections]}.')
-	#					else:
-	#						raise Exception(f'df exited with error {exitStatus}')
-	#				else:
-	#					info = ( #Chop up df command output.
-	#						df.communicate()[0]
-	#						.split(b'\n')[1] #Remove first line, column headings
-	#						.split() #Each output is now in a list.
-	#					)
-	#					callback({
-	#						'available': int(info[0]),
-	#						'used': int(info[1]),
-	#						'total': int(info[0]) + int(info[1]),
-	#					})
-	#			delay(self, 0.20, lambda: #Initial delay, df usually runs in .17s.
-	#				checkDf(timeout=0.05) )
+	@pyqtSlot('QDBusMessage')
+	def __interfacePropertiesChangedEvent(self, msg):
+		log.print(f'Rescanning, network change detected. ({msg.arguments()})')
+		self.__rescan()
+	
+	def __rescan(self):
+		self._connections.clear()
+		for interfaces in self._networkInterfaces:
+			carrier = QDBusReply(
+				interfaces['Device property interface'].call('Get',
+					'org.freedesktop.NetworkManager.Device.Wired', 'Carrier' ) ) #Interface, Property
+			if carrier.isValid() and carrier.value():
+				try:
+					addr = IPv4Address(
+						QDBusReply(
+							interfaces['Device property interface'].call(
+								'Get', #Method
+								'org.freedesktop.NetworkManager.Device', #Interface
+								'Ip4Address', #Property
+							)
+						).value()
+					)
+					addr = IPv4Address('.'.join(reversed(str(addr).split('.')))) #So close. Truly, if there's two ways of representing information… (note: This is actually Python's fault here, the number parses fine in a browser address bar.)
+				except AddressValueError:
+					try:
+						#"Array of tuples of IPv4 address/prefix/gateway. All 3 elements of each tuple are in network byte order. Essentially: [(addr, prefix, gateway), (addr, prefix, gateway), ...]"
+						#	-- https://developer.gnome.org/NetworkManager/0.9/spec.html
+						addr = IPv6Address(bytes(
+							QDBusReply(
+								interfaces['Ip6Config property interface'].call(
+									'Get', #Method
+									'org.freedesktop.NetworkManager.IP6Config', #Interface
+									'Addresses', #Property
+								)
+							).value()[-1][0]
+						))
+					except (AddressValueError, IndexError):
+						addr = None
+				
+				interface = QDBusReply(
+					interfaces['Device property interface'].call(
+						'Get', #Method
+						'org.freedesktop.NetworkManager.Device', #Interface
+						'Interface', #Property
+					)
+				).value()
+				
+				if addr:
+					self._connections.append({
+						'path': interfaces['Device'].path(),
+						'name': defaultdict(
+							lambda: 'generic connection', 
+							{'e': 'ethernet', 'u': 'usb'}
+						)[interface[0]],
+						'address': addr,
+					})
+		
+		log.print(f'conns: {self._connections}')
+		
+		for callback in self._callbacks:
+			callback(self._connections)
+
 networkInterfaces = NetworkInterfaces()
 del NetworkInterfaces
 
