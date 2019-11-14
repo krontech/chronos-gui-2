@@ -189,7 +189,7 @@
    </property>
    <property name="text">
     <string>White Bal.
-{0.0f}°K</string>
+{}°K</string>
    </property>
    <property name="clickMarginLeft" stdset="0">
     <enum>Button::none</enum>
