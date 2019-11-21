@@ -52,8 +52,7 @@ sys.excepthook = eh
 del eh #Don't export.
 
 
-
-def brk():
+def dbg():
 	"""Start an interactive debugger at the callsite."""
 	
 	#Prevent pyqt5 from printing a lot of errors when we take control away from it with pdb. Unfortunately, this also means the app stops responding to things.
@@ -71,9 +70,7 @@ def brk():
 # @pdb.hideframe #Provided by pdbpp, which also gives color and nice tab-completion.
 # pdbpp segfaults Designer on my desktop computer, but works on my laptop so we'll only use it if available.
 if hasattr(pdb, 'hideframe'):
-	brk = pdb.hideframe(brk)
-
-dbg = brk #I keep using one or the other. Either should probably work, let's make debugging easy on ourselves.
+	dbg = pdb.hideframe(dbg)
 
 
 def dump(*args):
