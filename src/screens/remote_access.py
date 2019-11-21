@@ -37,6 +37,7 @@ class RemoteAccess(QtWidgets.QWidget):
 		self.setAttribute(QtCore.Qt.WA_TranslucentBackground, True)
 		
 		# Widget binding.
+		self.uiDebug.clicked.connect(lambda: self and window and dbg())
 		
 		#Password-related stuff.
 		self.checkPasswordExists()
@@ -50,10 +51,10 @@ class RemoteAccess(QtWidgets.QWidget):
 		self.uiEnableSSH.stateChanged.connect(self.updateNetworkInterfaceInformation)
 		self.uiHTTPPort.valueChanged.connect(self.updateNetworkInterfaceInformation)
 		self.uiRandomiseHTTPPort.clicked.connect(lambda:
-			self.uiHTTPPort.setValue(randint(49152, 65535)))
+			self.uiHTTPPort.setValue(randint(49152, 65535)) )
 		self.uiSSHPort.valueChanged.connect(self.updateNetworkInterfaceInformation)
 		self.uiRandomiseSSHPort.clicked.connect(lambda:
-			self.uiSSHPort.setValue(randint(49152, 65535)))
+			self.uiSSHPort.setValue(randint(49152, 65535)) )
 		
 		#api.observe('networkInterfaces', self.updateNetworkInterfaces)
 		self.uiNetworkInterface.currentIndexChanged.connect(self.showNetworkInterface)

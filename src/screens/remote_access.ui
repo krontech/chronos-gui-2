@@ -527,6 +527,22 @@ URL For</string>
     <zorder>label_10</zorder>
     <zorder>uiSSHPort</zorder>
    </widget>
+   <widget class="QPushButton" name="uiDebug">
+    <property name="geometry">
+     <rect>
+      <x>705</x>
+      <y>10</y>
+      <width>81</width>
+      <height>71</height>
+     </rect>
+    </property>
+    <property name="focusPolicy">
+     <enum>Qt::NoFocus</enum>
+    </property>
+    <property name="text">
+     <string>dbg</string>
+    </property>
+   </widget>
   </widget>
   <widget class="Label" name="uiPasswordExplanation">
    <property name="geometry">
