@@ -2,10 +2,11 @@
 set -euo pipefail
 IFS=$'\n'
 
-trap "exit;" SIGINT SIGTERM #The following loop works fine in Konsole but won't ever stop on Gnome Terminal.
+trap "exit;" SIGINT SIGTERM
 
 cd "$(dirname "$0")/.." #Always sync project root directory.
 
+#The following loop works fine in Konsole but won't ever stop on Gnome Terminal.
 while true; do 
 	find -regex '\./[^_\.].*' ! -name git_description ! -path 'util/stats_reported' | entr -d bash -c "
 		if [[ \$(cat git_description) != \$(git describe --tags --always) ]]; then #Only update when description changes, results in some thrashing otherwise when using --times.
