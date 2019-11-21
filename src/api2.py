@@ -228,8 +228,12 @@ class video():
 			try:
 				if reply.isError():
 					if self._catches:
+						error = reply.error()
 						for catch in self._catches:
-							catch(reply.error())
+							try:
+								error = catch(error)
+							except Exception as e:
+								error = e
 					else:
 						#This won't do much, but (I'm assuming) most calls simply won't ever fail.
 						if reply.error().name() == 'org.freedesktop.DBus.Error.NoReply':
@@ -239,7 +243,17 @@ class video():
 				else:
 					value = reply.value()
 					for then in self._thens:
-						value = then(value)
+						try:
+							value = then(value)
+						except Exception as error:
+							if self._catches:
+								for catch in self._catches:
+									try:
+										error = catch(error)
+									except Exception as e:
+										error = e
+							else:
+								raise e
 			except Exception as e:
 				raise e
 			finally:
@@ -248,7 +262,6 @@ class video():
 				#is covered by the UI updating another few times anyway.
 				#Note that because each call still lags a little, this
 				#causes a few dropped frames every time the API is called.
-				#video._startNextCallback()
 				delay(self, API_INTERCALL_DELAY, video._startNextCallback)
 				
 				self.performance['handled'] = perf_counter()
@@ -285,19 +298,19 @@ class video():
 		"""
 		
 		#Unwrap D-Bus errors from message.
-		log.debug(f'control.callSync{tuple(args)}')
+		log.debug(f'video.callSync{tuple(args)}')
 		
 		start = perf_counter()
 		msg = QDBusReply(cameraVideoAPI.call(*args, **kwargs))
 		end = perf_counter()
 		if warnWhenCallIsSlow and (end - start > API_SLOW_WARN_MS / 1000):
-			log.warn(f'slow call: control.callSync{tuple(args)} took {(end-start)*1000:.0f}ms/{API_SLOW_WARN_MS}ms.')
+			log.warn(f'slow call: video.callSync{tuple(args)} took {(end-start)*1000:.0f}ms/{API_SLOW_WARN_MS}ms.')
 		
 		if msg.isValid():
 			return msg.value()
 		else:
 			if msg.error().name() == 'org.freedesktop.DBus.Error.NoReply':
-				raise DBusException(f"control.callSync{tuple(args)} timed out ({API_TIMEOUT_MS}ms)")
+				raise DBusException(f"video.callSync{tuple(args)} timed out ({API_TIMEOUT_MS}ms)")
 			else:
 				raise DBusException("%s: %s" % (msg.error().name(), msg.error().message()))
 	
@@ -444,8 +457,12 @@ class control():
 			try:
 				if reply.isError():
 					if self._catches:
+						error = reply.error()
 						for catch in self._catches:
-							catch(reply.error())
+							try:
+								error = catch(error)
+							except Exception as e:
+								error = e
 					else:
 						#This won't do much, but (I'm assuming) most calls simply won't ever fail.
 						if reply.error().name() == 'org.freedesktop.DBus.Error.NoReply':
@@ -455,7 +472,17 @@ class control():
 				else:
 					value = reply.value()
 					for then in self._thens:
-						value = then(value)
+						try:
+							value = then(value)
+						except Exception as error:
+							if self._catches:
+								for catch in self._catches:
+									try:
+										error = catch(error)
+									except Exception as e:
+										error = e
+							else:
+								raise e
 			except Exception as e:
 				raise e
 			finally:
@@ -627,7 +654,7 @@ class APIValues(QObject):
 		)
 		
 		self._callbacks = {value: [] for value in _camState}
-		self._callbacks['notify'] = [] #meta, watch everything
+		self._callbacks['all'] = [] #meta, watch everything
 		
 		QDBusConnection.systemBus().connect(
 			f"ca.krontech.chronos.{'control_mock' if USE_MOCK else 'control'}", 
@@ -666,6 +693,8 @@ class APIValues(QObject):
 				_camStateAge[key] += 1
 				for callback in self._callbacks[key]:
 					callback(value)
+				for callback in self._callbacks['all']:
+					callback(key, value)
 			else:
 				log.info(f'Ignoring {key} → {value}, stale.')
 	
