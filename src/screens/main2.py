@@ -20,6 +20,7 @@ import estimate_file as estimateFile
 RECORDING_MODES = {'START/STOP':1, 'SOFT_TRIGGER':2, 'VIRTUAL_TRIGGER':3}
 RECORDING_MODE = RECORDING_MODES['START/STOP']
 
+settings.setValue('theme', 'light') #[HACK DDR 2019-11-15] patch around dark theme until it works, because the dark theme is the default.
 
 class Main(QWidget):
 	def __init__(self, window):
