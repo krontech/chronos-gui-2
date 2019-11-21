@@ -4,7 +4,7 @@ from PyQt5.QtCore import Q_ENUMS, pyqtProperty
 
 from random import randint
 
-from debugger import dbg, brk; dbg, brk
+from debugger import dbg; dbg
 
 
 class MarginWidth:
