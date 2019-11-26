@@ -1,7 +1,7 @@
 import subprocess
 from animate import delay
 
-def run(self, command: list, error: callable, success: callable):
+def run(self, command: list, error: callable, success: callable, *, binaryOutput=False):
 	"""Run the command, passing stdout to success.
 		
 		command: a list of [command, ...args]
@@ -31,6 +31,7 @@ def run(self, command: list, error: callable, success: callable):
 		elif exitStatus:
 			error(exitStatus)
 		else:
-			success(str(proc.communicate()[0], 'utf8'))
+			converter = (lambda x,y: x) if binaryOutput else str
+			success(converter(proc.communicate()[0], 'utf8'))
 	delay(self, 200, lambda: #Initial delay, df et al usually run in .17-.20s.
 		checkProc(timeout=50) )
