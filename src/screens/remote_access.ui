@@ -45,6 +45,9 @@
      <height>81</height>
     </rect>
    </property>
+   <property name="text">
+    <string>«pass»</string>
+   </property>
    <property name="echoMode">
     <enum>QLineEdit::Password</enum>
    </property>
@@ -106,7 +109,7 @@
      </rect>
     </property>
    </widget>
-   <widget class="Label" name="label_11">
+   <widget class="Label" name="uiNetworkInterfaceInformation">
     <property name="geometry">
      <rect>
       <x>350</x>
@@ -146,7 +149,7 @@ URL For</string>
      <property name="geometry">
       <rect>
        <x>0</x>
-       <y>10</y>
+       <y>40</y>
        <width>151</width>
        <height>81</height>
       </rect>
@@ -175,7 +178,7 @@ URL For</string>
      <property name="geometry">
       <rect>
        <x>230</x>
-       <y>60</y>
+       <y>90</y>
        <width>71</width>
        <height>81</height>
       </rect>
@@ -191,8 +194,8 @@ URL For</string>
      <property name="geometry">
       <rect>
        <x>20</x>
-       <y>90</y>
-       <width>101</width>
+       <y>120</y>
+       <width>91</width>
        <height>21</height>
       </rect>
      </property>
@@ -204,7 +207,7 @@ URL For</string>
      <property name="geometry">
       <rect>
        <x>90</x>
-       <y>70</y>
+       <y>100</y>
        <width>141</width>
        <height>71</height>
       </rect>
@@ -229,8 +232,8 @@ URL For</string>
      <property name="geometry">
       <rect>
        <x>20</x>
-       <y>140</y>
-       <width>101</width>
+       <y>170</y>
+       <width>91</width>
        <height>21</height>
       </rect>
      </property>
@@ -242,9 +245,9 @@ URL For</string>
      <property name="geometry">
       <rect>
        <x>110</x>
-       <y>140</y>
+       <y>170</y>
        <width>201</width>
-       <height>181</height>
+       <height>151</height>
       </rect>
      </property>
      <layout class="QGridLayout" name="gridLayout">
@@ -290,7 +293,7 @@ URL For</string>
        </widget>
       </item>
       <item row="1" column="1">
-       <widget class="QWidget" name="uiAppUrlQRCode" native="true">
+       <widget class="QLabel" name="uiAppUrlQRCode">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
           <horstretch>50</horstretch>
@@ -306,6 +309,9 @@ URL For</string>
         <property name="styleSheet">
          <string notr="true">background: wheat</string>
         </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+        </property>
        </widget>
       </item>
       <item row="2" column="0" colspan="3">
@@ -315,13 +321,26 @@ URL For</string>
         </property>
         <property name="sizeHint" stdset="0">
          <size>
-          <width>20</width>
-          <height>40</height>
+          <width>0</width>
+          <height>0</height>
          </size>
         </property>
        </spacer>
       </item>
      </layout>
+    </widget>
+    <widget class="FeedbackLabel" name="uiHTTPStatus">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>30</y>
+       <width>261</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="customStyleSheet" stdset="0">
+      <string>font-size: 16px;</string>
+     </property>
     </widget>
     <zorder>uiEnableHTTP</zorder>
     <zorder>subheader_3</zorder>
@@ -330,6 +349,7 @@ URL For</string>
     <zorder>label_8</zorder>
     <zorder>widget_2</zorder>
     <zorder>uiHTTPPort</zorder>
+    <zorder>uiHTTPStatus</zorder>
    </widget>
    <widget class="QWidget" name="widget_4" native="true">
     <property name="geometry">
@@ -357,9 +377,9 @@ URL For</string>
      <property name="geometry">
       <rect>
        <x>110</x>
-       <y>140</y>
+       <y>170</y>
        <width>231</width>
-       <height>181</height>
+       <height>151</height>
       </rect>
      </property>
      <layout class="QGridLayout" name="gridLayout_2">
@@ -385,8 +405,8 @@ URL For</string>
         </property>
         <property name="sizeHint" stdset="0">
          <size>
-          <width>20</width>
-          <height>40</height>
+          <width>0</width>
+          <height>0</height>
          </size>
         </property>
        </spacer>
@@ -405,7 +425,7 @@ URL For</string>
        </spacer>
       </item>
       <item row="1" column="1">
-       <widget class="QWidget" name="uiSSHCommandQRCode" native="true">
+       <widget class="QLabel" name="uiSSHCommandQRCode">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
           <horstretch>50</horstretch>
@@ -420,6 +440,9 @@ URL For</string>
         </property>
         <property name="styleSheet">
          <string notr="true">background: wheat</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
         </property>
        </widget>
       </item>
@@ -443,7 +466,7 @@ URL For</string>
      <property name="geometry">
       <rect>
        <x>230</x>
-       <y>60</y>
+       <y>90</y>
        <width>71</width>
        <height>81</height>
       </rect>
@@ -459,8 +482,8 @@ URL For</string>
      <property name="geometry">
       <rect>
        <x>20</x>
-       <y>90</y>
-       <width>101</width>
+       <y>120</y>
+       <width>91</width>
        <height>21</height>
       </rect>
      </property>
@@ -472,7 +495,7 @@ URL For</string>
      <property name="geometry">
       <rect>
        <x>90</x>
-       <y>70</y>
+       <y>100</y>
        <width>141</width>
        <height>71</height>
       </rect>
@@ -497,7 +520,7 @@ URL For</string>
      <property name="geometry">
       <rect>
        <x>0</x>
-       <y>10</y>
+       <y>40</y>
        <width>151</width>
        <height>81</height>
       </rect>
@@ -510,13 +533,26 @@ URL For</string>
      <property name="geometry">
       <rect>
        <x>20</x>
-       <y>140</y>
-       <width>101</width>
+       <y>170</y>
+       <width>91</width>
        <height>21</height>
       </rect>
      </property>
      <property name="text">
       <string>Command</string>
+     </property>
+    </widget>
+    <widget class="FeedbackLabel" name="uiSSHStatus">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>30</y>
+       <width>261</width>
+       <height>30</height>
+      </rect>
+     </property>
+     <property name="customStyleSheet" stdset="0">
+      <string>font-size: 16px;</string>
      </property>
     </widget>
     <zorder>subheader_4</zorder>
@@ -526,21 +562,25 @@ URL For</string>
     <zorder>uiEnableSSH</zorder>
     <zorder>label_10</zorder>
     <zorder>uiSSHPort</zorder>
+    <zorder>uiSSHStatus</zorder>
    </widget>
-   <widget class="QPushButton" name="uiDebug">
+   <widget class="Label" name="uiNoNetworkConnection">
     <property name="geometry">
      <rect>
-      <x>705</x>
-      <y>10</y>
-      <width>81</width>
-      <height>71</height>
+      <x>350</x>
+      <y>90</y>
+      <width>261</width>
+      <height>41</height>
      </rect>
     </property>
-    <property name="focusPolicy">
-     <enum>Qt::NoFocus</enum>
-    </property>
     <property name="text">
-     <string>dbg</string>
+     <string>No usable network devices are plugged in.</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+    </property>
+    <property name="wordWrap">
+     <bool>true</bool>
     </property>
    </widget>
   </widget>
@@ -589,6 +629,22 @@ URL For</string>
     <string>Network Access Password</string>
    </property>
   </widget>
+  <widget class="QPushButton" name="uiDebug">
+   <property name="geometry">
+    <rect>
+     <x>710</x>
+     <y>10</y>
+     <width>81</width>
+     <height>71</height>
+    </rect>
+   </property>
+   <property name="focusPolicy">
+    <enum>Qt::NoFocus</enum>
+   </property>
+   <property name="text">
+    <string>dbg</string>
+   </property>
+  </widget>
   <zorder>backdrop</zorder>
   <zorder>uiPasswordExplanation</zorder>
   <zorder>uiAllConfigOptions</zorder>
@@ -598,6 +654,7 @@ URL For</string>
   <zorder>uiPassword</zorder>
   <zorder>uiDone</zorder>
   <zorder>subheader</zorder>
+  <zorder>uiDebug</zorder>
  </widget>
  <customwidgets>
   <customwidget>
@@ -619,6 +676,11 @@ URL For</string>
    <class>ComboBox</class>
    <extends>QComboBox</extends>
    <header>combo_box</header>
+  </customwidget>
+  <customwidget>
+   <class>FeedbackLabel</class>
+   <extends>QLabel</extends>
+   <header>feedback_label</header>
   </customwidget>
   <customwidget>
    <class>HeaderLabel</class>
