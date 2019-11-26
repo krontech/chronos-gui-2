@@ -161,8 +161,16 @@ class Power(QtWidgets.QDialog):
 		#evt has .rect() -> QRect and .region() -> QClipRegion functions.
 		p = QPainter(self.uiChart)
 		pen = QPen()
-		normalFont = QFont("DejaVu Sans", 11, weight=QtGui.QFont.Thin)
-		tinyFont = QFont("DejaVu Sans", 9, weight=QtGui.QFont.Thin)
+		
+		#Font more or less copied from main.py, where we set the app font.
+		normalFont = QFont("Roboto", 11, weight=QtGui.QFont.Normal)
+		normalFont.setLetterSpacing(QtGui.QFont.AbsoluteSpacing, 0.25)
+		normalFont.setHintingPreference(QtGui.QFont.PreferNoHinting)
+		
+		tinyFont = QFont("Roboto", 9, weight=QtGui.QFont.Normal)
+		tinyFont.setLetterSpacing(QtGui.QFont.AbsoluteSpacing, 0.25)
+		tinyFont.setHintingPreference(QtGui.QFont.PreferNoHinting)
+		
 		p.setRenderHint(QPainter.Antialiasing, True)
 		p.setRenderHint(QPainter.TextAntialiasing, True)
 		p.setFont(normalFont)

@@ -353,7 +353,6 @@ class RemoteAccess(QtWidgets.QWidget):
 				end = '',
 			)
 			sshd_config.truncate()
-			
 		
 		self.reloadSSH()
 	
