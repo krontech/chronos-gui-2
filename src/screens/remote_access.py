@@ -5,6 +5,7 @@ from hashlib import sha256
 import binascii
 import json
 import subprocess
+import re
 
 from PyQt5 import uic, QtWidgets, QtCore
 from PyQt5.QtGui import QPixmap
@@ -314,7 +315,7 @@ class RemoteAccess(QtWidgets.QWidget):
 					self.uiSSHStatus.showError(
 						f"Status: Error. See journalctl.", 
 						timeout = 0 ),
-					log.error(str(err)),
+					log.error(f'Internal command failed with code {err}.'),
 				),
 				
 				lambda *_: external_process.run(self,
@@ -324,7 +325,7 @@ class RemoteAccess(QtWidgets.QWidget):
 						self.uiSSHStatus.showError(
 							f"Status: Error. See journalctl.", 
 							timeout = 0 ),
-						log.error(str(err)),
+						log.error(f'Internal command failed with code {err}.'),
 					),
 					
 					lambda *_:
@@ -337,6 +338,23 @@ class RemoteAccess(QtWidgets.QWidget):
 	def setSSHPort(self, num):
 		log.print(f'setSSHPort {num}')
 		settings.setValue('ssh port', num)
+		
+		#lol i bet this is going to cause problems
+		with open('/etc/ssh/sshd_config', 'r+', encoding='utf8') as sshd_config:
+			configuration = sshd_config.read()
+			sshd_config.seek(0)
+			print(
+				re.sub(
+					r'\n#? ?Port \d+\n',
+					f'\nPort {num}\n',
+					configuration,
+				),
+				file = sshd_config, 
+				end = '',
+			)
+			sshd_config.truncate()
+			
+		
 		self.reloadSSH()
 	
 	def reloadSSH(self):
@@ -352,9 +370,9 @@ class RemoteAccess(QtWidgets.QWidget):
 			
 			lambda err: (
 				self.uiSSHStatus.showError(
-					f"Status: Error. See journalctl.", 
+					f"Status: Error. (See journalctl -xn.)", 
 					timeout = 0 ),
-				log.error(str(err)),
+				log.error(f'Internal command failed with code {err}.'),
 			),
 			
 			lambda *_:
@@ -380,7 +398,7 @@ class RemoteAccess(QtWidgets.QWidget):
 					self.uiHTTPStatus.showError(
 						f"Status: Error. See journalctl.", 
 						timeout = 0 ),
-					log.error(str(err)),
+					log.error(f'Internal command failed with code {err}.'),
 				),
 				
 				lambda *_: external_process.run(self,
@@ -390,7 +408,7 @@ class RemoteAccess(QtWidgets.QWidget):
 						self.uiHTTPStatus.showError(
 							f"Status: Error. See journalctl.", 
 							timeout = 0 ),
-						log.error(str(err)),
+						log.error(f'Internal command failed with code {err}.'),
 					),
 					
 					lambda *_:
