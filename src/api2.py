@@ -1058,23 +1058,57 @@ class NetworkInterfaces(QObject):
 		)
 		self._acquireInterfacesCall.finished.connect(self._acquireInterfaceData)
 	def _acquireInterfaceData(self, reply):
+		"""Continuation of __init__.
+		
+			[DDR 2019-11-05] Note: In Qt 5.7, we can't just go
+			self._networkInterfaces['Device'].property(), like we could with
+			self._networkInterfaces['Device'].call(), because .property()
+			doesn't seem to work. afaik, it _should_ work, and the example in
+			https://stackoverflow.com/questions/20042995/error-getting-dbus-interface-property-with-qdbusinterface
+			which is directly relevant to our situation shows it working. Yet,
+			I cannot figure out how to port it to Python. So we do it manually
+			with the `'* property interface'`s.
+					Note: https://doc.qt.io/archives/qt-5.7/qnetworkinterface.html is
+			a thing. Shame it doesn't have notification events.
+					Command-line based examples:
+			docs: https://developer.gnome.org/NetworkManager/0.9/spec.html
+			org.freedesktop.NetworkManager.Device.Wired has ipv4/6 properties
+			gdbus introspect --system --dest org.freedesktop.NetworkManager.Device.Wired --object-path /org/freedesktop/NetworkManager/Device/Wired
+			
+			- Get network interfaces:
+				> gdbus introspect --system --dest org.freedesktop.NetworkManager --object-path /org/freedesktop/NetworkManager
+					- Has ActivateConnection method in org.freedesktop.NetworkManager
+					- Has GetDevices method in org.freedesktop.NetworkManager
+						> gdbus call --system --dest org.freedesktop.NetworkManager --object-path /org/freedesktop/NetworkManager --method org.freedesktop.NetworkManager.GetDevices
+							- ([objectpath '/org/freedesktop/NetworkManager/Devices/0', '/org/freedesktop/NetworkManager/Devices/1', '/org/freedesktop/NetworkManager/Devices/2', '/org/freedesktop/NetworkManager/Devices/3'],)
+						> gdbus introspect --system --dest org.freedesktop.NetworkManager --object-path /org/freedesktop/NetworkManager/Devices/0
+							- This is apparently a network connection - in this case, loopback.
+							- Links to IPv4/6 config.
+						> gdbus introspect --system --dest org.freedesktop.NetworkManager --object-path /org/freedesktop/NetworkManager/Devices/1
+							- eth0
+							- is plugged in?
+								- org.freedesktop.NetworkManager.Device.Wired property Carrier
+								- [implements g interfaces] Filter org.freedesktop.NetworkManager.GetDevices to get the list of plugged-in interfaces.
+							> gdbus introspect --system --dest org.freedesktop.NetworkManager --object-path /org/freedesktop/NetworkManager/DHCP4Config/0
+								- yields org.freedesktop.NetworkManager.DHCP4Config
+								- from ip_address' Dhcp4Config property
+								- [implements g n lan IPv4 or v6] in properties & PropertiesChanged signal.
+							> gdbus introspect --system --dest org.freedesktop.NetworkManager --object-path /org/freedesktop/NetworkManager/IP6Config/2
+								- yields org.freedesktop.NetworkManager.IP6Config
+								- from ip_address' Ip6Config property
+								- [implements g n g n www IPv4 or v6] in Addresses (first item) & PropertiesChanged signal.
+							- has Disconnect method
+								- https://developer.gnome.org/NetworkManager/0.9/spec.html#org.freedesktop.NetworkManager.Device.Disconnect
+						> gdbus introspect --system --dest org.freedesktop.NetworkManager --object-path /org/freedesktop/NetworkManager/Devices/2
+							- eth1
+						> gdbus introspect --system --dest org.freedesktop.NetworkManager --object-path /org/freedesktop/NetworkManager/Devices/3
+							- usb0
+		"""
+		
 		reply = QDBusPendingReply(reply)
 		if reply.isError():
 			raise DBusException("%s: %s" % (reply.error().name(), reply.error().message()))
 		reply = reply.value()
-		
-		#[DDR 2019-11-05] Note: In Qt 5.7, we can't just go
-		#self._networkInterfaces['Device'].property(), like we could with
-		#self._networkInterfaces['Device'].call(), because .property()
-		#doesn't seem to work. afaik, it _should_ work, and the example in
-		#https://stackoverflow.com/questions/20042995/error-getting-dbus-interface-property-with-qdbusinterface
-		#which is directly relevant to our situation shows it working. Yet,
-		#I cannot figure out how to port it to Python. So we do it manually
-		#with the `'* property interface'`s.
-		
-		#Note: https://doc.qt.io/archives/qt-5.7/qnetworkinterface.html is
-		#a thing. Shame it doesn't have notification events.
-		
 		
 		self._networkInterfaces = [{
 			'Device': QDBusInterface( #Provides node.
