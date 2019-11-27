@@ -174,10 +174,9 @@ class RemoteAccess(QtWidgets.QWidget):
 		#	 {'address': IPv4Address('192.168.12.1'),
 		#	  'name': 'usb',
 		#	  'path': '/org/freedesktop/NetworkManager/Devices/3'}]
-		log.print(f'updateNetworkInterface {interfaces}')
+		
 		self.uiNetworkInterface.clear()
 		for interface in interfaces:
-			log.print(f'adding {interface}')
 			self.uiNetworkInterface.addItem(interface['name'], interface)
 		
 		#Do something here to set the selected item to the newest interface, whatever wasn't used last time ought to be fine?
