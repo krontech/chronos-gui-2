@@ -836,6 +836,12 @@ Peaking</string>
      <height>32</height>
     </rect>
    </property>
+   <property name="styleSheet">
+    <string notr="true">
+			font-size: 16px;
+			background: #00b800;
+		</string>
+   </property>
    <property name="pixmap">
     <pixmap>../../assets/images/battery-light-charging.svg</pixmap>
    </property>

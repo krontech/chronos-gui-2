@@ -605,6 +605,7 @@ class Main(QWidget):
 		self.uiBattery.clicked.connect(lambda: window.show('power'))
 		
 		self.uiBatteryIcon.setAttribute(Qt.WA_TransparentForMouseEvents)
+		self.uiBatteryIcon.setStyleSheet('')
 		api.observe('externalPower', lambda state: (
 			setattr(self, '_batteryCharging', state),
 			state and (
