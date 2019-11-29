@@ -39,7 +39,8 @@ class __light():
 	headerText          = 'black'                 #only for the header widget
 	highlight           = '#777'                  #selected text background
 	highlitText         = 'white'                 #selected text letters
-	focusRing           = 'blue'                  #activate with jog wheel, shows active widget
+	focusRingBase       = 'rgba(196,196,255,32)'  #activate with jog wheel, shows active widget
+	focusRingBorder     = '#1D6262'               #activate with jog wheel, shows active widget
 	
 	
 
@@ -58,7 +59,8 @@ class __dark():
 	headerText         = '#fff'                  #only for the header widget
 	highlight          = '#777'                  #selected text background
 	highlitText        = '#ddd'                  #selected text letters
-	focusRing          = 'blue'                  #activate with jog wheel, shows active widget
+	focusRingBase      = 'rgba(196,196,255,32)'  #activate with jog wheel, shows active widget
+	focusRingBorder    = '#1D6262'               #activate with jog wheel, shows active widget
 	
 	
 

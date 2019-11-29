@@ -5,6 +5,8 @@ from PyQt5.QtCore import Qt, QPoint, QSize, QRect
 from sip import isdeleted
 
 from debugger import *; dbg
+from widgets.theme import theme
+import settings
 
 
 class FocusRing(QLabel):
@@ -35,7 +37,12 @@ class FocusRing(QLabel):
 		self.focusInOutTimer.timeout.connect(self._updateFocusRingPadding)
 		self.focusInOutTimer.setInterval(16)
 		
-		self.refreshStyleSheet(self._currentPadding)
+		self.theme = None
+		settings.observe('theme', 'dark', lambda name: (
+			setattr(self, 'theme', theme(name)),
+			self.refreshStyleSheet(self._currentPadding)
+		))
+		
 		self.hide()
 	
 	
@@ -97,8 +104,8 @@ class FocusRing(QLabel):
 	
 	def refreshStyleSheet(self, ringPadding: int):
 		self.setStyleSheet(f"""
-			border: 2px solid #1D6262;
-			background: rgba(196,196,255,32);
+			border: 2px solid {self.theme.focusRingBorder};
+			background: {self.theme.focusRingBase};
 			border-radius: {ringPadding}px;
 			/*widget-animation-duration: 1000; doesn't exist in pyqt 5.7 #backport-from-5.11*/
 		""")
