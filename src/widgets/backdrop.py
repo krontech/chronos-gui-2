@@ -5,6 +5,7 @@ from PyQt5.QtCore import pyqtProperty, QSize
 
 from debugger import *; dbg
 import settings
+from theme import theme
 
 
 class Backdrop(QLabel):
@@ -13,13 +14,13 @@ class Backdrop(QLabel):
 
 	def __init__(self, parent=None, showHitRects=False):
 		super().__init__(parent)
-		self.theme = ''
+		self.theme = theme('dark') #Gotta provide a default, both clickMarginColor and theme update style and both need to be set.
 		self._customStyleSheet = self.styleSheet() #always '' for some reason
 		self._showHitRects = showHitRects
 		self.refreshStyle()
 		
-		settings.observe('theme', 'dark', lambda theme: (
-			setattr(self, 'theme', theme),
+		settings.observe('theme', 'dark', lambda name: (
+			setattr(self, 'theme', theme(name)),
 			self.refreshStyle(),
 		))
 		
@@ -28,14 +29,14 @@ class Backdrop(QLabel):
 		if self._showHitRects:
 			# Let us see the background grid for editing.
 			self.setStyleSheet(f"""
-				background: rgba(255,255,255,128);
-				border: 4px solid white;
+				background: {self.theme.backgroundInEditor};
+				border: 4px solid {self.theme.bgBorderInEditor};
 				{self._customStyleSheet}
 			""")
 		else:
 			# Full opaque white, don't need that grid now!
 			self.setStyleSheet(f"""
-				background: {'#333' if self.theme == 'dark' else 'white'};
+				background: {self.theme.background};
 				{self._customStyleSheet}
 			""")
 	

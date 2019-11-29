@@ -2,7 +2,7 @@
 
 from random import randint
 
-from PyQt5.QtCore import Q_ENUMS, QSize, Qt
+from PyQt5.QtCore import Q_ENUMS, QSize, Qt, pyqtProperty
 from PyQt5.QtWidgets import QPushButton
 
 from debugger import *; dbg
@@ -10,6 +10,7 @@ import settings
 from show_paint_rect_plugin import ShowPaintRectsPlugin
 from touch_margin_plugin import TouchMarginPlugin, MarginWidth
 from focusable_plugin import FocusablePlugin
+from theme import theme
 
 
 class Button(ShowPaintRectsPlugin, TouchMarginPlugin, FocusablePlugin, QPushButton):
@@ -19,6 +20,7 @@ class Button(ShowPaintRectsPlugin, TouchMarginPlugin, FocusablePlugin, QPushButt
 	def __init__(self, parent=None, showHitRects=False):
 		self.keepActiveLook = False
 		self._fake_disability = False
+		self._hideBorder = None
 		
 		super().__init__(parent, showHitRects=showHitRects)
 		
@@ -26,11 +28,11 @@ class Button(ShowPaintRectsPlugin, TouchMarginPlugin, FocusablePlugin, QPushButt
 		if not self.text():
 			self.setText('Button')
 		
-		self.theme = ''
+		self.theme = theme('dark') #Gotta provide a default, both clickMarginColor and theme update style and both need to be set.
 		self.clickMarginColor = f"rgba({randint(0, 32)}, {randint(0, 32)}, {randint(128, 255)}, {randint(32,96)})"
 		
-		settings.observe('theme', 'dark', lambda theme: (
-			setattr(self, 'theme', theme),
+		settings.observe('theme', 'dark', lambda name: (
+			setattr(self, 'theme', theme(name)),
 			self.refreshStyle(),
 		))
 		
@@ -60,7 +62,8 @@ class Button(ShowPaintRectsPlugin, TouchMarginPlugin, FocusablePlugin, QPushButt
 				/* Editor style. Use border to show were click margin is, so we don't mess it up during layout. */
 				Button {{
 					font-size: 16px;
-					background: rgba(255,255,255,127); /* The background is drawn under the button borders, so they are opaque if the background is opaque. */
+					background: {self.theme.baseInEditor}; /* The background is drawn under the button borders, so they are opaque if the background is opaque. We need them to be transparent because we can't see borders under borders otherwise. */
+					color: {self.theme.text};
 					
 					/* use borders instead of margins so we can see what we're doing */
 					border-left:   {self.clickMarginLeft   * 10 + 1}px solid {self.clickMarginColor};
@@ -74,16 +77,10 @@ class Button(ShowPaintRectsPlugin, TouchMarginPlugin, FocusablePlugin, QPushButt
 				/* App style. Use margin to provide further click area outside the visual button. */
 				Button {{
 					font-size: 16px;
-					color: {
-						('white' if not self._fake_disability else 'lightgrey') 
-						if self.theme == 'dark' else 
-						('black' if not self._fake_disability else 'darkgrey')
-					};
-					background-color: {'#333' if self.theme == 'dark' else 'white'};
+					color: {self.theme.dimText if self.fake_disability else self.theme.text};
+					background-color: {self.theme.base};
 					
-					border: 1px solid {'#333' if self.theme == 'dark' else 'black'};
-					border-left-color: rgb(50,50,50);
-					border-top-color: rgb(50,50,50); /* Add a subtle 3d-ness until we figure out drop-shadows. */
+					border: 1px solid {'transparent' if self.hideBorder else self.theme.border};
 					
 					/* Add some touch space so this widget is easier to press. */
 					margin-left: {self.clickMarginLeft*10}px;
@@ -92,11 +89,8 @@ class Button(ShowPaintRectsPlugin, TouchMarginPlugin, FocusablePlugin, QPushButt
 					margin-bottom: {self.clickMarginBottom*10}px;
 				}}
 				
-				Button{'' if self.keepActiveLook or self._fake_disability else ':pressed'} {{ /*Look active if faking disability; gives a radio-button-esque feel to disabled buttons. ¯\\_(ツ)_/¯ */
-					border-color: rgb(50,50,50);
-					border-top-color: black;
-					border-left-color: black;
-					background: rgb(240,240,240);
+				Button{'' if self.keepActiveLook or self.fake_disability else ':pressed'} {{ /*Look active if faking disability; gives a radio-button-esque feel to disabled buttons. ¯\\_(ツ)_/¯ */
+					background: {self.theme.baseActive};
 				}}
 			""" + self.originalStyleSheet())
 	
@@ -113,4 +107,14 @@ class Button(ShowPaintRectsPlugin, TouchMarginPlugin, FocusablePlugin, QPushButt
 	@fake_disability.setter
 	def fake_disability(self, disabled: bool):
 		self._fake_disability = disabled
+		self.refreshStyle()
+	
+	
+	@pyqtProperty(bool)
+	def hideBorder(self):
+		return False if self._hideBorder is None else self._hideBorder
+		
+	@hideBorder.setter
+	def hideBorder(self, hide):
+		self._hideBorder = hide
 		self.refreshStyle()
