@@ -650,8 +650,8 @@ class Main(QWidget):
 					QPoint(x,y+h), #Bottom
 					QPoint(x+w,y+h),
 					QPoint(x+w,y+2),
-					QPoint(x+w-2,y+2), #Right battery nub chunk.
-					QPoint(x+w-2,y),
+					QPoint(x+w-3,y+2), #Right battery nub chunk.
+					QPoint(x+w-3,y),
 				]))
 				batteryOutline.closeSubpath() #Top of battery nub.
 				p.setClipPath(batteryOutline, Qt.IntersectClip)
