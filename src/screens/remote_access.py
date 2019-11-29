@@ -20,7 +20,7 @@ import external_process
 webServer = QtCore.QSettings('Krontech', 'web interface')
 
 
-def hexHash(*, password: str):
+def hexHash(*, password: str) -> str:
 	return binascii.hexlify(
 		sha256(
 			bytes(api.apiValues.get('cameraSerial'), 'utf-8') + 
@@ -260,8 +260,8 @@ class RemoteAccess(QtWidgets.QWidget):
 		self.setSSHPassword(password)
 	
 	def setHTTPPassword(self, password): #password
-		webServer.setValue('password',
-			hexHash(password=password) if password else '' )
+		webServer.setValue('password', json.dumps(
+			hexHash(password=password) if password else '' ))
 		self.reloadHTTP()
 
 	def setSSHPassword(self, password):
@@ -288,7 +288,7 @@ class RemoteAccess(QtWidgets.QWidget):
 					self.uiSSHStatus.showError(
 						f"Status: Error. See journalctl.", 
 						timeout = 0 ),
-					log.error(err),
+					log.error(f'[wf8F10] external process returned {err}'),
 				),
 				
 				lambda *_: external_process.run(self,
@@ -298,7 +298,7 @@ class RemoteAccess(QtWidgets.QWidget):
 						self.uiSSHStatus.showError(
 							f"Status: Error. See journalctl.", 
 							timeout = 0 ),
-						log.error(err),
+						log.error(f'[iJGaZW] external process returned {err}'),
 					),
 					
 					lambda *_:
@@ -434,7 +434,7 @@ class RemoteAccess(QtWidgets.QWidget):
 					self.uiHTTPStatus.showError(
 						f"Status: Error. See journalctl.", 
 						timeout = 0 ),
-					log.error(err),
+					log.error(f'[9quMdB] external process returned {err}'),
 				),
 				
 				lambda *_: external_process.run(self,
@@ -444,7 +444,7 @@ class RemoteAccess(QtWidgets.QWidget):
 						self.uiHTTPStatus.showError(
 							f"Status: Error. See journalctl.", 
 							timeout = 0 ),
-						log.error(err),
+						log.error(f'[kNIh2U] external process returned {err}'),
 					),
 					
 					lambda *_:
@@ -475,7 +475,7 @@ class RemoteAccess(QtWidgets.QWidget):
 				self.uiHTTPStatus.showError(
 					f"Status: Error. See journalctl.", 
 					timeout = 0 ),
-				log.error(err),
+				log.error(f'[4wQyPn] external process returned {err}'),
 			),
 			
 			lambda *_:
