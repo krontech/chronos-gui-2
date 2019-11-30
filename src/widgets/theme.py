@@ -25,6 +25,7 @@
 
 
 class __light():
+	"""Light theme, based on white, mimicing and improving on the Classic™ Chronos look."""
 	background          = 'white'                 #*screen* background color
 	backgroundInEditor  = 'rgba(255,255,255,127)' #screen background color in Qt Designer
 	bgBorderInEditor    = 'white'                 #*screen* background border in Qt Designer
@@ -42,9 +43,18 @@ class __light():
 	focusRingBase       = 'rgba(196,196,255,32)'  #activate with jog wheel, shows active widget
 	focusRingBorder     = '#1D6262'               #activate with jog wheel, shows active widget
 	
+	class checkbox():
+		checked = 'checkbox-checked-black.svg.png'
+		unchecked = 'checkbox-unchecked-black.svg.png'
+		
+	class radioButton():
+		checked = 'radio-button-checked-black.svg.png'
+		unchecked = 'radio-button-unchecked-black.svg.png'
+	
 	
 
 class __dark():
+	"""Trendy dark theme, getting away from the Classic™ Chronos look."""
 	background         = '#333'                  #*screen* background color
 	backgroundInEditor = 'rgba(48,48,48,127)'    #screen background color in Qt Designer
 	bgBorderInEditor   = '#333'                  #*screen* background border in Qt Designer
@@ -61,6 +71,14 @@ class __dark():
 	highlitText        = '#ddd'                  #selected text letters
 	focusRingBase      = 'rgba(196,196,255,32)'  #activate with jog wheel, shows active widget
 	focusRingBorder    = '#1D6262'               #activate with jog wheel, shows active widget
+	
+	class checkbox():
+		checked = 'checkbox-checked-white.svg.png'
+		unchecked = 'checkbox-unchecked-white.svg.png'
+		
+	class radioButton():
+		checked = 'radio-button-checked-white.svg.png'
+		unchecked = 'radio-button-unchecked-white.svg.png'
 	
 	
 

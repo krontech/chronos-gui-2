@@ -12,6 +12,7 @@ import logging; log = logging.getLogger('Chronos.gui')
 from touch_margin_plugin import TouchMarginPlugin, MarginWidth
 from direct_api_link_plugin import DirectAPILinkPlugin
 from focusable_plugin import FocusablePlugin
+from theme import theme
 
 
 class CheckBox(QCheckBox, TouchMarginPlugin, DirectAPILinkPlugin, FocusablePlugin):
@@ -21,12 +22,12 @@ class CheckBox(QCheckBox, TouchMarginPlugin, DirectAPILinkPlugin, FocusablePlugi
 	def __init__(self, parent=None, showHitRects=False):
 		super().__init__(parent, showHitRects=showHitRects)
 		
-		self.theme = ''
+		self.theme = theme('dark')
 		self._clickMarginRight = MarginWidth.none
 		self.clickMarginColor = f"rgba({randint(128, 255)}, {randint(0, 32)}, {randint(128, 255)}, {randint(32,96)})"
 		
-		settings.observe('theme', 'dark', lambda theme: (
-			setattr(self, 'theme', theme),
+		settings.observe('theme', 'dark', lambda name: (
+			setattr(self, 'theme', theme(name)),
 			self.refreshStyle(),
 		))
 		
@@ -61,7 +62,8 @@ class CheckBox(QCheckBox, TouchMarginPlugin, DirectAPILinkPlugin, FocusablePlugi
 				CheckBox {{
 					/* Editor style. Use border to show were click margin is, so we don't mess it up during layout. */
 					font-size: 16px;
-					background: rgba(255,255,255,127); /* The background is drawn under the button borders, so they are opaque if the background is opaque. */
+					color: {self.theme.text};
+					background: {self.theme.baseInEditor}; /* The background is drawn under the button borders, so they are opaque if the background is opaque. */
 					
 					/* use borders instead of margins so we can see what we're doing */
 					border-left:   {self.clickMarginLeft   * 10 + 1}px solid {self.clickMarginColor};
@@ -71,10 +73,10 @@ class CheckBox(QCheckBox, TouchMarginPlugin, DirectAPILinkPlugin, FocusablePlugi
 				}}
 				
 				CheckBox::indicator:checked {{
-					image: url(../../assets/images/checkbox-checked.svg.png);
+					image: url(../../assets/images/{self.theme.checkbox.checked});
 				}}
 				CheckBox::indicator:unchecked {{
-					image: url(../../assets/images/checkbox-unchecked.svg.png);
+					image: url(../../assets/images/{self.theme.checkbox.unchecked});
 				}}
 				
 			""" + self.originalStyleSheet())
@@ -83,8 +85,8 @@ class CheckBox(QCheckBox, TouchMarginPlugin, DirectAPILinkPlugin, FocusablePlugi
 				CheckBox {{
 					/* App style. Use margin to provide further click area outside the visual button. */
 					font-size: 16px;
-					color: {'white' if self.theme == 'dark' else 'black'};
-					background-color: {'#333' if self.theme == 'dark' else 'white'};
+					color: {self.theme.text};
+					background-color: {self.theme.base};
 					
 					/* Add some touch space so this widget is easier to press. */
 					margin-left: {self.clickMarginLeft*10}px;
@@ -94,9 +96,9 @@ class CheckBox(QCheckBox, TouchMarginPlugin, DirectAPILinkPlugin, FocusablePlugi
 				}}
 				
 				CheckBox::indicator:checked {{
-					image: url(assets/images/checkbox-checked.svg.png);
+					image: url(assets/images/{self.theme.checkbox.checked});
 				}}
 				CheckBox::indicator:unchecked {{
-					image: url(assets/images/checkbox-unchecked.svg.png);
+					image: url(assets/images/{self.theme.checkbox.unchecked});
 				}}
 			""" + self.originalStyleSheet())

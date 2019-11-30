@@ -6,9 +6,13 @@ from PyQt5.QtCore import Q_ENUMS, QSize, Qt
 from PyQt5.QtWidgets import QRadioButton
 
 from debugger import *; dbg
+import settings
+import logging; log = logging.getLogger('Chronos.gui')
+
 from touch_margin_plugin import TouchMarginPlugin, MarginWidth
 from direct_api_link_plugin import DirectAPILinkPlugin
 from focusable_plugin import FocusablePlugin
+from theme import theme
 
 
 class RadioButton(QRadioButton, TouchMarginPlugin, DirectAPILinkPlugin, FocusablePlugin):
@@ -17,8 +21,15 @@ class RadioButton(QRadioButton, TouchMarginPlugin, DirectAPILinkPlugin, Focusabl
 	
 	def __init__(self, parent=None, showHitRects=False):
 		super().__init__(parent, showHitRects=showHitRects)
+		
+		self.theme = theme('dark')
 		self._clickMarginRight = MarginWidth.none
 		self.clickMarginColor = f"rgba({randint(128, 255)}, {randint(128, 255)}, {randint(0, 32)}, {randint(32,96)})"
+		
+		settings.observe('theme', 'dark', lambda name: (
+			setattr(self, 'theme', theme(name)),
+			self.refreshStyle(),
+		))
 		
 		self.jogWheelLowResolutionRotation.connect(lambda delta, pressed: 
 			not pressed and self.selectWidget(delta) )
@@ -49,7 +60,8 @@ class RadioButton(QRadioButton, TouchMarginPlugin, DirectAPILinkPlugin, Focusabl
 				RadioButton {{
 					/* Editor style. Use border to show were click margin is, so we don't mess it up during layout. */
 					font-size: 16px;
-					background: rgba(255,255,255,127); /* The background is drawn under the button borders, so they are opaque if the background is opaque. */
+					color: {self.theme.text};
+					background: {self.theme.baseInEditor}; /* The background is drawn under the button borders, so they are opaque if the background is opaque. */
 					
 					/* use borders instead of margins so we can see what we're doing */
 					border-left:   {self.clickMarginLeft   * 10 + 1}px solid {self.clickMarginColor};
@@ -59,10 +71,10 @@ class RadioButton(QRadioButton, TouchMarginPlugin, DirectAPILinkPlugin, Focusabl
 				}}
 				
 				RadioButton::indicator:checked {{
-					image: url(../../assets/images/radio-button-checked.svg.png);
+					image: url(../../assets/images/{self.theme.radioButton.checked});
 				}}
 				RadioButton::indicator:unchecked {{
-					image: url(../../assets/images/radio-button-unchecked.svg.png);
+					image: url(../../assets/images/{self.theme.radioButton.unchecked});
 				}}
 			""" + self.originalStyleSheet())
 		else:
@@ -70,7 +82,8 @@ class RadioButton(QRadioButton, TouchMarginPlugin, DirectAPILinkPlugin, Focusabl
 				RadioButton {{
 					/* App style. Use margin to provide further click area outside the visual button. */
 					font-size: 16px;
-					background: white;
+					color: {self.theme.text};
+					background-color: {self.theme.base};
 					
 					/* Add some touch space so this widget is easier to press. */
 					margin-left: {self.clickMarginLeft*10}px;
@@ -80,9 +93,9 @@ class RadioButton(QRadioButton, TouchMarginPlugin, DirectAPILinkPlugin, Focusabl
 				}}
 				
 				RadioButton::indicator:checked {{
-					image: url(assets/images/radio-button-checked.svg.png);
+					image: url(assets/images/{self.theme.radioButton.checked});
 				}}
 				RadioButton::indicator:unchecked {{
-					image: url(assets/images/radio-button-unchecked.svg.png);
+					image: url(assets/images/{self.theme.radioButton.unchecked});
 				}}
 			""" + self.originalStyleSheet())
