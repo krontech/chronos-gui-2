@@ -26,21 +26,22 @@
 
 class __light():
 	"""Light theme, based on white, mimicing and improving on the Classic™ Chronos look."""
-	background          = 'white'                 #*screen* background color
-	backgroundInEditor  = 'rgba(255,255,255,127)' #screen background color in Qt Designer
-	bgBorderInEditor    = 'white'                 #*screen* background border in Qt Designer
-	base                = 'white'                 #*widget* background color
-	baseInEditor        = 'rgba(255,255,255,127)' #widget background in Qt Designer
-	baseActive          = 'rgb(240,240,240)'      #widget active background color (pressed button)
-	border              = 'black'                 #*interactive* widget border
-	text                = 'black'                 #normal text, buttons, labels, etc.
-	dimText             = '#777'                  #disabled/placeholder text
-	subheaderText       = 'black'                 #only for the subheader widget
-	headerText          = 'black'                 #only for the header widget
-	highlight           = '#777'                  #selected text background
-	highlitText         = 'white'                 #selected text letters
-	focusRingBase       = 'rgba(196,196,255,32)'  #activate with jog wheel, shows active widget
-	focusRingBorder     = '#1D6262'               #activate with jog wheel, shows active widget
+	background         = 'white'                 #*screen* background color
+	backgroundInEditor = 'rgba(255,255,255,127)' #screen background color in Qt Designer
+	bgBorderInEditor   = 'white'                 #*screen* background border in Qt Designer
+	base               = 'white'                 #*widget* background color
+	baseInEditor       = 'rgba(255,255,255,127)' #widget background in Qt Designer
+	baseActive         = 'rgb(240,240,240)'      #widget active background color (pressed button)
+	border             = 'black'                 #*interactive* widget border
+	text               = 'black'                 #normal text, buttons, labels, etc.
+	errorText          = '#c80000'               #error message text
+	dimText            = '#777'                  #disabled/placeholder text
+	subheaderText      = 'black'                 #only for the subheader widget
+	headerText         = 'black'                 #only for the header widget
+	highlight          = '#777'                  #selected text background
+	highlitText        = 'white'                 #selected text letters
+	focusRingBase      = 'rgba(196,196,255,32)'  #activate with jog wheel, shows active widget
+	focusRingBorder    = '#1D6262'               #activate with jog wheel, shows active widget
 	
 	class checkbox():
 		checked = 'checkbox-checked-black.svg.png'
@@ -67,6 +68,7 @@ class __dark():
 	baseActive         = 'rgb(96,96,96)'         #widget active background color (pressed button)
 	border             = '#fff'                  #*interactive* widget border
 	text               = '#fff'                  #normal text, buttons, labels, etc.
+	errorText          = '#c80000'               #error message text
 	dimText            = '#aaa'                  #disabled/placeholder text
 	subheaderText      = '#fff'                  #only for the subheader widget
 	headerText         = '#fff'                  #only for the header widget

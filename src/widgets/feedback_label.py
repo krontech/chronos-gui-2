@@ -4,6 +4,7 @@ from PyQt5.QtWidgets import QLabel
 from PyQt5.QtCore import QSize, pyqtProperty, Qt
 
 from debugger import *; dbg
+from theme import theme
 
 
 class FeedbackLabel(QLabel):
@@ -17,7 +18,14 @@ class FeedbackLabel(QLabel):
 	def __init__(self, parent=None, showHitRects=False):
 		super().__init__(parent)
 		
+		self.theme = theme('dark')
 		self._customStyleSheet = ''
+		
+		settings.observe('theme', 'dark', lambda name: (
+			setattr(self, 'theme', theme(name)),
+			self.refreshStyle(),
+		))
+		
 		self.setWordWrap(True)
 		self.setAlignment(Qt.AlignTop | Qt.AlignLeft)
 		
@@ -40,7 +48,7 @@ class FeedbackLabel(QLabel):
 		self.setStyleSheet(f"""
 			font-size: 14px;
 			background: transparent;
-			color: #c80000;
+			color: {self.theme.errorText};
 		""" + self._customStyleSheet)
 	
 	
@@ -53,7 +61,7 @@ class FeedbackLabel(QLabel):
 		self.setStyleSheet(f"""
 			font-size: 14px;
 			background: transparent;
-			color: #c80000;
+			color: {self.theme.errorText};
 		""" + self._customStyleSheet)
 		
 		#DDR 2019-06-27: Sometimes this seems to not be populated. I don't know why.
@@ -75,7 +83,7 @@ class FeedbackLabel(QLabel):
 		self.setStyleSheet(f"""
 			font-size: 14px;
 			background: transparent;
-			color: #000000;
+			color: {self.theme.text};
 		""" + self._customStyleSheet)
 		
 		message and self.setText(message)

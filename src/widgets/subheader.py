@@ -4,16 +4,22 @@ from PyQt5.QtWidgets import QLabel
 from PyQt5.QtCore import QSize
 
 from debugger import *; dbg
+import settings
+from theme import theme
 
 
 class Subheader(QLabel):
 	def __init__(self, parent=None, showHitRects=False):
 		super().__init__(parent)
 		
-		self.setStyleSheet(f"""
-			font-size: 18px;
-			background: transparent; /*Don't mess with this, it affects font width.*/
-		""" + self.styleSheet())
+		self.baseStyleSheet = self.styleSheet()
+		settings.observe('theme', 'dark', lambda name:
+			self.setStyleSheet(f"""
+				font-size: 18px;
+				background: transparent;
+				color: {theme(name).text};
+			""" + self.baseStyleSheet )
+		)
 		
 		# Set some default text, so we can see the widget.
 		if not self.text():
