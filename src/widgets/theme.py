@@ -34,7 +34,6 @@ class __light():
 	baseActive          = 'rgb(240,240,240)'      #widget active background color (pressed button)
 	border              = 'black'                 #*interactive* widget border
 	text                = 'black'                 #normal text, buttons, labels, etc.
-	textActive          = 'black'                 #normal text, buttons, labels, etc.
 	dimText             = '#777'                  #disabled/placeholder text
 	subheaderText       = 'black'                 #only for the subheader widget
 	headerText          = 'black'                 #only for the header widget
@@ -68,7 +67,6 @@ class __dark():
 	baseActive         = 'rgb(96,96,96)'         #widget active background color (pressed button)
 	border             = '#fff'                  #*interactive* widget border
 	text               = '#fff'                  #normal text, buttons, labels, etc.
-	textActive         = '#fff'                  #normal text, buttons, labels, etc.
 	dimText            = '#aaa'                  #disabled/placeholder text
 	subheaderText      = '#fff'                  #only for the subheader widget
 	headerText         = '#fff'                  #only for the header widget

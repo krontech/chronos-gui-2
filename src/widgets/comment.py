@@ -3,8 +3,6 @@
 from PyQt5.QtWidgets import QLabel
 from PyQt5.QtCore import QSize, Qt
 
-from debugger import *; dbg
-
 
 class Comment(QLabel):
 	def __init__(self, parent=None, showHitRects=False):

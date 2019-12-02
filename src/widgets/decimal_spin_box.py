@@ -7,6 +7,8 @@ from PyQt5.QtWidgets import QDoubleSpinBox, QLineEdit
 
 from debugger import *; dbg
 from signal_tap import signalTap
+import settings 
+from theme import theme
 
 from touch_margin_plugin import TouchMarginPlugin, MarginWidth
 from direct_api_link_plugin import DirectAPILinkPlugin
@@ -24,7 +26,13 @@ class DecimalSpinBox(QDoubleSpinBox, TouchMarginPlugin, DirectAPILinkPlugin, Foc
 		
 		self.setCorrectionMode(self.CorrectToNearestValue)
 		
+		self.theme = theme('dark')
 		self.clickMarginColor = f"rgba({randint(0, 32)}, {randint(128, 255)}, {randint(128, 255)}, {randint(32,96)})"
+		
+		settings.observe('theme', 'dark', lambda name: (
+			setattr(self, 'theme', theme(name)),
+			self.refreshStyle(),
+		))
 		
 		self.isFocused = False
 		self.inputMode = '' #Set to empty, 'jogWheel', or 'touch'. Used for defocus event handling behaviour.
@@ -62,7 +70,8 @@ class DecimalSpinBox(QDoubleSpinBox, TouchMarginPlugin, DirectAPILinkPlugin, Foc
 					border: 1px solid black;
 					padding-right: 0px;
 					padding-left: 10px;
-					background: rgba(255,255,255,127); /* The background is drawn under the button borders, so they are opaque if the background is opaque. */
+					background: {self.theme.baseInEditor}; /* The background is drawn under the button borders, so they are opaque if the background is opaque. */
+					color: {self.theme.text};
 					
 					/* use borders instead of margins so we can see what we're doing */
 					border-left:   {self.clickMarginLeft   * 10 + 1}px solid {self.clickMarginColor};
@@ -71,7 +80,7 @@ class DecimalSpinBox(QDoubleSpinBox, TouchMarginPlugin, DirectAPILinkPlugin, Foc
 					border-bottom: {self.clickMarginBottom * 10 + 1}px solid {self.clickMarginColor};
 				}}
 				DecimalSpinBox:disabled {{ 
-					color: #969696;
+					color: {self.theme.dimText};
 				}}
 				DecimalSpinBox::up-button, DecimalSpinBox::down-button {{
 					width: 0px; /*These buttons just take up room. We have a jog wheel for them.*/
@@ -81,10 +90,11 @@ class DecimalSpinBox(QDoubleSpinBox, TouchMarginPlugin, DirectAPILinkPlugin, Foc
 			self.setStyleSheet(f"""
 				DecimalSpinBox {{ 
 					font-size: 16px;
-					border: 1px solid black;
+					border: 1px solid {self.theme.border};
 					padding-right: 0px;
 					padding-left: 10px;
-					background: white;
+					background: {self.theme.base};
+					color: {self.theme.text};
 					
 					/* Add some touch space so this widget is easier to press. */
 					margin-left: {self.clickMarginLeft*10}px;
@@ -93,7 +103,7 @@ class DecimalSpinBox(QDoubleSpinBox, TouchMarginPlugin, DirectAPILinkPlugin, Foc
 					margin-bottom: {self.clickMarginBottom*10}px;
 				}}
 				DecimalSpinBox:disabled {{ 
-					color: #969696;
+					color: {self.theme.dimText};
 				}}
 				DecimalSpinBox::up-button, DecimalSpinBox::down-button {{
 					width: 0px; /*These buttons just take up room. We have a jog wheel for them.*/
