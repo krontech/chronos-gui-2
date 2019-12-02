@@ -8,7 +8,10 @@ from PyQt5.QtGui import QPainter, QIcon
 from PyQt5.QtWidgets import QLineEdit, QToolButton
 
 from debugger import *; dbg
+import settings 
+from theme import theme
 from animate import delay
+
 from touch_margin_plugin import TouchMarginPlugin, MarginWidth
 from direct_api_link_plugin import DirectAPILinkPlugin
 from focusable_plugin import FocusablePlugin
@@ -29,8 +32,14 @@ class LineEdit(QLineEdit, TouchMarginPlugin, DirectAPILinkPlugin, FocusablePlugi
 			self.setText('text input')
 		
 		self.setCursorMoveStyle(Qt.LogicalMoveStyle) #Left moves left, right moves right. Defaults is right arrow key moves left under rtl writing systems.
-			
+		
+		self.theme = theme('dark')
 		self.clickMarginColor = f"rgba({randint(128, 255)}, {randint(64, 128)}, {randint(0, 32)}, {randint(32,96)})"
+		
+		settings.observe('theme', 'dark', lambda name: (
+			setattr(self, 'theme', theme(name)),
+			self.refreshStyle(),
+		))
 		
 		if self.isClearButtonEnabled():
 			clearButton = self.findChild(QToolButton)
@@ -85,7 +94,8 @@ class LineEdit(QLineEdit, TouchMarginPlugin, DirectAPILinkPlugin, FocusablePlugi
 				/* Editor style. Use border to show were click margin is, so we don't mess it up during layout. */
 				LineEdit {{
 					font-size: 16px;
-					background: rgba(255,255,255,127); /* The background is drawn under the button borders, so they are opaque if the background is opaque. */
+					background: {self.theme.baseInEditor}; /* The background is drawn under the button borders, so they are opaque if the background is opaque. */
+					color: {self.theme.text};
 					padding-right: 0px;
 					padding-left: 10px;
 					
@@ -105,10 +115,9 @@ class LineEdit(QLineEdit, TouchMarginPlugin, DirectAPILinkPlugin, FocusablePlugi
 				LineEdit {{
 					/* App style. Use margin to provide further click area outside the visual button. */
 					font-size: 16px;
-					background: white;
-					border: 1px solid black;
-					border-left-color: rgb(50,50,50);
-					border-top-color: rgb(50,50,50); /* Add a subtle 3d-ness until we figure out drop-shadows. */
+					background: {self.theme.base};
+					color: {self.theme.text};
+					border: 1px solid {self.theme.border};
 					padding-right: 0px;
 					padding-left: 10px;
 					
