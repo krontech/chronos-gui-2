@@ -45,6 +45,7 @@ class Slider(ShowPaintRectsPlugin, FocusablePlugin, QSlider): #Must be in this o
 		self.clickMarginColorSlider = f"rgba({randint(0, 32)}, {randint(128, 255)}, {randint(0, 32)}, {randint(32,96)})"
 		self.clickMarginColorHandle = f"rgba({randint(0, 32)}, {randint(128, 255)}, {randint(0, 32)}, {randint(32,96)})"
 		
+		self.baseStyleSheet = self.styleSheet()
 		settings.observe('theme', 'dark', lambda name: (
 			setattr(self, 'theme', theme(name)),
 			self.refreshStyle(),
@@ -123,7 +124,7 @@ class Slider(ShowPaintRectsPlugin, FocusablePlugin, QSlider): #Must be in this o
 			Slider::groove:horizontal {{
 				height: 15px; /* The groove expands to the size of the slider by default. We'll give it an explicit width. */
 			}}
-		""" + self.styleSheet())
+		""" + self.baseStyleSheet)
 		
 		
 	def touchMargins(self):
