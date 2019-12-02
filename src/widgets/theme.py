@@ -50,6 +50,11 @@ class __light():
 	class radioButton():
 		checked = 'radio-button-checked-black.svg.png'
 		unchecked = 'radio-button-unchecked-black.svg.png'
+		
+	class slider():
+		horizontalHandle = 'handle-bars-light-81x41+20.png'
+		verticalHandle = 'handle-bars-light-41x81+20.png'
+		videoSeekHandle = 'handle-bars-light-156x61+40.png'
 	
 	
 
@@ -79,6 +84,11 @@ class __dark():
 	class radioButton():
 		checked = 'radio-button-checked-white.svg.png'
 		unchecked = 'radio-button-unchecked-white.svg.png'
+		
+	class slider():
+		horizontalHandle = 'handle-bars-dark-81x41+20.png'
+		verticalHandle = 'handle-bars-dark-41x81+20.png'
+		videoSeekHandle = 'handle-bars-dark-156x61+40.png'
 	
 	
 

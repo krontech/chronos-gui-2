@@ -13,6 +13,7 @@ from animate import MenuToggle, delay
 from widgets.line_edit import LineEdit
 from widgets.button import Button
 import settings
+from theme import theme
 
 
 
@@ -176,21 +177,24 @@ class PlayAndSave(QtWidgets.QDialog):
 		self.uiSavedFileSettings.clicked.connect(lambda: window.show('file_settings'))
 		self.uiDone.clicked.connect(window.back)
 		
-		self.uiSeekSlider.setStyleSheet( #Can't use setCustomStylesheet because slider is not a child of touch_margin_plugin.
-			self.uiSeekSlider.styleSheet() + f"""
-				/* ----- Play And Save Screen Styling ----- */
-				
-				
-				/*Heatmap got delayed. Don't style for now… (Remove the "X-"s to apply again.)*/
-				Slider::handle:horizontal {{
-					image: url({"../../" if self.uiSeekSlider.showHitRects else ""}assets/images/handle-bars-156x61+40.png); /* File name fields: width x height + horizontal padding. */
-					margin: -200px -40px; /* y: -slider groove margin. x: touch padding outsidet the groove. Clipped by Slider width. Should be enough for most customizations if we move stuff around. */
-				}}
-				
-				Slider::groove {{
-					border: none;
-				}}
-			""")
+		self.uiSeekSliderBaseStyleSheet = self.uiSeekSlider.styleSheet()
+		settings.observe('theme', 'dark', lambda name:
+			self.uiSeekSlider.setStyleSheet(
+				self.uiSeekSliderBaseStyleSheet + f"""
+					/* ----- Play And Save Screen Styling ----- */
+					
+					
+					Slider::handle:horizontal {{
+						image: url({"../../" if self.uiSeekSlider.showHitRects else ""}assets/images/{theme(name).slider.videoSeekHandle}); /* File name fields: width x height + horizontal padding. */
+						margin: -200px -40px; /* y: -slider groove margin. x: touch padding outsidet the groove. Clipped by Slider width. Should be enough for most customizations if we move stuff around. */
+					}}
+					
+					Slider::groove {{
+						border: none;
+					}}
+				"""
+			)
+		)
 		#Heatmap got delayed. Don't report different size/touchMargins for heatmap styling.
 		self.uiSeekSlider.sliderSize = lambda: QtCore.QSize(156, 61) #Line up focus ring.
 		#self.uiSeekSlider.touchMargins = lambda: { "top": 10, "left": 10, "bottom": 10, "right": 10, } #Report real margins.

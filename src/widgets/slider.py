@@ -8,6 +8,9 @@ from PyQt5.QtWidgets import QSlider
 from PyQt5.QtGui import QRegion, QPaintEvent
 
 from debugger import *; dbg
+import settings
+from theme import theme
+
 from focusable_plugin import FocusablePlugin
 from show_paint_rect_plugin import ShowPaintRectsPlugin
 
@@ -36,11 +39,16 @@ class Slider(ShowPaintRectsPlugin, FocusablePlugin, QSlider): #Must be in this o
 		
 		self.setAttribute(Qt.WA_OpaquePaintEvent, True)
 		
+		self.theme = theme('dark')
 		self.showHitRects = showHitRects
 		
 		self.clickMarginColorSlider = f"rgba({randint(0, 32)}, {randint(128, 255)}, {randint(0, 32)}, {randint(32,96)})"
 		self.clickMarginColorHandle = f"rgba({randint(0, 32)}, {randint(128, 255)}, {randint(0, 32)}, {randint(32,96)})"
-		self.refreshStyle()
+		
+		settings.observe('theme', 'dark', lambda name: (
+			setattr(self, 'theme', theme(name)),
+			self.refreshStyle(),
+		))
 		
 		self.isFocused = False
 		self.jogWheelClick.connect(self.toggleFocussed)
@@ -95,17 +103,17 @@ class Slider(ShowPaintRectsPlugin, FocusablePlugin, QSlider): #Must be in this o
 				padding: -1px;
 			}}
 			Slider::handle:vertical {{
-				image: url({"../../" if self.showHitRects else ""}assets/images/handle-bars-41x81+20.png); /* File name fields: width x height + vertical padding. */
+				image: url({"../../" if self.showHitRects else ""}assets/images/{self.theme.slider.verticalHandle}); /* File name fields: width x height + vertical padding. */
 				margin: -20px -200px; /* y: -slider groove margin. x: touch padding outsidet the groove. Clipped by Slider width. Should be enough for most customizations if we move stuff around. */
 			}}
 			Slider::handle:horizontal {{
-				image: url({"../../" if self.showHitRects else ""}assets/images/handle-bars-81x41+20.png); /* File name fields: width x height + horizontal padding. */
+				image: url({"../../" if self.showHitRects else ""}assets/images/{self.theme.slider.horizontalHandle}); /* File name fields: width x height + horizontal padding. */
 				margin: -200px -20px; /* y: -slider groove margin. x: touch padding outsidet the groove. Clipped by Slider width. Should be enough for most customizations if we move stuff around. */
 			}}
 			
 			Slider::groove {{
 				/* This slider has an extra-large hitbox, so it's easy to tap. This is done by giving it an invisible margin. A small graphic, handle-bars.png, draws the visual slider for us. Note that the real area of the slider, and it's QWidget holders, must be as large as the hitbox.*/
-				border: 1px solid black;
+				border: 1px solid {self.theme.border};
 				margin: 20px; /* Handle needs margin to compensate for this. Controls how far from the bottom and top the groove is. */
 				border-radius: 7.5px; /* Half of width. More turns it off. */
 			}}
