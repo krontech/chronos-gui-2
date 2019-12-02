@@ -55,6 +55,9 @@ class __light():
 		horizontalHandle = 'handle-bars-light-81x41+20.png'
 		verticalHandle = 'handle-bars-light-41x81+20.png'
 		videoSeekHandle = 'handle-bars-light-156x61+40.png'
+		
+	class interactiveVideoArea():
+		chickletBackground = 'rgba(255,255,255,192)'
 	
 	
 
@@ -89,6 +92,9 @@ class __dark():
 		horizontalHandle = 'handle-bars-dark-81x41+20.png'
 		verticalHandle = 'handle-bars-dark-41x81+20.png'
 		videoSeekHandle = 'handle-bars-dark-156x61+40.png'
+		
+	class interactiveVideoArea():
+		chickletBackground = 'rgba(48,48,48,218)'
 	
 	
 

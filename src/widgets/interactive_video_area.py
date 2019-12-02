@@ -6,6 +6,8 @@ from PyQt5.QtWidgets import QWidget, QLabel, QGestureEvent
 from PyQt5.QtCore import QSize, QEvent, Qt
 
 from debugger import *; dbg
+import settings
+from theme import theme
 from animate import delay
 try:
 	import api2 as api
@@ -24,25 +26,27 @@ class InteractiveVideoArea(QWidget):
 
 	def __init__(self, parent=None, showHitRects=False):
 		super().__init__(parent)
+		
 		self._customStyleSheet = self.styleSheet() #always '' for some reason
+		
 		if showHitRects:
 			self.setStyleSheet(f"""
 				background: rgba(0,0,0,128);
 				border: 4px solid black;
 			""")
 		
-		
 		self.zoomLabel = QLabel(self)
-		self.zoomLabel.setStyleSheet(f"""
-			color: white;
-			color: black;
-			background-color: rgba(1,80,26,218);
-			background-color: rgba(255,255,255,192);
-			border: 1px solid black;
-			margin: 10px 5px;
-			padding: 5px 10px;
-			border-radius: 17px;
-		""")
+		def setZoomLabelStyle(name):
+			theme_ = theme(name)
+			self.zoomLabel.setStyleSheet(f"""
+				color: {theme_.text};
+				background-color: {theme_.interactiveVideoArea.chickletBackground};
+				border: 1px solid {theme_.border};
+				margin: 10px 5px;
+				padding: 5px 10px;
+				border-radius: 17px;
+			""")
+		settings.observe('theme', 'dark', setZoomLabelStyle)
 		self.zoomLabel.setText(self.zoomLabelTemplate.format(zoom=2))
 		self.zoomLabel.show()
 		
