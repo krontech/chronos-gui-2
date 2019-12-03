@@ -73,6 +73,9 @@
    <property name="clickMarginRight" stdset="0">
     <enum>Button::half</enum>
    </property>
+   <property name="customStyleSheet" stdset="0">
+    <string>Button { font-size: 24px; }</string>
+   </property>
   </widget>
   <widget class="Button" name="uiRandomisePassword">
    <property name="geometry">
@@ -88,6 +91,9 @@
    </property>
    <property name="clickMarginLeft" stdset="0">
     <enum>Button::none</enum>
+   </property>
+   <property name="customStyleSheet" stdset="0">
+    <string>Button { font-size: 24px; }</string>
    </property>
   </widget>
   <widget class="QWidget" name="uiAllConfigOptions" native="true">
@@ -188,6 +194,9 @@ URL For</string>
      </property>
      <property name="clickMarginLeft" stdset="0">
       <enum>Button::half</enum>
+     </property>
+     <property name="customStyleSheet" stdset="0">
+      <string>Button { font-size: 24px; }</string>
      </property>
     </widget>
     <widget class="Label" name="label_7">
@@ -476,6 +485,9 @@ URL For</string>
      </property>
      <property name="clickMarginLeft" stdset="0">
       <enum>Button::half</enum>
+     </property>
+     <property name="customStyleSheet" stdset="0">
+      <string>Button { font-size: 24px; }</string>
      </property>
     </widget>
     <widget class="Label" name="label_9">
