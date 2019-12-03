@@ -4,6 +4,7 @@ from PyQt5.QtWidgets import QLabel
 from PyQt5.QtCore import QSize, pyqtProperty, Qt
 
 from debugger import *; dbg
+import settings
 from theme import theme
 
 
