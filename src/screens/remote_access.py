@@ -67,6 +67,8 @@ class RemoteAccess(QtWidgets.QWidget):
 		
 		# Widget binding.
 		self.uiDebug.clicked.connect(lambda: self and window and dbg())
+		settings.observe('debug controls enabled', False, lambda show:
+			self.uiDebug.show() if show else self.uiDebug.hide() )
 		
 		# Password-related stuff.
 		self.checkPasswordExists()
