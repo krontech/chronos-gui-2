@@ -80,18 +80,15 @@
     <rect>
      <x>20</x>
      <y>260</y>
-     <width>441</width>
-     <height>51</height>
+     <width>371</width>
+     <height>71</height>
     </rect>
-   </property>
-   <property name="styleSheet">
-    <string notr="true">
-			font-size: 14px;
-			background: transparent;
-		</string>
    </property>
    <property name="text">
     <string>Pop up a confirmation prompt if you're going to record over a previously-recorded video you haven't viewed in &quot;Play and Save&quot;.</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
    </property>
    <property name="wordWrap">
     <bool>true</bool>
@@ -101,7 +98,7 @@
    <property name="geometry">
     <rect>
      <x>20</x>
-     <y>320</y>
+     <y>340</y>
      <width>231</width>
      <height>21</height>
     </rect>
@@ -130,7 +127,7 @@
    <property name="geometry">
     <rect>
      <x>0</x>
-     <y>320</y>
+     <y>340</y>
      <width>301</width>
      <height>81</height>
     </rect>
@@ -217,14 +214,14 @@
     </rect>
    </property>
    <property name="pixmap">
-    <pixmap>../../assets/images/right-handed-interface.svg</pixmap>
+    <pixmap>../../assets/images/interface-white-right-up.png</pixmap>
    </property>
   </widget>
   <widget class="FeedbackLabel" name="uiSystemClockFeedback">
    <property name="geometry">
     <rect>
      <x>20</x>
-     <y>380</y>
+     <y>400</y>
      <width>261</width>
      <height>101</height>
     </rect>

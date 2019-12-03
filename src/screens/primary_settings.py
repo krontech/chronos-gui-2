@@ -38,6 +38,8 @@ class PrimarySettings(QtWidgets.QDialog):
 			settings.setValue('interface rotation', '180' if index else '0') )
 		settings.observe('interface rotation', None, self.updateInterfaceSide)
 		
+		settings.observe('theme', 'dark', self.updateInterfaceSide)
+		
 		#Note the operations attached here:
 		#	- We must observe a silenced callback to update the state. This prevents an infinite loop.
 		#	- We update the state from a callback attached to the widget.
@@ -66,7 +68,7 @@ class PrimarySettings(QtWidgets.QDialog):
 	
 	def updateInterfaceSide(self, *_):
 		self.uiLayoutPreview.setPixmap(QPixmap(
-			f"assets/images/interface-{'left' if self.uiInterfaceSide.currentIndex() else 'right'}-{'down' if self.uiInterfaceRotated.currentIndex() else 'up'}.png"
+			dump(f"assets/images/interface-{settings.value('theme', 'dark')}-{'left' if self.uiInterfaceSide.currentIndex() else 'right'}-{'down' if self.uiInterfaceRotated.currentIndex() else 'up'}.png")
 		))
 		
 		#How to rotate stuff:
