@@ -338,7 +338,7 @@
      </rect>
     </property>
     <property name="styleSheet">
-     <string notr="true">border: none; background: rgba(255,255,255,150);</string>
+     <string notr="true">border: none; background: rgba(0,0,0,150);</string>
     </property>
    </widget>
    <widget class="QWidget" name="uiPassepartoutBottom" native="true">
@@ -351,7 +351,7 @@
      </rect>
     </property>
     <property name="styleSheet">
-     <string notr="true">border: none; background: rgba(255,255,255,150);</string>
+     <string notr="true">border: none; background: rgba(0,0,0,150);</string>
     </property>
    </widget>
    <widget class="QWidget" name="uiPassepartoutLeft" native="true">
@@ -364,7 +364,7 @@
      </rect>
     </property>
     <property name="styleSheet">
-     <string notr="true">border: none; background: rgba(255,255,255,150);</string>
+     <string notr="true">border: none; background: rgba(0,0,0,150);</string>
     </property>
    </widget>
    <widget class="QWidget" name="uiPassepartoutRight" native="true">
@@ -377,7 +377,7 @@
      </rect>
     </property>
     <property name="styleSheet">
-     <string notr="true">border: none; background: rgba(255,255,255,150);</string>
+     <string notr="true">border: none; background: rgba(0,0,0,150);</string>
     </property>
    </widget>
    <widget class="QWidget" name="uiPassepartoutInnerBorder" native="true">
@@ -584,8 +584,8 @@
    </property>
    <property name="styleSheet">
     <string notr="true">
-				background: rgba(255,255,255,128);
-				border: 4px solid white;
+				background: rgba(48,48,48,127);
+				border: 4px solid #333;
 				border-image: url(../../assets/images/picture-small.jpg); border-image: url(assets/images/picture-small.jpg);
 			</string>
    </property>
