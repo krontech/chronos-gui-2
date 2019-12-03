@@ -25,7 +25,7 @@ Note: ~ denotes "in the root folder of" this project. So, this file is ~util/rea
 	
 	- designer.sh: Launch Qt Designer via this script, to set the correct env vars so you get the custom widgets the UI uses.
 		- Requires Qt Designer and the PyQt5 tools to be installed. On Ubuntu, this is:
-			> sudo apt install python3-pip qttools5-dev-tools qt5-default pyqt5-dev-tools
+			> sudo apt install python3-pip qttools5-dev-tools qt5-default pyqt5-dev-tools fonts-roboto
 			> pip3 install future_fstrings==1.2.0
 			- You may isolate this by using `python3 -m venv venv`, which is provided by `sudo apt install python3-venv`.
 		- You will see some errors along the lines of "Unable to import api". It is nonfatal, just some of our plugins reporting that they can't find the Chronos control api software. They'll work fine when they're on the camera.
