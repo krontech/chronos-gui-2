@@ -191,6 +191,7 @@ class PlayAndSave(QtWidgets.QDialog):
 					
 					Slider::groove {{
 						border: none;
+						background-color: none;
 					}}
 				"""
 			)

@@ -482,7 +482,7 @@ class control():
 									except Exception as e:
 										error = e
 							else:
-								raise e
+								raise error
 			except Exception as e:
 				raise e
 			finally:

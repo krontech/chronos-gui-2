@@ -78,7 +78,7 @@ class Button(ShowPaintRectsPlugin, TouchMarginPlugin, FocusablePlugin, QPushButt
 				Button {{
 					font-size: 16px;
 					color: {self.theme.dimText if self.fake_disability else self.theme.text};
-					background-color: {self.theme.base};
+					background-color: {self.theme.background if self.hideBorder else self.theme.base};
 					
 					border: 1px solid {'transparent' if self.hideBorder else self.theme.border};
 					

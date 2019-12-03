@@ -265,20 +265,21 @@ Sensor</string>
 				CheckBox {
 					/* Editor style. Use border to show were click margin is, so we don't mess it up during layout. */
 					font-size: 16px;
-					background: rgba(255,255,255,127); /* The background is drawn under the button borders, so they are opaque if the background is opaque. */
+					color: #fff;
+					background: rgba(48,48,48,127); /* The background is drawn under the button borders, so they are opaque if the background is opaque. */
 					
 					/* use borders instead of margins so we can see what we're doing */
-					border-left:   11px solid rgba(191, 3, 246, 40);
-					border-right:  1px solid rgba(191, 3, 246, 40);
-					border-top:    21px solid rgba(191, 3, 246, 40);
-					border-bottom: 1px solid rgba(191, 3, 246, 40);
+					border-left:   11px solid rgba(160, 28, 210, 52);
+					border-right:  1px solid rgba(160, 28, 210, 52);
+					border-top:    21px solid rgba(160, 28, 210, 52);
+					border-bottom: 1px solid rgba(160, 28, 210, 52);
 				}
 				
 				CheckBox::indicator:checked {
-					image: url(../../assets/images/checkbox-checked.svg.png);
+					image: url(../../assets/images/checkbox-checked-white.svg.png);
 				}
 				CheckBox::indicator:unchecked {
-					image: url(../../assets/images/checkbox-unchecked.svg.png);
+					image: url(../../assets/images/checkbox-unchecked-white.svg.png);
 				}
 				
 			CheckBox {  text-align: center; }</string>
@@ -341,8 +342,8 @@ Peaking</string>
    <property name="clickMarginBottom" stdset="0">
     <enum>Button::none</enum>
    </property>
-   <property name="customStyleSheet" stdset="0">
-    <string>Button { border-width: 0px }</string>
+   <property name="hideBorder" stdset="0">
+    <bool>true</bool>
    </property>
   </widget>
   <widget class="InteractiveVideoArea" name="uiVideo">
@@ -465,7 +466,7 @@ Peaking</string>
     <bool>true</bool>
    </property>
   </widget>
-  <widget class="Backdrop" name="backdrop">
+  <widget class="Backdrop" name="uiTopBackdrop">
    <property name="geometry">
     <rect>
      <x>0</x>
@@ -475,7 +476,7 @@ Peaking</string>
     </rect>
    </property>
   </widget>
-  <widget class="Backdrop" name="backdrop_2">
+  <widget class="Backdrop" name="uiBottomBackdrop">
    <property name="geometry">
     <rect>
      <x>0</x>
@@ -579,10 +580,10 @@ Peaking</string>
 					color: #fff;
 					
 					/* use borders instead of margins so we can see what we're doing */
-					border-left:   1px solid rgba(8, 16, 135, 90);
-					border-right:  1px solid rgba(8, 16, 135, 90);
-					border-top:    21px solid rgba(8, 16, 135, 90);
-					border-bottom: 1px solid rgba(8, 16, 135, 90);
+					border-left:   1px solid rgba(32, 16, 199, 81);
+					border-right:  1px solid rgba(32, 16, 199, 81);
+					border-top:    21px solid rgba(32, 16, 199, 81);
+					border-bottom: 1px solid rgba(32, 16, 199, 81);
 				}
 			Button { background: #7a70f7 }</string>
     </property>
@@ -1230,8 +1231,8 @@ Peaking</string>
    <zorder>uiWBPreset5</zorder>
    <zorder>uiFineTuneColor</zorder>
   </widget>
-  <zorder>backdrop</zorder>
-  <zorder>backdrop_2</zorder>
+  <zorder>uiTopBackdrop</zorder>
+  <zorder>uiBottomBackdrop</zorder>
   <zorder>uiVideo</zorder>
   <zorder>uiMenuButton</zorder>
   <zorder>uiBattery</zorder>

@@ -61,7 +61,7 @@ class RadioButton(QRadioButton, TouchMarginPlugin, DirectAPILinkPlugin, Focusabl
 					/* Editor style. Use border to show were click margin is, so we don't mess it up during layout. */
 					font-size: 16px;
 					color: {self.theme.text};
-					background: {self.theme.baseInEditor}; /* The background is drawn under the button borders, so they are opaque if the background is opaque. */
+					background: {self.theme.backgroundInEditor}; /* The background is drawn under the button borders, so they are opaque if the background is opaque. */
 					
 					/* use borders instead of margins so we can see what we're doing */
 					border-left:   {self.clickMarginLeft   * 10 + 1}px solid {self.clickMarginColor};
@@ -83,7 +83,7 @@ class RadioButton(QRadioButton, TouchMarginPlugin, DirectAPILinkPlugin, Focusabl
 					/* App style. Use margin to provide further click area outside the visual button. */
 					font-size: 16px;
 					color: {self.theme.text};
-					background-color: {self.theme.base};
+					background-color: {self.theme.background};
 					
 					/* Add some touch space so this widget is easier to press. */
 					margin-left: {self.clickMarginLeft*10}px;

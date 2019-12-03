@@ -72,9 +72,11 @@ class ScrollList(QListView, FocusablePlugin):
 				border: 1px solid {self.theme.border};
 				color: {self.theme.text};
 				selection-background-color: {self.theme.highlight};
+				background: {self.theme.base};
 			}}
 			QAbstractItemView::item {{
 				padding: 15px;
+				color: {self.theme.text};
 				background: {self.theme.base}; /*Must explicitly set background colour to anything other than auto for padding to affect text position. 😠. Whyyyy.*/
 				font-size: 6px; /*Doesn't work.*/
 			}}

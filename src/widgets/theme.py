@@ -64,10 +64,10 @@ class __light():
 		
 	class interactiveVideoArea():
 		chickletBackground = 'rgba(255,255,255,192)'
-	
-	
 
-class __dark():
+
+
+class __darkWithBorders():
 	"""Trendy dark theme, getting away from the Classic™ Chronos look."""
 	background         = '#333'                  #*screen* background color
 	backgroundInEditor = 'rgba(48,48,48,127)'    #screen background color in Qt Designer
@@ -76,6 +76,49 @@ class __dark():
 	baseInEditor       = 'rgba(48,48,48,127)'    #widget background in Qt Designer
 	baseActive         = 'rgb(96,96,96)'         #widget active background color (pressed button)
 	border             = '#fff'                  #*interactive* widget border
+	text               = '#fff'                  #normal text, buttons, labels, etc.
+	errorText          = '#c80000'               #error message text
+	dimText            = '#aaa'                  #disabled/placeholder text
+	subheaderText      = '#fff'                  #only for the subheader widget
+	headerText         = '#fff'                  #only for the header widget
+	highlight          = '#777'                  #selected text background
+	highlitText        = '#ddd'                  #selected text letters
+	focusRingBase      = 'rgba(196,196,255,32)'  #activate with jog wheel, shows active widget
+	focusRingBorder    = '#1D6262'               #
+	
+	#Arrows for the drop-down menus and such.
+	wedgeUpEnabled     = 'wedge-up-white-enabled.png'
+	wedgeDownEnabled   = 'wedge-down-white-enabled.png'
+	wedgeLeftEnabled   = 'wedge-left-white-enabled.png'
+	wedgeRightEnabled  = 'wedge-right-white-enabled.png'
+	
+	class checkbox():
+		checked = 'checkbox-checked-white.svg.png'
+		unchecked = 'checkbox-unchecked-white.svg.png'
+		
+	class radioButton():
+		checked = 'radio-button-checked-white.svg.png'
+		unchecked = 'radio-button-unchecked-white.svg.png'
+		
+	class slider():
+		horizontalHandle = 'handle-bars-dark-81x41+20.png'
+		verticalHandle = 'handle-bars-dark-41x81+20.png'
+		videoSeekHandle = 'handle-bars-dark-156x61+40.png'
+		
+	class interactiveVideoArea():
+		chickletBackground = 'rgba(48,48,48,218)'
+
+
+
+class __dark():
+	"""Trendy dark theme, getting away from the Classic™ Chronos look."""
+	background         = '#333'                  #*screen* background color
+	backgroundInEditor = 'rgba(48,48,48,127)'    #screen background color in Qt Designer
+	bgBorderInEditor   = '#333'                  #*screen* background border in Qt Designer
+	base               = '#555'                  #*widget* background color
+	baseInEditor       = 'rgba(48,48,48,127)'    #widget background in Qt Designer
+	baseActive         = 'rgb(96,96,96)'         #widget active background color (pressed button)
+	border             = '#333'                  #*interactive* widget border
 	text               = '#fff'                  #normal text, buttons, labels, etc.
 	errorText          = '#c80000'               #error message text
 	dimText            = '#aaa'                  #disabled/placeholder text

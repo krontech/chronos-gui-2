@@ -13,6 +13,7 @@ from PyQt5.QtGui import QPainter, QPen, QBrush, QColor, QStandardItemModel, QPai
 
 from debugger import *; dbg
 import settings
+from widgets.theme import theme
 import animate
 import api2 as api
 import estimate_file as estimateFile
@@ -41,6 +42,21 @@ class Main(QWidget):
 		else:
 			self.uiBottomHorizontalLine.show()
 			self.uiBottomVerticalLine.show()
+		
+		self.uiFocusPeakingOriginalCustomStyleSheet = self.uiFocusPeaking.styleSheet()
+		self.uiZebraStripesOriginalCustomStyleSheet = self.uiZebraStripes.styleSheet()
+		settings.observe('theme', 'dark', lambda name: (
+			self.uiFocusPeaking.setStyleSheet(
+				self.uiFocusPeakingOriginalCustomStyleSheet + f"""
+					CheckBox {{ background-color: {theme(name).background} }}
+				"""
+			),
+			self.uiZebraStripes.setStyleSheet(
+				self.uiZebraStripesOriginalCustomStyleSheet + f"""
+					CheckBox {{ background-color: {theme(name).background} }}
+				"""
+			)
+		))
 		
 		#Note start/end recording times, to display the timers.
 		recordingStartTime = 0

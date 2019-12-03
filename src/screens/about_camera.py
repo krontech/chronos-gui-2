@@ -6,8 +6,10 @@ from PyQt5.QtWidgets import QScroller
 
 from debugger import *; dbg
 
-import api
+import api2 as api
 from stats import appVersion
+import settings
+from widgets.theme import theme
 
 
 class AboutCamera(QtWidgets.QDialog):
@@ -21,14 +23,28 @@ class AboutCamera(QtWidgets.QDialog):
 		self.setAttribute(QtCore.Qt.WA_TranslucentBackground, True)
 		
 		#Substitute constants into header bit.
-		self.uiText.setText(
-			self.uiText.text()
-			.replace('{MODEL}', f"{api.get('cameraModel')}, {api.get('cameraMemoryGB')}, {'color' if api.get('sensorRecordsColor') else 'mono'}")
-			.replace('{SERIAL_NUMBER}', api.get('cameraSerial'))
-			.replace('{UI_VERSION}', appVersion)
-			.replace('{API_VERSION}', api.get('cameraApiVersion'))
-			.replace('{FPGA_VERSION}', api.get('cameraFpgaVersion'))
+		api.get(['cameraModel', 'cameraMemoryGB', 'sensorColorPattern', 'cameraSerial', 'cameraApiVersion', 'cameraFpgaVersion']).then(
+			lambda values:
+				self.uiText.setText(
+					self.uiText.text()
+					.replace('{MODEL}', f"{values['cameraModel']}, {values['cameraMemoryGB']}, {'mono' if values['sensorColorPattern'] == 'mono' else 'color'}")
+					.replace('{SERIAL_NUMBER}', values['cameraSerial'])
+					.replace('{UI_VERSION}', appVersion)
+					.replace('{API_VERSION}', values['cameraApiVersion'])
+					.replace('{FPGA_VERSION}', values['cameraFpgaVersion'])
+				)
 		)
+		settings.observe('theme', 'dark', lambda name: (
+			self.uiScrollArea.setStyleSheet(f"""
+				color: {theme(name).text};
+				background: {theme(name).base};
+				border: 1px solid {theme(name).border};
+			"""),
+			self.uiText.setStyleSheet(f"""
+				border: none;
+				padding: 5px;
+			""")
+		))
 		
 		# Set scroll bar to scroll all text content. 
 		self.uiScroll.setMaximum( 
@@ -53,12 +69,10 @@ class AboutCamera(QtWidgets.QDialog):
 		
 		self.uiDone.clicked.connect(window.back)
 	
-	@api.silenceCallbacks('uiScrollArea')
 	def scrollPane(self, pos):
 		"""Update the text position when the slider position changes."""
 		self.uiScrollArea.verticalScrollBar().setValue(pos)
 	
-	@api.silenceCallbacks('uiScroll')
 	def scrollKnob(self, pos):
 		"""Update the slider position when the text position changes."""
 		self.uiScroll.setValue(pos)

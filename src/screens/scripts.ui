@@ -147,6 +147,9 @@
    <property name="customStyleSheet" stdset="0">
     <string>Button { border: 0px solid black; }</string>
    </property>
+   <property name="hideBorder" stdset="0">
+    <bool>true</bool>
+   </property>
   </widget>
   <widget class="ScrollList" name="uiOutput">
    <property name="geometry">

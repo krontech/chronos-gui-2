@@ -227,7 +227,7 @@
     <rect>
      <x>0</x>
      <y>400</y>
-     <width>141</width>
+     <width>151</width>
      <height>81</height>
     </rect>
    </property>
@@ -241,7 +241,7 @@ Trigger</string>
     <rect>
      <x>140</x>
      <y>400</y>
-     <width>131</width>
+     <width>141</width>
      <height>81</height>
     </rect>
    </property>
@@ -254,7 +254,7 @@ Trigger</string>
     <rect>
      <x>270</x>
      <y>400</y>
-     <width>141</width>
+     <width>151</width>
      <height>81</height>
     </rect>
    </property>

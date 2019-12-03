@@ -117,6 +117,7 @@ class Slider(ShowPaintRectsPlugin, FocusablePlugin, QSlider): #Must be in this o
 				border: 1px solid {self.theme.border};
 				margin: 20px; /* Handle needs margin to compensate for this. Controls how far from the bottom and top the groove is. */
 				border-radius: 7.5px; /* Half of width. More turns it off. */
+				background-color: {self.theme.base};
 			}}
 			Slider::groove:vertical {{
 				width: 15px; /* The groove expands to the size of the slider by default. We'll give it an explicit width. */
