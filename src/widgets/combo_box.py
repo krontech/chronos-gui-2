@@ -6,6 +6,9 @@ from PyQt5.QtCore import Q_ENUMS, QSize, Qt
 from PyQt5.QtWidgets import QComboBox
 
 from debugger import *; dbg
+import settings
+from theme import theme
+
 from scroll_list import ScrollList
 from touch_margin_plugin import TouchMarginPlugin, MarginWidth
 #Can't directly link, because the API generally doesn't use capitalized values and our combo boxes generally do.
@@ -16,7 +19,14 @@ class ComboBox(QComboBox, TouchMarginPlugin, FocusablePlugin):
 	
 	def __init__(self, parent=None, showHitRects=False):
 		super().__init__(parent, showHitRects=showHitRects)
+		
+		self.theme = theme('dark')
 		self.clickMarginColor = f"rgba({randint(128, 255)}, {randint(0, 32)}, {randint(0, 32)}, {randint(32,96)})"
+		
+		settings.observe('theme', 'dark', lambda name: (
+			setattr(self, 'theme', theme(name)),
+			self.refreshStyle(),
+		))
 		
 		def onLowResRotate(delta, pressed):
 			if pressed:
@@ -42,8 +52,9 @@ class ComboBox(QComboBox, TouchMarginPlugin, FocusablePlugin):
 			self.setStyleSheet(f"""
 				ComboBox {{
 					/* Editor style. Use border to show were click margin is, so we don't mess it up during layout. */
+					color: {self.theme.text};
 					font-size: 16px;
-					background: rgba(255,255,255,127); /* The background is drawn under the button borders, so they are opaque if the background is opaque. */
+					background: {self.theme.baseInEditor}; /* The background is drawn under the button borders, so they are opaque if the background is opaque. */
 					
 					/* use borders instead of margins so we can see what we're doing */
 					border-left:   {self.clickMarginLeft   * 10 + 1}px solid {self.clickMarginColor};
@@ -58,24 +69,24 @@ class ComboBox(QComboBox, TouchMarginPlugin, FocusablePlugin):
 				}}
 
 				ComboBox QAbstractItemView {{ /*This is the drop-down menu.*/
-					border: 1px solid black;
-					color: black;
-					selection-background-color: grey;
+					border: 1px solid {self.theme.border};
+					color: {self.theme.text};
+					selection-background-color: {self.theme.highlight};
 				}}
 				ComboBox QAbstractItemView::item {{
 					padding: 15px;
-					background: white;
+					background: {self.theme.base};
 				}}
 				ComboBox QAbstractItemView::item::selected {{
-					background: #888;
+					background: {self.theme.highlight};
 				}}
 
 				ComboBox::drop-down {{
 					subcontrol-origin: content;
 					width: 40px;
-					border: 0px solid black;
+					border: 0px solid {self.theme.border};
 					border-left-width: 1px;
-					color: black;
+					color: {self.theme.text};
 					max-height: 100px;
 				}}
 				ComboBox::drop-down:on {{
@@ -84,7 +95,7 @@ class ComboBox(QComboBox, TouchMarginPlugin, FocusablePlugin):
 					/*padding-left: -1px;*/
 				}}
 				ComboBox::down-arrow {{
-					image: url(../../assets/images/wedge-down-enabled.png);
+					image: url(../../assets/images/{self.theme.wedgeDownEnabled});
 				}}
 			""" + self.originalStyleSheet())
 		else:
@@ -92,9 +103,10 @@ class ComboBox(QComboBox, TouchMarginPlugin, FocusablePlugin):
 				ComboBox {{
 					subcontrol-origin: content;
 					/*subcontrol-origin: padding; does nothing but mess up the drop-down button*/
+					color: {self.theme.text};
 					font-size: 16px;
-					background: white;
-					border: 1px solid black;
+					background: {self.theme.base};
+					border: 1px solid {self.theme.border};
 					margin-left: {self.clickMarginLeft*10}px;
 					margin-right: {self.clickMarginRight*10}px;
 					margin-top: {self.clickMarginTop*10}px;
@@ -106,25 +118,25 @@ class ComboBox(QComboBox, TouchMarginPlugin, FocusablePlugin):
 				}}
 
 				ComboBox QAbstractItemView {{ /*This is the drop-down menu.*/
-					border: 1px solid black;
-					color: black;
-					selection-background-color: grey;
+					border: 1px solid {self.theme.border};
+					color: {self.theme.text};
+					selection-background-color: {self.theme.highlight};
 				}}
 				ComboBox QAbstractItemView::item {{
 					padding: 15px;
-					background: white; /*Must explicitly set background colour to anything other than auto for padding to affect text position. 😠. Whyyyy.*/
+					background: {self.theme.base}; /*Must explicitly set background colour to anything other than auto for padding to affect text position. 😠. Whyyyy.*/
 					font-size: 6px; /*Doesn't work.*/
 				}}
 				ComboBox QAbstractItemView::item::selected {{
-					background: #888;
+					background: {self.theme.highlight};
 				}}
 				ComboBox QScrollBar {{
-					background: white;
+					background: {self.theme.base};
 					width: 8px;
-					border: 1px solid white;
+					border: 1px solid {self.theme.border};
 				}}
 				ComboBox QScrollBar::handle {{
-					background: #666;
+					background: {self.theme.highlight};
 					border-radius: 3px; /*QScrollBar width - border-left - border-right / 2*/
 				}}
 				ComboBox QScrollBar::add-line,
@@ -136,9 +148,9 @@ class ComboBox(QComboBox, TouchMarginPlugin, FocusablePlugin):
 				ComboBox::drop-down {{
 					subcontrol-origin: content;
 					width: 40px;
-					border: 0px solid black;
+					border: 0px solid {self.theme.border};
 					border-left-width: 1px;
-					color: black;
+					color: {self.theme.text};
 				}}
 				ComboBox::drop-down:on {{
 					/*Stupid hack because the dropdown scrollbar *can't* be increased in width. It's off the width of the drop-down button by -1px. We can't just decrease the width of the drop-down button, because every other button we own is 40px instead of 39px. So. What we do is adjust the button size down when the drop-down is open, because that's the only time the off-by-one with QScrollBar is noticable, and you're distracted by the scrollbar then.*/
@@ -146,7 +158,7 @@ class ComboBox(QComboBox, TouchMarginPlugin, FocusablePlugin):
 					/*padding-left: -1px;*/
 				}}
 				ComboBox::down-arrow {{
-					image: url(assets/images/wedge-down-enabled.png);
+					image: url(assets/images/{self.theme.wedgeDownEnabled});
 				}}
 			""" + self.originalStyleSheet())
 	

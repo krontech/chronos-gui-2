@@ -1,9 +1,11 @@
 # -*- coding: future_fstrings -*-
 
 from PyQt5.QtCore import Qt, QSize, pyqtProperty, QItemSelectionModel
-from PyQt5.QtWidgets import QListView, QScroller, QComboBox
+from PyQt5.QtWidgets import QListView, QScroller, QComboBox, QStyleFactory
 
 from debugger import *; dbg
+import settings
+from theme import theme
 from focusable_plugin import FocusablePlugin
 
 
@@ -31,6 +33,12 @@ class ScrollList(QListView, FocusablePlugin):
 		super().__init__(parent)
 		self._customStyleSheet = ''
 		self._useInlineSelectMode = False
+		self.setStyle(QStyleFactory.create('Fusion')) #Fix bug where scrollbar background is stippled.
+		
+		settings.observe('theme', 'dark', lambda name: (
+			setattr(self, 'theme', theme(name)),
+			self.refreshStyle(),
+		))
 		
 		#Set up scroll on jogwheel.
 		self.setMouseTracking(False) #Something do do with the scroller?
@@ -58,31 +66,29 @@ class ScrollList(QListView, FocusablePlugin):
 		properties.setScrollMetric(properties.OvershootScrollTime, 0.5) #default: 0.7
 		scroller.setScrollerProperties(properties)
 		
-		self.refreshStyle()
-		
 	def refreshStyle(self):
 		self.setStyleSheet(f"""
 			QAbstractItemView {{
-				border: 1px solid black;
-				color: black;
-				selection-background-color: grey;
+				border: 1px solid {self.theme.border};
+				color: {self.theme.text};
+				selection-background-color: {self.theme.highlight};
 			}}
 			QAbstractItemView::item {{
 				padding: 15px;
-				background: white; /*Must explicitly set background colour to anything other than auto for padding to affect text position. 😠. Whyyyy.*/
+				background: {self.theme.base}; /*Must explicitly set background colour to anything other than auto for padding to affect text position. 😠. Whyyyy.*/
 				font-size: 6px; /*Doesn't work.*/
 			}}
 			QAbstractItemView::item::selected {{
-				background: #888;
+				background: {self.theme.highlight};
 			}}
 			
 			QScrollBar {{
-				background: white;
+				background: {self.theme.base};
 				width: 8px;
-				border: 1px solid white;
+				border: 1px solid {self.theme.base};
 			}}
 			QScrollBar::handle {{
-				background: #666;
+				background: {self.theme.highlight};
 				border-radius: 3px; /*QScrollBar width - border-left - border-right / 2*/
 			}}
 			QScrollBar::add-line,
@@ -94,16 +100,16 @@ class ScrollList(QListView, FocusablePlugin):
 			ScrollList::drop-down {{
 				subcontrol-origin: content;
 				width: 40px;
-				border: 0px solid black;
+				border: 0px solid {self.theme.border};
 				border-left-width: 1px;
-				color: black;
+				color: {self.theme.text};
 			}}
 			ScrollList::drop-down:on {{
 				/*Stupid hack because the dropdown scrollbar *can't* be increased in width. It's off the width of the drop-down button by -1px. We can't just decrease the width of the drop-down button, because every other button we own is 40px instead of 39px. So. What we do is adjust the button size down when the drop-down is open, because that's the only time the off-by-one with QScrollBar is noticable, and you're distracted by the scrollbar then.*/
 				padding-left: -1px;
 			}}
 			ScrollList::down-arrow {{
-				image: url(assets/images/wedge-down-enabled.png);
+				image: url(assets/images/{self.theme.wedgeDownEnabled});
 			}}
 		""" + self.originalStyleSheet())
 	

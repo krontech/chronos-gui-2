@@ -41,7 +41,13 @@ class __light():
 	highlight          = '#777'                  #selected text background
 	highlitText        = 'white'                 #selected text letters
 	focusRingBase      = 'rgba(196,196,255,32)'  #activate with jog wheel, shows active widget
-	focusRingBorder    = '#1D6262'               #activate with jog wheel, shows active widget
+	focusRingBorder    = '#1D6262'               #
+	
+	#Arrows for the drop-down menus and such.
+	wedgeUpEnabled     = 'wedge-up-black-enabled.png'
+	wedgeDownEnabled   = 'wedge-down-black-enabled.png'
+	wedgeLeftEnabled   = 'wedge-left-black-enabled.png'
+	wedgeRightEnabled  = 'wedge-right-black-enabled.png'
 	
 	class checkbox():
 		checked = 'checkbox-checked-black.svg.png'
@@ -78,7 +84,13 @@ class __dark():
 	highlight          = '#777'                  #selected text background
 	highlitText        = '#ddd'                  #selected text letters
 	focusRingBase      = 'rgba(196,196,255,32)'  #activate with jog wheel, shows active widget
-	focusRingBorder    = '#1D6262'               #activate with jog wheel, shows active widget
+	focusRingBorder    = '#1D6262'               #
+	
+	#Arrows for the drop-down menus and such.
+	wedgeUpEnabled     = 'wedge-up-white-enabled.png'
+	wedgeDownEnabled   = 'wedge-down-white-enabled.png'
+	wedgeLeftEnabled   = 'wedge-left-white-enabled.png'
+	wedgeRightEnabled  = 'wedge-right-white-enabled.png'
 	
 	class checkbox():
 		checked = 'checkbox-checked-white.svg.png'
