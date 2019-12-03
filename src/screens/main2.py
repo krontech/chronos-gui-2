@@ -34,14 +34,13 @@ class Main(QWidget):
 		
 		self._window = window
 		
-		def tweakForTheme(theme):
-			if theme == 'dark':
-				self.uiBottomHorizontalLine.hide()
-				self.uiBottomVerticalLine.hide()
-			else:
-				self.uiBottomHorizontalLine.show()
-				self.uiBottomVerticalLine.show()
-		settings.observe('theme', 'dark', tweakForTheme)
+		#Hide the fake borders if the buttons don't have borders.
+		if self.uiBlackCal.hideBorder:
+			self.uiBottomHorizontalLine.hide()
+			self.uiBottomVerticalLine.hide()
+		else:
+			self.uiBottomHorizontalLine.show()
+			self.uiBottomVerticalLine.show()
 		
 		#Note start/end recording times, to display the timers.
 		recordingStartTime = 0
