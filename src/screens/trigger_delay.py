@@ -1,12 +1,10 @@
 # -*- coding: future_fstrings -*-
 
 from PyQt5 import uic, QtWidgets, QtCore
-from PyQt5.QtCore import pyqtSlot
 
 from debugger import *; dbg
 
-import api
-from api import silenceCallbacks
+import api2 as api
 
 
 class TriggerDelay(QtWidgets.QDialog):
@@ -39,41 +37,41 @@ class TriggerDelay(QtWidgets.QDialog):
 		# Value init.
 		self.availableDelayMultiplier = 1. #Used for "more" and "less" pre-record delay. Multiplies totalAvailableFrames.
 		
-		relevantValues = api.get(['totalAvailableFrames', 'recordingPeriod', 'triggerDelay'] )
-		self.totalAvailableFrames = relevantValues['totalAvailableFrames']
-		self.recordingPeriod = relevantValues['recordingPeriod']
-		self.triggerDelay = relevantValues['triggerDelay']
+		relevantValues = api.getSync(['cameraMaxFrames', 'framePeriod', 'recTrigDelay'] )
+		self.cameraMaxFrames = relevantValues['cameraMaxFrames']
+		self.framePeriod = relevantValues['framePeriod']
+		self.recTrigDelay = relevantValues['recTrigDelay']
 		
-		api.observe_future_only('totalAvailableFrames', self.updateTotalAvailableFrames)
-		api.observe_future_only('recordingPeriod', self.updateRecordingPeriod)
-		api.observe_future_only('triggerDelay', self.updateTriggerDelay)
+		api.observe_future_only('cameraMaxFrames', self.updateTotalAvailableFrames)
+		api.observe_future_only('framePeriod', self.updateRecordingPeriod)
+		api.observe_future_only('recTrigDelay', self.updateTriggerDelay)
 		self.updateDisplayedValues()
 		
 		# Button binding.
 		self.ui0Pct.clicked.connect(lambda:
-			api.set({'triggerDelay': 0}) )
+			api.set({'recTrigDelay': 0}) )
 		self.ui50Pct.clicked.connect(lambda:
-			api.set({'triggerDelay': self.totalAvailableFrames//2}) )
+			api.set({'recTrigDelay': self.cameraMaxFrames//2}) )
 		self.ui100Pct.clicked.connect(lambda:
-			api.set({'triggerDelay': self.totalAvailableFrames}) )
+			api.set({'recTrigDelay': self.cameraMaxFrames}) )
 		
 		self.uiTriggerDelaySlider.valueChanged.connect(self.newSliderPosition)
 		
 		
 		self.uiPreRecordDelayFrames.valueChanged.connect(lambda frames:
-			api.set({'triggerDelay': -frames}) )
+			api.set({'recTrigDelay': -frames}) )
 		self.uiPreRecordDelaySec.valueChanged.connect(lambda seconds:
-			api.set({'triggerDelay': -self.secondsToFrames(seconds)}) )
+			api.set({'recTrigDelay': -self.secondsToFrames(seconds)}) )
 		
 		self.uiPreTriggerRecordingFrames.valueChanged.connect(lambda frames:
-			api.set({'triggerDelay': frames}) )
+			api.set({'recTrigDelay': frames}) )
 		self.uiPreTriggerRecordingSec.valueChanged.connect(lambda seconds:
-			api.set({'triggerDelay': self.secondsToFrames(seconds)}) )
+			api.set({'recTrigDelay': self.secondsToFrames(seconds)}) )
 		
 		self.uiPostTriggerRecordingFrames.valueChanged.connect(lambda frames:
-			api.set({'triggerDelay': self.totalAvailableFrames - frames}) )
+			api.set({'recTrigDelay': self.cameraMaxFrames - frames}) )
 		self.uiPostTriggerRecordingSec.valueChanged.connect(lambda seconds:
-			api.set({'triggerDelay': self.totalAvailableFrames - self.secondsToFrames(seconds)}) )
+			api.set({'recTrigDelay': self.cameraMaxFrames - self.secondsToFrames(seconds)}) )
 		
 		
 		# self.uiDone.clicked.connect(lambda: self and dbg())
@@ -81,41 +79,41 @@ class TriggerDelay(QtWidgets.QDialog):
 	
 	
 	def secondsToFrames(self, seconds: float) -> int:
-		return round(seconds / (self.recordingPeriod/1e9))
+		return round((seconds*1e9) / self.framePeriod)
 	
 	def framesToSeconds(self, frames: int) -> float:
-		return frames * self.recordingPeriod/1e9 #🤞 convert recordingPeriod to seconds, then multiply to get the duration for frames
+		return frames * self.framePeriod / 1e9 #🤞 convert framePeriod to seconds, then multiply to get the duration for frames
 	
 	
-	@pyqtSlot(int, name="updateTotalAvailableFrames")
-	@silenceCallbacks('uiTriggerDelaySlider')
+	# @pyqtSlot(int, name="updateTotalAvailableFrames")
+	# @silenceCallbacks('uiTriggerDelaySlider')
 	def updateTotalAvailableFrames(self, frames: int):
-		self.totalAvailableFrames = frames
+		self.cameraMaxFrames = frames
 		self.updateDisplayedValues()
 	
 	
-	@pyqtSlot(int, name="updateRecordingPeriod")
-	@silenceCallbacks()
+	# @pyqtSlot(int, name="updateRecordingPeriod")
+	# @silenceCallbacks()
 	def updateRecordingPeriod(self, frames: int):
-		self.recordingPeriod = frames
+		self.framePeriod = frames
 		self.updateDisplayedValues()
 	
 	
-	@pyqtSlot(int, name="updateTriggerDelay")
-	@silenceCallbacks()
+	# @pyqtSlot(int, name="updateTriggerDelay")
+	# @silenceCallbacks()
 	def updateTriggerDelay(self, frames: int):
-		self.triggerDelay = frames
+		self.recTrigDelay = frames
 		self.updateDisplayedValues()
 	
 	
-	@silenceCallbacks('uiTriggerDelaySlider',
-		'uiPreRecordDelaySec', 'uiPreTriggerRecordingSec', 'uiPostTriggerRecordingSec',
-		'uiPreRecordDelayFrames', 'uiPreTriggerRecordingFrames', 'uiPostTriggerRecordingFrames')
+	# @silenceCallbacks('uiTriggerDelaySlider',
+	# 	'uiPreRecordDelaySec', 'uiPreTriggerRecordingSec', 'uiPostTriggerRecordingSec',
+	# 	'uiPreRecordDelayFrames', 'uiPreTriggerRecordingFrames', 'uiPostTriggerRecordingFrames')
 	def updateDisplayedValues(self):
 		"""Update all the inputs and values.
 			
 			This is done as one function because all the inputs are
-			displaying the same value, triggerDelay, so there's no
+			displaying the same value, recTrigDelay, so there's no
 			real point in separating them. The worst inefficiency is
 			when the time-per-frame is changed, since we update 7
 			widgets when we could have gotten away with 3. However,
@@ -124,50 +122,50 @@ class TriggerDelay(QtWidgets.QDialog):
 			at the same time. The expensive part, painting, will be
 			amortized by QT's mark-dirty system."""
 		
-		self.uiTriggerDelaySlider.setMinimum(round(-self.totalAvailableFrames * self.availableDelayMultiplier))
-		self.uiTriggerDelaySlider.setMaximum(self.totalAvailableFrames)
-		self.uiTriggerDelaySlider.setPageStep(self.totalAvailableFrames//100)
-		self.uiTriggerDelaySlider.setValue(self.triggerDelay)
+		self.uiTriggerDelaySlider.setMinimum(round(-self.cameraMaxFrames * self.availableDelayMultiplier))
+		self.uiTriggerDelaySlider.setMaximum(self.cameraMaxFrames)
+		self.uiTriggerDelaySlider.setPageStep(self.cameraMaxFrames//100)
+		self.uiTriggerDelaySlider.setValue(self.recTrigDelay)
 		
 		
 		self.uiPreRecordDelayFrames.setMinimum(0)
 		self.uiPreRecordDelayFrames.setMaximum(2**30)
-		self.uiPreRecordDelayFrames.setValue(max(0, -self.triggerDelay))
+		self.uiPreRecordDelayFrames.setValue(max(0, -self.recTrigDelay))
 		
 		self.uiPreRecordDelaySec.setMinimum(0)
 		self.uiPreRecordDelaySec.setMaximum(
 			self.framesToSeconds(self.uiPreRecordDelayFrames.maximum()) )
 		self.uiPreRecordDelaySec.setValue(
-			self.framesToSeconds(max(0, -self.triggerDelay)) )
+			self.framesToSeconds(max(0, -self.recTrigDelay)) )
 		
 		
 		self.uiPreTriggerRecordingFrames.setMinimum(0)
-		self.uiPreTriggerRecordingFrames.setMaximum(self.totalAvailableFrames)
-		self.uiPreTriggerRecordingFrames.setValue(max(0, self.triggerDelay))
+		self.uiPreTriggerRecordingFrames.setMaximum(self.cameraMaxFrames)
+		self.uiPreTriggerRecordingFrames.setValue(max(0, self.recTrigDelay))
 		
 		self.uiPreTriggerRecordingSec.setMinimum(0)
 		self.uiPreTriggerRecordingSec.setMaximum(
 			self.framesToSeconds(self.uiPreTriggerRecordingFrames.maximum()) )
 		self.uiPreTriggerRecordingSec.setValue(
-			self.framesToSeconds(max(0, self.triggerDelay)) )
+			self.framesToSeconds(max(0, self.recTrigDelay)) )
 		
 		
 		self.uiPostTriggerRecordingFrames.setMinimum(0)
-		self.uiPostTriggerRecordingFrames.setMaximum(self.totalAvailableFrames)
-		self.uiPostTriggerRecordingFrames.setValue(self.totalAvailableFrames-self.triggerDelay)
+		self.uiPostTriggerRecordingFrames.setMaximum(self.cameraMaxFrames)
+		self.uiPostTriggerRecordingFrames.setValue(self.cameraMaxFrames-self.recTrigDelay)
 		
 		self.uiPostTriggerRecordingSec.setMinimum(0)
 		self.uiPostTriggerRecordingSec.setMaximum(
 			self.framesToSeconds(self.uiPreTriggerRecordingFrames.maximum()) )
 		self.uiPostTriggerRecordingSec.setValue(
-			self.framesToSeconds(self.totalAvailableFrames-self.triggerDelay) )
+			self.framesToSeconds(self.cameraMaxFrames-self.recTrigDelay) )
 	
-	def newSliderPosition(self, triggerDelay: int):
+	def newSliderPosition(self, recTrigDelay: int):
 		# Uncomment this to move the slider and the text at the same time.
-		#self.triggerDelay = triggerDelay
+		#self.recTrigDelay = recTrigDelay
 		#self.updateDisplayedValues()
 		
-		api.set({'triggerDelay': triggerDelay})
+		api.set({'recTrigDelay': recTrigDelay})
 		
 		#Set the slider label position.
 		handleSize = 101 #px

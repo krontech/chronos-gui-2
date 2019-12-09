@@ -568,7 +568,7 @@ class Main(QWidget):
 			{'name':"Recording Settings",    'open':lambda: window.show('recording_settings'),    'hidden': True,            'synonyms':"resolution framerate offset gain boost brightness exposure"},
 			{'name':"Review Saved Videos",   'open':lambda: window.show('replay'),                'hidden': False,           'synonyms':"playback show footage saved card movie replay"},
 			{'name':"Stamp Overlay",         'open':lambda: window.show('stamp'),                 'hidden': False,           'synonyms':"watermark"},
-			{'name':"Trigger Delay",         'open':lambda: window.show('trigger_delay'),         'hidden': False,           'synonyms':"wait"},
+			#{'name':"Trigger Delay",        'open':lambda: window.show('trigger_delay'),         'hidden': False,           'synonyms':"wait"}, #Removed because we use the trigger/io delay block now.
 			{'name':"Triggers & IO",         'open':lambda: window.show('triggers_and_io'),       'hidden': False,           'synonyms':"bnc green ~a1 ~a2 trig1 trig2 trig3 signal input output trigger delay"},
 			{'name':"Update Camera",         'open':lambda: window.show('update_firmware'),       'hidden': False,           'synonyms':"firmware"},
 			{'name':"Video Save Settings",   'open':lambda: window.show('file_settings'),         'hidden': True,            'synonyms':"file saving"},
