@@ -5,7 +5,7 @@ from PyQt5.QtCore import pyqtProperty, pyqtSlot
 import logging; log = logging.getLogger('Chronos.gui')
 #Importing API may fail in Qt Designer, since we may not have it set up on the designing machine.
 try:
-	import api2 as api
+	import api
 except Exception:
 	#We don't want the lack of an API to fail us in Qt Designer. However, do warn.
 	log.warn('Unable to import api, DirectAPILinkPlugin disabled. (Some widgets will not have any effect when used.)')

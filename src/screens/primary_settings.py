@@ -9,7 +9,7 @@ from PyQt5.QtGui import QStandardItemModel
 
 from debugger import *; dbg
 import settings
-import api2
+import api
 
 
 class PrimarySettings(QtWidgets.QDialog):
@@ -49,7 +49,7 @@ class PrimarySettings(QtWidgets.QDialog):
 				["always", "if not reviewed", "never"][index] ) )
 		
 		
-		api2.observe('dateTime', self.stopEditingDate) #When the date is changed, always display the update even if an edit is in progress. Someone probably set the date some other way instead of this, or this was being edited in error.
+		api.observe('dateTime', self.stopEditingDate) #When the date is changed, always display the update even if an edit is in progress. Someone probably set the date some other way instead of this, or this was being edited in error.
 		self.uiSystemTime.focusInEvent = self.sysTimeFocusIn
 		self.uiSystemTime.editingFinished.connect(self.sysTimeFocusOut)
 		self._timeUpdateTimer = QtCore.QTimer()
@@ -98,7 +98,7 @@ class PrimarySettings(QtWidgets.QDialog):
 		#except ValueError: #Probably means we couldn't parse the date.
 		#	return self.uiSystemClockFeedback.showError("Date not formatted correctly; format is YYYY-MM-DD HH:MM:SS AM or PM.")
 		
-		(api2.set({'dateTime': self.uiSystemTime.text()}) #newTime.isoformat()})
+		(api.set({'dateTime': self.uiSystemTime.text()}) #newTime.isoformat()})
 			.then(lambda status: 
 				self.uiSystemClockFeedback.showMessage(
 					"System date updated." ) )
@@ -118,4 +118,4 @@ class PrimarySettings(QtWidgets.QDialog):
 			return
 		
 		#TODO DDR 2018-09-24: Convert this into a series of plain number inputs.
-		api2.get('dateTime').then(self.uiSystemTime.setText)
+		api.get('dateTime').then(self.uiSystemTime.setText)

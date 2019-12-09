@@ -10,7 +10,7 @@ import settings
 from theme import theme
 from animate import delay
 try:
-	import api2 as api
+	import api
 except Exception:
 	#We don't want the lack of an API to fail us in Qt Designer. However, do warn.
 	log.warn('Unable to import api, DirectAPILinkPlugin disabled. (Some widgets will not have any effect when used.)')

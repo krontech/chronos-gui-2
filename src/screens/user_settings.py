@@ -7,7 +7,7 @@ from time import sleep
 from PyQt5 import uic, QtWidgets, QtCore
 
 from debugger import *; dbg
-import api2 as api
+import api
 
 CAM_SERIAL_FILE_NAME = 'cameraSerial.txt'
 

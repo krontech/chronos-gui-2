@@ -6,7 +6,7 @@ from PyQt5.QtWidgets import QScroller
 
 from debugger import *; dbg
 
-import api2 as api
+import api
 from stats import appVersion
 import settings
 from widgets.theme import theme

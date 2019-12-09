@@ -15,7 +15,7 @@ from debugger import *; dbg
 import settings
 from widgets.theme import theme
 import animate
-import api2 as api
+import api
 import estimate_file as estimateFile
 
 RECORDING_MODES = {'START/STOP':1, 'SOFT_TRIGGER':2, 'VIRTUAL_TRIGGER':3}

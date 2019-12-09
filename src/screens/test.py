@@ -4,7 +4,7 @@ from PyQt5 import uic, QtWidgets, QtCore
 from PyQt5.QtCore import pyqtSlot
 
 from debugger import *; dbg
-import api2
+import api
 
 
 class Test(QtWidgets.QWidget):
@@ -28,12 +28,12 @@ class Test(QtWidgets.QWidget):
 		#self.uiDebug.clicked.connect(lambda: self.decimalspinbox_3.availableUnits()) #"self" is needed here, won't be available otherwise.
 		self.uiBack.clicked.connect(window.back)
 		
-		rtl = api2.control.callSync('getResolutionTimingLimits', api2.getSync('resolution'))
+		rtl = api.control.callSync('getResolutionTimingLimits', api.getSync('resolution'))
 		self.uiSlider.setMaximum(rtl['exposureMax'])
 		self.uiSlider.setMinimum(rtl['exposureMin'])
 		
 		self.uiSlider.debounce.sliderMoved.connect(self.onExposureChanged)
-		api2.observe('exposurePeriod', self.updateExposureNs)
+		api.observe('exposurePeriod', self.updateExposureNs)
 		
 		
 	
@@ -45,7 +45,7 @@ class Test(QtWidgets.QWidget):
 	
 	def onExposureChanged(self, newExposureNs):
 		#print(f'slider moved to {newExposureNs}')
-		api2.set('exposurePeriod', newExposureNs)
+		api.set('exposurePeriod', newExposureNs)
 	
 	def afterAShortPeriodOftime(self):
 		return self.aShortPeriodOfTime.stop()

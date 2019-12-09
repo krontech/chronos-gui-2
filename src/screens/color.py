@@ -5,7 +5,7 @@ from typing import Sequence
 from PyQt5 import uic, QtWidgets, QtCore
 
 from debugger import *; dbg
-import api2 as api
+import api
 import settings
 
 #Two abbreviations used on this page are WB for White Balance and CM for Colour Matrix.

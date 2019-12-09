@@ -4,7 +4,7 @@ from urllib.request import urlopen
 import json
 import logging; log = logging.getLogger('Chronos.perf')
 
-import api2
+import api
 
 appVersion = 'unknown'
 try:
@@ -23,7 +23,7 @@ def report(tag: str, data: dict):
 	assert "serial_number" not in data
 		
 	data["tag"] = tag
-	data["serial_number"] = api2.getSync('cameraSerial')
+	data["serial_number"] = api.getSync('cameraSerial')
 	try:
 		urlopen(report_url, bytes(json.dumps(data), 'utf-8'), 0.1)
 	except Exception:

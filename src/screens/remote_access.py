@@ -12,7 +12,7 @@ from PyQt5.QtGui import QPixmap
 
 from debugger import *; dbg
 
-import api2 as api
+import api
 import settings
 import external_process
 

@@ -5,7 +5,7 @@ from PyQt5 import uic, QtWidgets, QtCore
 # from PyQt5.QtCore import pyqtSlot
 
 from debugger import *; dbg
-import api2 as api
+import api
 import settings
 from animate import delay
 

@@ -9,7 +9,7 @@ from PyQt5.QtCore import pyqtSlot
 
 from debugger import *; dbg
 import settings
-import api2
+import api
 
 
 class RecordingSettings(QtWidgets.QDialog):
@@ -38,7 +38,7 @@ class RecordingSettings(QtWidgets.QDialog):
 		self.uiPresets.currentIndexChanged.connect(self.applyPreset)
 		
 		#Resolution & resolution preview
-		invariants = api2.getSync([
+		invariants = api.getSync([
 			'sensorVMax', 'sensorVMin', 'sensorVIncrement',
 			'sensorHMax', 'sensorHMin', 'sensorHIncrement',
 		])
@@ -55,7 +55,7 @@ class RecordingSettings(QtWidgets.QDialog):
 		self.uiVOffset.valueChanged.connect(self.updateForSensorVOffset)
 		
 		self._lastResolution = defaultdict(lambda: None) #Set up for dispatchResolutionUpdate.
-		api2.observe('resolution', self.dispatchResolutionUpdate)
+		api.observe('resolution', self.dispatchResolutionUpdate)
 		
 
 		
@@ -63,11 +63,11 @@ class RecordingSettings(QtWidgets.QDialog):
 		self.uiFps.setMinimum(0.01)
 		self.uiFps.valueChanged.connect(self.updateFps)
 		self.uiFrameDuration.valueChanged.connect(self.updateFrameDuration)
-		api2.observe('frameRate', self.updateFpsFromAPI)
+		api.observe('frameRate', self.updateFpsFromAPI)
 		
 		#Analog gain
 		self.populateUiLuxAnalogGain()
-		api2.observe('currentGain', self.setLuxAnalogGain)
+		api.observe('currentGain', self.setLuxAnalogGain)
 		self.uiAnalogGain.currentIndexChanged.connect(self.luxAnalogGainChanged)
 		
 		# Button binding.
@@ -77,11 +77,11 @@ class RecordingSettings(QtWidgets.QDialog):
 		self.uiDone.clicked.connect(self.applySettings)
 		self.uiDone.clicked.connect(lambda: self.window_.back())
 		
-		api2.observe('exposureMin', self.setMinExposure)
-		api2.observe('exposureMax', self.setMaxExposure)
-		api2.observe('exposurePeriod', self.updateExposure)
+		api.observe('exposureMin', self.setMinExposure)
+		api.observe('exposureMax', self.setMaxExposure)
+		api.observe('exposurePeriod', self.updateExposure)
 		self.uiExposure.valueChanged.connect(
-			lambda val: api2.set('exposurePeriod', val) )
+			lambda val: api.set('exposurePeriod', val) )
 		self.uiMaximizeExposure.clicked.connect(lambda: 
 			self.uiExposure.setValue(self.uiExposure.maximum()) )
 		
@@ -137,7 +137,7 @@ class RecordingSettings(QtWidgets.QDialog):
 	presets = []
 	for geometry_ in __potentialPresetGeometries: #Fix bug where this overrode the screen's geometry property, preventing any keyboard from opening.
 		hRes, vRes = geometry_[0], geometry_[1]
-		geometryTimingLimits = api2.control.callSync('getResolutionTimingLimits', {'hRes':hRes, 'vRes':vRes})
+		geometryTimingLimits = api.control.callSync('getResolutionTimingLimits', {'hRes':hRes, 'vRes':vRes})
 		if 'error' not in geometryTimingLimits:
 			presets += [{
 				'hRes': hRes, 
@@ -158,7 +158,7 @@ class RecordingSettings(QtWidgets.QDialog):
 	def __disabled__onShow(self):
 		pos = self.uiPassepartoutInnerBorder.mapToGlobal(
 			self.uiPassepartoutInnerBorder.pos() )
-		api2.video.call('configure', {
+		api.video.call('configure', {
 			'xoff': pos.x(),
 			'yoff': pos.y(),
 			'hres': self.uiPassepartoutInnerBorder.width(),
@@ -375,7 +375,7 @@ class RecordingSettings(QtWidgets.QDialog):
 			#Shortcut. We can do this because the exposure values set below by the real call are not required when an API-driven update is fired, since the API-driven update will also update the exposure. I think. 🤞
 			limits = {'minFramePeriod': minFrameTime*1e9}
 		else:
-			limits = api2.control.callSync('getResolutionTimingLimits', {
+			limits = api.control.callSync('getResolutionTimingLimits', {
 				'hRes': self.uiHRes.value(),
 				'vRes': self.uiVRes.value(),
 			})
@@ -398,8 +398,8 @@ class RecordingSettings(QtWidgets.QDialog):
 		self.updateExposureLimits()
 	
 	
-	_sensorWidth = api2.getSync('sensorHMax')
-	_sensorHeight = api2.getSync('sensorVMax')
+	_sensorWidth = api.getSync('sensorHMax')
+	_sensorHeight = api.getSync('sensorVMax')
 	def updatePassepartout(self):
 		previewTop = 1
 		previewLeft = 1
@@ -496,7 +496,7 @@ class RecordingSettings(QtWidgets.QDialog):
 	
 	def luxAnalogGainChanged(self, index):
 		self.uiAnalogGain.setCurrentIndex(index)
-		api2.set({'currentGain': 
+		api.set({'currentGain': 
 			self.luxRecordingAnalogGains[index]['multiplier']})
 	
 	@pyqtSlot(int, name="setLuxAnalogGain")
@@ -527,7 +527,7 @@ class RecordingSettings(QtWidgets.QDialog):
 			self._dirty = False
 			self.uiUnsavedChangesWarning.hide()
 			self.uiCancel.hide()
-			api2.control.call('set', {
+			api.control.call('set', {
 				'resolution': {
 					#'vDarkRows': 0, #Don't reset what we don't show. That's annoying if you did manually set it.
 					'hRes': self.uiHRes.value(),
@@ -543,12 +543,12 @@ class RecordingSettings(QtWidgets.QDialog):
 	def revertSettings(self):
 		"""Set resolution settings back to the API."""
 		
-		self.updateUiHRes(api2.apiValues.get('resolution')['hRes'])
-		self.updateUiVRes(api2.apiValues.get('resolution')['vRes'])
-		self.updateUiHOffset(api2.apiValues.get('resolution')['hOffset'])
-		self.updateUiVOffset(api2.apiValues.get('resolution')['vOffset'])
-		self.updateMaximumFramerate(api2.apiValues.get('resolution')['minFrameTime'])
-		self.updateFpsFromAPI(api2.apiValues.get('frameRate'))
+		self.updateUiHRes(api.apiValues.get('resolution')['hRes'])
+		self.updateUiVRes(api.apiValues.get('resolution')['vRes'])
+		self.updateUiHOffset(api.apiValues.get('resolution')['hOffset'])
+		self.updateUiVOffset(api.apiValues.get('resolution')['vOffset'])
+		self.updateMaximumFramerate(api.apiValues.get('resolution')['minFrameTime'])
+		self.updateFpsFromAPI(api.apiValues.get('frameRate'))
 		
 		self._dirty = False
 		self.uiUnsavedChangesWarning.hide()

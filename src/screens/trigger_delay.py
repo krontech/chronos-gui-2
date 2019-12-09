@@ -4,7 +4,7 @@ from PyQt5 import uic, QtWidgets, QtCore
 
 from debugger import *; dbg
 
-import api2 as api
+import api
 
 
 class TriggerDelay(QtWidgets.QDialog):

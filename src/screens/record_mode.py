@@ -5,7 +5,7 @@ from PyQt5 import uic, QtWidgets, QtCore
 
 from debugger import *; dbg
 import settings
-import api2 as api
+import api
 
 
 

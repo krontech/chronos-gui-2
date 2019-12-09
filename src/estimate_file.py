@@ -2,7 +2,7 @@ from typing import Optional
 from datetime import timedelta
 
 from debugger import *; dbg
-import api2 as api
+import api
 import settings
 
 

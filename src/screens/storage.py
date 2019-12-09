@@ -5,7 +5,7 @@ from os import system
 from PyQt5 import uic, QtWidgets, QtCore
 
 from debugger import *; dbg
-import api2
+import api
 from external_process import run
 
 
@@ -24,7 +24,7 @@ class Storage(QtWidgets.QWidget):
 		self.uiUnmountMedia.clicked.connect(self.unmountMedia)
 		
 		# Update mounted devices list.
-		api2.externalPartitions.observe(self.updateMountedDeviceList) #Fast path (only works if partition mountable)
+		api.externalPartitions.observe(self.updateMountedDeviceList) #Fast path (only works if partition mountable)
 		self._updateMountedDeviceListTimer = QtCore.QTimer() #Slow path, just poll
 		self._updateMountedDeviceListTimer.timeout.connect(self.updateMountedDeviceList)
 		self._updateMountedDeviceListTimer.setTimerType(QtCore.Qt.VeryCoarseTimer)
@@ -32,7 +32,7 @@ class Storage(QtWidgets.QWidget):
 		
 		# Update the dropdown.
 		self._lastKnownDevices = None #A list of regex matches. Use .group('name') to get device path name, for example.
-		api2.externalPartitions.observe(self.pollDevices) #Fast path (only works if partition mountable)
+		api.externalPartitions.observe(self.pollDevices) #Fast path (only works if partition mountable)
 		self._pollDevicesTimer = QtCore.QTimer() #Slow path, just poll
 		self._pollDevicesTimer.timeout.connect(self.pollDevices)
 		self._pollDevicesTimer.setTimerType(QtCore.Qt.VeryCoarseTimer)

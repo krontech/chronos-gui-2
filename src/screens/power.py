@@ -8,7 +8,7 @@ from PyQt5 import uic, QtWidgets, QtCore, QtGui
 
 import settings
 from debugger import *; dbg
-import api2
+import api
 
 
 
@@ -82,9 +82,9 @@ class Power(QtWidgets.QDialog):
 		self.uiVoltageLabel.formatString = self.uiVoltageLabel.text()
 		self.uiChargeLabel.formatString = self.uiChargeLabel.text()
 		
-		api2.observe("saveAndPowerDownLowBatteryLevelNormalized", self.updatePowerDownThreshold)
+		api.observe("saveAndPowerDownLowBatteryLevelNormalized", self.updatePowerDownThreshold)
 		self.uiPowerDownThreshold.currentTextChanged.connect(lambda val:
-			api2.set("saveAndPowerDownLowBatteryLevelNormalized", pct2dec(val)) )
+			api.set("saveAndPowerDownLowBatteryLevelNormalized", pct2dec(val)) )
 		self.uiPowerDownThreshold.currentTextChanged.connect(self.uiChart.update)
 		
 		self.uiDone.clicked.connect(window.back)
@@ -120,14 +120,14 @@ class Power(QtWidgets.QDialog):
 	def updateLabels(self):
 		self.uiChargeLabel.setText(
 			self.uiChargeLabel.formatString.format(
-				api2.getSync('batteryChargeNormalized')*100 ) )
+				api.getSync('batteryChargeNormalized')*100 ) )
 		self.uiVoltageLabel.setText(
 			self.uiVoltageLabel.formatString.format(
-				api2.getSync('batteryVoltage') ) )
+				api.getSync('batteryVoltage') ) )
 		
 	def updateChartData(self):
 		"""Always update the chart data, even when hidden, so we can look at it later."""
-		cv = api2.getSync(['batteryChargeNormalized', 'batteryVoltage'])
+		cv = api.getSync(['batteryChargeNormalized', 'batteryVoltage'])
 		charge, voltage = cv['batteryChargeNormalized'], cv['batteryVoltage']
 		
 		if charge < 0 or voltage < 0:

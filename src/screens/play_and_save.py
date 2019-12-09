@@ -8,7 +8,7 @@ from PyQt5.QtGui import QImage, QTransform, QPainter, QColor, QPainterPath, QBru
 
 from debugger import *; dbg
 
-import api2
+import api
 from animate import MenuToggle, delay
 from widgets.line_edit import LineEdit
 from widgets.button import Button
@@ -150,19 +150,19 @@ class PlayAndSave(QtWidgets.QDialog):
 				self.labelUpdateIdleDelayTimer.start()
 		self.labelUpdateIdleDelayTimer.timeout.connect(checkLastKnownFrame)
 		self.labelUpdateTimer.timeout.connect(lambda: #Now, the timer is not running, so we can't just stop it to stop this process. We may be waiting on the dbus call instead.
-			api2.video.call('status').then(checkLastKnownFrame) )
+			api.video.call('status').then(checkLastKnownFrame) )
 		
 		self.uiCurrentFrame.suffixFormatString = self.uiCurrentFrame.suffix()
 		self.uiCurrentFrame.valueChanged.connect(lambda f: 
-			self.uiCurrentFrame.hasFocus() and api2.video.call('playback', {'position':f}) )
+			self.uiCurrentFrame.hasFocus() and api.video.call('playback', {'position':f}) )
 		
 		self.seekRate = 60
 		self.uiSeekRate.setValue(self.seekRate)
 		
-		self.uiSeekBackward.pressed.connect( lambda: api2.video.call('playback', {'framerate': -self.seekRate}))
-		self.uiSeekBackward.released.connect(lambda: api2.video.call('playback', {'framerate': 0}))
-		self.uiSeekForward.pressed.connect(  lambda: api2.video.call('playback', {'framerate': +self.seekRate}))
-		self.uiSeekForward.released.connect( lambda: api2.video.call('playback', {'framerate': 0}))
+		self.uiSeekBackward.pressed.connect( lambda: api.video.call('playback', {'framerate': -self.seekRate}))
+		self.uiSeekBackward.released.connect(lambda: api.video.call('playback', {'framerate': 0}))
+		self.uiSeekForward.pressed.connect(  lambda: api.video.call('playback', {'framerate': +self.seekRate}))
+		self.uiSeekForward.released.connect( lambda: api.video.call('playback', {'framerate': 0}))
 		
 		self.uiSeekFaster.clicked.connect(self.seekFaster)
 		self.uiSeekSlower.clicked.connect(self.seekSlower)
@@ -202,7 +202,7 @@ class PlayAndSave(QtWidgets.QDialog):
 		#self.uiSeekSlider.focusGeometryNudge = (0,0,0,0)
 		self.uiSeekSlider.touchMargins = lambda: { "top": 10, "left": 0, "bottom": 10, "right": 0, } #Report real margins.
 		self.uiSeekSlider.debounce.sliderMoved.connect(lambda frame: 
-			api2.video.callSync('playback', {'position': frame}) )
+			api.video.callSync('playback', {'position': frame}) )
 		self.uiSeekSlider.debounce.sliderMoved.connect(lambda frame: 
 			self.uiCurrentFrame.setValue(frame) )
 		#last_perf = perf_counter()
@@ -249,17 +249,17 @@ class PlayAndSave(QtWidgets.QDialog):
 		self.lastSelectedRegion = None
 		self.uiMarkedRegions.clicked.connect(self.selectMarkedRegion)
 		
-		api2.observe('videoState', self.onVideoStateChangeAlways)
-		api2.observe('state', self.onStateChangeAlways)
+		api.observe('videoState', self.onVideoStateChangeAlways)
+		api.observe('state', self.onStateChangeAlways)
 		
-		api2.signal.observe('sof', self.onSOF)
-		api2.signal.observe('eof', self.onEOF)
+		api.signal.observe('sof', self.onSOF)
+		api.signal.observe('eof', self.onEOF)
 		
 	def onShow(self):
-		status = api2.video.callSync('status')
+		status = api.video.callSync('status')
 		
 		#Don't update the labels while hidden. But do show with accurate info when we start.
-		api2.video.call('configure', {
+		api.video.call('configure', {
 			'xoff': self.videoArea.x(),
 			'yoff': self.videoArea.y(),
 			'hres': self.videoArea.width(),
@@ -267,12 +267,12 @@ class PlayAndSave(QtWidgets.QDialog):
 		})
 		
 		if not status['filesave']:
-			api2.video.call('playback', {'framerate':0})
+			api.video.call('playback', {'framerate':0})
 		
 		self.updateBatteryTimer.start()
 		self.updateBattery()
 		
-		self.recordedSegments = segmentData #api2.get('recordedSegments')
+		self.recordedSegments = segmentData #api.get('recordedSegments')
 		
 		self.checkMarkedRegionsValid()
 		
@@ -297,15 +297,15 @@ class PlayAndSave(QtWidgets.QDialog):
 		self.uiSeekSlider.setValue(status['position'])
 		self.uiCurrentFrame.setValue(status['position'])
 		
-		api2.observe('state', self.onStateChangeWhenScreenActive)
+		api.observe('state', self.onStateChangeWhenScreenActive)
 		
 	def onHide(self):
 		self.updateBatteryTimer.stop()
-		api2.unobserve('state', self.onStateChangeWhenScreenActive)
+		api.unobserve('state', self.onStateChangeWhenScreenActive)
 	
 	
 	def updateBattery(self):
-		api2.control.call(
+		api.control.call(
 			'get', ['batteryChargePercent']
 		).then(lambda data:
 			self.uiBatteryReadout.setText(
@@ -325,7 +325,7 @@ class PlayAndSave(QtWidgets.QDialog):
 		
 		heatmapHeight = 16
 		
-		motionData = QByteArray.fromRawData(api2.control('waterfallMotionMap', {'segment':'placeholder', 'startFrame':400})["heatmap"]) # 16×(n<1024) heatmap. motionData: {"startFrame": int, "endFrame": int, "heatmap": QByteArray}
+		motionData = QByteArray.fromRawData(api.control('waterfallMotionMap', {'segment':'placeholder', 'startFrame':400})["heatmap"]) # 16×(n<1024) heatmap. motionData: {"startFrame": int, "endFrame": int, "heatmap": QByteArray}
 		assert len(motionData) % heatmapHeight == 0, f"Incompatible heatmap size {len(motionData)}; must be a multiple of {heatmapHeight}."
 		
 		self.motionHeatmap = (
@@ -435,7 +435,7 @@ class PlayAndSave(QtWidgets.QDialog):
 			"mark end": self.markedEnd,
 			"segment ids": [
 				segment['id']
-				for segment in segmentData#api2.get('recordedSegments') 
+				for segment in segmentData#api.get('recordedSegments') 
 				if not (segment['start'] >= self.markedEnd or segment['end'] < self.markedStart)
 			],
 			"region name": f'Clip {len(self.markedRegions)+1}',
@@ -641,12 +641,12 @@ class PlayAndSave(QtWidgets.QDialog):
 			watcher. This means that, once started, it will be called for each
 			marked region sequentially as saving completes."""
 		uuid = settings.value('preferredFileSavingUUID', '')
-		if uuid in [part['uuid'] for part in api2.externalPartitions.list()]:
+		if uuid in [part['uuid'] for part in api.externalPartitions.list()]:
 			#Use the operator-set partition.
-			partition = [part for part in api2.externalPartitions.list() if part['uuid'] == uuid][0]
-		elif api2.externalPartitions.list()[-1:]:
+			partition = [part for part in api.externalPartitions.list() if part['uuid'] == uuid][0]
+		elif api.externalPartitions.list()[-1:]:
 			#The operator-set partition is not mounted. Use the most recent partition instead.
-			partition = api2.externalPartitions.list()[-1]
+			partition = api.externalPartitions.list()[-1]
 		else:
 			#No media is usable for saving.
 			raise type(self).NoSaveMedia()
@@ -660,7 +660,7 @@ class PlayAndSave(QtWidgets.QDialog):
 		self.uiSeekSlider.setEnabled(False)
 		
 		now = datetime.now()
-		res = api2.getSync('resolution') #TODO DDR 2019-07-26 Get this from the segment metadata we don't have as of writing.
+		res = api.getSync('resolution') #TODO DDR 2019-07-26 Get this from the segment metadata we don't have as of writing.
 		roi['file'] = f'''{
 			partition['path'].decode('utf-8')
 		}/{
@@ -679,7 +679,7 @@ class PlayAndSave(QtWidgets.QDialog):
 		self.uiSave.hide()
 		
 		#regions are like {'region id': 'aaaaaaag', 'hue': 390, 'mark end': 42587, 'mark start': 16716, 'saved': 0.0, 'highlight': 0, 'segment ids': ['KxIjG09V'], 'region name': 'Clip 7'},
-		api2.video.callSync('recordfile', {
+		api.video.callSync('recordfile', {
 			'filename': roi['file'],
 			'format': {
 				'.mp4':'h264', 
@@ -691,7 +691,7 @@ class PlayAndSave(QtWidgets.QDialog):
 			'length': roi['mark end'] - roi['mark start'],
 			'framerate': settings.value('savedFileFramerate', 30), #TODO DDR 2019-07-24 read this from recording settings
 			'bitrate': min(
-				res['hRes'] * res['vRes'] * api2.getSync('frameRate') * settings.value('savedFileBPP', 0.7),
+				res['hRes'] * res['vRes'] * api.getSync('frameRate') * settings.value('savedFileBPP', 0.7),
 				settings.value('savedFileMaxBitrate', 40) * 1000000.0,
 			)
 		})
@@ -706,7 +706,7 @@ class PlayAndSave(QtWidgets.QDialog):
 		self.regionBeingSaved = None
 		self.saveCancelled = True
 		self.uiSeekSlider.setEnabled(True)
-		api2.video.call('stop')
+		api.video.call('stop')
 		
 		#Set the UI back to seek mode.
 		self.uiSeekRate.setValue(self.seekRate)
@@ -746,13 +746,13 @@ class PlayAndSave(QtWidgets.QDialog):
 		if state == 'recording' and (self.markedRegions or self.uiSeekSlider.value()):
 			self.markedRegions.clear()
 			self.updateMarkedRegions()
-			api2.setSync('playbackPosition', 0)
+			api.setSync('playbackPosition', 0)
 			self.uiSeekSlider.setValue(0)
 	
 	
 	@pyqtSlot(str, float)
 	def onStateChangeWhenScreenActive(self, state): #Only fires when screen open. Fires once when opened.
-		api2.video.call('status').then(self.onStateChangeWhenScreenActive2)
+		api.video.call('status').then(self.onStateChangeWhenScreenActive2)
 	def onStateChangeWhenScreenActive2(self, status):
 		#Filesave doesn't actually affect anything, just the transition to/from playback.
 		if status['filesave']:

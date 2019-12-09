@@ -4,7 +4,7 @@
 
 from PyQt5 import QtWidgets
 from debugger import *; dbg
-import api2
+import api
 import time
 
 TEST_ITERATIONS = 100
@@ -16,7 +16,7 @@ app = QtWidgets.QApplication(sys.argv)
 t1 = time.perf_counter()
 print('test 1: simple calls to control api')
 for x in range(TEST_ITERATIONS):
-	api2.control.callSync('get', ['batteryVoltage'])
+	api.control.callSync('get', ['batteryVoltage'])
 	print('.', end='', flush=True)
 print(f"""
 Time: {time.perf_counter()-t1}s total, {(time.perf_counter()-t1)/TEST_ITERATIONS*1000}ms per call.
@@ -40,7 +40,7 @@ Time: {time.perf_counter()-t2}s total, {(time.perf_counter()-t2)/TEST_ITERATIONS
 		getBatteryVoltage(-1)
 
 for x in range(TEST_ITERATIONS):
-	api2.control.call('get', ['batteryVoltage']).then(configureValue)
+	api.control.call('get', ['batteryVoltage']).then(configureValue)
 
 t3 = 0
 x = 0
@@ -49,7 +49,7 @@ def getBatteryVoltage(*_):
 	x = x + 1
 	if x <= 100:
 		print('.', end='', flush=True)
-		api2.get('batteryVoltage').then(getBatteryVoltage)
+		api.get('batteryVoltage').then(getBatteryVoltage)
 	else:
 		print(f"""
 Time: {time.perf_counter()-t3}s total, {(time.perf_counter()-t3)/TEST_ITERATIONS*1000}ms per call.

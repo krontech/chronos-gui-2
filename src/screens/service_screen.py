@@ -7,7 +7,7 @@ from PyQt5.QtCore import pyqtSlot
 
 from debugger import *; dbg
 
-import api2 as api
+import api
 import settings
 
 

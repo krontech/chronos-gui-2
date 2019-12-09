@@ -36,7 +36,7 @@ from PyQt5.QtGui import QStandardItemModel
 
 from debugger import *; dbg
 import settings
-import api2
+import api
 
 tr = partial(QtCore.QCoreApplication.translate, "Triggers")
 
@@ -142,7 +142,7 @@ class TriggersAndIO(QtWidgets.QDialog):
 		
 		self.oldIOMapping = defaultdict(lambda: defaultdict(lambda: None)) #Set part and parcel to whatever the most recent mapping is.
 		self.newIOMapping = defaultdict(lambda: defaultdict(lambda: None)) #Set piece-by-piece to the new mapping.
-		api2.observe('ioMapping', self.onNewIOMapping)
+		api.observe('ioMapping', self.onNewIOMapping)
 		
 		
 		self.uiActionList.selectionModel().selectionChanged.connect(
@@ -250,7 +250,7 @@ class TriggersAndIO(QtWidgets.QDialog):
 		self.newIOMapping = defaultdict(lambda: defaultdict(lambda: None))
 		self.onActionChanged(self.uiActionList.selectionModel().selection())
 		
-		ioMapping = api2.apiValues.get('ioMapping')
+		ioMapping = api.apiValues.get('ioMapping')
 		self.uiIo1ThresholdVoltage.setValue(ioMapping['io1In']['threshold'])
 		self.uiIo11MAPullup.setChecked(bool(ioMapping['io1']['driveStrength'] & 1))
 		self.uiIo120MAPullup.setChecked(bool(ioMapping['io1']['driveStrength'] & 2))
@@ -263,7 +263,7 @@ class TriggersAndIO(QtWidgets.QDialog):
 	
 	
 	def saveChanges(self, *_):
-		ioMapping = api2.apiValues.get('ioMapping')
+		ioMapping = api.apiValues.get('ioMapping')
 		
 		existingVirtuals = settings.value('virtually triggered actions', {})
 		newVirtuals = {
@@ -291,7 +291,7 @@ class TriggersAndIO(QtWidgets.QDialog):
 			'virtuals': virtuals,
 		})
 		
-		api2.set('ioMapping', dump('sending IO mapping', { #Send along the update delta. Strictly speaking, we could send the whole thing and not a delta, but it seems more correct to only send what we want to change. data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACMAAAAjCAMAAAApB0NrAAAAdVBMVEUAAAAAFBwCJTYbKjQjOUwoPlI/QT5GTFRDVmVQY3N4XGhgZGbUPobePYXgQY2BZnedZ4GBeH7EYqCXdYjbX5yigJOIjI+NkZTgfai5jZ2gnaHkire6m6fknsPxm8CtsrToqczrr8S9wsTwttHztszzuNPe4N2lYYACAAAAAXRSTlMAQObYZgAAAaBJREFUOMt9kwFTgzAMhVGn4ibMuqql40WFxP//E01TNgpu5o47Lnx9SV9CVS3Dp6iuRVPEZeK1RJrWN43/V+WKWinjg2/zyzUZDxGGvyA0MwkhypC/zHgiFgiqNeObkiGAyXIFo00W3QBdB5h0wWieMtVi7GJ0255XjCcRIR8ABMHh/WOIyEy1ZIRF0Onjhrr+jFbreWZaZGDvemX7n7h7ykxRrDkyCXo3DIOa0+/cw+YddnnvX086XjvBNsbaKfPtNjf3W3xpeuEOhPpt/Nnd98yEt/1LMnE1CO0azkX3eNCqzNBL0Hr31Dp+c5uHu4OoxToMnWr1FwpdrG83qZY5gYkBUMzUd67ew0RERhCMSHgx94A+pcxPQqoG40umBfOYETtPoHwCxf4cNat7ocshpgAUTDY1cD5MYypmTU2qCVHtYEs6B86t2cXUZBYOQRaBUWYPIKPtT26QTufJoMkd8PS1bNNq8Oxkdk3s69HTCdKBnZ0BzU1Q285Ci2mdC6TFn2+3nOpUjo/JyCtMZZNh2+HARUMrSP21/zWMf3V+AVFTVrq9UKSZAAAAAElFTkSuQmCC
+		api.set('ioMapping', dump('sending IO mapping', { #Send along the update delta. Strictly speaking, we could send the whole thing and not a delta, but it seems more correct to only send what we want to change. data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACMAAAAjCAMAAAApB0NrAAAAdVBMVEUAAAAAFBwCJTYbKjQjOUwoPlI/QT5GTFRDVmVQY3N4XGhgZGbUPobePYXgQY2BZnedZ4GBeH7EYqCXdYjbX5yigJOIjI+NkZTgfai5jZ2gnaHkire6m6fknsPxm8CtsrToqczrr8S9wsTwttHztszzuNPe4N2lYYACAAAAAXRSTlMAQObYZgAAAaBJREFUOMt9kwFTgzAMhVGn4ibMuqql40WFxP//E01TNgpu5o47Lnx9SV9CVS3Dp6iuRVPEZeK1RJrWN43/V+WKWinjg2/zyzUZDxGGvyA0MwkhypC/zHgiFgiqNeObkiGAyXIFo00W3QBdB5h0wWieMtVi7GJ0255XjCcRIR8ABMHh/WOIyEy1ZIRF0Onjhrr+jFbreWZaZGDvemX7n7h7ykxRrDkyCXo3DIOa0+/cw+YddnnvX086XjvBNsbaKfPtNjf3W3xpeuEOhPpt/Nnd98yEt/1LMnE1CO0azkX3eNCqzNBL0Hr31Dp+c5uHu4OoxToMnWr1FwpdrG83qZY5gYkBUMzUd67ew0RERhCMSHgx94A+pcxPQqoG40umBfOYETtPoHwCxf4cNat7ocshpgAUTDY1cD5MYypmTU2qCVHtYEs6B86t2cXUZBYOQRaBUWYPIKPtT26QTufJoMkd8PS1bNNq8Oxkdk3s69HTCdKBnZ0BzU1Q285Ci2mdC6TFn2+3nOpUjo/JyCtMZZNh2+HARUMrSP21/zWMf3V+AVFTVrq9UKSZAAAAAElFTkSuQmCC
 			action: 
 				{
 					key: default(newConfig[key], value)
@@ -392,7 +392,7 @@ class TriggersAndIO(QtWidgets.QDialog):
 				changes the trigger."""
 		
 		action = actionData[selected.indexes()[0].data(Qt.UserRole)]
-		config = api2.apiValues.get('ioMapping')[action['id']]
+		config = api.apiValues.get('ioMapping')[action['id']]
 		newConfig = self.newIOMapping[action['id']]
 		virtuals = settings.value('virtually triggered actions', {})
 		
@@ -450,7 +450,7 @@ class TriggersAndIO(QtWidgets.QDialog):
 		newSource = triggerData[self.uiTriggerList.itemData(index)]['id']
 		activeMapping = self.newIOMapping[activeAction['id']]
 		virtuals = settings.value('virtually triggered actions', {})
-		oldSource = api2.apiValues.get('ioMapping')[activeAction['id']]['source']
+		oldSource = api.apiValues.get('ioMapping')[activeAction['id']]['source']
 		if oldSource == newSource and activeAction['id'] not in virtuals: #If this was a virtual item, don't delete it if it's the same as what's corporeal. (Virtual defaults to "none", so if we switch from "virtual" to "none" we're actually switching from "none" to "none" which gets optimized out, which means we don't actually switch.
 			if activeMapping['source']: #Clear key if it exists, no need to set. Otherwise, when we switched actions, the trigger would always get set to what it was, which is pointless.
 				del activeMapping['source']
@@ -499,7 +499,7 @@ class TriggersAndIO(QtWidgets.QDialog):
 		print()
 		print()
 		print('existing:')
-		pp(api2.apiValues.get('ioMapping'))
+		pp(api.apiValues.get('ioMapping'))
 		print()
 		print('pending:')
 		pp(self.newIOMapping)
@@ -524,7 +524,7 @@ class TriggersAndIO(QtWidgets.QDialog):
 		lineLength = 15 #Arrow line length
 		lineOffset = 3 #Vertical offset, align arrows with text midline.
 		
-		ioMapping = api2.apiValues.get('ioMapping')
+		ioMapping = api.apiValues.get('ioMapping')
 		currentActionIndex = self.uiActionList.selectionModel().currentIndex().data(Qt.UserRole) or 0
 		
 		trigger = triggerData[self.uiTriggerList.currentData() or 0]['shortName']

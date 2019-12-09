@@ -10,7 +10,7 @@ from PyQt5.QtWidgets import QWidget, QApplication
 from debugger import *; dbg
 from widgets.button import Button
 import settings
-import api2
+import api
 
 RECORDING_MODES = {'START/STOP':1, 'SOFT_TRIGGER':2, 'VIRTUAL_TRIGGER':3}
 RECORDING_MODE = RECORDING_MODES['START/STOP']
@@ -29,7 +29,7 @@ class Main(QWidget):
 		
 		self._window = window
 		
-		api2.set('cameraTallyMode', 'auto')
+		api.set('cameraTallyMode', 'auto')
 		
 		#Set the kerning to false because it looks way better.
 		#Doesn't seem to be working? --DDR 2019-05-29
@@ -45,7 +45,7 @@ class Main(QWidget):
 		self.uiRecord.pressed.connect(lambda: self.setVirtualTrigger(True))
 		self.uiRecord.released.connect(lambda: self.setVirtualTrigger(False))
 		
-		api2.observe('state', self.onStateChange)
+		api.observe('state', self.onStateChange)
 		
 		self.uiDebugA.clicked.connect(self.makeFailingCall)
 		self.uiDebugB.clicked.connect(lambda: window.show('test'))
@@ -80,37 +80,37 @@ class Main(QWidget):
 		self.uiShotAssist.clicked.connect(closeRecordingAndTriggersMenu)
 		
 		self.uiShowWhiteClipping.stateChanged.connect(
-			lambda state: api2.set(
+			lambda state: api.set(
 				{'zebraLevel': state/2} ) )
-		api2.observe('zebraLevel', self.updateWhiteClipping)
+		api.observe('zebraLevel', self.updateWhiteClipping)
 		
-		api2.observe('focusPeakingLevel', self.updateFocusPeakingIntensity)
+		api.observe('focusPeakingLevel', self.updateFocusPeakingIntensity)
 		
 		self.uiFocusPeakingIntensity.currentIndexChanged.connect(
-			lambda index: api2.set(
+			lambda index: api.set(
 				{'focusPeakingLevel': index/(self.uiFocusPeakingIntensity.count()-1) } ) )
 		
 		self.uiFocusPeakingIntensity.currentIndexChanged.connect(
 			self.uiShotAssistMenu.setFocus )
 		
-		api2.observe('focusPeakingColor', self.updateFocusPeakingColor)
+		api.observe('focusPeakingColor', self.updateFocusPeakingColor)
 		
 		self.uiBlueFocusPeaking.clicked.connect(lambda:
-			api2.set({'focusPeakingColor': 'blue'} ) )
+			api.set({'focusPeakingColor': 'blue'} ) )
 		self.uiPinkFocusPeaking.clicked.connect(lambda:
-			api2.set({'focusPeakingColor': 'magenta'} ) )
+			api.set({'focusPeakingColor': 'magenta'} ) )
 		self.uiRedFocusPeaking.clicked.connect(lambda:
-			api2.set({'focusPeakingColor': 'red'} ) )
+			api.set({'focusPeakingColor': 'red'} ) )
 		self.uiYellowFocusPeaking.clicked.connect(lambda:
-			api2.set({'focusPeakingColor': 'yellow'} ) )
+			api.set({'focusPeakingColor': 'yellow'} ) )
 		self.uiGreenFocusPeaking.clicked.connect(lambda:
-			api2.set({'focusPeakingColor': 'green'} ) )
+			api.set({'focusPeakingColor': 'green'} ) )
 		self.uiCyanFocusPeaking.clicked.connect(lambda:
-			api2.set({'focusPeakingColor': 'cyan'} ) )
+			api.set({'focusPeakingColor': 'cyan'} ) )
 		self.uiBlackFocusPeaking.clicked.connect(lambda:
-			api2.set({'focusPeakingColor': 'black'} ) )
+			api.set({'focusPeakingColor': 'black'} ) )
 		self.uiWhiteFocusPeaking.clicked.connect(lambda:
-			api2.set({'focusPeakingColor': 'white'} ) )
+			api.set({'focusPeakingColor': 'white'} ) )
 		
 		self.uiBlueFocusPeaking.clicked.connect(self.uiShotAssistMenu.setFocus)
 		self.uiPinkFocusPeaking.clicked.connect(self.uiShotAssistMenu.setFocus)
@@ -122,7 +122,7 @@ class Main(QWidget):
 		
 		#Twiddle the calibration menu so it shows the right thing. It's pretty context-sensitive - you can't white-balance a black-and-white camera, and you can't do motion trigger calibration when there's no motion trigger set up.
 		#I think the sanest approach is to duplicate the button, one for each menu, since opening the menu is pretty complex and I don't want to try dynamically rebind menus.
-		if api2.getSync('sensorColorPattern') == 'mono':
+		if api.getSync('sensorColorPattern') == 'mono':
 			self.uiCalibration = self.uiCalibrationOrBlackCal
 			self.uiBlackCal0 = Button(parent=self.uiCalibrationOrBlackCal.parent())
 			self.copyButton(src=self.uiCalibrationOrBlackCal, dest=self.uiBlackCal0)
@@ -142,14 +142,14 @@ class Main(QWidget):
 			self.uiWhiteBalance1.clicked.connect(self.closeCalibrationMenu)
 			self.uiWhiteBalance1.clicked.connect(self.closeShotAssistMenu)
 			self.uiWhiteBalance1.clicked.connect(self.closeRecordingAndTriggersMenu)
-			self.uiWhiteBalance1.clicked.connect(lambda: api2.control.call('startAutoWhiteBalance', {}))
+			self.uiWhiteBalance1.clicked.connect(lambda: api.control.call('startAutoWhiteBalance', {}))
 			
 			self.uiBlackCal0.clicked.connect(self.closeCalibrationMenu)
 			self.uiBlackCal0.clicked.connect(lambda: 
-				api2.control.call('startCalibration', {'blackCal': True}) ) #may time out if already in progress - check state is 'idle' before issuing call!
+				api.control.call('startCalibration', {'blackCal': True}) ) #may time out if already in progress - check state is 'idle' before issuing call!
 			self.uiBlackCal1.clicked.connect(self.closeCalibrationMenu)
 			self.uiBlackCal1.clicked.connect(lambda: 
-				api2.control.call('startCalibration', {'blackCal': True}) )
+				api.control.call('startCalibration', {'blackCal': True}) )
 			
 			self.updateBaWTriggers()
 		else:
@@ -167,16 +167,16 @@ class Main(QWidget):
 			#Calibration either opens the uiCalibrationMenu or the uiCalibrationMenuWithMotion [trigger button].
 			self.uiWhiteBalance1.clicked.connect(self.closeCalibrationMenu1)
 			self.uiWhiteBalance1.clicked.connect(self.closeCalibrationMenu2)
-			self.uiWhiteBalance1.clicked.connect(lambda: api2.control.call('startAutoWhiteBalance', {}))
+			self.uiWhiteBalance1.clicked.connect(lambda: api.control.call('startAutoWhiteBalance', {}))
 			self.uiWhiteBalance2.clicked.connect(self.closeCalibrationMenu1)
 			self.uiWhiteBalance2.clicked.connect(self.closeCalibrationMenu2)
-			self.uiWhiteBalance2.clicked.connect(lambda: api2.control.call('startAutoWhiteBalance', {}))
+			self.uiWhiteBalance2.clicked.connect(lambda: api.control.call('startAutoWhiteBalance', {}))
 			self.uiBlackCal1.clicked.connect(self.closeCalibrationMenu1)
 			self.uiBlackCal1.clicked.connect(self.closeCalibrationMenu2)
-			self.uiBlackCal1.clicked.connect(lambda: api2.control.call('startCalibration', {'blackCal': True}))
+			self.uiBlackCal1.clicked.connect(lambda: api.control.call('startCalibration', {'blackCal': True}))
 			self.uiBlackCal2.clicked.connect(self.closeCalibrationMenu1)
 			self.uiBlackCal2.clicked.connect(self.closeCalibrationMenu2)
-			self.uiBlackCal2.clicked.connect(lambda: api2.control.call('startCalibration', {'blackCal': True}))
+			self.uiBlackCal2.clicked.connect(lambda: api.control.call('startCalibration', {'blackCal': True}))
 			self.uiRecalibrateMotionTrigger.clicked.connect(self.closeCalibrationMenu1)
 			self.uiRecalibrateMotionTrigger.clicked.connect(self.closeCalibrationMenu2)
 			#self.uiRecalibrateMotionTrigger.clicked.connect(lambda: api.control('takeStillReferenceForMotionTriggering'))
@@ -217,9 +217,9 @@ class Main(QWidget):
 		
 		#Set up exposure slider.
 		# This slider is significantly more responsive to mouse than to touch. 🤔
-		api2.observe('exposureMax', self.updateExposureMax)
-		api2.observe('exposureMin', self.updateExposureMin)
-		api2.observe('exposurePeriod', self.updateExposureNs)
+		api.observe('exposureMax', self.updateExposureMax)
+		api.observe('exposureMin', self.updateExposureMin)
+		api.observe('exposurePeriod', self.updateExposureNs)
 		#[TODO DDR 2018-09-13] This valueChanged event is really quite slow, for some reason.
 		self.uiExposureSlider.debounce.sliderMoved.connect(self.onExposureSliderMoved)
 		self.uiExposureSlider.touchMargins = lambda: {
@@ -231,28 +231,28 @@ class Main(QWidget):
 		
 		self._framerate = None
 		self._resolution = None
-		api2.observe('exposurePeriod', lambda ns: 
-			setattr(self, '_framerate', api2.getSync('frameRate')) )
-		api2.observe('resolution', lambda res: 
+		api.observe('exposurePeriod', lambda ns: 
+			setattr(self, '_framerate', api.getSync('frameRate')) )
+		api.observe('resolution', lambda res: 
 			setattr(self, '_resolution', res) )
-		api2.observe('exposurePeriod', self.updateResolutionOverlay)
-		api2.observe('resolution', self.updateResolutionOverlay)
+		api.observe('exposurePeriod', self.updateResolutionOverlay)
+		api.observe('resolution', self.updateResolutionOverlay)
 		
 		
 		#Oh god this is gonna mess up scroll wheel selection so badly. 😭
 		self.uiShowWhiteClipping.stateChanged.connect(self.uiShotAssistMenu.setFocus)
 	
 	def onShow(self):
-		api2.video.call('configure', {
+		api.video.call('configure', {
 			'xoff': self.uiPinchToZoomGestureInterceptionPanel.x(),
 			'yoff': self.uiPinchToZoomGestureInterceptionPanel.y(),
 			'hres': self.uiPinchToZoomGestureInterceptionPanel.width(),
 			'vres': self.uiPinchToZoomGestureInterceptionPanel.height(),
 		})
-		api2.video.call('livedisplay', {})
+		api.video.call('livedisplay', {})
 		self._batteryChargeUpdateTimer.start() #ms
 		
-		if api2.apiValues.get('state') == 'idle' and settings.value('resumeRecordingAfterSave', False):
+		if api.apiValues.get('state') == 'idle' and settings.value('resumeRecordingAfterSave', False):
 			self.startRecording()
 	
 	def onHide(self):
@@ -260,7 +260,7 @@ class Main(QWidget):
 	
 	
 	def updateBatteryCharge(self):
-		api2.control.call(
+		api.control.call(
 			'get', ['batteryChargePercent']
 		).then(lambda data:
 			self.uiBattery.setText(
@@ -272,7 +272,7 @@ class Main(QWidget):
 		#startTime = time.perf_counter()
 		linearRatio = (newExposureNs-self.uiExposureSlider.minimum()) / (self.uiExposureSlider.maximum()-self.uiExposureSlider.minimum())
 		log.print(f'lr {linearRatio}')
-		api2.control.call('set', {
+		api.control.call('set', {
 			'exposurePeriod': math.pow(linearRatio, 2) * self.uiExposureSlider.maximum(),
 		})
 	
@@ -299,7 +299,7 @@ class Main(QWidget):
 	
 	def updateExposureDependancies(self):
 		"""Update exposure text to match exposure slider, and sets the slider step so clicking the gutter always moves 1%."""
-		percent = api2.getSync('exposurePercent')
+		percent = api.getSync('exposurePercent')
 		self.uiExposureOverlay.setText(
 			self.uiExposureOverlayTemplate.format(
 				self.uiExposureSlider.value()/1000,
@@ -507,7 +507,7 @@ class Main(QWidget):
 		QWidget.setTabOrder(src, dest)
 	
 	def makeFailingCall(self):
-		api2.control.call(
+		api.control.call(
 			'get', ['batteryChargePercentage']
 		).then(lambda data:
 			log.print(f'Test failed: Data ({data}) was returned.')
@@ -521,7 +521,7 @@ class Main(QWidget):
 		if RECORDING_MODE != RECORDING_MODES['START/STOP']:
 			return
 		
-		if api2.apiValues.get('state') == 'idle':
+		if api.apiValues.get('state') == 'idle':
 			self.startRecording()
 		else:
 			self.stopRecording()
@@ -563,7 +563,7 @@ class Main(QWidget):
 		elif RECORDING_MODE == RECORDING_MODES['VIRTUAL_TRIGGER']:
 			virtuals = settings.value('virtually triggered actions', {})
 			if virtuals:
-				api2.setSync('ioMapping', dump('new io mapping', {
+				api.setSync('ioMapping', dump('new io mapping', {
 					action: { 
 						'source': 'alwaysHigh' if state else 'none',
 						'invert': config['invert'],
@@ -596,8 +596,8 @@ class Main(QWidget):
 	
 	def startRecording(self):
 		self.uiRecord.setText('Stop') #Show feedback quick, the signal takes a noticable amount of time.
-		api2.control.callSync('startRecording')
+		api.control.callSync('startRecording')
 	
 	def stopRecording(self):
 		self.uiRecord.setText('Rec')
-		api2.control.callSync('stopRecording')
+		api.control.callSync('stopRecording')
