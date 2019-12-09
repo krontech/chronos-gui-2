@@ -40,6 +40,8 @@ def constrain(low: float, n: float, high: float) -> float:
 
 
 class Power(QtWidgets.QDialog):
+	uiPowerDownThreshold = 0.05 #Used to be in API as saveAndPowerDownLowBatteryLevelNormalized, but this got taken out December 2019.
+	
 	def __init__(self, window):
 		super().__init__()
 		uic.loadUi("src/screens/power.ui", self)
@@ -81,11 +83,6 @@ class Power(QtWidgets.QDialog):
 		
 		self.uiVoltageLabel.formatString = self.uiVoltageLabel.text()
 		self.uiChargeLabel.formatString = self.uiChargeLabel.text()
-		
-		api.observe("saveAndPowerDownLowBatteryLevelNormalized", self.updatePowerDownThreshold)
-		self.uiPowerDownThreshold.currentTextChanged.connect(lambda val:
-			api.set("saveAndPowerDownLowBatteryLevelNormalized", pct2dec(val)) )
-		self.uiPowerDownThreshold.currentTextChanged.connect(self.uiChart.update)
 		
 		self.uiDone.clicked.connect(window.back)
 	

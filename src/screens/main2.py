@@ -24,6 +24,8 @@ RECORDING_MODE = RECORDING_MODES['START/STOP']
 #settings.setValue('theme', 'dark') #[HACK DDR 2019-11-15] patch around dark theme until it works, because the dark theme is the default.
 
 class Main(QWidget):
+	uiPowerDownThreshold = 0.05 #Used to be in API as saveAndPowerDownLowBatteryLevelNormalized, but this got taken out December 2019.
+	
 	def __init__(self, window):
 		super().__init__()
 		uic.loadUi("src/screens/main2.ui", self)
@@ -640,7 +642,7 @@ class Main(QWidget):
 		def uiBatteryIconPaintEvent(evt, rectSize=24):
 			"""Draw the little coloured square on the focus peaking button."""
 			if self._batteryPresent and (self._batteryCharging or not self._batteryBlink):
-				powerDownLevel = api.apiValues.get('saveAndPowerDownWhenLowBattery') * api.apiValues.get("saveAndPowerDownLowBatteryLevelNormalized")
+				powerDownLevel = api.apiValues.get('powerOffWhenMainsLost') * self.uiPowerDownThreshold
 				warningLevel = powerDownLevel + 0.15
 				
 				x,y,w,h = (
@@ -940,7 +942,7 @@ class Main(QWidget):
 		api.get('batteryChargeNormalized').then(
 			self.updateBatteryCharge2 )
 	def updateBatteryCharge2(self, charge):
-		powerDownLevel = api.apiValues.get('saveAndPowerDownWhenLowBattery') * api.apiValues.get("saveAndPowerDownLowBatteryLevelNormalized")
+		powerDownLevel = api.apiValues.get('powerOffWhenMainsLost') * self.uiPowerDownThreshold
 		warningLevel = powerDownLevel + 0.15
 		criticalLevel = powerDownLevel + 0.05
 		if not charge > warningLevel and self._batteryCharge > warningLevel:

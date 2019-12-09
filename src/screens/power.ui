@@ -122,12 +122,12 @@
     <rect>
      <x>20</x>
      <y>350</y>
-     <width>281</width>
+     <width>431</width>
      <height>61</height>
     </rect>
    </property>
    <property name="text">
-    <string>Save and power down when</string>
+    <string>Save and power down when power disconnected</string>
    </property>
    <property name="clickMarginTop" stdset="0">
     <enum>CheckBox::half</enum>
@@ -136,55 +136,7 @@
     <enum>CheckBox::half</enum>
    </property>
    <property name="linkedValueName" stdset="0">
-    <string>saveAndPowerDownWhenLowBattery</string>
-   </property>
-  </widget>
-  <widget class="ComboBox" name="uiPowerDownThreshold">
-   <property name="geometry">
-    <rect>
-     <x>280</x>
-     <y>340</y>
-     <width>151</width>
-     <height>81</height>
-    </rect>
-   </property>
-   <item>
-    <property name="text">
-     <string>100%</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>15%</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>10%</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>5%</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>0%</string>
-    </property>
-   </item>
-  </widget>
-  <widget class="Label" name="label_4">
-   <property name="geometry">
-    <rect>
-     <x>420</x>
-     <y>360</y>
-     <width>161</width>
-     <height>41</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>charge remaining</string>
+    <string>powerOffWhenMainsLost</string>
    </property>
   </widget>
   <widget class="CheckBox" name="uiStartWhenPowered">
@@ -229,20 +181,6 @@
     </rect>
    </property>
   </widget>
-  <zorder>backdrop</zorder>
-  <zorder>backdrop_2</zorder>
-  <zorder>headerlabel</zorder>
-  <zorder>uiChargeLabel</zorder>
-  <zorder>uiVoltageLabel</zorder>
-  <zorder>label_3</zorder>
-  <zorder>headerlabel_2</zorder>
-  <zorder>uiDimScreen</zorder>
-  <zorder>uiSafelyPowerDown</zorder>
-  <zorder>label_4</zorder>
-  <zorder>uiStartWhenPowered</zorder>
-  <zorder>uiPowerDownThreshold</zorder>
-  <zorder>uiDone</zorder>
-  <zorder>uiChart</zorder>
  </widget>
  <customwidgets>
   <customwidget>
@@ -261,11 +199,6 @@
    <header>check_box</header>
   </customwidget>
   <customwidget>
-   <class>ComboBox</class>
-   <extends>QComboBox</extends>
-   <header>combo_box</header>
-  </customwidget>
-  <customwidget>
    <class>HeaderLabel</class>
    <extends>QLabel</extends>
    <header>header_label</header>
@@ -280,7 +213,6 @@
   <tabstop>uiDone</tabstop>
   <tabstop>uiDimScreen</tabstop>
   <tabstop>uiSafelyPowerDown</tabstop>
-  <tabstop>uiPowerDownThreshold</tabstop>
   <tabstop>uiStartWhenPowered</tabstop>
  </tabstops>
  <resources/>
