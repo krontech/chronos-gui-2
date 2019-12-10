@@ -31,6 +31,7 @@ import random
 from typing import *
 from time import sleep
 from pathlib import Path
+import datetime
 
 from PyQt5.QtCore import pyqtSlot, QObject, QTimer, Qt, QByteArray
 from PyQt5.QtDBus import QDBusConnection, QDBusMessage, QDBusError
@@ -45,14 +46,14 @@ if not QDBusConnection.systemBus().isConnected():
 	sys.exit(-1)
 
 
-class MockError(Exception):
+class MockError(Dict):
 	"""An error which has been mocked out.
 		
 		I can't figure out how to emit dbus errors, and I can't
 		figure out how to install dbus-python in my VM."""
 	
 	def __init__(self, type_, message):
-		super().__init__(f"{type_}: {message}")
+		super().__init__({"error": f"{type_}: {message}"})
 
 
 def action(actionType: str) -> callable:
@@ -152,7 +153,7 @@ pendingCallbacks = set()
 
 
 def changeRecordingResolution(state):
-	if state.currentState == 'preview':
+	if state._state == 'preview':
 		print(f"Mock: changing recording resolution to xywh {state.previewHOffset} {state.previewVOffset} {state.previewHRes} {state.previewVRes}.")
 	else:
 		print(f"Mock: changing recording resolution to xywh {state.recordingHOffset} {state.recordingVOffset} {state.recordingHRes} {state.recordingVRes}.")
@@ -170,6 +171,28 @@ def notifyExposureChange(state):
 #######################################
 
 class State():
+	def __propChange(self, propName):
+		#TODO DDR 2019-12-09: Make this emit update signals like the real API? Or does our setter already cover it?
+		pass
+	
+	#===============================================================================================
+	# API Parameters: Configuration Dictionary
+	@property
+	def config(self):
+		"""Return a configuration dictionary of all saveable parameters"""
+		logging.debug('Config getter called')
+		result = {}
+		for name in dir(type(self)):
+			if name == 'config':
+				continue #Don't recurse to death looking up ourself.
+			try:
+				prop = getattr(type(self), name, None)
+				if (isinstance(prop, property)):
+					result[name] = getattr(self, name)
+			except AttributeError:
+				logging.error('AttributeError while accessing: %s', name)
+		return result
+	
 	#===============================================================================================
 	# API Parameters: Camera Info Group
 	@property
@@ -203,16 +226,41 @@ class State():
 		self._description = value
 	
 	_cameraIDNumber = -1
-	
 	@property
 	def cameraIDNumber(self):
 		return self._cameraIDNumber
-	
 	@cameraIDNumber.setter
 	def cameraIDNumber(self, value):
 		if not isinstance(value, int):
 			raise TypeError("cameraIDNumber must be an integer")
 		self._cameraIDNumber = value
+		self.__propChange("cameraIdNumber")
+	
+	__tallyMode = 'auto'
+	@property
+	def cameraTallyMode(self):
+		"""str: Mode in which the recording LEDs should operate.
+		
+		Args:
+			'on': All recording LEDs on the camera are turned on.
+			'off': All recording LEDs on the camera are turned off.
+			'auto': The recording LEDs on the camera are on whenever the `status` property is equal to 'recording'.
+		"""
+		return self.__tallyMode
+	@cameraTallyMode.setter
+	def cameraTallyMode(self, value):
+		# Update the LEDs and tally state.
+		if (value == 'on'):
+			pass
+		elif (value == 'off'):
+			pass
+		elif (value == 'auto'):
+			pass
+		else:
+			raise ValueError("cameraTallyMode value of '%s' is not supported" % (value))
+
+		self.__tallyMode = value
+		self.__propChange('cameraTallyMode')
 	
 	#===============================================================================================
 	# API Parameters: Sensor Info Group
@@ -229,24 +277,52 @@ class State():
 		return 12
 	
 	@property
-	def sensorISO(self):
-		return 5
-	
-	@property
 	def sensorMaxGain(self):
 		return 6
 	
 	@property
+	def sensorVIncrement(self):
+		return 2
+	
+	@property
 	def sensorVMax(self):
 		return 1280
+	
+	@property
+	def sensorVMin(self):
+		return 8
+
+	@property
+	def sensorHIncrement(self):
+		return 16
 
 	@property
 	def sensorHMax(self):
 		return 720
+
+	@property
+	def sensorHMin(self):
+		return 96
 	
 	@property
 	def sensorVDark(self):
-		return 1 #TODO: What is this?
+		return 4 #VDarkRows, for calibration
+	
+	@property
+	def sensorIso(self):
+		return 320
+	
+	@property
+	def sensorPixelRate(self):
+		return 1.40198e+09
+	
+	@property
+	def sensorTemperature(self):
+		return 22.125
+	
+	
+	
+	
 	
 	#===============================================================================================
 	# API Parameters: Exposure Group
@@ -268,6 +344,14 @@ class State():
 	@exposurePercent.setter
 	def exposurePercent(self, value):
 		pass
+	
+	@property
+	def exposureNormalized(self):
+		"""float: The current exposure time rescaled between `exposureMin` and `exposureMax`.  This value is 0 when exposure is at minimum, and increases linearly until exposure is at maximum, when it is 1.0."""
+		return 0.5
+	@exposureNormalized.setter
+	def exposureNormalized(self, value):
+		pass
 
 	@property
 	def shutterAngle(self):
@@ -285,6 +369,34 @@ class State():
 	def exposureMax(self):
 		return 10
 	
+	
+	__exposureMode = 'normal'
+	@property
+	def exposureMode(self):
+		"""str: Mode in which frame timing and exposure should operate.
+		
+		Args:
+			'normal': Frame and exposure timing operate on fixed periods and are free-running.
+			'frameTrigger': Frame starts on the rising edge of the trigger signal, and **exposes
+				the frame for `exposurePeriod` nanoseconds**. Once readout completes, the camera will
+				wait for another rising edge before starting the next frame. In this mode, the
+				`framePeriod` property constrains the minimum time between frames.
+			'shutterGating': Frame starts on the rising edge of the trigger signal, and **exposes
+				the frame for as long as the trigger signal is held high**, regardless of the `exposurePeriod`
+				property. Once readout completes, the camera will wait for another
+				rising edge before starting the next frame. In this mode, the `framePeriod` property
+				constrains the minimum time between frames. 
+		"""
+		return self.__exposureMode
+	@exposureMode.setter
+	def exposureMode(self, value):
+		if not self._state == 'idle':
+			raise Exception('State is not idle.')
+		if value not in ('normal', 'frameTrigger', 'shutterGating'):
+			raise ValueError("exposureMode value of '%s' is not supported" % (value))
+		
+		self.__exposureMode = value
+	
 	#===============================================================================================
 	# API Parameters: Gain Group
 	_gain = 1
@@ -298,22 +410,136 @@ class State():
 		self._gain = value
 	
 	@property
-	def currentISO(self):
+	def currentIso(self):
 		return self._gain * 5
-
+	
 	#===============================================================================================
 	# API Parameters: Camera Status Group
 	
-	_currentState = 'idle' #There's going to be some interaction about what's valid when, wrt this variable and API calls.
-	
-	@property
-	def currentState(self):
-		return self._currentState
+	_state = 'idle' #There's going to be some interaction about what's valid when, wrt this variable and API calls.
 	
 	@property
 	def state(self):
-		return self._currentState
+		return self._state
+	
+	@property
+	def dateTime(self):
+		"""str: The current date and time in ISO-8601 format."""
+		return datetime.datetime.now().isoformat()
+	
+	@property
+	def externalPower(self):
+		"""bool: True when the AC adaptor is present, and False when on battery power."""
+		return True
+	
+	@property
+	def batteryChargePercent(self):
+		"""float: Estimated battery charge, with 0.0 being fully depleted and 1.0 being fully charged."""
+		return self.batteryChargeNormalized * 100
+	
+	@property
+	def batteryChargeNormalized(self):
+		"""float: Estimated battery charge, with 0% being fully depleted and 100% being fully charged."""
+		return [1.0, 0.99, 0.98][random.randrange(3) % 3]
+	
+	@property
+	def batteryVoltage(self):
+		"""float: A measure of the power the removable battery is putting out, in volts. A happy battery outputs between 12v and 12.5v. This value is graphed on the battery screen on the Chronos."""
+		return [12.45, 12.50, 12.55][random.randrange(3) % 3]
+	
+	@property
+	def batteryPresent(self):
+		"""float: A measure of the power the removable battery is putting out, in volts. A happy battery outputs between 12v and 12.5v. This value is graphed on the battery screen on the Chronos."""
+		return True
+	
+	@property
+	def batteryCritical(self):
+		"""float: A measure of the power the removable battery is putting out, in volts. A happy battery outputs between 12v and 12.5v. This value is graphed on the battery screen on the Chronos."""
+		return False
+	
+	_fanOverride = True
+	@property
+	def fanOverride(self):
+		"""float Turn off the camera if the battery charge level, reported by `batteryChargePercent`, falls below this level. The camera will start saving any recorded footage before it powers down. If this level is too low, the camera may run out of battery and stop before it finishes saving."""
+		return self._fanOverride
+		
+	@fanOverride.setter
+	def fanOverride(self, val):
+		self._fanOverride = val
+		self.__propChange("saveAndPowerDownLowBatteryLevelNormalized")
+		self.__propChange("fanOverride")
+	
+	
+	_powerOffWhenMainsLost = False
+	@property
+	def powerOffWhenMainsLost(self):
+		"""bool: Should the camera try to turn off gracefully when the battery is low? The low level is set by `saveAndPowerDownLowBatteryLevelPercent` (or `saveAndPowerDownLowBatteryLevelNormalized`). The opposite of `powerOnWhenMainsConnected`. See `powerOnWhenMainsConnected` for an example which sets the camera to turn on and off when external power is supplied."""
+		return self._powerOffWhenMainsLost
+		
+	@powerOffWhenMainsLost.setter
+	def powerOffWhenMainsLost(self, val):
+		self._powerOffWhenMainsLost = val
+		self.__propChange("powerOffWhenMainsLost")
+	
+	_powerOnWhenMainsConnected = False
+	@property
+	def powerOnWhenMainsConnected(self):
+		"""bool: Set to `True` to have the camera turn itself on when it is plugged in. The inverse of this, turning off when the charger is disconnected, is achieved by setting the camera to turn off at any battery percentage. For example, to make the camera turn off when it is unpowered and turn on when it is powered again - effectively only using the battery to finish saving - you could make the following call: `api.set({ 'powerOnWhenMainsConnected':True, 'saveAndPowerDownWhenLowBattery':True, 'saveAndPowerDownLowBatteryLevelPercent':100.0 })`."""
+		return self._powerOnWhenMainsConnected
+		
+	@powerOnWhenMainsConnected.setter
+	def powerOnWhenMainsConnected(self, val):
+		self._powerOnWhenMainsConnected = val
+		self.__propChange("powerOnWhenMainsConnected")
+	
+	_backlightEnabled = True
+	@property
+	def backlightEnabled(self):
+		"""bool: True if the LCD on the back of the camera is lit. Can be set to False to dim the screen and save a small amount of power."""
+		return self._backlightEnabled
+	@backlightEnabled.setter
+	def backlightEnabled(self, value):
+		pass
 
+	@property
+	def externalStorage(self):
+		"""dict: The currently attached external storage partitions and their status. The sizes
+		of the reported storage devices are in units of kB.
+		
+		Examples:
+			>>> print(json.dumps(camera.externalStorage, indent=3))
+			{
+				\"mmcblk1p1\": {
+					\"available\": 27831008,
+					\"mount\": \"/media/mmcblk1p1\",
+					\"used\": 3323680,
+					\"device\": \"/dev/mmcblk1p1\",
+					\"size\": 31154688
+				}
+			}
+		"""
+		return {
+			"mmcblk1p1": {
+				"available": 27831008,
+				"mount": "/media/mmcblk1p1",
+				"used": 3323680,
+				"device": "/dev/mmcblk1p1",
+				"size": 31154688
+			}
+		}
+	
+	#===============================================================================================
+	# API Parameters: Camera Network Group
+	_networkHostname = "chronos"
+	@property
+	def networkHostname(self):
+		"""str: hostname to be used for dhcp requests and to be displayed on the command line.
+		"""
+		return self._networkHostname
+	@networkHostname.setter
+	def networkHostname(self, name):
+		self._networkHostname = name
+	
 	#===============================================================================================
 	# API Parameters: Recording Group
 	@property
@@ -333,7 +559,7 @@ class State():
 	@property
 	def resolution(self):
 		"""Dictionary describing the current resolution settings."""
-		return _resolution
+		return self._resolution
 	
 	@resolution.setter
 	def resolution(self, value):
@@ -365,26 +591,31 @@ class State():
 	@frameRate.setter
 	def frameRate(self, value):
 		self._framePeriod = 1 / value
-	
-	
-	@property
-	def frameCapture(self):
-		return 1 #TODO: What is this?
 
 	#===============================================================================================
 	# API Parameters: Color Space Group
 	
-	_wbMatrix = [1,1,1]
+	_wbColor = [1,1,1]
 	
 	@property
-	def wbMatrix(self):
+	def wbColor(self):
 		"""Array of Red, Green, and Blue gain coefficients to achieve white balance."""
-		return self._wbMatrix
+		return self._wbColor
 		
-	@wbMatrix.setter
-	def wbMatrix(self, value):
-		self._wbMatrix = value
+	@wbColor.setter
+	def wbColor(self, value):
+		self._wbColor = value
 	
+	_wbCustomColor = [1,1,1]
+	
+	@property
+	def wbCustomColor(self):
+		"""Array of Red, Green, and Blue gain coefficients to achieve white balance."""
+		return self._wbCustomColor
+		
+	@wbCustomColor.setter
+	def wbCustomColor(self, value):
+		self._wbCustomColor = value
 	
 	_colorMatrix = [
 		1,0,0,
@@ -400,16 +631,517 @@ class State():
 	@colorMatrix.setter
 	def colorMatrix(self, value):
 		self._colorMatrix = value
+	
+	_wbTemperature = 5400 #°K
+	
+	@property
+	def wbTemperature(self):
+		"""Array of Red, Green, and Blue gain coefficients to achieve white balance."""
+		return self._wbTemperature
+		
+	@wbTemperature.setter
+	def wbTemperature(self, value):
+		self._wbTemperature = value
+	
+	_recMaxFrames = 0
+	@property
+	def recMaxFrames(self):
+		return self._recMaxFrames
+	@recMaxFrames.setter
+	def recMaxFrames(self, value):
+		self._recMaxFrames = value
+	
+	_recMode = 'normal'
+	@property
+	def recMode(self):
+		return self._recMode
+	@recMode.setter
+	def recMode(self, value):
+		assert value in ('normal', 'segmented', 'burst')
+		self._recMode = value
+	
+	_recPreBurst = 0
+	@property
+	def recPreBurst(self):
+		return self._recPreBurst
+	@recPreBurst.setter
+	def recPreBurst(self, value):
+		self._recPreBurst = value
+	
+	_recSegments = 1
+	@property
+	def recSegments(self):
+		return self._recSegments
+	@recSegments.setter
+	def recSegments(self, value):
+		assert value >= 1
+		self._recSegments = value
+	
+	_recTrigDelay = 0
+	@property
+	def recTrigDelay(self):
+		return self._recTrigDelay
+	@recTrigDelay.setter
+	def recTrigDelay(self, value):
+		self._recTrigDelay = value
 
 	#===============================================================================================
 	# API Parameters: IO Configuration Group
+	_ioMappingStopRec = {
+		"source": "none",
+		"debounce": 0,
+		"invert": 0
+	}
 	@property
-	def ioMapping(self):
-		return [] #TODO: What is this?
+	def ioMappingStopRec(self):
+		return self._ioMappingStopRec
+	@ioMappingStopRec.setter
+	def ioMappingStopRec(self, value):
+		self._ioMappingStopRec = value
 	
-	@ioMapping.setter
-	def ioMapping(self, value):
+	_ioDetailedStatus = {
+		"detailedComb": {
+			"or1": 0,
+			"or2": 0,
+			"or3": 0,
+			"xor": 1,
+			"and": 1
+		},
+		"edgeTimers": {
+			"toggle": {
+				"rising": 42.9497,
+				"falling": 42.9497
+			},
+			"stop": {
+				"rising": 42.9497,
+				"falling": 42.9497
+			},
+			"interrupt": {
+				"rising": 42.9497,
+				"falling": 42.9497
+			},
+			"io1": {
+				"rising": 42.9497,
+				"falling": 42.9497
+			},
+			"shutter": {
+				"rising": 42.9497,
+				"falling": 42.9497
+			},
+			"io2": {
+				"rising": 42.9497,
+				"falling": 42.9497
+			},
+			"start": {
+				"rising": 42.9497,
+				"falling": 42.9497
+			}
+		},
+		"sources": {
+			"io1": 0,
+			"delay": 0,
+			"nextSeg": 0,
+			"io3": 0,
+			"dispFrame": 0,
+			"alwaysHigh": 1,
+			"comb": 1,
+			"none": 0,
+			"toggle": 0,
+			"shutter": 1,
+			"endRec": 0,
+			"timingIo": 1,
+			"recording": 0,
+			"software": 0,
+			"startRec": 0,
+			"io2": 0
+		},
+		"outputs": {
+			"delay": 0,
+			"start": 0,
+			"comb": 1,
+			"shutter": 0,
+			"toggle": 0,
+			"stop": 0,
+			"io1": 0,
+			"io2": 0
+		}
+	}
+	@property
+	def ioDetailedStatus(self):
+		return self._ioDetailedStatus
+	@ioDetailedStatus.setter
+	def ioDetailedStatus(self, value):
+		self._ioDetailedStatus = value
+	
+	_ioMappingCombAnd = {
+		"source": "alwaysHigh",
+		"debounce": 0,
+		"invert": 0
+	}
+	@property
+	def ioMappingCombAnd(self):
+		return self._ioMappingCombAnd
+	@ioMappingCombAnd.setter
+	def ioMappingCombAnd(self, value):
+		self._ioMappingCombAnd = value
+	
+	_ioMappingStartRec = {
+		"source": "none",
+		"debounce": 0,
+		"invert": 0
+	}
+	@property
+	def ioMappingStartRec(self):
+		return self._ioMappingStartRec
+	@ioMappingStartRec.setter
+	def ioMappingStartRec(self, value):
+		self._ioMappingStartRec = value
+	
+	_ioSourceStatus = {
+		"io1": 0,
+		"delay": 0,
+		"nextSeg": 0,
+		"io3": 0,
+		"dispFrame": 0,
+		"alwaysHigh": 1,
+		"comb": 1,
+		"none": 0,
+		"toggle": 0,
+		"shutter": 1,
+		"endRec": 0,
+		"timingIo": 1,
+		"recording": 0,
+		"software": 0,
+		"startRec": 0,
+		"io2": 0
+	}
+	@property
+	def ioSourceStatus(self):
+		return self._ioSourceStatus
+	@ioSourceStatus.setter
+	def ioSourceStatus(self, value):
+		self._ioSourceStatus = value
+	
+	_ioMappingToggleClear = {
+		"source": "none",
+		"debounce": 0,
+		"invert": 0
+	}
+	@property
+	def ioMappingToggleClear(self):
+		return self._ioMappingToggleClear
+	@ioMappingToggleClear.setter
+	def ioMappingToggleClear(self, value):
+		self._ioMappingToggleClear = value
+	
+	_ioThresholdIo2 = 2.50271
+	@property
+	def ioThresholdIo2(self):
+		return self._ioThresholdIo2
+	@ioThresholdIo2.setter
+	def ioThresholdIo2(self, value):
+		self._ioThresholdIo2 = value
+	
+	_ioThresholdIo1 = 2.50271
+	@property
+	def ioThresholdIo1(self):
+		return self._ioThresholdIo1
+	@ioThresholdIo1.setter
+	def ioThresholdIo1(self, value):
+		self._ioThresholdIo1 = value
+	
+	_ioDelayTime = 0
+	@property
+	def ioDelayTime(self):
+		return self._ioDelayTime
+	@ioDelayTime.setter
+	def ioDelayTime(self, value):
+		self._ioDelayTime = value
+	
+	_ioMappingCombOr1 = {
+		"source": "none",
+		"debounce": 1,
+		"invert": 0
+	}
+	@property
+	def ioMappingCombOr1(self):
+		return self._ioMappingCombOr1
+	@ioMappingCombOr1.setter
+	def ioMappingCombOr1(self, value):
+		self._ioMappingCombOr1 = value
+	
+	_ioMappingCombOr2 = {
+		"source": "none",
+		"debounce": 1,
+		"invert": 0
+	}
+	@property
+	def ioMappingCombOr2(self):
+		return self._ioMappingCombOr2
+	@ioMappingCombOr2.setter
+	def ioMappingCombOr2(self, value):
+		self._ioMappingCombOr2 = value
+	
+	_ioMappingIo2 = {
+		"drive": 0,
+		"source": "none",
+		"debounce": 0,
+		"invert": 0
+	}
+	@property
+	def ioMappingIo2(self):
+		return self._ioMappingIo2
+	@ioMappingIo2.setter
+	def ioMappingIo2(self, value):
+		self._ioMappingIo2 = value
+	
+	_ioOutputStatus = {
+		"delay": 0,
+		"start": 0,
+		"comb": 1,
+		"shutter": 0,
+		"toggle": 0,
+		"stop": 0,
+		"io1": 0,
+		"io2": 0
+	}
+	@property
+	def ioOutputStatus(self):
+		return self._ioOutputStatus
+	@ioOutputStatus.setter
+	def ioOutputStatus(self, value):
+		self._ioOutputStatus = value
+	
+	_ioMappingTrigger = {
+		"source": "none",
+		"debounce": 0,
+		"invert": 0
+	}
+	@property
+	def ioMappingTrigger(self):
+		return self._ioMappingTrigger
+	@ioMappingTrigger.setter
+	def ioMappingTrigger(self, value):
+		self._ioMappingTrigger = value
+	
+	_ioMappingCombXor = {
+		"source": "alwaysHigh",
+		"debounce": 0,
+		"invert": 0
+	}
+	@property
+	def ioMappingCombXor(self):
+		return self._ioMappingCombXor
+	@ioMappingCombXor.setter
+	def ioMappingCombXor(self, value):
+		self._ioMappingCombXor = value
+	
+	_ioMappingShutter = {
+		"source": "none",
+		"debounce": 0,
+		"invert": 0
+	}
+	@property
+	def ioMappingShutter(self):
+		return self._ioMappingShutter
+	@ioMappingShutter.setter
+	def ioMappingShutter(self, value):
+		self._ioMappingShutter = value
+	
+	_ioMappingToggleFlip = {
+		"source": "comb",
+		"debounce": 0,
+		"invert": 0
+	}
+	@property
+	def ioMappingToggleFlip(self):
+		return self._ioMappingToggleFlip
+	@ioMappingToggleFlip.setter
+	def ioMappingToggleFlip(self, value):
+		self._ioMappingToggleFlip = value
+	
+	_ioMappingCombOr3 = {
+		"source": "none",
+		"debounce": 1,
+		"invert": 0
+	}
+	@property
+	def ioMappingCombOr3(self):
+		return self._ioMappingCombOr3
+	@ioMappingCombOr3.setter
+	def ioMappingCombOr3(self, value):
+		self._ioMappingCombOr3 = value
+	
+	_ioMappingToggleSet = {
+		"source": "none",
+		"debounce": 0,
+		"invert": 0
+	}
+	@property
+	def ioMappingToggleSet(self):
+		return self._ioMappingToggleSet
+	@ioMappingToggleSet.setter
+	def ioMappingToggleSet(self, value):
+		self._ioMappingToggleSet = value
+	
+	_ioMappingDelay = {
+		"source": "toggle",
+		"debounce": 0,
+		"invert": 0
+	}
+	@property
+	def ioMappingDelay(self):
+		return self._ioMappingDelay
+	@ioMappingDelay.setter
+	def ioMappingDelay(self, value):
+		self._ioMappingDelay = value
+	
+	_ioMappingIo1 = {
+		"drive": 0,
+		"source": "none",
+		"debounce": 0,
+		"invert": 0
+	}
+	@property
+	def ioMappingIo1(self):
+		return self._ioMappingIo1
+	@ioMappingIo1.setter
+	def ioMappingIo1(self, value):
+		self._ioMappingIo1 = value
+	
+	
+	#===============================================================================================
+	# API Parameters: Misc
+	
+	__miscScratchPad = {}
+	@property
+	def miscScratchPad(self):
+		if self.__miscScratchPad == {}:
+			return {"empty":True}
+		else:
+			return self.__miscScratchPad
+	@miscScratchPad.setter
+	def miscScratchPad(self, value):
+		for key,value in value.items():
+			if value is None or value == 'null':
+				if key in self.__miscScratchPad:
+					del self.__miscScratchPad[key]
+			else:
+				self.__miscScratchPad[key] = value
+
+		self.__propChange('miscScratchPad')
+	
+
+	#===============================================================================================
+	# Camera parameters.
+	@property
+	def totalFrames(self):
+		return 10000
+	
+	@totalFrames.setter
+	def totalFrames(self, value):
 		pass
+	
+	_totalSegments = 0
+	@property
+	def totalSegments(self):
+		return self._totalSegments
+	@totalSegments.setter
+	def totalSegments(self, value):
+		self._totalSegments = value
+	
+	_focusPeakingColor = 'Red'
+	@property
+	def focusPeakingColor(self):
+		return self._focusPeakingColor
+	@focusPeakingColor.setter
+	def focusPeakingColor(self, value):
+		self._focusPeakingColor = value
+	
+	_focusPeakingLevel = 0
+	@property
+	def focusPeakingLevel(self):
+		return self._focusPeakingLevel
+	@focusPeakingLevel.setter
+	def focusPeakingLevel(self, value):
+		self._focusPeakingLevel = value
+	
+	_zebraLevel = 0
+	@property
+	def zebraLevel(self):
+		return self._zebraLevel
+	@zebraLevel.setter
+	def zebraLevel(self, value):
+		self._zebraLevel = value
+	
+	_overlayEnable = 0
+	@property
+	def overlayEnable(self):
+		return self._overlayEnable
+	@overlayEnable.setter
+	def overlayEnable(self, value):
+		self._overlayEnable = value
+	
+	_overlayFormat = "frame %d"
+	@property
+	def overlayFormat(self):
+		return self._overlayFormat
+	@overlayFormat.setter
+	def overlayFormat(self, value):
+		self._overlayFormat = value
+	
+	_playbackLength = 10000
+	@property
+	def playbackLength(self):
+		return self._playbackLength
+	@playbackLength.setter
+	def playbackLength(self, value):
+		self._playbackLength = value
+	
+	_playbackPosition = 0
+	@property
+	def playbackPosition(self):
+		return self._playbackPosition
+	@playbackPosition.setter
+	def playbackPosition(self, value):
+		self._playbackPosition = value
+	
+	_playbackRate = 60
+	@property
+	def playbackRate(self):
+		return self._playbackRate
+	@playbackRate.setter
+	def playbackRate(self, value):
+		self._playbackRate = value
+	
+	_playbackStart = 0
+	@property
+	def playbackStart(self):
+		return self._playbackStart
+	@playbackStart.setter
+	def playbackStart(self, value):
+		self._playbackStart = value
+	
+	_playbackStart = 0
+	@property
+	def playbackStart(self):
+		return self._playbackStart
+	@playbackStart.setter
+	def playbackStart(self, value):
+		self._playbackStart = value
+	
+	_shippingMode = False
+	@property
+	def shippingMode(self):
+		return self._shippingMode
+	@shippingMode.setter
+	def shippingMode(self, value):
+		self._shippingMode = value
+	
+	@property
+	def videoState(self):
+		return 'live'
+	
 
 
 
@@ -444,12 +1176,12 @@ class ControlAPIMock(QObject):
 	
 	def holdState(self, state: str, duration: int) -> None:
 		"""Set the current state to something else for a little bit. Returns to 'idle'."""
-		state._currentState = state
-		self.emitControlSignal('currentState')
+		state._state = state
+		self.emitControlSignal('state')
 		
 		def done():
-			state._currentState = 'idle'
-			self.emitControlSignal('currentState')
+			state._state = 'idle'
+			self.emitControlSignal('state')
 			
 		timer = QTimer(self)
 		timer.timeout.connect(done)
@@ -467,7 +1199,7 @@ class ControlAPIMock(QObject):
 				#QDBusMessage.createErrorReply does not exist in PyQt5, and QDBusMessage.errorReply can't be sent. As far as I can tell, we simply can not emit D-Bus errors.
 				#Can't reply with a single string, either, since QVariantMap MUST be key:value pairs and we don't seem to have unions or anything.
 				#The type overloading, as detailed at http://pyqt.sourceforge.net/Docs/PyQt5/signals_slots.html#the-pyqtslot-decorator, simply does not work in this case. The last pyqtSlot will override the first pyqtSlot with its return type.
-				return MockError('ValueError', f"The value '{key}' is not a known key to set.\nValid keys are: {[i for i in dir(state) if i[0] != '_']}")
+				return MockError('ValueError', f"The value '{key}' is not a known key to get.\nValid keys are: {[i for i in dir(state) if i[0] != '_']}")
 			
 			retval[key] = getattr(state, key)
 		
@@ -536,13 +1268,13 @@ class ControlAPIMock(QObject):
 	
 	@action('get')
 	@pyqtSlot('QVariantMap', result='QVariantMap')
-	def status(self, opts):
-		return {'state': state.currentState}
+	def status(self, *_):
+		return {'state': state._state}
 	
 	
 	@action('set')
 	@pyqtSlot('QVariantMap', result='QVariantMap')
-	def doReset(self, opts) -> None:
+	def doReset(self, *_) -> None:
 		print('resetting...')
 		self.holdState('reinitializing', 500)
 		return self.status()
@@ -550,21 +1282,21 @@ class ControlAPIMock(QObject):
 	
 	@action('set')
 	@pyqtSlot('QVariantMap', result='QVariantMap')
-	def startAutoWhiteBalance(self, opts) -> None:
+	def startAutoWhiteBalance(self, *_) -> None:
 		print('auto white balancing...')
 		return self.status()
 	
 	
 	@action('set')
 	@pyqtSlot('QVariantMap', result='QVariantMap')
-	def revertAutoWhiteBalance(self, opts) -> None:
+	def revertAutoWhiteBalance(self, *_) -> None:
 		print('reset white balance')
 		return self.status()
 	
 	
 	@action('set')
 	@pyqtSlot('QVariantMap', result='QVariantMap')
-	def startBlackCalibration(self, opts) -> None:
+	def startBlackCalibration(self, *_) -> None:
 		print('starting black calibration...')
 		self.holdState('calibrating', 2000)
 		return self.status()
@@ -572,7 +1304,7 @@ class ControlAPIMock(QObject):
 	
 	@action('set')
 	@pyqtSlot('QVariantMap', result='QVariantMap')
-	def startZeroTimeBlackCal(self, opts) -> None:
+	def startZeroTimeBlackCal(self, *_) -> None:
 		print('starting zero-time black calibration...')
 		self.holdState('calibrating', 2000)
 		return self.status()
@@ -580,7 +1312,7 @@ class ControlAPIMock(QObject):
 	
 	@action('set')
 	@pyqtSlot('QVariantMap', result='QVariantMap')
-	def startAnalogCalibration(self, opts) -> None:
+	def startAnalogCalibration(self, *_) -> None:
 		print('starting analog calibration...')
 		self.holdState('calibrating', 2000)
 		return self.status()
@@ -588,17 +1320,23 @@ class ControlAPIMock(QObject):
 	
 	@action('set')
 	@pyqtSlot('QVariantMap', result='QVariantMap')
-	def startRecording(self, opts) -> None:
-		state._currentState = 'recording'
-		self.emitControlSignal('currentState')
+	def startRecording(self, *_) -> None:
+		state._state = 'recording'
+		self.emitControlSignal('state')
 		return self.status()
 	
 	
 	@action('set')
 	@pyqtSlot('QVariantMap', result='QVariantMap')
-	def getResolutionTimingLimits(self, opts) -> None:
-		state._currentState = 'recording'
-		self.emitControlSignal('currentState')
+	def stopRecording(self, *_) -> None:
+		state._state = 'idle'
+		self.emitControlSignal('state')
+		return self.status()
+	
+	
+	@action('set')
+	@pyqtSlot('QVariantMap', result='QVariantMap')
+	def getResolutionTimingLimits(self, *_) -> None:
 		return {
 			"cameraMaxFrames": int(1000000),
 			"minFramePeriod": int(5 * 1000000000),

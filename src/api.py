@@ -23,6 +23,8 @@ API_INTERCALL_DELAY = 0
 API_SLOW_WARN_MS = 100
 API_TIMEOUT_MS = 5000
 
+if USE_MOCK: #Resource accquisition is initialisation, here, so importing starts the mocks.
+	import control_api_mock, video_api_mock; control_api_mock, video_api_mock
 
 # Set up d-bus interface. Connect to mock system buses. Check everything's working.
 if not QDBusConnection.systemBus().isConnected():
