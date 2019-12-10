@@ -24,6 +24,7 @@ API_SLOW_WARN_MS = 100
 API_TIMEOUT_MS = 5000
 
 if USE_MOCK: #Resource accquisition is initialisation, here, so importing starts the mocks.
+	log.warn(f"Using API mocks. ($USE_CHRONOS_API_MOCK={os.environ.get('USE_CHRONOS_API_MOCK')})")
 	import control_api_mock, video_api_mock; control_api_mock, video_api_mock
 
 # Set up d-bus interface. Connect to mock system buses. Check everything's working.
@@ -1042,7 +1043,7 @@ class NetworkInterfaces(QObject):
 			self.networkManager.setTimeout(10)
 			
 			if not self.networkManager.isValid():
-				log.critical(f"Error: Can not connect to NetworkManager at {self.networkManager.service()}. ({self.networkManager.lastError().name()}: {self.networkManager.lastError().message()}) Try running `apt install udisks2`?")
+				log.critical(f"Error: Can not connect to NetworkManager at {self.networkManager.service()}. ({self.networkManager.lastError().name()}: {self.networkManager.lastError().message()}) Try running `apt install network-manager`?")
 				raise Exception("D-Bus Setup Error")
 		
 		self.networkManager.setTimeout(1000)
@@ -1137,7 +1138,7 @@ class NetworkInterfaces(QObject):
 			for networkInterface in interfaces.values():
 				networkInterface.setTimeout(1000)
 				if not networkInterface.isValid():
-					log.critical(f"Error: Can not connect to udisks2 at {networkInterface.service()}. ({networkInterface.lastError().name()}: {networkInterface.lastError().message()}) Try running `apt install udisks2`?")
+					log.critical(f"Error: Can not connect to NetworkManager at {networkInterface.service()}. ({networkInterface.lastError().name()}: {networkInterface.lastError().message()}) Try running `apt install network-manager`?")
 					raise Exception("D-Bus Setup Error")
 			
 			#Deadlock fix as above.
