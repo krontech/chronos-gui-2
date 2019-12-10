@@ -25,43 +25,43 @@ from chronosGui2.widgets.focus_ring import FocusRing
 # Do argument parsing to configure debug and logging.
 parser = argparse.ArgumentParser(description="Chronos On-Camera GUI")
 parser.add_argument('--debug', default=[], action='append', nargs='?',
-                    help="Enable debug logging")
+		help="Enable debug logging")
 parser.add_argument('--pdb', default=False, action='store_true',
-                    help="Drop into a python debug console on exception")
+		help="Drop into a python debug console on exception")
 parser.add_argument('args', nargs=argparse.REMAINDER)
 parsed = parser.parse_args()
 
 # Configure logging levels.
 logging.basicConfig(
-    datefmt=None,
-    format='%(levelname)8s%(name)12s %(funcName)s() %(message)s',
-    level=logging.INFO,
+	datefmt=None,
+	format='%(levelname)8s%(name)12s %(funcName)s() %(message)s',
+	level=logging.INFO,
 )
 for name in parsed.debug:
-    if (name == 'all'):
-        logging.getLogger().setLevel(logging.DEBUG)
-    else:
-        logging.getLogger(name).setLevel(logging.DEBUG)
+	if (name == 'all'):
+		logging.getLogger().setLevel(logging.DEBUG)
+	else:
+		logging.getLogger(name).setLevel(logging.DEBUG)
 
 # Install exception handlers for interactive debug on exception.
 if parsed.pdb:
-    # Enable segfault backtraces, usually from C libs. (exit code 139)
-    from faulthandler import enable; enable()
+	# Enable segfault backtraces, usually from C libs. (exit code 139)
+	from faulthandler import enable; enable()
     
-    def excepthook(t,v,tb):
-        QtCore.pyqtRemoveInputHook()
-        
-        #Fix system not echoing keystrokes after first auto restart.
-        try:
-            os.system('stty sane')
-        except Exception as e:
-            pass
+	def excepthook(t,v,tb):
+		QtCore.pyqtRemoveInputHook()
 
-        pdb.traceback.print_exception(t, v, tb)
-        pdb.post_mortem(t=tb)
+		#Fix system not echoing keystrokes after first auto restart.
+		try:
+			os.system('stty sane')
+		except Exception as e:
+			pass
 
-    sys.excepthook = excepthook
-    dbg, brk = pdb.set_trace, pdb.set_trace #convenience debugging
+		pdb.traceback.print_exception(t, v, tb)
+		pdb.post_mortem(t=tb)
+
+	sys.excepthook = excepthook
+	dbg, brk = pdb.set_trace, pdb.set_trace #convenience debugging
         
 # Instantiate the QApplication with any remaining arguments.
 app = QtWidgets.QApplication(parsed.args)
@@ -94,26 +94,26 @@ app.setStyleSheet("""
 
 window = Window(app)
 def focusChanged(old, new):
-    if new:
-        window._screens[window.currentScreen].focusRing.focusOn(new)
-        window._screens[window.currentScreen].focusRing.focusOut(immediate=True)
-    else:
-        #hide on screen transition
-        window._screens[window.currentScreen].focusRing.hide()
+	if new:
+		window._screens[window.currentScreen].focusRing.focusOn(new)
+		window._screens[window.currentScreen].focusRing.focusOut(immediate=True)
+	else:
+		#hide on screen transition
+		window._screens[window.currentScreen].focusRing.hide()
 app.focusChanged.connect(focusChanged)
 
 
 forceHardwareInstantiation = False #This should be an env var.
 if forceHardwareInstantiation:
-    hardware = Hardware()
-    connectHardwareEvents(app, hardware)
+	hardware = Hardware()
+	connectHardwareEvents(app, hardware)
 else:
-    try:
-        hardware = Hardware() #Must be instantiated like this, I think the event pump timer gets eaten by GC otherwise.
-        connectHardwareEvents(app, hardware)
-    except Exception:
-        #We're probably in the VM, just print a message.
-        print('GUI2: Could not initialize camera hardware for input.')
+	try:
+		hardware = Hardware() #Must be instantiated like this, I think the event pump timer gets eaten by GC otherwise.
+		connectHardwareEvents(app, hardware)
+	except Exception:
+		#We're probably in the VM, just print a message.
+		print('GUI2: Could not initialize camera hardware for input.')
 
 
 report("start_up_time", {"seconds": time.perf_counter() - chronosGui2.main.perf_start_time})
