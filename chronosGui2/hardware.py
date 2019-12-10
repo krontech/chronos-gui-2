@@ -47,7 +47,7 @@ class Hardware():
 		
 		#GPIO 20 and 26 are quite high frequency, and need to be checkd more frequently than we can here. (ie, drawing blocks for multiple ms, but we need to check every ms at least.)
 		#They're shelled out to a little C program which aggregates them.
-		encoderReader = 'src/read_jog_wheel_encoder'
+		encoderReader = os.path.dirname(__file__) + '/read_jog_wheel_encoder'
 		if not Path(encoderReader).exists():
 			print('Compiling jog wheel encoder reader application…') #Should be cached, so this should not show up every time!
 			if call([f'gcc {encoderReader}.c -O3 -o {encoderReader}'], shell=True):
@@ -61,12 +61,9 @@ class Hardware():
 		except CalledProcessError:
 			pass #it worked fine, pgrep just fails if there's nothing to find
 		
-		encoderProcess = Popen([encoderReader], stdout=PIPE)
-		signal.signal(signal.SIGINT, #Kill encoder process when we exit.
-			lambda sig, frame: os.kill(encoderProcess.pid, signal.SIGTERM))
-		self._jogWheelEncoders = encoderProcess.stdout
-		flags = fcntl(self._jogWheelEncoders, F_GETFL)
-		fcntl(self._jogWheelEncoders, F_SETFL, flags | os.O_NONBLOCK)
+		self.encoderProcess = Popen([encoderReader], stdout=PIPE)
+		flags = fcntl(self.encoderProcess.stdout, F_GETFL)
+		fcntl(self.encoderProcess.stdout, F_SETFL, flags | os.O_NONBLOCK)
 		
 		#This was sort of ported from the C++ app, but with fewer threads because I couldn't figure out what it was doing. Take caution: This is probably "working incorrect" code.
 		self._jogWheelSwitch     = os.fdopen(os.open(str(gpioPath/"gpio27/value"), os.O_RDONLY, 0), 'rb', buffering=0)
@@ -95,6 +92,9 @@ class Hardware():
 		self.lowResolutionTimer.timeout.connect(self.__updateButtonStates)
 		self.lowResolutionTimer.start(16) #ms, 1/frame @ 60fps
 	
+	def __del__(self):
+		"""Terminate the encoder process on garbage collection."""
+		os.kill(self.encoderProcess.pid, signal.SIGTERM)
 	
 	def subscribe(self, eventName:str, callback:Callable[[Optional[int]], None]) -> None:
 		"""Invoke callback when event happens.
@@ -165,7 +165,7 @@ class Hardware():
 		
 		#Can't readlines() here, never returns since we could turn the jog wheel forever.
 		while True:
-			line = self._jogWheelEncoders.readline()
+			line = self.encoderProcess.stdout.readline()
 			if len(line) == 0:
 				break
 			if len(line) != 3:

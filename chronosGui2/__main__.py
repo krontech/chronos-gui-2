@@ -19,6 +19,7 @@ from PyQt5 import QtWidgets, QtCore, QtGui
 from chronosGui2.stats import report
 from chronosGui2.debugger import *; dbg #imported for occasional use debugging, ignore "unused" warning
 import chronosGui2.settings
+from chronosGui2 import Hardware
 from chronosGui2.main import Window
 from chronosGui2.widgets.focus_ring import FocusRing
 
@@ -28,7 +29,8 @@ parser.add_argument('--debug', default=[], action='append', nargs='?',
 		help="Enable debug logging")
 parser.add_argument('--pdb', default=False, action='store_true',
 		help="Drop into a python debug console on exception")
-parser.add_argument('args', nargs=argparse.REMAINDER)
+parser.add_argument('args', nargs=argparse.REMAINDER,
+		help="Additional argument passed to Qt")
 parsed = parser.parse_args()
 
 # Configure logging levels.
@@ -106,11 +108,11 @@ app.focusChanged.connect(focusChanged)
 forceHardwareInstantiation = False #This should be an env var.
 if forceHardwareInstantiation:
 	hardware = Hardware()
-	connectHardwareEvents(app, hardware)
+	chronosGui2.main.connectHardwareEvents(app, hardware)
 else:
 	try:
 		hardware = Hardware() #Must be instantiated like this, I think the event pump timer gets eaten by GC otherwise.
-		connectHardwareEvents(app, hardware)
+		chronosGui2.main.connectHardwareEvents(app, hardware)
 	except Exception:
 		#We're probably in the VM, just print a message.
 		print('GUI2: Could not initialize camera hardware for input.')
