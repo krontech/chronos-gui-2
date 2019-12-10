@@ -15,8 +15,7 @@ while true; do
 		
 		#Use --times instead of --checksum because it means we can touch a file (ie, save it) and have the camera script restart. Checksum is more proper, and may take longer to run, but I haven't noticed any difference in my testing. Note that with --times, we redeploy the whole project when we switch computers, because we ran 'git checkout' at different times.
 		rsync --recursive --delete --links --inplace --times --itemize-changes \
-			./ \"${CAM_ADDRESS:-root@192.168.12.1}:/root/gui/\" \
-			--rsh=\"/usr/bin/sshpass -p $CHRONOS_PASSWORD ssh -l root\" \
+			./ \"${CAM_ADDRESS:-root@192.168.12.1}:~/gui/\" \
 			--exclude \"__pycache__\" \
 			--exclude \"/.git\" \
 			--exclude \".mypy_cache\" \
