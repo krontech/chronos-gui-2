@@ -1,7 +1,6 @@
 raspberry pi install notes
 - loosely followed debian 8 setup instructions
 	- export USE_CHRONOS_API_MOCK='always'
-- Add /home/pi/.local/bin to $PATH?
 
 cat > /etc/profile.d/cow.sh <<'EOS'
 cowsay << EOQ
@@ -9,3 +8,5 @@ You have reached the Tx Pro testing Raspberry Pi.
 For help and documentation, see http://forum.krontech.ca/ and https://github.com/krontech.
 EOQ
 EOS
+
+Remove env vars from .bashrc so the ui starts in a window.
