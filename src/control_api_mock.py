@@ -209,11 +209,11 @@ class State():
 	
 	@property
 	def cameraModel(self):
-		return "CR14-1.0-MOCK"
+		return "TX21-1.0-MOCK"
 	
 	@property
 	def cameraSerial(self):
-		return "-00001"
+		return "-1"
 	
 	_description = 'mock camera'
 	
