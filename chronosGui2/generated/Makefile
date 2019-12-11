@@ -1,0 +1,46 @@
+# Makefile to build generated code.
+PYDIR := $(dir $(lastword $(MAKEFILE_LIST)))/..
+SRCDIR := $(PYDIR)/..
+.DEFAULT_GOAL := all
+
+# Helper function to generate the inner XML for a QResource file.
+# Usage: $(call qrc_list_files, <dirname>, <filepattern>)
+define qrc_list_files
+	(cd $(SRCDIR) && find -L $1 -name $2 -printf '    <file>%h/%f</file>\n')
+endef
+
+# Generic rule for building a QResource file.
+%.qrc: $(SRCDIR)/%
+	@echo "Compiling $@"
+	@echo "<RCC>" > $@
+	@echo "  <qresource>" >> $@
+	@$(call qrc_list_files, $*, '*.png') >> $@
+	@$(call qrc_list_files, $*, '*.svg') >> $@
+	@echo "  </qresource>" >> $@
+	@echo "</RCC>" >> $@
+
+# Generic rule for building a Python resource file.
+# Unfortunately, pyrcc5 has a very hard time operating out-of-tree
+# so we need to create a symlink to the resource directory in the
+# source tree. It seems like this should be fixable with the -root
+# option, but that doesn't appear to do anything.
+%.py: %.qrc
+	@[ -e $* ] || ln -s $(SRCDIR)/$* $*
+	pyrcc5 -o $@ $^
+	@[ -L $* ] && rm $*
+
+# Generic rule for building a Python/Qt UI files.
+%.py: $(PYDIR)/screens/%.ui
+	pyuic5 -o $@ $^
+
+# The things we want to build and their dependencies.
+assets.qrc: $(shell find $(SRCDIR)/assets -type d)
+
+UISRC := $(shell find $(PYDIR)/screens/ -name '*.ui')
+
+all: assets.py assets.qrc $(notdir $(UISRC:.ui=.py))
+
+clean:
+	rm -rf assets.py $(notdir $(UISRC:.ui=.py))
+	rm -rf assets.qrc
+	

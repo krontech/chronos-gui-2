@@ -185,7 +185,7 @@ class PlayAndSave(QtWidgets.QDialog):
 					
 					
 					Slider::handle:horizontal {{
-						image: url({"../../" if self.uiSeekSlider.showHitRects else ""}assets/images/{theme(name).slider.videoSeekHandle}); /* File name fields: width x height + horizontal padding. */
+						image: url(:/assets/images/{theme(name).slider.videoSeekHandle}); /* File name fields: width x height + horizontal padding. */
 						margin: -200px -40px; /* y: -slider groove margin. x: touch padding outsidet the groove. Clipped by Slider width. Should be enough for most customizations if we move stuff around. */
 					}}
 					
