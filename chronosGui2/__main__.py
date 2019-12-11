@@ -15,6 +15,7 @@ import argparse
 
 # QT-specific imports
 from PyQt5 import QtWidgets, QtCore, QtGui
+import chronosGui2.generated.assets
 
 from chronosGui2.stats import report
 from chronosGui2.debugger import *; dbg #imported for occasional use debugging, ignore "unused" warning
