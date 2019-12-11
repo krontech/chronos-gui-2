@@ -18,7 +18,7 @@ class Storage(QtWidgets.QWidget):
 			uic.loadUi("src/screens/storage.chronos.ui", self)
 		
 		# Panel init.
-		self.setGeometry(0,0, 800,480)
+		self.setFixedSize(window.app.primaryScreen().virtualSize())
 		self.setWindowFlags(QtCore.Qt.FramelessWindowHint)
 		self.setAttribute(QtCore.Qt.WA_TranslucentBackground, True)
 		

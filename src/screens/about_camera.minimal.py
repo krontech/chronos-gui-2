@@ -18,7 +18,7 @@ class AboutCamera(QtWidgets.QDialog):
 			uic.loadUi("screens/about_camera.chronos.ui", self)
 		
 		# Panel init.
-		self.setGeometry(0,0, 800,480)
+		self.setFixedSize(window.app.primaryScreen().virtualSize())
 		self.setWindowFlags(QtCore.Qt.FramelessWindowHint)
 		
 		self.uiDone.clicked.connect(QtWidgets.QApplication.closeAllWindows)

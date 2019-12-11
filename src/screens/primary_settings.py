@@ -21,7 +21,7 @@ class PrimarySettings(QtWidgets.QDialog):
 			uic.loadUi("src/screens/primary_settings.chronos.ui", self)
 		
 		# Panel init.
-		self.setGeometry(0,0, 800,480)
+		self.setFixedSize(window.app.primaryScreen().virtualSize())
 		self.setWindowFlags(QtCore.Qt.FramelessWindowHint)
 		self.setAttribute(QtCore.Qt.WA_TranslucentBackground, True)
 		

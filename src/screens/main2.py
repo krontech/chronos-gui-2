@@ -29,14 +29,13 @@ class Main(QWidget):
 	def __init__(self, window):
 		super().__init__()
 		#uic\.loadUi\("(.*?)\.chronos\.ui", self\)
-		
 		if api.apiValues.get('cameraModel')[0:2] == 'TX':
 			uic.loadUi("src/screens/main2.txpro.ui", self)
 		else:
 			uic.loadUi("src/screens/main2.chronos.ui", self)
 		
 		# Panel init.
-		self.setGeometry(0,0, 800,480) #This is not a responsive design.
+		self.setFixedSize(window.app.primaryScreen().virtualSize()) #This is not a responsive design.
 		self.setWindowFlags(QtCore.Qt.FramelessWindowHint)
 		self.setAttribute(QtCore.Qt.WA_TranslucentBackground, True)
 		
