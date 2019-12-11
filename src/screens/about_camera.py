@@ -15,7 +15,10 @@ from widgets.theme import theme
 class AboutCamera(QtWidgets.QDialog):
 	def __init__(self, window):
 		super().__init__()
-		uic.loadUi("src/screens/about_camera.ui", self)
+		if api.apiValues.get('cameraModel')[0:2] == 'TX':
+			uic.loadUi("src/screens/about_camera.txpro.ui", self)
+		else:
+			uic.loadUi("src/screens/about_camera.chronos.ui", self)
 		
 		# Panel init.
 		self.setGeometry(0,0, 800,480)

@@ -58,7 +58,10 @@ def execSetPassword(userName:str, password:str):
 class RemoteAccess(QtWidgets.QWidget):
 	def __init__(self, window):
 		super().__init__()
-		uic.loadUi("src/screens/remote_access.ui", self)
+		if api.apiValues.get('cameraModel')[0:2] == 'TX':
+			uic.loadUi("src/screens/remote_access.txpro.ui", self)
+		else:
+			uic.loadUi("src/screens/remote_access.chronos.ui", self)
 		
 		# Panel init.
 		self.setGeometry(0,0, 800,480)

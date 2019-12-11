@@ -44,7 +44,10 @@ class Power(QtWidgets.QDialog):
 	
 	def __init__(self, window):
 		super().__init__()
-		uic.loadUi("src/screens/power.ui", self)
+		if api.apiValues.get('cameraModel')[0:2] == 'TX':
+			uic.loadUi("src/screens/power.txpro.ui", self)
+		else:
+			uic.loadUi("src/screens/power.chronos.ui", self)
 		
 		# Panel init.
 		self.setGeometry(0,0, 800,480)

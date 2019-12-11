@@ -1,0 +1,442 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Form</class>
+ <widget class="QWidget" name="Form">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>800</width>
+    <height>480</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string notr="true">Chronos Screen</string>
+  </property>
+  <widget class="Backdrop" name="backdrop">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>801</width>
+     <height>481</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="HeaderLabel" name="headerlabel">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>20</y>
+     <width>241</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Storage</string>
+   </property>
+  </widget>
+  <widget class="Button" name="uiDone">
+   <property name="geometry">
+    <rect>
+     <x>630</x>
+     <y>400</y>
+     <width>171</width>
+     <height>81</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Done</string>
+   </property>
+   <property name="clickMarginLeft" stdset="0">
+    <enum>Button::half</enum>
+   </property>
+  </widget>
+  <widget class="QWidget" name="uiNetworkStoragePanel" native="true">
+   <property name="geometry">
+    <rect>
+     <x>350</x>
+     <y>10</y>
+     <width>461</width>
+     <height>411</height>
+    </rect>
+   </property>
+   <widget class="LineEdit" name="uiNetworkStorageUsername">
+    <property name="geometry">
+     <rect>
+      <x>110</x>
+      <y>90</y>
+      <width>291</width>
+      <height>61</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="clickMarginTop" stdset="0">
+     <enum>LineEdit::half</enum>
+    </property>
+    <property name="clickMarginBottom" stdset="0">
+     <enum>LineEdit::half</enum>
+    </property>
+   </widget>
+   <widget class="LineEdit" name="uiNetworkStoragePassoword">
+    <property name="geometry">
+     <rect>
+      <x>110</x>
+      <y>150</y>
+      <width>291</width>
+      <height>61</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="echoMode">
+     <enum>QLineEdit::PasswordEchoOnEdit</enum>
+    </property>
+    <property name="clickMarginTop" stdset="0">
+     <enum>LineEdit::none</enum>
+    </property>
+   </widget>
+   <widget class="Label" name="label_6">
+    <property name="geometry">
+     <rect>
+      <x>30</x>
+      <y>110</y>
+      <width>91</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Username:</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+    </property>
+   </widget>
+   <widget class="Label" name="label_7">
+    <property name="geometry">
+     <rect>
+      <x>30</x>
+      <y>160</y>
+      <width>91</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Password:</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+    </property>
+   </widget>
+   <widget class="LineEdit" name="uiNetworkStorageAddress">
+    <property name="geometry">
+     <rect>
+      <x>110</x>
+      <y>30</y>
+      <width>291</width>
+      <height>61</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="clickMarginBottom" stdset="0">
+     <enum>LineEdit::none</enum>
+    </property>
+   </widget>
+   <widget class="Label" name="label_5">
+    <property name="geometry">
+     <rect>
+      <x>30</x>
+      <y>60</y>
+      <width>91</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Address:</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+    </property>
+   </widget>
+   <widget class="Button" name="uiTestNetworkStorage">
+    <property name="geometry">
+     <rect>
+      <x>110</x>
+      <y>200</y>
+      <width>211</width>
+      <height>71</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Connect</string>
+    </property>
+    <property name="clickMarginTop" stdset="0">
+     <enum>Button::half</enum>
+    </property>
+   </widget>
+   <widget class="Subheader" name="subheader_3">
+    <property name="geometry">
+     <rect>
+      <x>130</x>
+      <y>20</y>
+      <width>241</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Network Storage:</string>
+    </property>
+   </widget>
+   <widget class="FeedbackLabel" name="uiNetworkStorageFeedback">
+    <property name="geometry">
+     <rect>
+      <x>130</x>
+      <y>260</y>
+      <width>261</width>
+      <height>131</height>
+     </rect>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+    </property>
+    <property name="customStyleSheet" stdset="0">
+     <string>background: white; /*Cover up Mounted Devices if needed.*/</string>
+    </property>
+   </widget>
+   <zorder>label_6</zorder>
+   <zorder>label_7</zorder>
+   <zorder>label_5</zorder>
+   <zorder>uiNetworkStorageUsername</zorder>
+   <zorder>uiNetworkStoragePassoword</zorder>
+   <zorder>uiNetworkStorageAddress</zorder>
+   <zorder>subheader_3</zorder>
+   <zorder>uiNetworkStorageFeedback</zorder>
+   <zorder>uiTestNetworkStorage</zorder>
+  </widget>
+  <widget class="Label" name="uiMountedDeviceList">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>280</y>
+     <width>591</width>
+     <height>201</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">
+			font-size: 16px;
+			background: transparent;
+			font-family: Monospace;
+		</string>
+   </property>
+   <property name="text">
+    <string>NAME        MAJ:MIN RM   SIZE RO TYPE MOUNTPOINT TEST
+mmcblk0     179:0    0   7.4G  0 disk
+|-mmcblk0p1 179:1    0  39.2M  0 part /boot
+`-mmcblk0p2 179:2    0   7.4G  0 part /</string>
+   </property>
+   <property name="textFormat">
+    <enum>Qt::PlainText</enum>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+   </property>
+  </widget>
+  <widget class="Button" name="uiUnmountMedia">
+   <property name="geometry">
+    <rect>
+     <x>180</x>
+     <y>140</y>
+     <width>171</width>
+     <height>71</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Unmount</string>
+   </property>
+   <property name="clickMarginLeft" stdset="0">
+    <enum>Button::half</enum>
+   </property>
+   <property name="clickMarginTop" stdset="0">
+    <enum>Button::half</enum>
+   </property>
+  </widget>
+  <widget class="Button" name="uiFormatMedia">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>140</y>
+     <width>171</width>
+     <height>71</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Format</string>
+   </property>
+   <property name="clickMarginRight" stdset="0">
+    <enum>Button::half</enum>
+   </property>
+   <property name="clickMarginTop" stdset="0">
+    <enum>Button::half</enum>
+   </property>
+  </widget>
+  <widget class="Label" name="label_10">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>67</y>
+     <width>361</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Configure and format save media.</string>
+   </property>
+  </widget>
+  <widget class="Comment" name="comment">
+   <property name="geometry">
+    <rect>
+     <x>50</x>
+     <y>370</y>
+     <width>231</width>
+     <height>71</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Make sure this is Monospace font! Designer tends to forget if it's not set in the CSS. Also, it prints QFont::setPointSize errors. 😒</string>
+   </property>
+  </widget>
+  <widget class="Subheader" name="subheader_4">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>250</y>
+     <width>241</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Mounted Devices:</string>
+   </property>
+  </widget>
+  <widget class="FeedbackLabel" name="uiLocalMediaFeedback">
+   <property name="geometry">
+    <rect>
+     <x>30</x>
+     <y>200</y>
+     <width>241</width>
+     <height>51</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>«error message
+will go here»</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+   </property>
+  </widget>
+  <widget class="ComboBox" name="uiDeviceSelect">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>70</y>
+     <width>341</width>
+     <height>71</height>
+    </rect>
+   </property>
+   <property name="clickMarginBottom" stdset="0">
+    <enum>ComboBox::half</enum>
+   </property>
+  </widget>
+  <widget class="Comment" name="comment_2">
+   <property name="geometry">
+    <rect>
+     <x>280</x>
+     <y>410</y>
+     <width>161</width>
+     <height>71</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>This should also probably scroll if there are many entries, but it's not that important.</string>
+   </property>
+  </widget>
+  <zorder>backdrop</zorder>
+  <zorder>headerlabel</zorder>
+  <zorder>uiMountedDeviceList</zorder>
+  <zorder>uiUnmountMedia</zorder>
+  <zorder>uiFormatMedia</zorder>
+  <zorder>label_10</zorder>
+  <zorder>comment</zorder>
+  <zorder>subheader_4</zorder>
+  <zorder>uiLocalMediaFeedback</zorder>
+  <zorder>uiNetworkStoragePanel</zorder>
+  <zorder>uiDone</zorder>
+  <zorder>uiDeviceSelect</zorder>
+  <zorder>comment_2</zorder>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>Backdrop</class>
+   <extends>QLabel</extends>
+   <header>backdrop</header>
+  </customwidget>
+  <customwidget>
+   <class>Button</class>
+   <extends>QPushButton</extends>
+   <header>button</header>
+  </customwidget>
+  <customwidget>
+   <class>ComboBox</class>
+   <extends>QComboBox</extends>
+   <header>combo_box</header>
+  </customwidget>
+  <customwidget>
+   <class>Comment</class>
+   <extends>QLabel</extends>
+   <header>comment</header>
+  </customwidget>
+  <customwidget>
+   <class>FeedbackLabel</class>
+   <extends>QLabel</extends>
+   <header>feedback_label</header>
+  </customwidget>
+  <customwidget>
+   <class>HeaderLabel</class>
+   <extends>QLabel</extends>
+   <header>header_label</header>
+  </customwidget>
+  <customwidget>
+   <class>Label</class>
+   <extends>QLabel</extends>
+   <header>label</header>
+  </customwidget>
+  <customwidget>
+   <class>LineEdit</class>
+   <extends>QLineEdit</extends>
+   <header>line_edit</header>
+  </customwidget>
+  <customwidget>
+   <class>Subheader</class>
+   <extends>QLabel</extends>
+   <header>subheader</header>
+  </customwidget>
+ </customwidgets>
+ <tabstops>
+  <tabstop>uiDone</tabstop>
+  <tabstop>uiFormatMedia</tabstop>
+  <tabstop>uiUnmountMedia</tabstop>
+  <tabstop>uiNetworkStorageAddress</tabstop>
+  <tabstop>uiNetworkStorageUsername</tabstop>
+  <tabstop>uiNetworkStoragePassoword</tabstop>
+  <tabstop>uiTestNetworkStorage</tabstop>
+ </tabstops>
+ <resources/>
+ <connections/>
+</ui>

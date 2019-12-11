@@ -12,7 +12,10 @@ sys.path.append('widgets') #Add the components' path to import, because — sinc
 class AboutCamera(QtWidgets.QDialog):
 	def __init__(self):
 		super().__init__()
-		uic.loadUi("screens/about_camera.ui", self)
+		if api.apiValues.get('cameraModel')[0:2] == 'TX':
+			uic.loadUi("screens/about_camera.txpro.ui", self)
+		else:
+			uic.loadUi("screens/about_camera.chronos.ui", self)
 		
 		# Panel init.
 		self.setGeometry(0,0, 800,480)

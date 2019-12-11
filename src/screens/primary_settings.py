@@ -15,7 +15,10 @@ import api
 class PrimarySettings(QtWidgets.QDialog):
 	def __init__(self, window):
 		super().__init__()
-		uic.loadUi("src/screens/primary_settings.ui", self)
+		if api.apiValues.get('cameraModel')[0:2] == 'TX':
+			uic.loadUi("src/screens/primary_settings.txpro.ui", self)
+		else:
+			uic.loadUi("src/screens/primary_settings.chronos.ui", self)
 		
 		# Panel init.
 		self.setGeometry(0,0, 800,480)

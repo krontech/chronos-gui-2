@@ -16,7 +16,10 @@ class ServiceScreenLocked(QtWidgets.QDialog):
 	
 	def __init__(self, window):
 		super().__init__()
-		uic.loadUi("src/screens/service_screen.locked.ui", self)
+		if api.apiValues.get('cameraModel')[0:2] == 'TX':
+			uic.loadUi("src/screens/service_screen.locked.txpro.ui", self)
+		else:
+			uic.loadUi("src/screens/service_screen.locked.chronos.ui", self)
 		
 		# Panel init.
 		self.setGeometry(0,0, 800,480)
@@ -58,7 +61,10 @@ class ServiceScreenLocked(QtWidgets.QDialog):
 class ServiceScreenUnlocked(QtWidgets.QDialog):
 	def __init__(self, window):
 		super().__init__()
-		uic.loadUi("src/screens/service_screen.unlocked.ui", self)
+		if api.apiValues.get('cameraModel')[0:2] == 'TX':
+			uic.loadUi("src/screens/service_screen.unlocked.txpro.ui", self)
+		else:
+			uic.loadUi("src/screens/service_screen.unlocked.chronos.ui", self)
 		
 		# Panel init.
 		self.setGeometry(0,0, 800,480)

@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Form</class>
+ <widget class="QWidget" name="Form">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>800</width>
+    <height>480</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Battery &amp; Power</string>
+  </property>
+  <widget class="Backdrop" name="backdrop">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>801</width>
+     <height>481</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="Backdrop" name="backdrop_2">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>801</width>
+     <height>481</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="HeaderLabel" name="headerlabel">
+   <property name="geometry">
+    <rect>
+     <x>15</x>
+     <y>11</y>
+     <width>221</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Battery &amp; Power</string>
+   </property>
+  </widget>
+  <widget class="Label" name="uiChargeLabel">
+   <property name="geometry">
+    <rect>
+     <x>40</x>
+     <y>63</y>
+     <width>281</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Battery Charge: {:2.0f}%</string>
+   </property>
+  </widget>
+  <widget class="Label" name="uiVoltageLabel">
+   <property name="geometry">
+    <rect>
+     <x>40</x>
+     <y>100</y>
+     <width>281</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Battery Voltage: {:0.2f}V</string>
+   </property>
+  </widget>
+  <widget class="Label" name="label_3">
+   <property name="geometry">
+    <rect>
+     <x>353</x>
+     <y>19</y>
+     <width>371</width>
+     <height>30</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Battery Charge and Voltage Over Time</string>
+   </property>
+  </widget>
+  <widget class="HeaderLabel" name="headerlabel_2">
+   <property name="geometry">
+    <rect>
+     <x>22</x>
+     <y>260</y>
+     <width>141</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Options</string>
+   </property>
+  </widget>
+  <widget class="CheckBox" name="uiDimScreen">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>280</y>
+     <width>301</width>
+     <height>71</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Dim screen</string>
+   </property>
+   <property name="clickMarginBottom" stdset="0">
+    <enum>CheckBox::half</enum>
+   </property>
+   <property name="linkedValueName" stdset="0">
+    <string>backlightEnabled</string>
+   </property>
+  </widget>
+  <widget class="CheckBox" name="uiSafelyPowerDown">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>350</y>
+     <width>431</width>
+     <height>61</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Save and power down when power disconnected</string>
+   </property>
+   <property name="clickMarginTop" stdset="0">
+    <enum>CheckBox::half</enum>
+   </property>
+   <property name="clickMarginBottom" stdset="0">
+    <enum>CheckBox::half</enum>
+   </property>
+   <property name="linkedValueName" stdset="0">
+    <string>powerOffWhenMainsLost</string>
+   </property>
+  </widget>
+  <widget class="CheckBox" name="uiStartWhenPowered">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>410</y>
+     <width>391</width>
+     <height>71</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Turn camera on when power connected</string>
+   </property>
+   <property name="clickMarginTop" stdset="0">
+    <enum>CheckBox::half</enum>
+   </property>
+   <property name="linkedValueName" stdset="0">
+    <string>powerOnWhenMainsConnected</string>
+   </property>
+  </widget>
+  <widget class="Button" name="uiDone">
+   <property name="geometry">
+    <rect>
+     <x>620</x>
+     <y>400</y>
+     <width>181</width>
+     <height>81</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Done</string>
+   </property>
+  </widget>
+  <widget class="QWidget" name="uiChart" native="true">
+   <property name="geometry">
+    <rect>
+     <x>330</x>
+     <y>30</y>
+     <width>471</width>
+     <height>241</height>
+    </rect>
+   </property>
+  </widget>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>Backdrop</class>
+   <extends>QLabel</extends>
+   <header>backdrop</header>
+  </customwidget>
+  <customwidget>
+   <class>Button</class>
+   <extends>QPushButton</extends>
+   <header>button</header>
+  </customwidget>
+  <customwidget>
+   <class>CheckBox</class>
+   <extends>QCheckBox</extends>
+   <header>check_box</header>
+  </customwidget>
+  <customwidget>
+   <class>HeaderLabel</class>
+   <extends>QLabel</extends>
+   <header>header_label</header>
+  </customwidget>
+  <customwidget>
+   <class>Label</class>
+   <extends>QLabel</extends>
+   <header>label</header>
+  </customwidget>
+ </customwidgets>
+ <tabstops>
+  <tabstop>uiDone</tabstop>
+  <tabstop>uiDimScreen</tabstop>
+  <tabstop>uiSafelyPowerDown</tabstop>
+  <tabstop>uiStartWhenPowered</tabstop>
+ </tabstops>
+ <resources/>
+ <connections/>
+</ui>

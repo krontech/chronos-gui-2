@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Form</class>
+ <widget class="QWidget" name="Form">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>800</width>
+    <height>480</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string notr="true">Service Screen</string>
+  </property>
+  <widget class="Backdrop" name="backdrop">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>801</width>
+     <height>481</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="HeaderLabel" name="headerlabel">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>10</y>
+     <width>241</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Service Screen</string>
+   </property>
+  </widget>
+  <widget class="Button" name="uiDone">
+   <property name="geometry">
+    <rect>
+     <x>620</x>
+     <y>400</y>
+     <width>181</width>
+     <height>81</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Done</string>
+   </property>
+  </widget>
+  <widget class="CheckBox" name="uiShowDebugControls">
+   <property name="geometry">
+    <rect>
+     <x>370</x>
+     <y>80</y>
+     <width>251</width>
+     <height>81</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Show Debug Controls</string>
+   </property>
+  </widget>
+  <widget class="LineEdit" name="uiSerialNumber">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>110</y>
+     <width>171</width>
+     <height>81</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+  </widget>
+  <widget class="Label" name="label">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>100</y>
+     <width>221</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Serial Number</string>
+   </property>
+  </widget>
+  <widget class="Subheader" name="subheader">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>70</y>
+     <width>241</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Factory Settings</string>
+   </property>
+  </widget>
+  <widget class="Subheader" name="subheader_2">
+   <property name="geometry">
+    <rect>
+     <x>390</x>
+     <y>70</y>
+     <width>241</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Debugging Options</string>
+   </property>
+  </widget>
+  <widget class="Button" name="uiCal">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>200</y>
+     <width>301</width>
+     <height>81</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Run Factory Calibration</string>
+   </property>
+   <property name="customStyleSheet" stdset="0">
+    <string>align: left;</string>
+   </property>
+  </widget>
+  <widget class="Label" name="label_2">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>190</y>
+     <width>331</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>White Balance and Black Cal</string>
+   </property>
+  </widget>
+  <widget class="Label" name="uiCalibratedOn">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>280</y>
+     <width>311</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Calibrated on %Y-%m-%d %I:%M%p</string>
+   </property>
+  </widget>
+  <zorder>backdrop</zorder>
+  <zorder>headerlabel</zorder>
+  <zorder>uiDone</zorder>
+  <zorder>uiShowDebugControls</zorder>
+  <zorder>label</zorder>
+  <zorder>subheader</zorder>
+  <zorder>subheader_2</zorder>
+  <zorder>uiCal</zorder>
+  <zorder>uiSerialNumber</zorder>
+  <zorder>label_2</zorder>
+  <zorder>uiCalibratedOn</zorder>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>Backdrop</class>
+   <extends>QLabel</extends>
+   <header>backdrop</header>
+  </customwidget>
+  <customwidget>
+   <class>Button</class>
+   <extends>QPushButton</extends>
+   <header>button</header>
+  </customwidget>
+  <customwidget>
+   <class>CheckBox</class>
+   <extends>QCheckBox</extends>
+   <header>check_box</header>
+  </customwidget>
+  <customwidget>
+   <class>HeaderLabel</class>
+   <extends>QLabel</extends>
+   <header>header_label</header>
+  </customwidget>
+  <customwidget>
+   <class>Label</class>
+   <extends>QLabel</extends>
+   <header>label</header>
+  </customwidget>
+  <customwidget>
+   <class>LineEdit</class>
+   <extends>QLineEdit</extends>
+   <header>line_edit</header>
+  </customwidget>
+  <customwidget>
+   <class>Subheader</class>
+   <extends>QLabel</extends>
+   <header>subheader</header>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>

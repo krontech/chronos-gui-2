@@ -22,7 +22,10 @@ class RecordingSettings(QtWidgets.QDialog):
 	
 	def __init__(self, window):
 		super().__init__()
-		uic.loadUi("src/screens/recording_settings.ui", self)
+		if api.apiValues.get('cameraModel')[0:2] == 'TX':
+			uic.loadUi("src/screens/recording_settings.txpro.ui", self)
+		else:
+			uic.loadUi("src/screens/recording_settings.chronos.ui", self)
 		self.window_ = window
 		
 		# Panel init.

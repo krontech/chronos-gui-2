@@ -1,0 +1,816 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Form</class>
+ <widget class="QWidget" name="Form">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>799</width>
+    <height>480</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Triggers</string>
+  </property>
+  <widget class="HeaderLabel" name="headerlabel">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>10</y>
+     <width>271</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Triggers/IO</string>
+   </property>
+  </widget>
+  <widget class="Backdrop" name="backdrop">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>801</width>
+     <height>481</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="Label" name="uiUnsavedChangesWarning">
+   <property name="geometry">
+    <rect>
+     <x>420</x>
+     <y>397</y>
+     <width>361</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>* Press Save to apply changes.</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+   </property>
+  </widget>
+  <widget class="Button" name="uiSave">
+   <property name="geometry">
+    <rect>
+     <x>630</x>
+     <y>400</y>
+     <width>171</width>
+     <height>81</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Save</string>
+   </property>
+   <property name="clickMarginLeft" stdset="0">
+    <enum>Button::half</enum>
+   </property>
+  </widget>
+  <widget class="Button" name="uiDone">
+   <property name="geometry">
+    <rect>
+     <x>630</x>
+     <y>400</y>
+     <width>171</width>
+     <height>81</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Done</string>
+   </property>
+   <property name="clickMarginLeft" stdset="0">
+    <enum>Button::half</enum>
+   </property>
+  </widget>
+  <widget class="Button" name="uiCancel">
+   <property name="geometry">
+    <rect>
+     <x>460</x>
+     <y>400</y>
+     <width>171</width>
+     <height>81</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Cancel</string>
+   </property>
+   <property name="clickMarginRight" stdset="0">
+    <enum>Button::half</enum>
+   </property>
+  </widget>
+  <widget class="Subheader" name="subheader">
+   <property name="geometry">
+    <rect>
+     <x>30</x>
+     <y>50</y>
+     <width>321</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Action</string>
+   </property>
+  </widget>
+  <widget class="ComboBox" name="uiTriggerList">
+   <property name="geometry">
+    <rect>
+     <x>400</x>
+     <y>30</y>
+     <width>361</width>
+     <height>71</height>
+    </rect>
+   </property>
+   <property name="currentIndex">
+    <number>-1</number>
+   </property>
+   <property name="clickMarginBottom" stdset="0">
+    <enum>ComboBox::half</enum>
+   </property>
+  </widget>
+  <widget class="Subheader" name="subheader_2">
+   <property name="geometry">
+    <rect>
+     <x>410</x>
+     <y>20</y>
+     <width>371</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Trigger for Action</string>
+   </property>
+  </widget>
+  <widget class="CheckBox" name="uiInvertCondition">
+   <property name="geometry">
+    <rect>
+     <x>400</x>
+     <y>100</y>
+     <width>191</width>
+     <height>71</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Invert Condition</string>
+   </property>
+   <property name="clickMarginTop" stdset="0">
+    <enum>CheckBox::half</enum>
+   </property>
+  </widget>
+  <widget class="CheckBox" name="uiDebounce">
+   <property name="geometry">
+    <rect>
+     <x>590</x>
+     <y>100</y>
+     <width>171</width>
+     <height>71</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Debounce</string>
+   </property>
+   <property name="clickMarginTop" stdset="0">
+    <enum>CheckBox::half</enum>
+   </property>
+  </widget>
+  <widget class="ScrollList" name="uiActionList">
+   <property name="geometry">
+    <rect>
+     <x>40</x>
+     <y>80</y>
+     <width>321</width>
+     <height>231</height>
+    </rect>
+   </property>
+   <property name="editTriggers">
+    <set>QAbstractItemView::NoEditTriggers</set>
+   </property>
+  </widget>
+  <widget class="QWidget" name="uiPreview" native="true">
+   <property name="geometry">
+    <rect>
+     <x>40</x>
+     <y>370</y>
+     <width>321</width>
+     <height>111</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="Subheader" name="uiPreviewSubheader">
+   <property name="geometry">
+    <rect>
+     <x>30</x>
+     <y>340</y>
+     <width>321</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Preview</string>
+   </property>
+  </widget>
+  <widget class="QStackedWidget" name="uiIndividualTriggerConfigurationPanes">
+   <property name="geometry">
+    <rect>
+     <x>400</x>
+     <y>160</y>
+     <width>401</width>
+     <height>241</height>
+    </rect>
+   </property>
+   <property name="currentIndex">
+    <number>5</number>
+   </property>
+   <widget class="QWidget" name="uiNonePane"/>
+   <widget class="QWidget" name="uiVirtualPane"/>
+   <widget class="QWidget" name="uiIo1Pane">
+    <widget class="DecimalSpinBox" name="uiIo1ThresholdVoltage">
+     <property name="geometry">
+      <rect>
+       <x>140</x>
+       <y>20</y>
+       <width>221</width>
+       <height>81</height>
+      </rect>
+     </property>
+     <property name="suffix">
+      <string> Volts</string>
+     </property>
+     <property name="maximum">
+      <double>6.600000000000000</double>
+     </property>
+     <property name="singleStep">
+      <double>0.100000000000000</double>
+     </property>
+    </widget>
+    <widget class="CheckBox" name="uiIo120MAPullup">
+     <property name="geometry">
+      <rect>
+       <x>140</x>
+       <y>110</y>
+       <width>151</width>
+       <height>81</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>20mA at
+5 Volts</string>
+     </property>
+    </widget>
+    <widget class="CheckBox" name="uiIo11MAPullup">
+     <property name="geometry">
+      <rect>
+       <x>0</x>
+       <y>110</y>
+       <width>141</width>
+       <height>81</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>1mA at
+5 Volts</string>
+     </property>
+    </widget>
+    <widget class="Label" name="label_2">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>40</y>
+       <width>171</width>
+       <height>41</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Input Threshold</string>
+     </property>
+    </widget>
+    <widget class="Label" name="label_4">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>100</y>
+       <width>181</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Pullups</string>
+     </property>
+    </widget>
+    <widget class="Subheader" name="subheader_8">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>10</y>
+       <width>241</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Trigger Options</string>
+     </property>
+    </widget>
+    <zorder>label_4</zorder>
+    <zorder>label_2</zorder>
+    <zorder>uiIo1ThresholdVoltage</zorder>
+    <zorder>uiIo11MAPullup</zorder>
+    <zorder>uiIo120MAPullup</zorder>
+    <zorder>subheader_8</zorder>
+   </widget>
+   <widget class="QWidget" name="uiIo2Pane">
+    <widget class="DecimalSpinBox" name="uiIo2ThresholdVoltage">
+     <property name="geometry">
+      <rect>
+       <x>140</x>
+       <y>20</y>
+       <width>221</width>
+       <height>81</height>
+      </rect>
+     </property>
+     <property name="suffix">
+      <string> Volts</string>
+     </property>
+     <property name="maximum">
+      <double>6.600000000000000</double>
+     </property>
+     <property name="singleStep">
+      <double>0.100000000000000</double>
+     </property>
+    </widget>
+    <widget class="CheckBox" name="uiIo220MAPullup">
+     <property name="geometry">
+      <rect>
+       <x>0</x>
+       <y>110</y>
+       <width>211</width>
+       <height>81</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>20mA
+at 5 Volts</string>
+     </property>
+    </widget>
+    <widget class="Label" name="label_5">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>100</y>
+       <width>181</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Pullup</string>
+     </property>
+    </widget>
+    <widget class="Label" name="label_6">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>40</y>
+       <width>171</width>
+       <height>41</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Input Threshold</string>
+     </property>
+    </widget>
+    <widget class="Subheader" name="subheader_7">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>10</y>
+       <width>241</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Trigger Options</string>
+     </property>
+    </widget>
+    <zorder>label_5</zorder>
+    <zorder>label_6</zorder>
+    <zorder>uiIo2ThresholdVoltage</zorder>
+    <zorder>uiIo220MAPullup</zorder>
+    <zorder>subheader_7</zorder>
+   </widget>
+   <widget class="QWidget" name="uiIo3Pane">
+    <widget class="Label" name="label_7">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>0</y>
+       <width>321</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Note: Input threshold is 5 volts.</string>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QWidget" name="uiAudioPane">
+    <widget class="Label" name="label">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>50</y>
+       <width>81</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Volume</string>
+     </property>
+    </widget>
+    <widget class="Label" name="label_9">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>110</y>
+       <width>80</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Duration</string>
+     </property>
+    </widget>
+    <widget class="QWidget" name="uiAudioGraph" native="true">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>160</y>
+       <width>321</width>
+       <height>71</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">border: 1px solid black</string>
+     </property>
+    </widget>
+    <widget class="Label" name="uiAudioGraphLabel">
+     <property name="geometry">
+      <rect>
+       <x>21</x>
+       <y>161</y>
+       <width>151</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">
+			font-size: 16px;
+			background: rgba(255,255,255,127);</string>
+     </property>
+     <property name="text">
+      <string>Audio Over Time</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+    <widget class="Label" name="label_11">
+     <property name="geometry">
+      <rect>
+       <x>200</x>
+       <y>50</y>
+       <width>41</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>or</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+    <widget class="DecimalSpinBox" name="uiAudioTriggerDB">
+     <property name="geometry">
+      <rect>
+       <x>80</x>
+       <y>20</y>
+       <width>141</width>
+       <height>71</height>
+      </rect>
+     </property>
+     <property name="suffix">
+      <string>dB</string>
+     </property>
+     <property name="maximum">
+      <double>45.000000000000000</double>
+     </property>
+     <property name="singleStep">
+      <double>0.100000000000000</double>
+     </property>
+     <property name="clickMarginBottom" stdset="0">
+      <enum>DecimalSpinBox::half</enum>
+     </property>
+    </widget>
+    <widget class="SpinBox" name="uiAudioTriggerPercent">
+     <property name="geometry">
+      <rect>
+       <x>220</x>
+       <y>20</y>
+       <width>141</width>
+       <height>71</height>
+      </rect>
+     </property>
+     <property name="suffix">
+      <string>%</string>
+     </property>
+     <property name="maximum">
+      <number>100</number>
+     </property>
+     <property name="clickMarginBottom" stdset="0">
+      <enum>SpinBox::half</enum>
+     </property>
+    </widget>
+    <widget class="Subheader" name="subheader_4">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>10</y>
+       <width>241</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Trigger Options</string>
+     </property>
+    </widget>
+    <widget class="DecimalSpinBox" name="uiAudioTriggerDuration">
+     <property name="geometry">
+      <rect>
+       <x>80</x>
+       <y>90</y>
+       <width>141</width>
+       <height>71</height>
+      </rect>
+     </property>
+     <property name="maximum">
+      <double>999999999.000000000000000</double>
+     </property>
+     <property name="singleStep">
+      <double>0.100000000000000</double>
+     </property>
+     <property name="clickMarginTop" stdset="0">
+      <enum>DecimalSpinBox::half</enum>
+     </property>
+     <property name="units" stdset="0">
+      <string>s</string>
+     </property>
+    </widget>
+    <zorder>label</zorder>
+    <zorder>label_9</zorder>
+    <zorder>uiAudioGraph</zorder>
+    <zorder>uiAudioGraphLabel</zorder>
+    <zorder>uiAudioTriggerDB</zorder>
+    <zorder>label_11</zorder>
+    <zorder>uiAudioTriggerPercent</zorder>
+    <zorder>uiAudioTriggerDuration</zorder>
+    <zorder>subheader_4</zorder>
+   </widget>
+   <widget class="QWidget" name="uiMotionPane">
+    <widget class="QWidget" name="uiMotionGraph" native="true">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>39</y>
+       <width>321</width>
+       <height>121</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">border: 1px solid black</string>
+     </property>
+    </widget>
+    <widget class="Button" name="uiConfigureMotionTriggering">
+     <property name="geometry">
+      <rect>
+       <x>0</x>
+       <y>149</y>
+       <width>361</width>
+       <height>81</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Configure Motion Triggering</string>
+     </property>
+    </widget>
+    <widget class="Label" name="uiMotionGraphLabel">
+     <property name="geometry">
+      <rect>
+       <x>21</x>
+       <y>40</y>
+       <width>151</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">
+			font-size: 16px;
+			background: rgba(255,255,255,127);</string>
+     </property>
+     <property name="text">
+      <string>Motion Over Time</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+    <widget class="Subheader" name="subheader_5">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>10</y>
+       <width>241</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Trigger Options</string>
+     </property>
+    </widget>
+    <zorder>uiMotionGraph</zorder>
+    <zorder>uiMotionGraphLabel</zorder>
+    <zorder>uiConfigureMotionTriggering</zorder>
+    <zorder>subheader_5</zorder>
+   </widget>
+   <widget class="QWidget" name="uiDelayPane">
+    <widget class="DecimalSpinBox" name="uiDelayAmount">
+     <property name="geometry">
+      <rect>
+       <x>50</x>
+       <y>20</y>
+       <width>151</width>
+       <height>81</height>
+      </rect>
+     </property>
+     <property name="decimals">
+      <number>2</number>
+     </property>
+     <property name="maximum">
+      <double>99999999.000000000000000</double>
+     </property>
+     <property name="singleStep">
+      <double>0.010000000000000</double>
+     </property>
+     <property name="units" stdset="0">
+      <string>s</string>
+     </property>
+    </widget>
+    <widget class="Label" name="label_8">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>40</y>
+       <width>51</width>
+       <height>41</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Delay</string>
+     </property>
+    </widget>
+    <widget class="Subheader" name="subheader_6">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>10</y>
+       <width>241</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Trigger Options</string>
+     </property>
+    </widget>
+    <zorder>label_8</zorder>
+    <zorder>uiDelayAmount</zorder>
+    <zorder>subheader_6</zorder>
+   </widget>
+   <widget class="QWidget" name="uiCombPane"/>
+   <widget class="QWidget" name="uiTogglePane"/>
+   <widget class="QWidget" name="uiShutterPane"/>
+   <widget class="QWidget" name="uiRecordingPane"/>
+   <widget class="QWidget" name="uiDispFramePane"/>
+   <widget class="QWidget" name="uiStartRecPane"/>
+   <widget class="QWidget" name="uiEndRecPane"/>
+   <widget class="QWidget" name="uiNextSegPane"/>
+   <widget class="QWidget" name="uiTimingIoPane"/>
+   <widget class="QWidget" name="uiAlwaysHighPane"/>
+  </widget>
+  <widget class="QPushButton" name="uiDebug">
+   <property name="geometry">
+    <rect>
+     <x>700</x>
+     <y>10</y>
+     <width>91</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="focusPolicy">
+    <enum>Qt::NoFocus</enum>
+   </property>
+   <property name="text">
+    <string>Debug</string>
+   </property>
+  </widget>
+  <zorder>backdrop</zorder>
+  <zorder>headerlabel</zorder>
+  <zorder>uiUnsavedChangesWarning</zorder>
+  <zorder>uiSave</zorder>
+  <zorder>uiDone</zorder>
+  <zorder>subheader</zorder>
+  <zorder>subheader_2</zorder>
+  <zorder>uiTriggerList</zorder>
+  <zorder>uiInvertCondition</zorder>
+  <zorder>uiDebounce</zorder>
+  <zorder>uiActionList</zorder>
+  <zorder>uiPreviewSubheader</zorder>
+  <zorder>uiIndividualTriggerConfigurationPanes</zorder>
+  <zorder>uiPreview</zorder>
+  <zorder>uiCancel</zorder>
+  <zorder>uiDebug</zorder>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>Backdrop</class>
+   <extends>QLabel</extends>
+   <header>backdrop</header>
+  </customwidget>
+  <customwidget>
+   <class>Button</class>
+   <extends>QPushButton</extends>
+   <header>button</header>
+  </customwidget>
+  <customwidget>
+   <class>CheckBox</class>
+   <extends>QCheckBox</extends>
+   <header>check_box</header>
+  </customwidget>
+  <customwidget>
+   <class>ComboBox</class>
+   <extends>QComboBox</extends>
+   <header>combo_box</header>
+  </customwidget>
+  <customwidget>
+   <class>DecimalSpinBox</class>
+   <extends>QDoubleSpinBox</extends>
+   <header>decimal_spin_box</header>
+  </customwidget>
+  <customwidget>
+   <class>HeaderLabel</class>
+   <extends>QLabel</extends>
+   <header>header_label</header>
+  </customwidget>
+  <customwidget>
+   <class>Label</class>
+   <extends>QLabel</extends>
+   <header>label</header>
+  </customwidget>
+  <customwidget>
+   <class>ScrollList</class>
+   <extends>QListView</extends>
+   <header>scroll_list</header>
+  </customwidget>
+  <customwidget>
+   <class>SpinBox</class>
+   <extends>QSpinBox</extends>
+   <header>spin_box</header>
+  </customwidget>
+  <customwidget>
+   <class>Subheader</class>
+   <extends>QLabel</extends>
+   <header>subheader</header>
+  </customwidget>
+ </customwidgets>
+ <tabstops>
+  <tabstop>uiDone</tabstop>
+  <tabstop>uiSave</tabstop>
+  <tabstop>uiActionList</tabstop>
+  <tabstop>uiTriggerList</tabstop>
+  <tabstop>uiInvertCondition</tabstop>
+  <tabstop>uiDebounce</tabstop>
+  <tabstop>uiIo1ThresholdVoltage</tabstop>
+  <tabstop>uiIo11MAPullup</tabstop>
+  <tabstop>uiIo120MAPullup</tabstop>
+  <tabstop>uiIo2ThresholdVoltage</tabstop>
+  <tabstop>uiIo220MAPullup</tabstop>
+  <tabstop>uiAudioTriggerDB</tabstop>
+  <tabstop>uiAudioTriggerPercent</tabstop>
+  <tabstop>uiAudioTriggerDuration</tabstop>
+  <tabstop>uiConfigureMotionTriggering</tabstop>
+  <tabstop>uiDelayAmount</tabstop>
+  <tabstop>uiCancel</tabstop>
+ </tabstops>
+ <resources>
+  <include location="../../assets.qrc"/>
+ </resources>
+ <connections/>
+</ui>

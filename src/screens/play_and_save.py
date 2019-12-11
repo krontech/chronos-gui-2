@@ -42,7 +42,10 @@ class PlayAndSave(QtWidgets.QDialog):
 	
 	def __init__(self, window):
 		super().__init__()
-		uic.loadUi("src/screens/play_and_save.ui", self)
+		if api.apiValues.get('cameraModel')[0:2] == 'TX':
+			uic.loadUi("src/screens/play_and_save.txpro.ui", self)
+		else:
+			uic.loadUi("src/screens/play_and_save.chronos.ui", self)
 		
 		self._window = window
 		
