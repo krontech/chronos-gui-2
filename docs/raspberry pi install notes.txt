@@ -10,3 +10,4 @@ EOQ
 EOS
 
 Remove env vars from .bashrc so the ui starts in a window.
+Add export DISPLAY=":0.0"
