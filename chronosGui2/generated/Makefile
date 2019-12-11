@@ -14,9 +14,23 @@ PYGENERATED += assets_rc.py
 PYGENERATED += __init__.py
 
 # Special rule to build the module __init__ file
+# FIXME: it doesn't really depend on the files, only their names.
 __init__.py: $(notdir $(UISRC:.ui=.py))
 	@echo "Generating $@"
-	@echo $(^F:.py=) | xargs -n1 printf "from chronosGui2.generated.%s import *\n" > $@
+	@echo "from chronosGui2.generated.version import __version__" > $@
+	@echo $(^F:.py=) | xargs -n1 printf "from chronosGui2.generated.%s import *\n" >> $@
+
+# Special rule to generate the module version dynamically, but
+# only if we happen to be in a git working tree. Otherwise, we
+# should leave the version file alone.
+ifeq ($(shell git rev-parse --is-inside-work-tree 2>/dev/null),true)
+PYGENERATED += version.py
+
+.PHONY: version.py
+version.py:
+	@echo "Generating $@"
+	@echo __version__ = \"$(shell git describe --tags --always)\" > $@
+endif
 
 # Helper function to generate the inner XML for a QResource file.
 # Usage: $(call qrc_list_files, <dirname>, <filepattern>)
