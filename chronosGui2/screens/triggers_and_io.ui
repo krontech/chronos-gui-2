@@ -810,7 +810,7 @@ at 5 Volts</string>
   <tabstop>uiCancel</tabstop>
  </tabstops>
  <resources>
-  <include location="../../assets.qrc"/>
+  <include location="../assets.qrc"/>
  </resources>
  <connections/>
 </ui>

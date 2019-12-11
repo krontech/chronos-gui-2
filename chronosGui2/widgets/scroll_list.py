@@ -110,7 +110,7 @@ class ScrollList(QListView, FocusablePlugin):
 				padding-left: -1px;
 			}}
 			ScrollList::down-arrow {{
-				image: url(assets/images/{self.theme.wedgeDownEnabled});
+				image: url(:/assets/images/{self.theme.wedgeDownEnabled});
 			}}
 		""" + self.originalStyleSheet())
 	

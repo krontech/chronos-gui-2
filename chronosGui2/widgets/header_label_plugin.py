@@ -31,7 +31,7 @@ class HeaderLabelPlugin(QPyDesignerCustomWidgetPlugin):
 		return "Chronos"
 
 	def icon(self):
-		return QIcon(QPixmap("../../assets/qt_creator/header_label.svg"))
+		return QIcon(QPixmap(":/assets/qt_creator/header_label.svg"))
 
 	def toolTip(self):
 		return """A section header in the Chronos style.

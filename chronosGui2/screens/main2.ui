@@ -276,10 +276,10 @@ Sensor</string>
 				}
 				
 				CheckBox::indicator:checked {
-					image: url(../../assets/images/checkbox-checked-white.svg.png);
+					image: url(:/assets/images/checkbox-checked-white.svg.png);
 				}
 				CheckBox::indicator:unchecked {
-					image: url(../../assets/images/checkbox-unchecked-white.svg.png);
+					image: url(:/assets/images/checkbox-unchecked-white.svg.png);
 				}
 				
 			CheckBox {  text-align: center; }</string>
@@ -884,7 +884,7 @@ Peaking</string>
 		</string>
    </property>
    <property name="pixmap">
-    <pixmap>../../assets/images/battery-light-charging.svg</pixmap>
+    <pixmap>:/assets/images/battery-light-charging.svg</pixmap>
    </property>
   </widget>
   <widget class="QWidget" name="uiExposureMenu" native="true">

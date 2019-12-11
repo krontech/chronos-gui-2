@@ -31,7 +31,7 @@ class InteractiveVideoAreaPlugin(QPyDesignerCustomWidgetPlugin):
 		return "Chronos"
 
 	def icon(self):
-		return QIcon(QPixmap("../../assets/qt_creator/interactive_video_area.svg"))
+		return QIcon(QPixmap(":/assets/qt_creator/interactive_video_area.svg"))
 
 	def toolTip(self):
 		return """A white panel, to cover the video presentation layer when needed.

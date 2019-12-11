@@ -103,11 +103,11 @@ class Slider(ShowPaintRectsPlugin, FocusablePlugin, QSlider): #Must be in this o
 				padding: -1px;
 			}}
 			Slider::handle:vertical {{
-				image: url({"../../" if self.showHitRects else ""}assets/images/{self.theme.slider.verticalHandle}); /* File name fields: width x height + vertical padding. */
+				image: url(:/assets/images/{self.theme.slider.verticalHandle}); /* File name fields: width x height + vertical padding. */
 				margin: -20px -200px; /* y: -slider groove margin. x: touch padding outsidet the groove. Clipped by Slider width. Should be enough for most customizations if we move stuff around. */
 			}}
 			Slider::handle:horizontal {{
-				image: url({"../../" if self.showHitRects else ""}assets/images/{self.theme.slider.horizontalHandle}); /* File name fields: width x height + horizontal padding. */
+				image: url(:/assets/images/{self.theme.slider.horizontalHandle}); /* File name fields: width x height + horizontal padding. */
 				margin: -200px -20px; /* y: -slider groove margin. x: touch padding outsidet the groove. Clipped by Slider width. Should be enough for most customizations if we move stuff around. */
 			}}
 			

@@ -94,7 +94,7 @@ class ComboBox(QComboBox, TouchMarginPlugin, FocusablePlugin):
 					/*padding-left: -1px;*/
 				}}
 				ComboBox::down-arrow {{
-					image: url(../../assets/images/{self.theme.wedgeDownEnabled});
+					image: url(:/assets/images/{self.theme.wedgeDownEnabled});
 				}}
 			""" + self.originalStyleSheet())
 		else:
@@ -157,7 +157,7 @@ class ComboBox(QComboBox, TouchMarginPlugin, FocusablePlugin):
 					/*padding-left: -1px;*/
 				}}
 				ComboBox::down-arrow {{
-					image: url(assets/images/{self.theme.wedgeDownEnabled});
+					image: url(:/assets/images/{self.theme.wedgeDownEnabled});
 				}}
 			""" + self.originalStyleSheet())
 	

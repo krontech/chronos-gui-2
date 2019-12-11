@@ -32,7 +32,7 @@ class ComboBoxPlugin(QPyDesignerCustomWidgetPlugin, FocusablePlugin):
 		return "Chronos"
 
 	def icon(self):
-		return QIcon(QPixmap("../../assets/qt_creator/combo_box.svg"))
+		return QIcon(QPixmap(":/assets/qt_creator/combo_box.svg"))
 
 	def toolTip(self):
 		return """A drop-down with adjustable margins.

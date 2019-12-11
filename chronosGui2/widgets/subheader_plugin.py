@@ -31,7 +31,7 @@ class SubheaderPlugin(QPyDesignerCustomWidgetPlugin):
 		return "Chronos"
 
 	def icon(self):
-		return QIcon(QPixmap("../../assets/qt_creator/subheader.svg"))
+		return QIcon(QPixmap(":/assets/qt_creator/subheader.svg"))
 
 	def toolTip(self):
 		return """A subheader - above label but below header

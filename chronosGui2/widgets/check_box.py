@@ -72,10 +72,10 @@ class CheckBox(QCheckBox, TouchMarginPlugin, DirectAPILinkPlugin, FocusablePlugi
 				}}
 				
 				CheckBox::indicator:checked {{
-					image: url(../../assets/images/{self.theme.checkbox.checked});
+					image: url(:/assets/images/{self.theme.checkbox.checked});
 				}}
 				CheckBox::indicator:unchecked {{
-					image: url(../../assets/images/{self.theme.checkbox.unchecked});
+					image: url(:/assets/images/{self.theme.checkbox.unchecked});
 				}}
 				
 			""" + self.originalStyleSheet())
@@ -95,9 +95,9 @@ class CheckBox(QCheckBox, TouchMarginPlugin, DirectAPILinkPlugin, FocusablePlugi
 				}}
 				
 				CheckBox::indicator:checked {{
-					image: url(assets/images/{self.theme.checkbox.checked});
+					image: url(:/assets/images/{self.theme.checkbox.checked});
 				}}
 				CheckBox::indicator:unchecked {{
-					image: url(assets/images/{self.theme.checkbox.unchecked});
+					image: url(:/assets/images/{self.theme.checkbox.unchecked});
 				}}
 			""" + self.originalStyleSheet())

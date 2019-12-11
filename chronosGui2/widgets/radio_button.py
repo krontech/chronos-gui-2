@@ -70,10 +70,10 @@ class RadioButton(QRadioButton, TouchMarginPlugin, DirectAPILinkPlugin, Focusabl
 				}}
 				
 				RadioButton::indicator:checked {{
-					image: url(../../assets/images/{self.theme.radioButton.checked});
+					image: url(:/assets/images/{self.theme.radioButton.checked});
 				}}
 				RadioButton::indicator:unchecked {{
-					image: url(../../assets/images/{self.theme.radioButton.unchecked});
+					image: url(:/assets/images/{self.theme.radioButton.unchecked});
 				}}
 			""" + self.originalStyleSheet())
 		else:
@@ -92,9 +92,9 @@ class RadioButton(QRadioButton, TouchMarginPlugin, DirectAPILinkPlugin, Focusabl
 				}}
 				
 				RadioButton::indicator:checked {{
-					image: url(assets/images/{self.theme.radioButton.checked});
+					image: url(:/assets/images/{self.theme.radioButton.checked});
 				}}
 				RadioButton::indicator:unchecked {{
-					image: url(assets/images/{self.theme.radioButton.unchecked});
+					image: url(:/assets/images/{self.theme.radioButton.unchecked});
 				}}
 			""" + self.originalStyleSheet())

@@ -31,7 +31,7 @@ class CommentPlugin(QPyDesignerCustomWidgetPlugin):
 		return "Chronos"
 
 	def icon(self):
-		return QIcon(QPixmap("../../assets/qt_creator/comment.svg"))
+		return QIcon(QPixmap(":/assets/qt_creator/comment.svg"))
 
 	def toolTip(self):
 		return """A comment which does not show up in the app."""

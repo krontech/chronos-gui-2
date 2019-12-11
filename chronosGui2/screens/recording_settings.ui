@@ -586,11 +586,11 @@
     <string notr="true">
 				background: rgba(48,48,48,127);
 				border: 4px solid #333;
-				border-image: url(../../assets/images/picture-small.jpg); border-image: url(assets/images/picture-small.jpg);
+				border-image: url(:/assets/images/picture-small.jpg);
 			</string>
    </property>
    <property name="customStyleSheet" stdset="0">
-    <string>border-image: url(../../assets/images/picture-small.jpg); border-image: url(assets/images/picture-small.jpg);</string>
+    <string>border-image: url(:/assets/images/picture-small.jpg);</string>
    </property>
   </widget>
   <widget class="Button" name="uiCancel">

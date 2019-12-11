@@ -214,7 +214,7 @@
     </rect>
    </property>
    <property name="pixmap">
-    <pixmap>../../assets/images/interface-white-right-up.png</pixmap>
+    <pixmap>:/assets/images/interface-white-right-up.png</pixmap>
    </property>
   </widget>
   <widget class="FeedbackLabel" name="uiSystemClockFeedback">

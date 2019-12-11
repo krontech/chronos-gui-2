@@ -359,8 +359,7 @@ Save Start</string>
    <property name="customStyleSheet" stdset="0">
     <string>
       border-left: 1px solid black;
-      background-image: url(../../assets/images/diagonal-hatching-sparse.png);
-      background-image: url(assets/images/diagonal-hatching-sparse.png);
+      background-image: url(:/assets/images/diagonal-hatching-sparse.png);
     </string>
    </property>
   </widget>
@@ -376,8 +375,7 @@ Save Start</string>
    <property name="customStyleSheet" stdset="0">
     <string>
       border-left: 1px solid black;
-      background-image: url(../../assets/images/diagonal-hatching-sparse.png);
-      background-image: url(assets/images/diagonal-hatching-sparse.png);
+      background-image: url(:/assets/images/diagonal-hatching-sparse.png);
     </string>
    </property>
   </widget>

@@ -31,7 +31,7 @@ class SpinBoxPlugin(QPyDesignerCustomWidgetPlugin):
 		return "Chronos"
 
 	def icon(self):
-		return QIcon(QPixmap("../../assets/qt_creator/spin_box.svg"))
+		return QIcon(QPixmap(":/assets/qt_creator/spin_box.svg"))
 
 	def toolTip(self):
 		return """A spin box with adjustable margins.
