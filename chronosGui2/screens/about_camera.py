@@ -6,11 +6,11 @@ from PyQt5.QtWidgets import QScroller
 # from PyQt5.QtCore import pyqtSlot
 
 import chronosGui2.api as api
-from chronosGui2.stats import appVersion
 import chronosGui2.settings as settings
 from theme import theme
 
-# Import the generated UI form.
+# Import the generated UI form and app version.
+from chronosGui2.generated import __version__ as appVersion
 from chronosGui2.generated.about_camera import Ui_AboutCamera
 
 class AboutCamera(QtWidgets.QDialog, Ui_AboutCamera):

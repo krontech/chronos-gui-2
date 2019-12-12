@@ -6,14 +6,6 @@ import logging; log = logging.getLogger('Chronos.perf')
 
 import chronosGui2.api as api
 
-appVersion = 'unknown'
-try:
-	with open('git_description', 'r') as gd_file:
-		appVersion = gd_file.read().strip()
-except Exception:
-	pass
-
-
 report_url = 'http://192.168.1.55:19861'
 contact_warned = False
 def report(tag: str, data: dict):
