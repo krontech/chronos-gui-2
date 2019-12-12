@@ -1,5 +1,18 @@
-chronos-gui2 (0.4.0~alpha) unstable; urgency=medium
+chronos-gui2 (0.4.0~alpha13) unstable; urgency=medium
 
+  * Add debian packaging files for version v0.4.0-alpha
+  * Fix typo in UI generation makefile.
+  * Add __init__.py to the generated content.
+  * Move and rename forms to get rid of runtime UI generation.
+  * Use generated UI files when loading screen classes.
+  * Convert UI and asset generation into a Makefile.
+  * Use QResource lookup for graphical assets.
+  * Add asset generation during build.
+  * Add setup.py for installation help.
+  * Make the jog wheel input functional again.
+  * Convert __main__.py to hard tabs.
+  * Convert project into chronosGui2 module.
+  * Fix gui2 wrt power off level being removed & power off changed.
   * Upstream release v0.4.0-alpha
 
- -- Owen Kirby <oskirby@gmail.com>  Wed, 11 Dec 2019 21:21:05 -0800
+ -- Owen Kirby <oskirby@gmail.com>  Thu, 12 Dec 2019 11:40:22 -0800
