@@ -5,6 +5,19 @@ SRCDIR := $(PYDIR)/..
 
 UICFLAGS = --import-from chronosGui2.generated
 
+# The things we want to build and their dependencies.
+assets.qrc: $(shell find $(SRCDIR)/assets -type d)
+
+UISRC := $(shell find $(PYDIR)/forms/ -name '*.ui')
+PYGENERATED := $(notdir $(UISRC:.ui=.py))
+PYGENERATED += assets_rc.py
+PYGENERATED += __init__.py
+
+# Special rule to build the module __init__ file
+__init__.py: $(notdir $(UISRC:.ui=.py))
+	@echo "Generating $@"
+	@echo $(^F:.py=) | xargs -n1 printf "from chronosGui2.generated.%s import *\n" > $@
+
 # Helper function to generate the inner XML for a QResource file.
 # Usage: $(call qrc_list_files, <dirname>, <filepattern>)
 define qrc_list_files
@@ -13,7 +26,7 @@ endef
 
 # Generic rule for building a QResource file.
 %.qrc: $(SRCDIR)/%
-	@echo "Compiling $@"
+	@echo "Generating $@"
 	@echo "<RCC>" > $@
 	@echo "  <qresource>" >> $@
 	@$(call qrc_list_files, $*, '*.png') >> $@
@@ -35,13 +48,8 @@ endef
 %.py: $(PYDIR)/forms/%.ui
 	pyuic5 $(UICFLAGS) -o $@ $^
 
-# The things we want to build and their dependencies.
-assets.qrc: $(shell find $(SRCDIR)/assets -type d)
-
-UISRC := $(shell find $(PYDIR)/forms/ -name '*.ui')
-
-all: assets_rc.py assets.qrc $(notdir $(UISRC:.ui=.py))
+all: assets_rc.py assets.qrc $(PYGEN)
 
 clean:
-	rm -rf assets_rc.py $(notdir $(UISRC:.ui=.py))
+	rm -rf $(PYGENERATED)
 	rm -rf assets.qrc
