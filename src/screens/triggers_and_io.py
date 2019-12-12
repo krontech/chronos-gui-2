@@ -126,7 +126,11 @@ class TriggersAndIO(QtWidgets.QDialog):
 	
 	def __init__(self, window):
 		super().__init__()
-		uic.loadUi('src/screens/triggers_and_io.ui', self)
+		
+		if api.apiValues.get('cameraModel')[0:2] == 'TX':
+			uic.loadUi("src/screens/triggers_and_io.txpro.ui", self)
+		else:
+			uic.loadUi("src/screens/triggers_and_io.chronos.ui", self)
 		
 		# Panel init.
 		self.setFixedSize(window.app.primaryScreen().virtualSize())
