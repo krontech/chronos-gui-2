@@ -48,7 +48,7 @@ endef
 %.py: $(PYDIR)/forms/%.ui
 	pyuic5 $(UICFLAGS) -o $@ $^
 
-all: assets_rc.py assets.qrc $(PYGEN)
+all: assets_rc.py assets.qrc $(PYGENERATED)
 
 clean:
 	rm -rf $(PYGENERATED)
