@@ -4,8 +4,10 @@ from PyQt5 import uic, QtWidgets, QtCore
 
 import chronosGui2.api as api
 
+# Import the generated UI form.
+from chronosGui2.generated.trigger_delay import Ui_Form as Ui_TriggerDelay
 
-class TriggerDelay(QtWidgets.QDialog):
+class TriggerDelay(QtWidgets.QDialog, Ui_TriggerDelay):
 	"""Configure how long it takes between IO trigger and action.
 		
 		Unlike in chronos-cam-app, this screen is *not* responsible
@@ -17,7 +19,7 @@ class TriggerDelay(QtWidgets.QDialog):
 	
 	def __init__(self, window):
 		super().__init__()
-		uic.loadUi(os.path.splitext(__file__)[0] + ".ui", self)
+		self.setupUi(self)
 		
 		# Panel init.
 		self.setGeometry(0,0, 800,480)

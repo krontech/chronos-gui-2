@@ -8,6 +8,9 @@ from PyQt5 import uic, QtWidgets, QtCore
 import chronosGui2.api
 import chronosGui2.settings
 
+# Import the generated UI form.
+from chronosGui2.generated.color import Ui_Form as Ui_Color
+
 #Two abbreviations used on this page are WB for White Balance and CM for Colour Matrix.
 
 presets = {
@@ -29,10 +32,10 @@ presets = {
 }
 
 
-class Color(QtWidgets.QDialog):
+class Color(QtWidgets.QDialog, Ui_Color):
 	def __init__(self, window):
 		super().__init__()
-		uic.loadUi(os.path.splitext(__file__)[0] + ".ui", self)
+		self.setupUi(self)
 		
 		# Panel init.
 		self.setGeometry(0,0, 800,480)

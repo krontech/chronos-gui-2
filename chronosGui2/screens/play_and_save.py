@@ -15,6 +15,9 @@ from line_edit import LineEdit
 from button import Button
 from theme import theme
 
+# Import the generated UI form.
+from chronosGui2.generated.play_and_save import Ui_Form as Ui_PlayAndSave
+
 import logging; log = logging.getLogger('Chronos.gui')
 
 def hsva(h,s,v,a=255):
@@ -33,7 +36,7 @@ segmentData = [{'start': 0, 'hres': 200, 'id': 'ldPxTT5R', 'end': int(1e10), 'vr
 
 
 
-class PlayAndSave(QtWidgets.QDialog):
+class PlayAndSave(QtWidgets.QDialog, Ui_PlayAndSave):
 	saveRegionMarkerHeight = 12
 	saveRegionMarkerOffset = 7
 	saveRegionBorder = 1
@@ -42,7 +45,7 @@ class PlayAndSave(QtWidgets.QDialog):
 	
 	def __init__(self, window):
 		super().__init__()
-		uic.loadUi(os.path.splitext(__file__)[0] + ".ui", self)
+		self.setupUi(self)
 		
 		self._window = window
 		

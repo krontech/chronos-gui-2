@@ -7,14 +7,16 @@ from PyQt5 import uic, QtCore, QtGui
 from chronosGui2.input_panels import KeyboardBase
 from button import Button
 
+from chronosGui2.generated.keyboard_alphanumeric import Ui_uiKeyboardNumericWithUnits
+
 padding = 10
 
 
-class KeyboardAlphanumeric(KeyboardBase):
+class KeyboardAlphanumeric(KeyboardBase, Ui_uiKeyboardNumericWithUnits):
 	
 	def __init__(self, window):
 		super().__init__(window)
-		uic.loadUi(os.path.splitext(__file__)[0] + ".ui", self)
+		self.setupUi(self)
 		self.move(800-self.width(), 0)
 		self.onShow.connect(self.__handleShown)
 		

@@ -17,6 +17,9 @@ import chronosGui2.api as api
 import chronosGui2.settings as settings
 import chronosGui2.external_process as external_process
 
+# Import the generated UI form.
+from chronosGui2.generated.remote_access import Ui_Form as Ui_RemoteAccess
+
 import logging; log = logging.getLogger('Chronos.gui')
 
 webServer = QtCore.QSettings('Krontech', 'web interface')
@@ -57,10 +60,10 @@ def execSetPassword(userName:str, password:str):
 		raise Exception("Error encountered changing the password!")
 
 
-class RemoteAccess(QtWidgets.QWidget):
+class RemoteAccess(QtWidgets.QWidget, Ui_RemoteAccess):
 	def __init__(self, window):
 		super().__init__()
-		uic.loadUi(os.path.splitext(__file__)[0] + ".ui", self)
+		self.setupUi(self)
 		
 		# Panel init.
 		self.setGeometry(0,0, 800,480)

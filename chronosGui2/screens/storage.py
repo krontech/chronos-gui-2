@@ -7,11 +7,13 @@ from PyQt5 import uic, QtWidgets, QtCore
 import chronosGui2.api as api
 from chronosGui2.external_process import run
 
+# Import the generated UI form.
+from chronosGui2.generated.storage import Ui_Form as Ui_Storage
 
-class Storage(QtWidgets.QWidget):
+class Storage(QtWidgets.QWidget, Ui_Storage):
 	def __init__(self, window):
 		super().__init__()
-		uic.loadUi(os.path.splitext(__file__)[0] + ".ui", self)
+		self.setupUi(self)
 		
 		# Panel init.
 		self.setGeometry(0,0, 800,480)

@@ -12,8 +12,10 @@ from chronosGui2.debugger import *; dbg
 import chronosGui2.settings as settings
 import chronosGui2.api as api
 
+# Import the generated UI form.
+from chronosGui2.generated.recording_settings import Ui_Form as Ui_RecordingSettings
 
-class RecordingSettings(QtWidgets.QDialog):
+class RecordingSettings(QtWidgets.QDialog, Ui_RecordingSettings):
 	"""The recording settings is one of the few windows that doesn't update 
 		the camera settings directly. Instead, it has a preview which utilizes
 		these settings under the hood, and the settings are actually only
@@ -23,7 +25,7 @@ class RecordingSettings(QtWidgets.QDialog):
 	
 	def __init__(self, window):
 		super().__init__()
-		uic.loadUi(os.path.splitext(__file__)[0] + ".ui", self)
+		self.setupUi(self)
 		self.window_ = window
 		
 		# Panel init.

@@ -12,11 +12,13 @@ import chronosGui2.settings as settings
 import chronosGui2.api as api
 from chronosGui2.debugger import dump
 
+# Import the generated UI form.
+from chronosGui2.generated.primary_settings import Ui_Form as Ui_PrimarySettings
 
-class PrimarySettings(QtWidgets.QDialog):
+class PrimarySettings(QtWidgets.QDialog, Ui_PrimarySettings):
 	def __init__(self, window):
 		super().__init__()
-		uic.loadUi(os.path.splitext(__file__)[0] + ".ui", self)
+		self.setupUi(self)
 		
 		# Panel init.
 		self.setGeometry(0,0, 800,480)

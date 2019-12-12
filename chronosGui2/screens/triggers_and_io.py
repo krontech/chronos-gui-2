@@ -39,6 +39,9 @@ from chronosGui2.debugger import *; dbg
 import chronosGui2.settings as settings
 import chronosGui2.api as api
 
+# Import the generated UI form.
+from chronosGui2.generated.triggers_and_io import Ui_Form as Ui_TriggersAndIo
+
 tr = partial(QtCore.QCoreApplication.translate, "Triggers")
 
 #Keep unsaved changes when something else changes them?
@@ -110,7 +113,7 @@ def default(*args):
 
 
 
-class TriggersAndIO(QtWidgets.QDialog):
+class TriggersAndIO(QtWidgets.QDialog, Ui_TriggersAndIo):
 	"""Trigger screen. Configure one IO trigger at a time.
 	
 		This screen is slightly unusual in that triggers are only
@@ -127,7 +130,7 @@ class TriggersAndIO(QtWidgets.QDialog):
 	
 	def __init__(self, window):
 		super().__init__()
-		uic.loadUi(os.path.splitext(__file__)[0] + ".ui", self)
+		self.setupUi(self)
 		
 		# Panel init.
 		self.setGeometry(0,0, 800,480)

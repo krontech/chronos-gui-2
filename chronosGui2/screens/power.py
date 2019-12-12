@@ -10,6 +10,8 @@ from PyQt5 import uic, QtWidgets, QtCore, QtGui
 import chronosGui2.api as api
 import chronosGui2.settings as settings
 
+# Import the generated UI form.
+from chronosGui2.generated.power import Ui_Form as Ui_Power
 
 chartDuration = 90 #minutes
 chartPadding = { #in px
@@ -38,12 +40,12 @@ def constrain(low: float, n: float, high: float) -> float:
 
 
 
-class Power(QtWidgets.QDialog):
+class Power(QtWidgets.QDialog, Ui_Power):
 	uiPowerDownThreshold = 0.05 #Used to be in API as saveAndPowerDownLowBatteryLevelNormalized, but this got taken out December 2019.
 	
 	def __init__(self, window):
 		super().__init__()
-		uic.loadUi(os.path.splitext(__file__)[0] + ".ui", self)
+		self.setupUi(self)
 		
 		# Panel init.
 		self.setGeometry(0,0, 800,480)

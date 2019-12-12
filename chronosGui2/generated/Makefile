@@ -3,6 +3,8 @@ PYDIR := $(dir $(lastword $(MAKEFILE_LIST)))/..
 SRCDIR := $(PYDIR)/..
 .DEFAULT_GOAL := all
 
+UICFLAGS = --import-from chronosGui2.generated
+
 # Helper function to generate the inner XML for a QResource file.
 # Usage: $(call qrc_list_files, <dirname>, <filepattern>)
 define qrc_list_files
@@ -24,23 +26,26 @@ endef
 # so we need to create a symlink to the resource directory in the
 # source tree. It seems like this should be fixable with the -root
 # option, but that doesn't appear to do anything.
-%.py: %.qrc
+%_rc.py: %.qrc
 	@[ -e $* ] || ln -s $(SRCDIR)/$* $*
 	pyrcc5 -o $@ $^
 	@[ -L $* ] && rm $*
 
 # Generic rule for building a Python/Qt UI files.
 %.py: $(PYDIR)/screens/%.ui
-	pyuic5 -o $@ $^
+	pyuic5 $(UICFLAGS) -o $@ $^
+
+%.py: $(PYDIR)/input_panels/%.ui
+	pyuic5 $(UICFLAGS) -o $@ $^
 
 # The things we want to build and their dependencies.
 assets.qrc: $(shell find $(SRCDIR)/assets -type d)
 
 UISRC := $(shell find $(PYDIR)/screens/ -name '*.ui')
+UISRC += $(shell find $(PYDIR)/input_panels/ -name '*.ui')
 
-all: assets.py assets.qrc $(notdir $(UISRC:.ui=.py))
+all: assets_rc.py assets.qrc $(notdir $(UISRC:.ui=.py))
 
 clean:
-	rm -rf assets.py $(notdir $(UISRC:.ui=.py))
+	rm -rf assets_rc.py $(notdir $(UISRC:.ui=.py))
 	rm -rf assets.qrc
-	

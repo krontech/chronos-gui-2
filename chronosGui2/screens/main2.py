@@ -23,14 +23,17 @@ from theme import theme
 RECORDING_MODES = {'START/STOP':1, 'SOFT_TRIGGER':2, 'VIRTUAL_TRIGGER':3}
 RECORDING_MODE = RECORDING_MODES['START/STOP']
 
+# Import the generated UI form.
+from chronosGui2.generated.main2 import Ui_Form as Ui_Main2
+
 #settings.setValue('theme', 'dark') #[HACK DDR 2019-11-15] patch around dark theme until it works, because the dark theme is the default.
 
-class Main(QWidget):
+class Main(QWidget, Ui_Main2):
 	uiPowerDownThreshold = 0.05 #Used to be in API as saveAndPowerDownLowBatteryLevelNormalized, but this got taken out December 2019.
 	
 	def __init__(self, window):
 		super().__init__()
-		uic.loadUi(os.path.splitext(__file__)[0] + ".ui", self)
+		self.setupUi(self)
 		
 		# Panel init.
 		self.setGeometry(0,0, 800,480) #This is not a responsive design.

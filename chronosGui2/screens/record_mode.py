@@ -7,16 +7,18 @@ from PyQt5 import uic, QtWidgets, QtCore
 import chronosGui2.settings as settings
 import chronosGui2.api as api
 
+# Import the generated UI form.
+from chronosGui2.generated.record_mode import Ui_Form as Ui_RecordMode
 
 
-class RecordMode(QtWidgets.QDialog):
+class RecordMode(QtWidgets.QDialog, Ui_RecordMode):
 	
 	#Save current screen by ID, not by index or display text because those are UI changes.
 	availableRecordModeIds = ['normal', 'segmented', 'burst', 'runAndGun']
 	
 	def __init__(self, window):
 		super().__init__()
-		uic.loadUi(os.path.splitext(__file__)[0] + ".ui", self)
+		self.setupUi(self)
 		
 		# Panel init.
 		self.setGeometry(0,0, 800,480)

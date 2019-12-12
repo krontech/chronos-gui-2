@@ -4,13 +4,13 @@ import os
 from PyQt5 import uic, QtWidgets, QtCore
 # from PyQt5.QtCore import pyqtSlot
 
-# import chronosGui2.api as api
+# Import the generated UI form.
+from chronosGui2.generated.stamp import Ui_Form as Ui_Stamp
 
-
-class Stamp(QtWidgets.QDialog):
+class Stamp(QtWidgets.QDialog, Ui_Stamp):
 	def __init__(self, window):
 		super().__init__()
-		uic.loadUi(os.path.splitext(__file__)[0] + ".ui", self)
+		self.setupUi(self)
 		
 		# Panel init.
 		self.setGeometry(0,0, 800,480)

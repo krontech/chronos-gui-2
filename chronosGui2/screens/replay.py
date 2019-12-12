@@ -3,10 +3,13 @@
 import os
 from PyQt5 import uic, QtWidgets, QtCore
 
-class Replay(QtWidgets.QWidget):
+# Import the generated UI form.
+from chronosGui2.generated.replay import Ui_Form as Ui_Replay
+
+class Replay(QtWidgets.QWidget, Ui_Replay):
 	def __init__(self, window):
 		super().__init__()
-		uic.loadUi(os.path.splitext(__file__)[0] + ".ui", self)
+		self.setupUi(self)
 		
 		# Panel init.
 		self.setGeometry(0,0, 800,480)

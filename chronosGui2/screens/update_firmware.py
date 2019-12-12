@@ -9,13 +9,15 @@ from PyQt5 import uic, QtWidgets, QtCore
 
 import chronosGui2.api as api
 
+# Import the generated UI form.
+from chronosGui2.generated.update_firmware import Ui_Form as Ui_UpdateFirmware
 
 CAM_SERIAL_FILE_NAME = 'cameraSerial.txt'
 
-class UpdateFirmware(QtWidgets.QDialog):
+class UpdateFirmware(QtWidgets.QDialog, Ui_UpdateFirmware):
 	def __init__(self, window):
 		super().__init__()
-		uic.loadUi(os.path.splitext(__file__)[0] + ".ui", self)
+		self.setupUi(self)
 		
 		# Panel init.
 		self.setGeometry(0,0, 800,480)

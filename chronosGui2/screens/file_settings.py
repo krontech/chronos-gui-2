@@ -9,11 +9,13 @@ import chronosGui2.api as api
 import chronosGui2.settings as settings
 from chronosGui2 import delay
 
+# Import the generated UI form.
+from chronosGui2.generated.file_settings import Ui_Form as Ui_FileSettings
 
-class FileSettings(QtWidgets.QDialog):
+class FileSettings(QtWidgets.QDialog, Ui_FileSettings):
 	def __init__(self, window):
 		super().__init__()
-		uic.loadUi(os.path.splitext(__file__)[0] + ".ui", self)
+		self.setupUi(self)
 		
 		# Panel init.
 		self.setGeometry(0,0, 800,480)

@@ -9,12 +9,15 @@ from PyQt5 import uic, QtWidgets, QtCore
 
 import chronosGui2.api as api
 
+# Import the generated UI form.
+from chronosGui2.generated.user_settings import Ui_Form as Ui_UserSettings
+
 CAM_SERIAL_FILE_NAME = 'cameraSerial.txt'
 
 class UserSettings(QtWidgets.QDialog):
 	def __init__(self, window):
 		super().__init__()
-		uic.loadUi(os.path.splitext(__file__)[0] + ".ui", self)
+		self.setupUi(self)
 		self.window_ = window
 		
 		# Panel init.
