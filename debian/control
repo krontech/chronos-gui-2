@@ -1,0 +1,27 @@
+Source: chronos-gui2
+Section: misc
+Priority: optional
+Maintainer: Owen Kirby <oskirby@gmail.com>
+Build-Depends: debhelper (>= 9), dh-exec,
+               dh-systemd (>= 1.5), dh-python,
+               python3-pyqt5, pyqt5-dev-tools,
+               python3-future-fstrings,
+               python3-all, python3-setuptools
+Standards-Version: 3.9.8
+Homepage: https://github.com/krontech/chronos-gui-2
+X-Python-Version: >= 2.6
+X-Python3-Version: >= 3.4
+#Vcs-Git: https://github.com/krontech/chronos-gui-2.git
+#Testsuite: autopkgtest-pkg-python
+
+Package: chronos-gui2
+Architecture: all
+Depends: ${python3:Depends}, ${misc:Depends},
+         chronos-control,
+         network-manager, udisks2,
+         fonts-roboto, fonts-noto-color-emoji,
+         python3-future-fstrings,
+         python3-pyqt5,
+         qrencode
+Description: Chronos 1.4 Back-of-Camera GUI (Python3/Qt5)
+

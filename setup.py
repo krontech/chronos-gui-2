@@ -48,7 +48,7 @@ class gui2_build_py(build_py):
 
 setup(
 	name='chronosGui2',
-	version='0.0.1',
+	version='0.4.0-alpha',
 	description='Chronos 1.4 back-of-camera Python QT 5 GUI',
 	url='https://github.com/krontech/chronos-gui-2',
 	author='David Roberts',
@@ -68,7 +68,7 @@ setup(
 		]
 	},
 	packages=['chronosGui2', 'chronosGui2/widgets', 'chronosGui2/screens', 'chronosGui2/input_panels'],
-	python_requires='>=3',
+	data_files=[('/etc/', ['util/chronos-gui2.conf'])],
 	license='GPLv3+',
 	# Command overrides
 	cmdclass={
