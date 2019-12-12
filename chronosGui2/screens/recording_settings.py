@@ -13,7 +13,7 @@ import chronosGui2.settings as settings
 import chronosGui2.api as api
 
 # Import the generated UI form.
-from chronosGui2.generated.recording_settings import Ui_RecordingSettings
+from chronosGui2.generated.chronos import Ui_RecordingSettings
 
 class RecordingSettings(QtWidgets.QDialog, Ui_RecordingSettings):
 	"""The recording settings is one of the few windows that doesn't update 

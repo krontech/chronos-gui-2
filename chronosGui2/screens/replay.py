@@ -4,7 +4,7 @@ import os
 from PyQt5 import uic, QtWidgets, QtCore
 
 # Import the generated UI form.
-from chronosGui2.generated.replay import Ui_Replay
+from chronosGui2.generated.chronos import Ui_Replay
 
 class Replay(QtWidgets.QWidget, Ui_Replay):
 	def __init__(self, window):

@@ -6,7 +6,7 @@ from PyQt5.QtCore import pyqtSlot
 from chronosGui2.debugger import *; dbg
 import chronosGui2.api as api
 
-from chronosGui2.generated.test_widget import Ui_TestWidget
+from chronosGui2.generated.chronos import Ui_TestWidget
 
 class Test(QtWidgets.QWidget):
 	def __init__(self, window):

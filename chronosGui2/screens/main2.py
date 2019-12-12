@@ -24,7 +24,7 @@ RECORDING_MODES = {'START/STOP':1, 'SOFT_TRIGGER':2, 'VIRTUAL_TRIGGER':3}
 RECORDING_MODE = RECORDING_MODES['START/STOP']
 
 # Import the generated UI form.
-from chronosGui2.generated.main2 import Ui_Main2
+from chronosGui2.generated.chronos import Ui_Main2
 
 #settings.setValue('theme', 'dark') #[HACK DDR 2019-11-15] patch around dark theme until it works, because the dark theme is the default.
 

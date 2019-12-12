@@ -16,7 +16,7 @@ from button import Button
 from theme import theme
 
 # Import the generated UI form.
-from chronosGui2.generated.play_and_save import Ui_PlayAndSave
+from chronosGui2.generated.chronos import Ui_PlayAndSave
 
 import logging; log = logging.getLogger('Chronos.gui')
 

@@ -9,8 +9,8 @@ from PyQt5.QtCore import pyqtSlot
 import chronosGui2.api as api
 import chronosGui2.settings as settings
 
-from chronosGui2.generated.service_screen_locked import Ui_ServiceScreenLocked
-from chronosGui2.generated.service_screen_unlocked import Ui_ServiceScreenUnlocked
+from chronosGui2.generated.chronos import Ui_ServiceScreenLocked
+from chronosGui2.generated.chronos import Ui_ServiceScreenUnlocked
 
 class ServiceScreenLocked(QtWidgets.QDialog, Ui_ServiceScreenLocked):
 	unlockPassword = "4242"

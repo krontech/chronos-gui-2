@@ -40,7 +40,7 @@ import chronosGui2.settings as settings
 import chronosGui2.api as api
 
 # Import the generated UI form.
-from chronosGui2.generated.triggers_and_io import Ui_TriggersAndIo
+from chronosGui2.generated.chronos import Ui_TriggersAndIo
 
 tr = partial(QtCore.QCoreApplication.translate, "Triggers")
 

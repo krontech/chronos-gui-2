@@ -11,7 +11,7 @@ from theme import theme
 
 # Import the generated UI form and app version.
 from chronosGui2.generated import __version__ as appVersion
-from chronosGui2.generated.about_camera import Ui_AboutCamera
+from chronosGui2.generated.chronos import Ui_AboutCamera
 
 class AboutCamera(QtWidgets.QDialog, Ui_AboutCamera):
 	def __init__(self, window):

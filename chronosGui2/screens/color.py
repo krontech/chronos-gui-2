@@ -9,7 +9,7 @@ import chronosGui2.api
 import chronosGui2.settings
 
 # Import the generated UI form.
-from chronosGui2.generated.color import Ui_Color
+from chronosGui2.generated.chronos import Ui_Color
 
 #Two abbreviations used on this page are WB for White Balance and CM for Colour Matrix.
 
