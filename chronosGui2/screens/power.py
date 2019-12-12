@@ -11,7 +11,7 @@ import chronosGui2.api as api
 import chronosGui2.settings as settings
 
 # Import the generated UI form.
-from chronosGui2.generated.power import Ui_Form as Ui_Power
+from chronosGui2.generated.power import Ui_Power
 
 chartDuration = 90 #minutes
 chartPadding = { #in px

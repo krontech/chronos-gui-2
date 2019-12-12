@@ -12,14 +12,16 @@ from widgets.button import Button
 import chronosGui2.settings as settings
 import chronosGui2.api as api
 
+from chronosGui2.generated.main_rh import Ui_MainRH
+
 RECORDING_MODES = {'START/STOP':1, 'SOFT_TRIGGER':2, 'VIRTUAL_TRIGGER':3}
 RECORDING_MODE = RECORDING_MODES['START/STOP']
 
 
-class Main(QWidget):
+class Main(QWidget, Ui_MainRH):
 	def __init__(self, window):
 		super().__init__()
-		uic.loadUi(os.path.splitext(__file__)[0] + ".right-handed.ui", self)
+		self.setupUi(self)
 		
 		# Panel init.
 		self.move(0, 0)

@@ -10,7 +10,7 @@ from PyQt5 import uic, QtWidgets, QtCore
 import chronosGui2.api as api
 
 # Import the generated UI form.
-from chronosGui2.generated.update_firmware import Ui_Form as Ui_UpdateFirmware
+from chronosGui2.generated.update_firmware import Ui_UpdateFirmware
 
 CAM_SERIAL_FILE_NAME = 'cameraSerial.txt'
 

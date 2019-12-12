@@ -8,7 +8,7 @@ import chronosGui2.settings as settings
 import chronosGui2.api as api
 
 # Import the generated UI form.
-from chronosGui2.generated.record_mode import Ui_Form as Ui_RecordMode
+from chronosGui2.generated.record_mode import Ui_RecordMode
 
 
 class RecordMode(QtWidgets.QDialog, Ui_RecordMode):

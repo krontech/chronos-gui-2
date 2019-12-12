@@ -10,7 +10,7 @@ import chronosGui2.settings as settings
 from chronosGui2 import delay
 
 # Import the generated UI form.
-from chronosGui2.generated.file_settings import Ui_Form as Ui_FileSettings
+from chronosGui2.generated.file_settings import Ui_FileSettings
 
 class FileSettings(QtWidgets.QDialog, Ui_FileSettings):
 	def __init__(self, window):

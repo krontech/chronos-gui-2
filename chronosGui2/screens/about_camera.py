@@ -11,7 +11,7 @@ import chronosGui2.settings as settings
 from theme import theme
 
 # Import the generated UI form.
-from chronosGui2.generated.about_camera import Ui_Form as Ui_AboutCamera
+from chronosGui2.generated.about_camera import Ui_AboutCamera
 
 class AboutCamera(QtWidgets.QDialog, Ui_AboutCamera):
 	def __init__(self, window):

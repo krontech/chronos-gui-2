@@ -6,11 +6,12 @@ from PyQt5.QtCore import pyqtSlot
 from chronosGui2.debugger import *; dbg
 import chronosGui2.api as api
 
+from chronosGui2.generated.test_widget import Ui_TestWidget
 
 class Test(QtWidgets.QWidget):
 	def __init__(self, window):
 		super().__init__()
-		uic.loadUi(os.path.splitext(__file__)[0] + ".widget.ui", self)
+		self.setupUi(self)
 		
 		# Panel init.
 		self.setGeometry(0,0, 800,480)

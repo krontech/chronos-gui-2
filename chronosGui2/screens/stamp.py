@@ -5,7 +5,7 @@ from PyQt5 import uic, QtWidgets, QtCore
 # from PyQt5.QtCore import pyqtSlot
 
 # Import the generated UI form.
-from chronosGui2.generated.stamp import Ui_Form as Ui_Stamp
+from chronosGui2.generated.stamp import Ui_Stamp
 
 class Stamp(QtWidgets.QDialog, Ui_Stamp):
 	def __init__(self, window):

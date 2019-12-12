@@ -32,17 +32,13 @@ endef
 	@[ -L $* ] && rm $*
 
 # Generic rule for building a Python/Qt UI files.
-%.py: $(PYDIR)/screens/%.ui
-	pyuic5 $(UICFLAGS) -o $@ $^
-
-%.py: $(PYDIR)/input_panels/%.ui
+%.py: $(PYDIR)/forms/%.ui
 	pyuic5 $(UICFLAGS) -o $@ $^
 
 # The things we want to build and their dependencies.
 assets.qrc: $(shell find $(SRCDIR)/assets -type d)
 
-UISRC := $(shell find $(PYDIR)/screens/ -name '*.ui')
-UISRC += $(shell find $(PYDIR)/input_panels/ -name '*.ui')
+UISRC := $(shell find $(PYDIR)/forms/ -name '*.ui')
 
 all: assets_rc.py assets.qrc $(notdir $(UISRC:.ui=.py))
 

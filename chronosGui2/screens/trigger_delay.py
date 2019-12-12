@@ -5,7 +5,7 @@ from PyQt5 import uic, QtWidgets, QtCore
 import chronosGui2.api as api
 
 # Import the generated UI form.
-from chronosGui2.generated.trigger_delay import Ui_Form as Ui_TriggerDelay
+from chronosGui2.generated.trigger_delay import Ui_TriggerDelay
 
 class TriggerDelay(QtWidgets.QDialog, Ui_TriggerDelay):
 	"""Configure how long it takes between IO trigger and action.

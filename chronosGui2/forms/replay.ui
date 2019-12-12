@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>Form</class>
- <widget class="QWidget" name="Form">
+ <class>Replay</class>
+ <widget class="QWidget" name="Replay">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -13,13 +13,23 @@
   <property name="windowTitle">
    <string notr="true">Chronos Screen</string>
   </property>
+  <widget class="Backdrop" name="backdrop">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>361</width>
+     <height>481</height>
+    </rect>
+   </property>
+  </widget>
   <widget class="ScrollList" name="scrolllist">
    <property name="geometry">
     <rect>
      <x>20</x>
-     <y>100</y>
+     <y>160</y>
      <width>321</width>
-     <height>341</height>
+     <height>301</height>
     </rect>
    </property>
   </widget>
@@ -111,26 +121,49 @@
    <property name="geometry">
     <rect>
      <x>0</x>
-     <y>30</y>
+     <y>50</y>
      <width>361</width>
-     <height>61</height>
+     <height>81</height>
     </rect>
-   </property>
-   <property name="clickMarginBottom" stdset="0">
-    <enum>ComboBox::none</enum>
    </property>
   </widget>
   <widget class="Label" name="label_5">
    <property name="geometry">
     <rect>
      <x>20</x>
-     <y>450</y>
+     <y>110</y>
      <width>271</width>
      <height>21</height>
     </rect>
    </property>
    <property name="text">
     <string>1gb free / 12gb total (94% full)</string>
+   </property>
+  </widget>
+  <widget class="Subheader" name="subheader">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>140</y>
+     <width>241</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Files on Device</string>
+   </property>
+  </widget>
+  <widget class="Subheader" name="subheader_2">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>50</y>
+     <width>241</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Storage Device</string>
    </property>
   </widget>
   <widget class="Button" name="uiDone">
@@ -146,32 +179,35 @@
     <string>Done</string>
    </property>
   </widget>
+  <widget class="Button" name="button_2">
+   <property name="geometry">
+    <rect>
+     <x>340</x>
+     <y>400</y>
+     <width>181</width>
+     <height>81</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Delete File</string>
+   </property>
+  </widget>
   <widget class="Backdrop" name="backdrop_2">
    <property name="geometry">
     <rect>
-     <x>360</x>
+     <x>290</x>
      <y>0</y>
      <width>511</width>
-     <height>15</height>
-    </rect>
-   </property>
-  </widget>
-  <widget class="Backdrop" name="backdrop">
-   <property name="geometry">
-    <rect>
-     <x>0</x>
-     <y>0</y>
-     <width>361</width>
-     <height>481</height>
+     <height>11</height>
     </rect>
    </property>
   </widget>
   <widget class="Backdrop" name="backdrop_3">
    <property name="geometry">
     <rect>
-     <x>360</x>
+     <x>290</x>
      <y>310</y>
-     <width>441</width>
+     <width>511</width>
      <height>171</height>
     </rect>
    </property>
@@ -188,18 +224,21 @@
   </widget>
   <zorder>backdrop_5</zorder>
   <zorder>backdrop_3</zorder>
-  <zorder>backdrop</zorder>
   <zorder>backdrop_2</zorder>
+  <zorder>backdrop</zorder>
   <zorder>headerlabel</zorder>
   <zorder>slider</zorder>
   <zorder>label</zorder>
   <zorder>label_2</zorder>
   <zorder>label_3</zorder>
   <zorder>label_4</zorder>
+  <zorder>scrolllist</zorder>
   <zorder>label_5</zorder>
+  <zorder>subheader</zorder>
+  <zorder>subheader_2</zorder>
   <zorder>storagemediaselect</zorder>
   <zorder>uiDone</zorder>
-  <zorder>scrolllist</zorder>
+  <zorder>button_2</zorder>
  </widget>
  <customwidgets>
   <customwidget>
@@ -241,6 +280,11 @@
    <class>StorageMediaSelect</class>
    <extends>ComboBox</extends>
    <header>storage_media_select</header>
+  </customwidget>
+  <customwidget>
+   <class>Subheader</class>
+   <extends>QLabel</extends>
+   <header>subheader</header>
   </customwidget>
  </customwidgets>
  <resources/>

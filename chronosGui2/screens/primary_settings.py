@@ -13,7 +13,7 @@ import chronosGui2.api as api
 from chronosGui2.debugger import dump
 
 # Import the generated UI form.
-from chronosGui2.generated.primary_settings import Ui_Form as Ui_PrimarySettings
+from chronosGui2.generated.primary_settings import Ui_PrimarySettings
 
 class PrimarySettings(QtWidgets.QDialog, Ui_PrimarySettings):
 	def __init__(self, window):

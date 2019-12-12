@@ -6,14 +6,15 @@ from PyQt5 import uic, QtCore, QtGui
 from PyQt5.QtWidgets import QDoubleSpinBox, QLineEdit
 
 from chronosGui2.input_panels import KeyboardBase
+from chronosGui2.generated.keyboard_numeric_nounits import Ui_uiKeyboardNumericNoUnits
+from chronosGui2.generated.keyboard_numeric_units_lh import Ui_uiKeyboardNumericUnitsLH
 
 padding = 10
 
-
-class KeyboardNumericWithoutUnits(KeyboardBase):
+class KeyboardNumericBase(KeyboardBase):
 	def __init__(self, window):
 		super().__init__(window)
-		self.loadUi()
+		self.setupUi(self) # This is provided by one of the concrete types below.
 		
 		# Panel init.
 		self.move(800-self.width(), 0)
@@ -47,11 +48,6 @@ class KeyboardNumericWithoutUnits(KeyboardBase):
 		
 		self.uiLeft.pressed.connect(lambda: self.adjustCarat(-1))
 		self.uiRight.pressed.connect(lambda: self.adjustCarat(1))
-	
-	
-	def loadUi(self):
-		uic.loadUi(os.path.splitext(__file__)[0] + ".without_units.ui", self)
-	
 	
 	def setUpSelectionWrap(self):
 		#Wrap "Close" around to "q", so we don't select off the end of the keyboard and close it.
@@ -135,11 +131,15 @@ class KeyboardNumericWithoutUnits(KeyboardBase):
 		self.window().app.setCursorFlashTime(cursorFlashTime)
 
 
-class KeyboardNumericWithUnits(KeyboardNumericWithoutUnits):
+class KeyboardNumericWithoutUnits(KeyboardNumericBase, Ui_uiKeyboardNumericNoUnits):
+	"""A numeric keyboard with no unit buttons."""
+	pass
+
+class KeyboardNumericWithUnits(KeyboardNumericBase, Ui_uiKeyboardNumericUnitsLH):
 	"""A numeric keyboard with unit buttons.
 		
 		This works with the """
-	
+
 	def __init__(self, window):
 		super().__init__(window)
 		
@@ -150,11 +150,6 @@ class KeyboardNumericWithUnits(KeyboardNumericWithoutUnits):
 		self.uiMilli.toggled.connect(self.unitToggled(2, self.uiMilli))
 		self.uiMicro.toggled.connect(self.unitToggled(3, self.uiMicro))
 		
-	
-	def loadUi(self):
-		uic.loadUi(os.path.splitext(__file__)[0] + ".with_units.left-handed.ui", self)
-	
-	
 	def unitToggled(self, unitIndex, button):
 		def unitToggledCallback(isChecked):
 			min_ = self.opener.minimum()

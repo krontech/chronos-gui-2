@@ -9,13 +9,15 @@ from PyQt5.QtCore import pyqtSlot
 import chronosGui2.api as api
 import chronosGui2.settings as settings
 
+from chronosGui2.generated.service_screen_locked import Ui_ServiceScreenLocked
+from chronosGui2.generated.service_screen_unlocked import Ui_ServiceScreenUnlocked
 
-class ServiceScreenLocked(QtWidgets.QDialog):
+class ServiceScreenLocked(QtWidgets.QDialog, Ui_ServiceScreenLocked):
 	unlockPassword = "4242"
 	
 	def __init__(self, window):
 		super().__init__()
-		uic.loadUi(os.path.splitext(__file__)[0] + ".locked.ui", self)
+		self.setupUi(self)
 		
 		# Panel init.
 		self.setGeometry(0,0, 800,480)
@@ -54,10 +56,10 @@ class ServiceScreenLocked(QtWidgets.QDialog):
 
 
 
-class ServiceScreenUnlocked(QtWidgets.QDialog):
+class ServiceScreenUnlocked(QtWidgets.QDialog, Ui_ServiceScreenUnlocked):
 	def __init__(self, window):
 		super().__init__()
-		uic.loadUi(os.path.splitext(__file__)[0] + ".unlocked.ui", self)
+		self.setupUi(self)
 		
 		# Panel init.
 		self.setGeometry(0,0, 800,480)

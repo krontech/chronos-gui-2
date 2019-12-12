@@ -11,7 +11,7 @@ from PyQt5.QtGui import QStandardItemModel, QStandardItem, QColor
 from chronosGui2 import delay
 
 # Import the generated UI form.
-from chronosGui2.generated.scripts import Ui_Form as Ui_Scripts
+from chronosGui2.generated.scripts import Ui_Scripts
 
 class Scripts(QtWidgets.QDialog, Ui_Scripts):
 	path = '/var/camera/scripts'

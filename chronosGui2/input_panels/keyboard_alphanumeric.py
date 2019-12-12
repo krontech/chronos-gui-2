@@ -7,12 +7,12 @@ from PyQt5 import uic, QtCore, QtGui
 from chronosGui2.input_panels import KeyboardBase
 from button import Button
 
-from chronosGui2.generated.keyboard_alphanumeric import Ui_uiKeyboardNumericWithUnits
+from chronosGui2.generated.keyboard_alphanumeric import Ui_uiKeyboardAlphanumeric
 
 padding = 10
 
 
-class KeyboardAlphanumeric(KeyboardBase, Ui_uiKeyboardNumericWithUnits):
+class KeyboardAlphanumeric(KeyboardBase, Ui_uiKeyboardAlphanumeric):
 	
 	def __init__(self, window):
 		super().__init__(window)

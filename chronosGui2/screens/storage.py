@@ -8,7 +8,7 @@ import chronosGui2.api as api
 from chronosGui2.external_process import run
 
 # Import the generated UI form.
-from chronosGui2.generated.storage import Ui_Form as Ui_Storage
+from chronosGui2.generated.storage import Ui_Storage
 
 class Storage(QtWidgets.QWidget, Ui_Storage):
 	def __init__(self, window):

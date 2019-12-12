@@ -18,7 +18,7 @@ import chronosGui2.settings as settings
 import chronosGui2.external_process as external_process
 
 # Import the generated UI form.
-from chronosGui2.generated.remote_access import Ui_Form as Ui_RemoteAccess
+from chronosGui2.generated.remote_access import Ui_RemoteAccess
 
 import logging; log = logging.getLogger('Chronos.gui')
 

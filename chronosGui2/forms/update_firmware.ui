@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>Form</class>
- <widget class="QWidget" name="Form">
+ <class>UpdateFirmware</class>
+ <widget class="QWidget" name="UpdateFirmware">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string notr="true">User Settings</string>
+   <string notr="true">Update Firmware</string>
   </property>
   <widget class="Backdrop" name="backdrop">
    <property name="geometry">
@@ -28,36 +28,33 @@
     <rect>
      <x>20</x>
      <y>10</y>
-     <width>241</width>
-     <height>31</height>
+     <width>231</width>
+     <height>41</height>
     </rect>
    </property>
    <property name="text">
-    <string>Camera Settings</string>
+    <string>Update Firmware</string>
    </property>
   </widget>
   <widget class="Label" name="label">
    <property name="geometry">
     <rect>
-     <x>20</x>
-     <y>50</y>
-     <width>671</width>
-     <height>81</height>
+     <x>30</x>
+     <y>160</y>
+     <width>731</width>
+     <height>31</height>
     </rect>
    </property>
    <property name="text">
-    <string>This screen allows you to save and restore how you've set up your camera so far. Some examples of user settings are: saved video framerate, focus peaking color, trigger settings, and so on. If you're selling the camera, it is recommend to reset it to the default factory settings.</string>
-   </property>
-   <property name="wordWrap">
-    <bool>true</bool>
+    <string>2: Back up your configuration to the external storage device. (optional)</string>
    </property>
   </widget>
-  <widget class="Button" name="uiSaveSettings">
+  <widget class="Button" name="uiSaveCalData">
    <property name="geometry">
     <rect>
-     <x>0</x>
-     <y>140</y>
-     <width>231</width>
+     <x>10</x>
+     <y>170</y>
+     <width>261</width>
      <height>81</height>
     </rect>
    </property>
@@ -68,12 +65,41 @@
     <enum>Button::half</enum>
    </property>
   </widget>
-  <widget class="Button" name="uiLoadSettings">
+  <widget class="Button" name="uiSafelyRemove">
    <property name="geometry">
     <rect>
-     <x>230</x>
-     <y>140</y>
-     <width>231</width>
+     <x>360</x>
+     <y>70</y>
+     <width>171</width>
+     <height>81</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Safely Remove</string>
+   </property>
+   <property name="clickMarginLeft" stdset="0">
+    <enum>Button::half</enum>
+   </property>
+  </widget>
+  <widget class="Button" name="uiApplyUpdate">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>270</y>
+     <width>271</width>
+     <height>81</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Apply Software Update</string>
+   </property>
+  </widget>
+  <widget class="Button" name="uiLoadCalData">
+   <property name="geometry">
+    <rect>
+     <x>270</x>
+     <y>170</y>
+     <width>261</width>
      <height>81</height>
     </rect>
    </property>
@@ -82,35 +108,6 @@
    </property>
    <property name="clickMarginLeft" stdset="0">
     <enum>Button::half</enum>
-   </property>
-  </widget>
-  <widget class="Button" name="uiFactoryReset">
-   <property name="geometry">
-    <rect>
-     <x>500</x>
-     <y>140</y>
-     <width>241</width>
-     <height>81</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Factory Reset</string>
-   </property>
-  </widget>
-  <widget class="Button" name="button_4">
-   <property name="geometry">
-    <rect>
-     <x>380</x>
-     <y>240</y>
-     <width>161</width>
-     <height>81</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Safely Remove</string>
-   </property>
-   <property name="clickMarginLeft" stdset="0">
-    <enum>Button::none</enum>
    </property>
   </widget>
   <widget class="Button" name="uiDone">
@@ -126,81 +123,103 @@
     <string>Done</string>
    </property>
   </widget>
-  <widget class="FeedbackLabel" name="uiLoadCalDataError">
-   <property name="geometry">
-    <rect>
-     <x>240</x>
-     <y>200</y>
-     <width>551</width>
-     <height>41</height>
-    </rect>
-   </property>
-   <property name="alignment">
-    <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
-   </property>
-  </widget>
   <widget class="FeedbackLabel" name="uiSaveCalDataError">
    <property name="geometry">
     <rect>
-     <x>20</x>
-     <y>200</y>
+     <x>30</x>
+     <y>230</y>
      <width>771</width>
-     <height>41</height>
+     <height>21</height>
     </rect>
    </property>
-   <property name="alignment">
-    <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
-   </property>
   </widget>
-  <widget class="Subheader" name="subheader">
+  <widget class="FeedbackLabel" name="uiApplyUpdateError">
    <property name="geometry">
     <rect>
-     <x>20</x>
-     <y>240</y>
-     <width>681</width>
+     <x>30</x>
+     <y>330</y>
+     <width>741</width>
+     <height>21</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="FeedbackLabel" name="uiLoadCalDataError">
+   <property name="geometry">
+    <rect>
+     <x>280</x>
+     <y>230</y>
+     <width>521</width>
+     <height>21</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="Label" name="label_5">
+   <property name="geometry">
+    <rect>
+     <x>30</x>
+     <y>60</y>
+     <width>731</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>1: Select the external storage device with &quot;camUpdate&quot; on it.</string>
+   </property>
+  </widget>
+  <widget class="Label" name="label_2">
+   <property name="geometry">
+    <rect>
+     <x>30</x>
+     <y>260</y>
+     <width>731</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>3: Apply the camera firmware upgrade. The camera will restart when complete.</string>
+   </property>
+  </widget>
+  <widget class="FeedbackLabel" name="uiConfirmRemove">
+   <property name="geometry">
+    <rect>
+     <x>30</x>
+     <y>130</y>
+     <width>771</width>
      <height>21</height>
     </rect>
    </property>
    <property name="text">
-    <string>Save Location</string>
+    <string>The device can be safely removed.</string>
    </property>
   </widget>
   <widget class="StorageMediaSelect" name="uiMediaSelect">
    <property name="geometry">
     <rect>
-     <x>0</x>
-     <y>240</y>
-     <width>381</width>
+     <x>10</x>
+     <y>70</y>
+     <width>351</width>
      <height>81</height>
     </rect>
    </property>
-  </widget>
-  <widget class="FeedbackLabel" name="uiFactoryResetError">
-   <property name="geometry">
-    <rect>
-     <x>520</x>
-     <y>200</y>
-     <width>271</width>
-     <height>41</height>
-    </rect>
-   </property>
-   <property name="alignment">
-    <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+   <property name="clickMarginRight" stdset="0">
+    <enum>ComboBox::half</enum>
    </property>
   </widget>
   <zorder>backdrop</zorder>
+  <zorder>uiConfirmRemove</zorder>
   <zorder>headerlabel</zorder>
-  <zorder>label</zorder>
-  <zorder>uiSaveSettings</zorder>
-  <zorder>uiLoadSettings</zorder>
-  <zorder>uiFactoryReset</zorder>
-  <zorder>button_4</zorder>
   <zorder>uiDone</zorder>
+  <zorder>uiApplyUpdateError</zorder>
   <zorder>uiSaveCalDataError</zorder>
-  <zorder>subheader</zorder>
   <zorder>uiLoadCalDataError</zorder>
+  <zorder>label_5</zorder>
+  <zorder>label</zorder>
+  <zorder>label_2</zorder>
+  <zorder>uiSaveCalData</zorder>
+  <zorder>uiSafelyRemove</zorder>
+  <zorder>uiLoadCalData</zorder>
+  <zorder>uiApplyUpdate</zorder>
   <zorder>uiMediaSelect</zorder>
-  <zorder>uiFactoryResetError</zorder>
  </widget>
  <customwidgets>
   <customwidget>
@@ -238,12 +257,14 @@
    <extends>ComboBox</extends>
    <header>storage_media_select</header>
   </customwidget>
-  <customwidget>
-   <class>Subheader</class>
-   <extends>QLabel</extends>
-   <header>subheader</header>
-  </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>uiDone</tabstop>
+  <tabstop>uiSafelyRemove</tabstop>
+  <tabstop>uiSaveCalData</tabstop>
+  <tabstop>uiLoadCalData</tabstop>
+  <tabstop>uiApplyUpdate</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>
