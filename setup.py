@@ -39,7 +39,7 @@ class gui2_build_ui(Command):
 		pass
 	
 	def run(self):
-		genenerate(self.dry_run)
+		generate(self.dry_run)
 
 # Generate some python code from Qt files.
 class gui2_build_py(build_py):
@@ -51,6 +51,7 @@ class gui2_build_py(build_py):
 		build_py.run(self)
 		
 class gui2_sdist(sdist):
+	#sdist = source distribution
 	def run(self):
 		# Build generated code.
 		generate(self.dry_run)
