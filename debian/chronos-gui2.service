@@ -1,0 +1,14 @@
+[Unit]
+Description=Chronos Back-of-Camera GUI (Python3/Qt5)
+After=chronos-video.service chronos-control.service
+Conflicts=chronos-gui.service
+
+[Service]
+WorkingDirectory=/var/camera
+EnvironmentFile=/etc/chronos-gui2.conf
+ExecStart=/usr/bin/python3 -m chronosGui2
+StandardOutput=journal+console
+StandardError=inherit
+
+[Install]
+WantedBy=multi-user.target

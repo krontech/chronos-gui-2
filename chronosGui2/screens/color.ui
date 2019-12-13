@@ -1,0 +1,907 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Color</class>
+ <widget class="QWidget" name="Color">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>800</width>
+    <height>480</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Chronos Screen</string>
+  </property>
+  <widget class="InteractiveVideoArea" name="interactivevideoarea">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>30</x>
+     <y>260</y>
+     <width>331</width>
+     <height>201</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="HeaderLabel" name="headerlabel">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>10</y>
+     <width>241</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Color</string>
+   </property>
+  </widget>
+  <widget class="Button" name="uiDone">
+   <property name="geometry">
+    <rect>
+     <x>630</x>
+     <y>400</y>
+     <width>171</width>
+     <height>81</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Done</string>
+   </property>
+   <property name="clickMarginLeft" stdset="0">
+    <enum>Button::half</enum>
+   </property>
+  </widget>
+  <widget class="Subheader" name="subheader">
+   <property name="geometry">
+    <rect>
+     <x>30</x>
+     <y>50</y>
+     <width>291</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Color Temperature (White Balance)</string>
+   </property>
+  </widget>
+  <widget class="SpinBox" name="uiColorTemperature">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>60</y>
+     <width>161</width>
+     <height>81</height>
+    </rect>
+   </property>
+   <property name="suffix">
+    <string>K</string>
+   </property>
+   <property name="minimum">
+    <number>1800</number>
+   </property>
+   <property name="maximum">
+    <number>10000</number>
+   </property>
+   <property name="singleStep">
+    <number>25</number>
+   </property>
+  </widget>
+  <widget class="ComboBox" name="uiColorMatrixPreset">
+   <property name="geometry">
+    <rect>
+     <x>380</x>
+     <y>60</y>
+     <width>231</width>
+     <height>81</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="Subheader" name="subheader_4">
+   <property name="geometry">
+    <rect>
+     <x>400</x>
+     <y>50</y>
+     <width>181</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Color Matrix Preset</string>
+   </property>
+  </widget>
+  <widget class="Subheader" name="subheader_5">
+   <property name="geometry">
+    <rect>
+     <x>30</x>
+     <y>230</y>
+     <width>241</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Preview</string>
+   </property>
+  </widget>
+  <widget class="Backdrop" name="backdrop_3">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>460</y>
+     <width>361</width>
+     <height>21</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="Backdrop" name="backdrop_4">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>230</y>
+     <width>31</width>
+     <height>231</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QWidget" name="widget" native="true">
+   <property name="geometry">
+    <rect>
+     <x>390</x>
+     <y>130</y>
+     <width>401</width>
+     <height>241</height>
+    </rect>
+   </property>
+   <widget class="DecimalSpinBox" name="uiCMGreenGreen">
+    <property name="geometry">
+     <rect>
+      <x>190</x>
+      <y>110</y>
+      <width>101</width>
+      <height>61</height>
+     </rect>
+    </property>
+    <property name="decimals">
+     <number>3</number>
+    </property>
+    <property name="minimum">
+     <double>-2.500000000000000</double>
+    </property>
+    <property name="maximum">
+     <double>2.500000000000000</double>
+    </property>
+    <property name="singleStep">
+     <double>0.010000000000000</double>
+    </property>
+    <property name="clickMarginLeft" stdset="0">
+     <enum>DecimalSpinBox::half</enum>
+    </property>
+    <property name="clickMarginRight" stdset="0">
+     <enum>DecimalSpinBox::half</enum>
+    </property>
+    <property name="clickMarginTop" stdset="0">
+     <enum>DecimalSpinBox::half</enum>
+    </property>
+    <property name="clickMarginBottom" stdset="0">
+     <enum>DecimalSpinBox::half</enum>
+    </property>
+   </widget>
+   <widget class="Subheader" name="subheader_3">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>10</y>
+      <width>241</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Color Matrix</string>
+    </property>
+   </widget>
+   <widget class="DecimalSpinBox" name="uiCMGreenRed">
+    <property name="geometry">
+     <rect>
+      <x>80</x>
+      <y>110</y>
+      <width>111</width>
+      <height>61</height>
+     </rect>
+    </property>
+    <property name="decimals">
+     <number>3</number>
+    </property>
+    <property name="minimum">
+     <double>-2.500000000000000</double>
+    </property>
+    <property name="maximum">
+     <double>2.500000000000000</double>
+    </property>
+    <property name="singleStep">
+     <double>0.010000000000000</double>
+    </property>
+    <property name="clickMarginRight" stdset="0">
+     <enum>DecimalSpinBox::half</enum>
+    </property>
+    <property name="clickMarginTop" stdset="0">
+     <enum>DecimalSpinBox::half</enum>
+    </property>
+    <property name="clickMarginBottom" stdset="0">
+     <enum>DecimalSpinBox::half</enum>
+    </property>
+   </widget>
+   <widget class="DecimalSpinBox" name="uiCMGreenBlue">
+    <property name="geometry">
+     <rect>
+      <x>290</x>
+      <y>110</y>
+      <width>111</width>
+      <height>61</height>
+     </rect>
+    </property>
+    <property name="decimals">
+     <number>3</number>
+    </property>
+    <property name="minimum">
+     <double>-2.500000000000000</double>
+    </property>
+    <property name="maximum">
+     <double>2.500000000000000</double>
+    </property>
+    <property name="singleStep">
+     <double>0.010000000000000</double>
+    </property>
+    <property name="clickMarginLeft" stdset="0">
+     <enum>DecimalSpinBox::half</enum>
+    </property>
+    <property name="clickMarginTop" stdset="0">
+     <enum>DecimalSpinBox::half</enum>
+    </property>
+    <property name="clickMarginBottom" stdset="0">
+     <enum>DecimalSpinBox::half</enum>
+    </property>
+   </widget>
+   <widget class="DecimalSpinBox" name="uiCMBlueGreen">
+    <property name="geometry">
+     <rect>
+      <x>190</x>
+      <y>170</y>
+      <width>101</width>
+      <height>61</height>
+     </rect>
+    </property>
+    <property name="decimals">
+     <number>3</number>
+    </property>
+    <property name="minimum">
+     <double>-2.500000000000000</double>
+    </property>
+    <property name="maximum">
+     <double>2.500000000000000</double>
+    </property>
+    <property name="singleStep">
+     <double>0.010000000000000</double>
+    </property>
+    <property name="clickMarginLeft" stdset="0">
+     <enum>DecimalSpinBox::half</enum>
+    </property>
+    <property name="clickMarginRight" stdset="0">
+     <enum>DecimalSpinBox::half</enum>
+    </property>
+    <property name="clickMarginTop" stdset="0">
+     <enum>DecimalSpinBox::half</enum>
+    </property>
+    <property name="clickMarginBottom" stdset="0">
+     <enum>DecimalSpinBox::half</enum>
+    </property>
+   </widget>
+   <widget class="DecimalSpinBox" name="uiCMRedRed">
+    <property name="geometry">
+     <rect>
+      <x>80</x>
+      <y>40</y>
+      <width>111</width>
+      <height>71</height>
+     </rect>
+    </property>
+    <property name="decimals">
+     <number>3</number>
+    </property>
+    <property name="minimum">
+     <double>-2.500000000000000</double>
+    </property>
+    <property name="maximum">
+     <double>2.500000000000000</double>
+    </property>
+    <property name="singleStep">
+     <double>0.010000000000000</double>
+    </property>
+    <property name="clickMarginRight" stdset="0">
+     <enum>DecimalSpinBox::half</enum>
+    </property>
+    <property name="clickMarginBottom" stdset="0">
+     <enum>DecimalSpinBox::half</enum>
+    </property>
+   </widget>
+   <widget class="DecimalSpinBox" name="uiCMRedBlue">
+    <property name="geometry">
+     <rect>
+      <x>290</x>
+      <y>40</y>
+      <width>111</width>
+      <height>71</height>
+     </rect>
+    </property>
+    <property name="decimals">
+     <number>3</number>
+    </property>
+    <property name="minimum">
+     <double>-2.500000000000000</double>
+    </property>
+    <property name="maximum">
+     <double>2.500000000000000</double>
+    </property>
+    <property name="singleStep">
+     <double>0.010000000000000</double>
+    </property>
+    <property name="clickMarginLeft" stdset="0">
+     <enum>DecimalSpinBox::half</enum>
+    </property>
+    <property name="clickMarginBottom" stdset="0">
+     <enum>DecimalSpinBox::half</enum>
+    </property>
+   </widget>
+   <widget class="DecimalSpinBox" name="uiCMBlueBlue">
+    <property name="geometry">
+     <rect>
+      <x>290</x>
+      <y>170</y>
+      <width>111</width>
+      <height>61</height>
+     </rect>
+    </property>
+    <property name="decimals">
+     <number>3</number>
+    </property>
+    <property name="minimum">
+     <double>-2.500000000000000</double>
+    </property>
+    <property name="maximum">
+     <double>2.500000000000000</double>
+    </property>
+    <property name="singleStep">
+     <double>0.010000000000000</double>
+    </property>
+    <property name="clickMarginLeft" stdset="0">
+     <enum>DecimalSpinBox::half</enum>
+    </property>
+    <property name="clickMarginTop" stdset="0">
+     <enum>DecimalSpinBox::half</enum>
+    </property>
+    <property name="clickMarginBottom" stdset="0">
+     <enum>DecimalSpinBox::half</enum>
+    </property>
+   </widget>
+   <widget class="DecimalSpinBox" name="uiCMBlueRed">
+    <property name="geometry">
+     <rect>
+      <x>80</x>
+      <y>170</y>
+      <width>111</width>
+      <height>61</height>
+     </rect>
+    </property>
+    <property name="decimals">
+     <number>3</number>
+    </property>
+    <property name="minimum">
+     <double>-2.500000000000000</double>
+    </property>
+    <property name="maximum">
+     <double>2.500000000000000</double>
+    </property>
+    <property name="singleStep">
+     <double>0.010000000000000</double>
+    </property>
+    <property name="clickMarginRight" stdset="0">
+     <enum>DecimalSpinBox::half</enum>
+    </property>
+    <property name="clickMarginTop" stdset="0">
+     <enum>DecimalSpinBox::half</enum>
+    </property>
+    <property name="clickMarginBottom" stdset="0">
+     <enum>DecimalSpinBox::half</enum>
+    </property>
+   </widget>
+   <widget class="DecimalSpinBox" name="uiCMRedGreen">
+    <property name="geometry">
+     <rect>
+      <x>190</x>
+      <y>40</y>
+      <width>101</width>
+      <height>71</height>
+     </rect>
+    </property>
+    <property name="decimals">
+     <number>3</number>
+    </property>
+    <property name="minimum">
+     <double>-2.500000000000000</double>
+    </property>
+    <property name="maximum">
+     <double>2.500000000000000</double>
+    </property>
+    <property name="singleStep">
+     <double>0.010000000000000</double>
+    </property>
+    <property name="clickMarginLeft" stdset="0">
+     <enum>DecimalSpinBox::half</enum>
+    </property>
+    <property name="clickMarginRight" stdset="0">
+     <enum>DecimalSpinBox::half</enum>
+    </property>
+    <property name="clickMarginBottom" stdset="0">
+     <enum>DecimalSpinBox::half</enum>
+    </property>
+   </widget>
+   <widget class="Label" name="label_6">
+    <property name="geometry">
+     <rect>
+      <x>2</x>
+      <y>70</y>
+      <width>91</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Red Out =</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+    </property>
+   </widget>
+   <widget class="Label" name="label_4">
+    <property name="geometry">
+     <rect>
+      <x>100</x>
+      <y>30</y>
+      <width>81</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Red In</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
+    </property>
+   </widget>
+   <widget class="Label" name="label_5">
+    <property name="geometry">
+     <rect>
+      <x>200</x>
+      <y>30</y>
+      <width>81</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Green In</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
+    </property>
+   </widget>
+   <widget class="Label" name="label_7">
+    <property name="geometry">
+     <rect>
+      <x>300</x>
+      <y>30</y>
+      <width>81</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Blue In</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
+    </property>
+   </widget>
+   <widget class="Label" name="label_8">
+    <property name="geometry">
+     <rect>
+      <x>2</x>
+      <y>130</y>
+      <width>91</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Green Out =</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+    </property>
+   </widget>
+   <widget class="Label" name="label_9">
+    <property name="geometry">
+     <rect>
+      <x>2</x>
+      <y>190</y>
+      <width>91</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Blue Out =</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+    </property>
+   </widget>
+   <widget class="Label" name="label_10">
+    <property name="geometry">
+     <rect>
+      <x>180</x>
+      <y>70</y>
+      <width>21</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>+</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
+    </property>
+   </widget>
+   <widget class="Label" name="label_11">
+    <property name="geometry">
+     <rect>
+      <x>280</x>
+      <y>70</y>
+      <width>21</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>+</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
+    </property>
+   </widget>
+   <widget class="Label" name="label_12">
+    <property name="geometry">
+     <rect>
+      <x>180</x>
+      <y>130</y>
+      <width>21</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>+</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
+    </property>
+   </widget>
+   <widget class="Label" name="label_13">
+    <property name="geometry">
+     <rect>
+      <x>280</x>
+      <y>130</y>
+      <width>21</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>+</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
+    </property>
+   </widget>
+   <widget class="Label" name="label_14">
+    <property name="geometry">
+     <rect>
+      <x>180</x>
+      <y>190</y>
+      <width>21</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>+</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
+    </property>
+   </widget>
+   <widget class="Label" name="label_15">
+    <property name="geometry">
+     <rect>
+      <x>280</x>
+      <y>190</y>
+      <width>21</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>+</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
+    </property>
+   </widget>
+   <zorder>uiCMBlueGreen</zorder>
+   <zorder>uiCMBlueRed</zorder>
+   <zorder>uiCMGreenRed</zorder>
+   <zorder>uiCMGreenBlue</zorder>
+   <zorder>uiCMRedGreen</zorder>
+   <zorder>uiCMBlueBlue</zorder>
+   <zorder>uiCMRedBlue</zorder>
+   <zorder>uiCMGreenGreen</zorder>
+   <zorder>uiCMRedRed</zorder>
+   <zorder>label_6</zorder>
+   <zorder>subheader_3</zorder>
+   <zorder>label_4</zorder>
+   <zorder>label_5</zorder>
+   <zorder>label_7</zorder>
+   <zorder>label_8</zorder>
+   <zorder>label_9</zorder>
+   <zorder>label_10</zorder>
+   <zorder>label_11</zorder>
+   <zorder>label_12</zorder>
+   <zorder>label_13</zorder>
+   <zorder>label_14</zorder>
+   <zorder>label_15</zorder>
+  </widget>
+  <widget class="QWidget" name="widget_2" native="true">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>130</y>
+     <width>361</width>
+     <height>111</height>
+    </rect>
+   </property>
+   <widget class="Label" name="label_2">
+    <property name="geometry">
+     <rect>
+      <x>120</x>
+      <y>50</y>
+      <width>21</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>G</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
+    </property>
+   </widget>
+   <widget class="DecimalSpinBox" name="uiWBBlue">
+    <property name="geometry">
+     <rect>
+      <x>230</x>
+      <y>20</y>
+      <width>121</width>
+      <height>81</height>
+     </rect>
+    </property>
+    <property name="decimals">
+     <number>3</number>
+    </property>
+    <property name="maximum">
+     <double>5.000000000000000</double>
+    </property>
+    <property name="singleStep">
+     <double>0.010000000000000</double>
+    </property>
+   </widget>
+   <widget class="DecimalSpinBox" name="uiWBGreen">
+    <property name="geometry">
+     <rect>
+      <x>120</x>
+      <y>20</y>
+      <width>111</width>
+      <height>81</height>
+     </rect>
+    </property>
+    <property name="decimals">
+     <number>3</number>
+    </property>
+    <property name="maximum">
+     <double>5.000000000000000</double>
+    </property>
+    <property name="singleStep">
+     <double>0.010000000000000</double>
+    </property>
+    <property name="clickMarginRight" stdset="0">
+     <enum>DecimalSpinBox::half</enum>
+    </property>
+   </widget>
+   <widget class="Label" name="label_3">
+    <property name="geometry">
+     <rect>
+      <x>230</x>
+      <y>50</y>
+      <width>21</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>B</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
+    </property>
+   </widget>
+   <widget class="DecimalSpinBox" name="uiWBRed">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>20</y>
+      <width>111</width>
+      <height>81</height>
+     </rect>
+    </property>
+    <property name="decimals">
+     <number>3</number>
+    </property>
+    <property name="maximum">
+     <double>5.000000000000000</double>
+    </property>
+    <property name="singleStep">
+     <double>0.010000000000000</double>
+    </property>
+    <property name="clickMarginRight" stdset="0">
+     <enum>DecimalSpinBox::half</enum>
+    </property>
+   </widget>
+   <widget class="Subheader" name="subheader_2">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>10</y>
+      <width>241</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>White Balance Matrix</string>
+    </property>
+   </widget>
+   <widget class="Label" name="label">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>50</y>
+      <width>21</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>R</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
+    </property>
+   </widget>
+   <zorder>subheader_2</zorder>
+   <zorder>label_2</zorder>
+   <zorder>uiWBBlue</zorder>
+   <zorder>uiWBGreen</zorder>
+   <zorder>label_3</zorder>
+   <zorder>uiWBRed</zorder>
+   <zorder>label</zorder>
+  </widget>
+  <widget class="Backdrop" name="backdrop">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>801</width>
+     <height>261</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="Backdrop" name="backdrop_2">
+   <property name="geometry">
+    <rect>
+     <x>360</x>
+     <y>260</y>
+     <width>441</width>
+     <height>221</height>
+    </rect>
+   </property>
+  </widget>
+  <zorder>backdrop</zorder>
+  <zorder>backdrop_2</zorder>
+  <zorder>subheader_4</zorder>
+  <zorder>widget</zorder>
+  <zorder>backdrop_4</zorder>
+  <zorder>backdrop_3</zorder>
+  <zorder>interactivevideoarea</zorder>
+  <zorder>headerlabel</zorder>
+  <zorder>uiDone</zorder>
+  <zorder>subheader</zorder>
+  <zorder>uiColorMatrixPreset</zorder>
+  <zorder>subheader_5</zorder>
+  <zorder>widget_2</zorder>
+  <zorder>uiColorTemperature</zorder>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>Backdrop</class>
+   <extends>QLabel</extends>
+   <header>backdrop</header>
+  </customwidget>
+  <customwidget>
+   <class>Button</class>
+   <extends>QPushButton</extends>
+   <header>button</header>
+  </customwidget>
+  <customwidget>
+   <class>ComboBox</class>
+   <extends>QComboBox</extends>
+   <header>combo_box</header>
+  </customwidget>
+  <customwidget>
+   <class>DecimalSpinBox</class>
+   <extends>QDoubleSpinBox</extends>
+   <header>decimal_spin_box</header>
+  </customwidget>
+  <customwidget>
+   <class>HeaderLabel</class>
+   <extends>QLabel</extends>
+   <header>header_label</header>
+  </customwidget>
+  <customwidget>
+   <class>InteractiveVideoArea</class>
+   <extends>QWidget</extends>
+   <header>interactive_video_area</header>
+  </customwidget>
+  <customwidget>
+   <class>Label</class>
+   <extends>QLabel</extends>
+   <header>label</header>
+  </customwidget>
+  <customwidget>
+   <class>SpinBox</class>
+   <extends>QSpinBox</extends>
+   <header>spin_box</header>
+  </customwidget>
+  <customwidget>
+   <class>Subheader</class>
+   <extends>QLabel</extends>
+   <header>subheader</header>
+  </customwidget>
+ </customwidgets>
+ <tabstops>
+  <tabstop>uiDone</tabstop>
+  <tabstop>uiColorTemperature</tabstop>
+  <tabstop>uiColorMatrixPreset</tabstop>
+  <tabstop>uiWBRed</tabstop>
+  <tabstop>uiWBGreen</tabstop>
+  <tabstop>uiWBBlue</tabstop>
+  <tabstop>uiCMRedRed</tabstop>
+  <tabstop>uiCMRedGreen</tabstop>
+  <tabstop>uiCMRedBlue</tabstop>
+  <tabstop>uiCMGreenRed</tabstop>
+  <tabstop>uiCMGreenGreen</tabstop>
+  <tabstop>uiCMGreenBlue</tabstop>
+  <tabstop>uiCMBlueRed</tabstop>
+  <tabstop>uiCMBlueGreen</tabstop>
+  <tabstop>uiCMBlueBlue</tabstop>
+ </tabstops>
+ <resources/>
+ <connections/>
+</ui>

@@ -1,0 +1,249 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>UserSettings</class>
+ <widget class="QWidget" name="UserSettings">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>800</width>
+    <height>480</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string notr="true">User Settings</string>
+  </property>
+  <widget class="Backdrop" name="backdrop">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>801</width>
+     <height>481</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="HeaderLabel" name="headerlabel">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>10</y>
+     <width>241</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Camera Settings</string>
+   </property>
+  </widget>
+  <widget class="Label" name="label">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>50</y>
+     <width>671</width>
+     <height>81</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>This screen allows you to save and restore how you've set up your camera so far. Some examples of user settings are: saved video framerate, focus peaking color, trigger settings, and so on. If you're selling the camera, it is recommend to reset it to the default factory settings.</string>
+   </property>
+   <property name="wordWrap">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="Button" name="uiSaveSettings">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>140</y>
+     <width>231</width>
+     <height>81</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Save Camera Settings</string>
+   </property>
+   <property name="clickMarginRight" stdset="0">
+    <enum>Button::half</enum>
+   </property>
+  </widget>
+  <widget class="Button" name="uiLoadSettings">
+   <property name="geometry">
+    <rect>
+     <x>230</x>
+     <y>140</y>
+     <width>231</width>
+     <height>81</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Load Camera Settings</string>
+   </property>
+   <property name="clickMarginLeft" stdset="0">
+    <enum>Button::half</enum>
+   </property>
+  </widget>
+  <widget class="Button" name="uiFactoryReset">
+   <property name="geometry">
+    <rect>
+     <x>500</x>
+     <y>140</y>
+     <width>241</width>
+     <height>81</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Factory Reset</string>
+   </property>
+  </widget>
+  <widget class="Button" name="button_4">
+   <property name="geometry">
+    <rect>
+     <x>380</x>
+     <y>240</y>
+     <width>161</width>
+     <height>81</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Safely Remove</string>
+   </property>
+   <property name="clickMarginLeft" stdset="0">
+    <enum>Button::none</enum>
+   </property>
+  </widget>
+  <widget class="Button" name="uiDone">
+   <property name="geometry">
+    <rect>
+     <x>620</x>
+     <y>400</y>
+     <width>181</width>
+     <height>81</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Done</string>
+   </property>
+  </widget>
+  <widget class="FeedbackLabel" name="uiLoadCalDataError">
+   <property name="geometry">
+    <rect>
+     <x>240</x>
+     <y>200</y>
+     <width>551</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+   </property>
+  </widget>
+  <widget class="FeedbackLabel" name="uiSaveCalDataError">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>200</y>
+     <width>771</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+   </property>
+  </widget>
+  <widget class="Subheader" name="subheader">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>240</y>
+     <width>681</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Save Location</string>
+   </property>
+  </widget>
+  <widget class="StorageMediaSelect" name="uiMediaSelect">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>240</y>
+     <width>381</width>
+     <height>81</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="FeedbackLabel" name="uiFactoryResetError">
+   <property name="geometry">
+    <rect>
+     <x>520</x>
+     <y>200</y>
+     <width>271</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+   </property>
+  </widget>
+  <zorder>backdrop</zorder>
+  <zorder>headerlabel</zorder>
+  <zorder>label</zorder>
+  <zorder>uiSaveSettings</zorder>
+  <zorder>uiLoadSettings</zorder>
+  <zorder>uiFactoryReset</zorder>
+  <zorder>button_4</zorder>
+  <zorder>uiDone</zorder>
+  <zorder>uiSaveCalDataError</zorder>
+  <zorder>subheader</zorder>
+  <zorder>uiLoadCalDataError</zorder>
+  <zorder>uiMediaSelect</zorder>
+  <zorder>uiFactoryResetError</zorder>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>Backdrop</class>
+   <extends>QLabel</extends>
+   <header>backdrop</header>
+  </customwidget>
+  <customwidget>
+   <class>Button</class>
+   <extends>QPushButton</extends>
+   <header>button</header>
+  </customwidget>
+  <customwidget>
+   <class>ComboBox</class>
+   <extends>QComboBox</extends>
+   <header>combo_box</header>
+  </customwidget>
+  <customwidget>
+   <class>FeedbackLabel</class>
+   <extends>QLabel</extends>
+   <header>feedback_label</header>
+  </customwidget>
+  <customwidget>
+   <class>HeaderLabel</class>
+   <extends>QLabel</extends>
+   <header>header_label</header>
+  </customwidget>
+  <customwidget>
+   <class>Label</class>
+   <extends>QLabel</extends>
+   <header>label</header>
+  </customwidget>
+  <customwidget>
+   <class>StorageMediaSelect</class>
+   <extends>ComboBox</extends>
+   <header>storage_media_select</header>
+  </customwidget>
+  <customwidget>
+   <class>Subheader</class>
+   <extends>QLabel</extends>
+   <header>subheader</header>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>

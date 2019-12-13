@@ -1,0 +1,305 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>TestSpinBox</class>
+ <widget class="QWidget" name="TestSpinBox">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>800</width>
+    <height>480</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Widget Test</string>
+  </property>
+  <widget class="Backdrop" name="white">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>801</width>
+     <height>481</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="HeaderLabel" name="headerlabel">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>10</y>
+     <width>141</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Test Screen</string>
+   </property>
+  </widget>
+  <widget class="Button" name="uiBack">
+   <property name="geometry">
+    <rect>
+     <x>630</x>
+     <y>400</y>
+     <width>171</width>
+     <height>81</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Back</string>
+   </property>
+   <property name="clickMarginLeft" stdset="0">
+    <enum>Button::half</enum>
+   </property>
+  </widget>
+  <widget class="DecimalSpinBox" name="decimalspinbox">
+   <property name="geometry">
+    <rect>
+     <x>50</x>
+     <y>80</y>
+     <width>201</width>
+     <height>81</height>
+    </rect>
+   </property>
+   <property name="singleStep">
+    <double>0.500000000000000</double>
+   </property>
+  </widget>
+  <widget class="DecimalSpinBox" name="decimalspinbox_2">
+   <property name="geometry">
+    <rect>
+     <x>50</x>
+     <y>160</y>
+     <width>201</width>
+     <height>81</height>
+    </rect>
+   </property>
+   <property name="decimals">
+    <number>3</number>
+   </property>
+   <property name="maximum">
+    <double>9999.989999999999782</double>
+   </property>
+   <property name="units" stdset="0">
+    <string>,k</string>
+   </property>
+  </widget>
+  <widget class="DecimalSpinBox" name="decimalspinbox_3">
+   <property name="geometry">
+    <rect>
+     <x>50</x>
+     <y>240</y>
+     <width>201</width>
+     <height>81</height>
+    </rect>
+   </property>
+   <property name="units" stdset="0">
+    <string>seconds</string>
+   </property>
+  </widget>
+  <widget class="SpinBox" name="spinbox">
+   <property name="geometry">
+    <rect>
+     <x>250</x>
+     <y>80</y>
+     <width>201</width>
+     <height>81</height>
+    </rect>
+   </property>
+   <property name="singleStep">
+    <number>16</number>
+   </property>
+  </widget>
+  <widget class="SpinBox" name="spinbox_2">
+   <property name="geometry">
+    <rect>
+     <x>250</x>
+     <y>160</y>
+     <width>201</width>
+     <height>81</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="SpinBox" name="spinbox_3">
+   <property name="geometry">
+    <rect>
+     <x>250</x>
+     <y>240</y>
+     <width>201</width>
+     <height>81</height>
+    </rect>
+   </property>
+   <property name="minimum">
+    <number>10</number>
+   </property>
+   <property name="maximum">
+    <number>2147483647</number>
+   </property>
+  </widget>
+  <widget class="Label" name="label">
+   <property name="geometry">
+    <rect>
+     <x>50</x>
+     <y>70</y>
+     <width>201</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Decimal</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignCenter</set>
+   </property>
+  </widget>
+  <widget class="Label" name="label_2">
+   <property name="geometry">
+    <rect>
+     <x>250</x>
+     <y>70</y>
+     <width>201</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Integer</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignCenter</set>
+   </property>
+  </widget>
+  <widget class="Label" name="label_3">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>110</y>
+     <width>61</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Short</string>
+   </property>
+  </widget>
+  <widget class="Label" name="label_4">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>190</y>
+     <width>61</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Long</string>
+   </property>
+  </widget>
+  <widget class="Label" name="label_5">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>270</y>
+     <width>61</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Units</string>
+   </property>
+  </widget>
+  <widget class="Button" name="uiDebug">
+   <property name="geometry">
+    <rect>
+     <x>460</x>
+     <y>400</y>
+     <width>171</width>
+     <height>81</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="focusPolicy">
+    <enum>Qt::NoFocus</enum>
+   </property>
+   <property name="toolTip">
+    <string>Start a command-line debugger.</string>
+   </property>
+   <property name="text">
+    <string>Debug</string>
+   </property>
+   <property name="clickMarginRight" stdset="0">
+    <enum>Button::half</enum>
+   </property>
+  </widget>
+  <widget class="Button" name="button">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>400</y>
+     <width>181</width>
+     <height>81</height>
+    </rect>
+   </property>
+  </widget>
+  <zorder>white</zorder>
+  <zorder>headerlabel</zorder>
+  <zorder>uiBack</zorder>
+  <zorder>label</zorder>
+  <zorder>label_2</zorder>
+  <zorder>label_3</zorder>
+  <zorder>label_4</zorder>
+  <zorder>label_5</zorder>
+  <zorder>uiDebug</zorder>
+  <zorder>decimalspinbox</zorder>
+  <zorder>spinbox_3</zorder>
+  <zorder>decimalspinbox_2</zorder>
+  <zorder>spinbox_2</zorder>
+  <zorder>decimalspinbox_3</zorder>
+  <zorder>spinbox</zorder>
+  <zorder>button</zorder>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>Backdrop</class>
+   <extends>QLabel</extends>
+   <header>backdrop</header>
+  </customwidget>
+  <customwidget>
+   <class>Button</class>
+   <extends>QPushButton</extends>
+   <header>button</header>
+  </customwidget>
+  <customwidget>
+   <class>DecimalSpinBox</class>
+   <extends>QDoubleSpinBox</extends>
+   <header>decimal_spin_box</header>
+  </customwidget>
+  <customwidget>
+   <class>HeaderLabel</class>
+   <extends>QLabel</extends>
+   <header>header_label</header>
+  </customwidget>
+  <customwidget>
+   <class>Label</class>
+   <extends>QLabel</extends>
+   <header>label</header>
+  </customwidget>
+  <customwidget>
+   <class>SpinBox</class>
+   <extends>QSpinBox</extends>
+   <header>spin_box</header>
+  </customwidget>
+ </customwidgets>
+ <tabstops>
+  <tabstop>uiBack</tabstop>
+  <tabstop>decimalspinbox</tabstop>
+  <tabstop>spinbox</tabstop>
+  <tabstop>decimalspinbox_2</tabstop>
+  <tabstop>spinbox_2</tabstop>
+  <tabstop>decimalspinbox_3</tabstop>
+  <tabstop>spinbox_3</tabstop>
+ </tabstops>
+ <resources/>
+ <connections/>
+</ui>

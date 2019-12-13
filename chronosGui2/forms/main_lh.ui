@@ -1,0 +1,542 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainLH</class>
+ <widget class="QWidget" name="MainLH">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>800</width>
+    <height>480</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Chronos Screen</string>
+  </property>
+  <widget class="Backdrop" name="backdrop">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>801</width>
+     <height>41</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="Backdrop" name="backdrop_2">
+   <property name="geometry">
+    <rect>
+     <x>600</x>
+     <y>40</y>
+     <width>201</width>
+     <height>441</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="Button" name="uiTriggerIO">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>181</width>
+     <height>61</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Trigger/IO</string>
+   </property>
+   <property name="clickMarginLeft" stdset="0">
+    <enum>Button::none</enum>
+   </property>
+   <property name="clickMarginRight" stdset="0">
+    <enum>Button::none</enum>
+   </property>
+   <property name="clickMarginTop" stdset="0">
+    <enum>Button::none</enum>
+   </property>
+   <property name="clickMarginBottom" stdset="0">
+    <enum>Button::full</enum>
+   </property>
+  </widget>
+  <widget class="Button" name="uiTriggerDelay">
+   <property name="geometry">
+    <rect>
+     <x>180</x>
+     <y>0</y>
+     <width>181</width>
+     <height>61</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Trigger Delay</string>
+   </property>
+   <property name="clickMarginLeft" stdset="0">
+    <enum>Button::none</enum>
+   </property>
+   <property name="clickMarginRight" stdset="0">
+    <enum>Button::none</enum>
+   </property>
+   <property name="clickMarginTop" stdset="0">
+    <enum>Button::none</enum>
+   </property>
+   <property name="clickMarginBottom" stdset="0">
+    <enum>Button::full</enum>
+   </property>
+  </widget>
+  <widget class="Button" name="uiPrefsAndUtils">
+   <property name="geometry">
+    <rect>
+     <x>360</x>
+     <y>0</y>
+     <width>181</width>
+     <height>61</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Prefs &amp;&amp; Utils</string>
+   </property>
+   <property name="clickMarginLeft" stdset="0">
+    <enum>Button::none</enum>
+   </property>
+   <property name="clickMarginRight" stdset="0">
+    <enum>Button::none</enum>
+   </property>
+   <property name="clickMarginTop" stdset="0">
+    <enum>Button::none</enum>
+   </property>
+   <property name="clickMarginBottom" stdset="0">
+    <enum>Button::full</enum>
+   </property>
+  </widget>
+  <widget class="Button" name="uiRecordingSettings">
+   <property name="geometry">
+    <rect>
+     <x>540</x>
+     <y>0</y>
+     <width>181</width>
+     <height>61</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Recording Settings</string>
+   </property>
+   <property name="clickMarginLeft" stdset="0">
+    <enum>Button::none</enum>
+   </property>
+   <property name="clickMarginRight" stdset="0">
+    <enum>Button::none</enum>
+   </property>
+   <property name="clickMarginTop" stdset="0">
+    <enum>Button::none</enum>
+   </property>
+   <property name="clickMarginBottom" stdset="0">
+    <enum>Button::full</enum>
+   </property>
+  </widget>
+  <widget class="Button" name="uiBatteryLevel">
+   <property name="geometry">
+    <rect>
+     <x>720</x>
+     <y>0</y>
+     <width>81</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>100%</string>
+   </property>
+   <property name="clickMarginLeft" stdset="0">
+    <enum>Button::none</enum>
+   </property>
+   <property name="clickMarginRight" stdset="0">
+    <enum>Button::none</enum>
+   </property>
+   <property name="clickMarginTop" stdset="0">
+    <enum>Button::none</enum>
+   </property>
+   <property name="clickMarginBottom" stdset="0">
+    <enum>Button::none</enum>
+   </property>
+  </widget>
+  <widget class="Button" name="uiBlackCal">
+   <property name="geometry">
+    <rect>
+     <x>660</x>
+     <y>40</y>
+     <width>141</width>
+     <height>61</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Black
+Calibration</string>
+   </property>
+   <property name="clickMarginLeft" stdset="0">
+    <enum>Button::none</enum>
+   </property>
+   <property name="clickMarginRight" stdset="0">
+    <enum>Button::none</enum>
+   </property>
+   <property name="clickMarginTop" stdset="0">
+    <enum>Button::none</enum>
+   </property>
+   <property name="clickMarginBottom" stdset="0">
+    <enum>Button::none</enum>
+   </property>
+  </widget>
+  <widget class="Button" name="uiFocusAid">
+   <property name="geometry">
+    <rect>
+     <x>660</x>
+     <y>100</y>
+     <width>141</width>
+     <height>61</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Focus Aid</string>
+   </property>
+   <property name="clickMarginLeft" stdset="0">
+    <enum>Button::none</enum>
+   </property>
+   <property name="clickMarginRight" stdset="0">
+    <enum>Button::none</enum>
+   </property>
+   <property name="clickMarginTop" stdset="0">
+    <enum>Button::none</enum>
+   </property>
+   <property name="clickMarginBottom" stdset="0">
+    <enum>Button::none</enum>
+   </property>
+  </widget>
+  <widget class="Button" name="uiSetZebraStripes">
+   <property name="geometry">
+    <rect>
+     <x>660</x>
+     <y>160</y>
+     <width>141</width>
+     <height>61</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Zebras</string>
+   </property>
+   <property name="clickMarginLeft" stdset="0">
+    <enum>Button::none</enum>
+   </property>
+   <property name="clickMarginRight" stdset="0">
+    <enum>Button::none</enum>
+   </property>
+   <property name="clickMarginTop" stdset="0">
+    <enum>Button::none</enum>
+   </property>
+   <property name="clickMarginBottom" stdset="0">
+    <enum>Button::none</enum>
+   </property>
+  </widget>
+  <widget class="Button" name="uiSetWhiteBalance">
+   <property name="geometry">
+    <rect>
+     <x>660</x>
+     <y>220</y>
+     <width>141</width>
+     <height>61</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Set White
+Balance</string>
+   </property>
+   <property name="clickMarginLeft" stdset="0">
+    <enum>Button::none</enum>
+   </property>
+   <property name="clickMarginRight" stdset="0">
+    <enum>Button::none</enum>
+   </property>
+   <property name="clickMarginTop" stdset="0">
+    <enum>Button::none</enum>
+   </property>
+   <property name="clickMarginBottom" stdset="0">
+    <enum>Button::none</enum>
+   </property>
+  </widget>
+  <widget class="Button" name="uiPlayAndSave">
+   <property name="geometry">
+    <rect>
+     <x>660</x>
+     <y>280</y>
+     <width>141</width>
+     <height>61</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Play &amp;&amp;
+Save</string>
+   </property>
+   <property name="clickMarginLeft" stdset="0">
+    <enum>Button::none</enum>
+   </property>
+   <property name="clickMarginRight" stdset="0">
+    <enum>Button::none</enum>
+   </property>
+   <property name="clickMarginTop" stdset="0">
+    <enum>Button::none</enum>
+   </property>
+   <property name="clickMarginBottom" stdset="0">
+    <enum>Button::none</enum>
+   </property>
+  </widget>
+  <widget class="Button" name="uiRecord">
+   <property name="geometry">
+    <rect>
+     <x>660</x>
+     <y>340</y>
+     <width>141</width>
+     <height>141</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Rec</string>
+   </property>
+   <property name="clickMarginLeft" stdset="0">
+    <enum>Button::none</enum>
+   </property>
+   <property name="clickMarginRight" stdset="0">
+    <enum>Button::none</enum>
+   </property>
+   <property name="clickMarginTop" stdset="0">
+    <enum>Button::none</enum>
+   </property>
+   <property name="clickMarginBottom" stdset="0">
+    <enum>Button::none</enum>
+   </property>
+  </widget>
+  <widget class="Slider" name="uiExposureSlider">
+   <property name="geometry">
+    <rect>
+     <x>570</x>
+     <y>65</y>
+     <width>121</width>
+     <height>425</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="Label" name="label">
+   <property name="geometry">
+    <rect>
+     <x>600</x>
+     <y>40</y>
+     <width>61</width>
+     <height>26</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Exp.</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignCenter</set>
+   </property>
+  </widget>
+  <widget class="Line" name="line">
+   <property name="geometry">
+    <rect>
+     <x>600</x>
+     <y>40</y>
+     <width>1</width>
+     <height>441</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">    border: none;
+    background: black;</string>
+   </property>
+   <property name="orientation">
+    <enum>Qt::Vertical</enum>
+   </property>
+  </widget>
+  <widget class="Label" name="label_2">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>40</y>
+     <width>551</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>No video available; waiting for gated burst.</string>
+   </property>
+  </widget>
+  <widget class="Label" name="label_3">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>60</y>
+     <width>551</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>No video available; exposure trigger low.</string>
+   </property>
+  </widget>
+  <widget class="Label" name="label_4">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>80</y>
+     <width>551</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>You are zoomed in.</string>
+   </property>
+  </widget>
+  <widget class="Label" name="uiResolutionOverlay">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>460</y>
+     <width>311</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>1280×1024 @ 1057fps</string>
+   </property>
+  </widget>
+  <widget class="Label" name="uiExposureOverlay">
+   <property name="geometry">
+    <rect>
+     <x>335</x>
+     <y>460</y>
+     <width>261</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Exposure: 713.1µs (75%)</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+   </property>
+  </widget>
+  <widget class="QFrame" name="uiDebugControls">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>350</y>
+     <width>241</width>
+     <height>101</height>
+    </rect>
+   </property>
+   <property name="frameShape">
+    <enum>QFrame::StyledPanel</enum>
+   </property>
+   <property name="frameShadow">
+    <enum>QFrame::Raised</enum>
+   </property>
+   <widget class="Button" name="uiDebugA">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>0</y>
+      <width>121</width>
+      <height>51</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Debug A</string>
+    </property>
+   </widget>
+   <widget class="Button" name="uiClose">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>50</y>
+      <width>121</width>
+      <height>51</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Close</string>
+    </property>
+   </widget>
+   <widget class="Button" name="uiDebugB">
+    <property name="geometry">
+     <rect>
+      <x>120</x>
+      <y>0</y>
+      <width>121</width>
+      <height>51</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Debug B</string>
+    </property>
+   </widget>
+   <widget class="Button" name="uiDebugC">
+    <property name="geometry">
+     <rect>
+      <x>120</x>
+      <y>50</y>
+      <width>121</width>
+      <height>51</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Debug C</string>
+    </property>
+   </widget>
+  </widget>
+  <zorder>backdrop_2</zorder>
+  <zorder>uiExposureSlider</zorder>
+  <zorder>backdrop</zorder>
+  <zorder>uiTriggerIO</zorder>
+  <zorder>uiTriggerDelay</zorder>
+  <zorder>uiPrefsAndUtils</zorder>
+  <zorder>uiRecordingSettings</zorder>
+  <zorder>uiBatteryLevel</zorder>
+  <zorder>uiBlackCal</zorder>
+  <zorder>uiFocusAid</zorder>
+  <zorder>uiSetZebraStripes</zorder>
+  <zorder>uiSetWhiteBalance</zorder>
+  <zorder>uiPlayAndSave</zorder>
+  <zorder>uiRecord</zorder>
+  <zorder>label</zorder>
+  <zorder>line</zorder>
+  <zorder>label_2</zorder>
+  <zorder>label_3</zorder>
+  <zorder>label_4</zorder>
+  <zorder>uiResolutionOverlay</zorder>
+  <zorder>uiExposureOverlay</zorder>
+  <zorder>uiDebugControls</zorder>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>Backdrop</class>
+   <extends>QLabel</extends>
+   <header>backdrop</header>
+  </customwidget>
+  <customwidget>
+   <class>Button</class>
+   <extends>QPushButton</extends>
+   <header>button</header>
+  </customwidget>
+  <customwidget>
+   <class>Label</class>
+   <extends>QLabel</extends>
+   <header>label</header>
+  </customwidget>
+  <customwidget>
+   <class>Slider</class>
+   <extends>QSlider</extends>
+   <header>slider</header>
+  </customwidget>
+ </customwidgets>
+ <resources>
+  <include location="../../assets.qrc"/>
+ </resources>
+ <connections/>
+</ui>

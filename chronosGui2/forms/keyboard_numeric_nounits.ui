@@ -1,0 +1,507 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>uiKeyboardNumericNoUnits</class>
+ <widget class="QWidget" name="uiKeyboardNumericNoUnits">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>286</width>
+    <height>480</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string notr="true">Chronos Screen</string>
+  </property>
+  <widget class="Backdrop" name="backdrop">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>0</y>
+     <width>281</width>
+     <height>481</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="Backdrop" name="uiDropshadow">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>10</width>
+     <height>481</height>
+    </rect>
+   </property>
+   <property name="customStyleSheet" stdset="0">
+    <string>background: qlineargradient(x1:0 y1:0, x2:1 y2:0, stop:0 transparent, stop:1 rgba(0,0,0,128));</string>
+   </property>
+  </widget>
+  <widget class="QWidget" name="uiKeyPanel" native="true">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>0</y>
+     <width>281</width>
+     <height>481</height>
+    </rect>
+   </property>
+   <widget class="Button" name="uiRight">
+    <property name="geometry">
+     <rect>
+      <x>100</x>
+      <y>360</y>
+      <width>81</width>
+      <height>121</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>▶</string>
+    </property>
+    <property name="autoRepeat">
+     <bool>true</bool>
+    </property>
+    <property name="autoRepeatDelay">
+     <number>500</number>
+    </property>
+    <property name="clickMarginLeft" stdset="0">
+     <enum>Button::none</enum>
+    </property>
+    <property name="clickMarginRight" stdset="0">
+     <enum>Button::none</enum>
+    </property>
+    <property name="customStyleSheet" stdset="0">
+     <string>Button { font-size: 22px; }</string>
+    </property>
+   </widget>
+   <widget class="Button" name="uiLeft">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>360</y>
+      <width>101</width>
+      <height>121</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>◀</string>
+    </property>
+    <property name="autoRepeat">
+     <bool>true</bool>
+    </property>
+    <property name="autoRepeatDelay">
+     <number>500</number>
+    </property>
+    <property name="clickMarginRight" stdset="0">
+     <enum>Button::none</enum>
+    </property>
+    <property name="customStyleSheet" stdset="0">
+     <string>Button { font-size: 22px; }</string>
+    </property>
+   </widget>
+   <widget class="Button" name="uiClose">
+    <property name="geometry">
+     <rect>
+      <x>180</x>
+      <y>380</y>
+      <width>101</width>
+      <height>101</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Close</string>
+    </property>
+    <property name="clickMarginLeft" stdset="0">
+     <enum>Button::none</enum>
+    </property>
+    <property name="clickMarginTop" stdset="0">
+     <enum>Button::none</enum>
+    </property>
+    <property name="customStyleSheet" stdset="0">
+     <string>Button { font-size: 22px; }</string>
+    </property>
+   </widget>
+   <widget class="Button" name="ui0">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>260</y>
+      <width>101</width>
+      <height>101</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>0</string>
+    </property>
+    <property name="clickMarginRight" stdset="0">
+     <enum>Button::none</enum>
+    </property>
+    <property name="clickMarginTop" stdset="0">
+     <enum>Button::none</enum>
+    </property>
+    <property name="customStyleSheet" stdset="0">
+     <string>Button { font-size: 22px; }</string>
+    </property>
+   </widget>
+   <widget class="Button" name="ui3">
+    <property name="geometry">
+     <rect>
+      <x>180</x>
+      <y>180</y>
+      <width>101</width>
+      <height>81</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>3</string>
+    </property>
+    <property name="clickMarginLeft" stdset="0">
+     <enum>Button::none</enum>
+    </property>
+    <property name="clickMarginTop" stdset="0">
+     <enum>Button::none</enum>
+    </property>
+    <property name="clickMarginBottom" stdset="0">
+     <enum>Button::none</enum>
+    </property>
+    <property name="customStyleSheet" stdset="0">
+     <string>Button { font-size: 22px; }</string>
+    </property>
+   </widget>
+   <widget class="Button" name="ui7">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>0</y>
+      <width>101</width>
+      <height>101</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>7</string>
+    </property>
+    <property name="clickMarginRight" stdset="0">
+     <enum>Button::none</enum>
+    </property>
+    <property name="clickMarginBottom" stdset="0">
+     <enum>Button::none</enum>
+    </property>
+    <property name="customStyleSheet" stdset="0">
+     <string>Button { font-size: 22px; }</string>
+    </property>
+   </widget>
+   <widget class="Button" name="ui8">
+    <property name="geometry">
+     <rect>
+      <x>100</x>
+      <y>0</y>
+      <width>81</width>
+      <height>101</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>8</string>
+    </property>
+    <property name="clickMarginLeft" stdset="0">
+     <enum>Button::none</enum>
+    </property>
+    <property name="clickMarginRight" stdset="0">
+     <enum>Button::none</enum>
+    </property>
+    <property name="clickMarginBottom" stdset="0">
+     <enum>Button::none</enum>
+    </property>
+    <property name="customStyleSheet" stdset="0">
+     <string>Button { font-size: 22px; }</string>
+    </property>
+   </widget>
+   <widget class="Button" name="ui4">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>100</y>
+      <width>101</width>
+      <height>81</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>4</string>
+    </property>
+    <property name="clickMarginRight" stdset="0">
+     <enum>Button::none</enum>
+    </property>
+    <property name="clickMarginTop" stdset="0">
+     <enum>Button::none</enum>
+    </property>
+    <property name="clickMarginBottom" stdset="0">
+     <enum>Button::none</enum>
+    </property>
+    <property name="customStyleSheet" stdset="0">
+     <string>Button { font-size: 22px; }</string>
+    </property>
+   </widget>
+   <widget class="Button" name="ui6">
+    <property name="geometry">
+     <rect>
+      <x>180</x>
+      <y>100</y>
+      <width>101</width>
+      <height>81</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>6</string>
+    </property>
+    <property name="clickMarginLeft" stdset="0">
+     <enum>Button::none</enum>
+    </property>
+    <property name="clickMarginTop" stdset="0">
+     <enum>Button::none</enum>
+    </property>
+    <property name="clickMarginBottom" stdset="0">
+     <enum>Button::none</enum>
+    </property>
+    <property name="customStyleSheet" stdset="0">
+     <string>Button { font-size: 22px; }</string>
+    </property>
+   </widget>
+   <widget class="Button" name="ui9">
+    <property name="geometry">
+     <rect>
+      <x>180</x>
+      <y>0</y>
+      <width>101</width>
+      <height>101</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>9</string>
+    </property>
+    <property name="clickMarginLeft" stdset="0">
+     <enum>Button::none</enum>
+    </property>
+    <property name="clickMarginBottom" stdset="0">
+     <enum>Button::none</enum>
+    </property>
+    <property name="customStyleSheet" stdset="0">
+     <string>Button { font-size: 22px; }</string>
+    </property>
+   </widget>
+   <widget class="Button" name="ui2">
+    <property name="geometry">
+     <rect>
+      <x>100</x>
+      <y>180</y>
+      <width>81</width>
+      <height>81</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>2</string>
+    </property>
+    <property name="clickMarginLeft" stdset="0">
+     <enum>Button::none</enum>
+    </property>
+    <property name="clickMarginRight" stdset="0">
+     <enum>Button::none</enum>
+    </property>
+    <property name="clickMarginTop" stdset="0">
+     <enum>Button::none</enum>
+    </property>
+    <property name="clickMarginBottom" stdset="0">
+     <enum>Button::none</enum>
+    </property>
+    <property name="customStyleSheet" stdset="0">
+     <string>Button { font-size: 22px; }</string>
+    </property>
+   </widget>
+   <widget class="Button" name="ui5">
+    <property name="geometry">
+     <rect>
+      <x>100</x>
+      <y>100</y>
+      <width>81</width>
+      <height>81</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>5</string>
+    </property>
+    <property name="clickMarginLeft" stdset="0">
+     <enum>Button::none</enum>
+    </property>
+    <property name="clickMarginRight" stdset="0">
+     <enum>Button::none</enum>
+    </property>
+    <property name="clickMarginTop" stdset="0">
+     <enum>Button::none</enum>
+    </property>
+    <property name="clickMarginBottom" stdset="0">
+     <enum>Button::none</enum>
+    </property>
+    <property name="customStyleSheet" stdset="0">
+     <string>Button { font-size: 22px; }</string>
+    </property>
+   </widget>
+   <widget class="Button" name="ui1">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>180</y>
+      <width>101</width>
+      <height>81</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>1</string>
+    </property>
+    <property name="clickMarginRight" stdset="0">
+     <enum>Button::none</enum>
+    </property>
+    <property name="clickMarginTop" stdset="0">
+     <enum>Button::none</enum>
+    </property>
+    <property name="clickMarginBottom" stdset="0">
+     <enum>Button::none</enum>
+    </property>
+    <property name="customStyleSheet" stdset="0">
+     <string>Button { font-size: 22px; }</string>
+    </property>
+   </widget>
+   <widget class="Button" name="uiBackspaceWide">
+    <property name="geometry">
+     <rect>
+      <x>100</x>
+      <y>260</y>
+      <width>181</width>
+      <height>101</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>⌫</string>
+    </property>
+    <property name="autoRepeat">
+     <bool>true</bool>
+    </property>
+    <property name="autoRepeatDelay">
+     <number>500</number>
+    </property>
+    <property name="clickMarginLeft" stdset="0">
+     <enum>Button::none</enum>
+    </property>
+    <property name="clickMarginRight" stdset="0">
+     <enum>Button::full</enum>
+    </property>
+    <property name="clickMarginTop" stdset="0">
+     <enum>Button::none</enum>
+    </property>
+    <property name="customStyleSheet" stdset="0">
+     <string>Button { font-size: 22px; }</string>
+    </property>
+   </widget>
+   <widget class="Button" name="uiBackspaceNarrow">
+    <property name="geometry">
+     <rect>
+      <x>180</x>
+      <y>260</y>
+      <width>101</width>
+      <height>101</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>⌫</string>
+    </property>
+    <property name="autoRepeat">
+     <bool>true</bool>
+    </property>
+    <property name="autoRepeatDelay">
+     <number>500</number>
+    </property>
+    <property name="clickMarginLeft" stdset="0">
+     <enum>Button::none</enum>
+    </property>
+    <property name="clickMarginRight" stdset="0">
+     <enum>Button::full</enum>
+    </property>
+    <property name="clickMarginTop" stdset="0">
+     <enum>Button::none</enum>
+    </property>
+    <property name="customStyleSheet" stdset="0">
+     <string>Button { font-size: 22px; }</string>
+    </property>
+   </widget>
+   <widget class="Button" name="uiDot">
+    <property name="geometry">
+     <rect>
+      <x>100</x>
+      <y>260</y>
+      <width>81</width>
+      <height>101</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>.</string>
+    </property>
+    <property name="clickMarginLeft" stdset="0">
+     <enum>Button::none</enum>
+    </property>
+    <property name="clickMarginRight" stdset="0">
+     <enum>Button::none</enum>
+    </property>
+    <property name="clickMarginTop" stdset="0">
+     <enum>Button::none</enum>
+    </property>
+    <property name="customStyleSheet" stdset="0">
+     <string>Button { font-size: 22px; }</string>
+    </property>
+   </widget>
+   <zorder>uiRight</zorder>
+   <zorder>uiLeft</zorder>
+   <zorder>uiClose</zorder>
+   <zorder>ui0</zorder>
+   <zorder>ui3</zorder>
+   <zorder>ui7</zorder>
+   <zorder>ui8</zorder>
+   <zorder>ui4</zorder>
+   <zorder>ui6</zorder>
+   <zorder>ui9</zorder>
+   <zorder>ui2</zorder>
+   <zorder>ui5</zorder>
+   <zorder>ui1</zorder>
+   <zorder>uiBackspaceNarrow</zorder>
+   <zorder>uiDot</zorder>
+   <zorder>uiBackspaceWide</zorder>
+  </widget>
+  <zorder>backdrop</zorder>
+  <zorder>uiKeyPanel</zorder>
+  <zorder>uiDropshadow</zorder>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>Backdrop</class>
+   <extends>QLabel</extends>
+   <header>backdrop</header>
+  </customwidget>
+  <customwidget>
+   <class>Button</class>
+   <extends>QPushButton</extends>
+   <header>button</header>
+  </customwidget>
+ </customwidgets>
+ <tabstops>
+  <tabstop>ui7</tabstop>
+  <tabstop>ui8</tabstop>
+  <tabstop>ui9</tabstop>
+  <tabstop>ui4</tabstop>
+  <tabstop>ui5</tabstop>
+  <tabstop>ui6</tabstop>
+  <tabstop>ui1</tabstop>
+  <tabstop>ui2</tabstop>
+  <tabstop>ui3</tabstop>
+  <tabstop>ui0</tabstop>
+  <tabstop>uiLeft</tabstop>
+  <tabstop>uiRight</tabstop>
+  <tabstop>uiClose</tabstop>
+ </tabstops>
+ <resources/>
+ <connections/>
+</ui>

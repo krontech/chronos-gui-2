@@ -14,3 +14,8 @@
 
 # Ignore git version description file, uploaded to the camera for display in the about panel, UI Version string.
 git_description
+
+# Ignore generated python content.
+/chronosGui2/generated/*.py
+/chronosGui2/generated/*.qrc
+/chronosGui2/generated/assets
