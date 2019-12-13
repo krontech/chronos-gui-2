@@ -10,7 +10,7 @@ Installation:
 	- sudo apt install python3-mypy
 
 Running: (in project root)
-	- python3 -m mypy src/screens/about_camera.minimal.py
+	- python3 -m mypy chronosGui2/screens/about_camera.minimal.py
 
 Notes:
 	- Linting with MyPy requires Python 3.6, which means we can't annotate types quite correctly with 3.4 because it's not supported. It might be possible to post-process this, but that seems like a lot of work.

@@ -1,4 +1,0 @@
-cam-loader /var/camera/FPGA.bit
-cam-pipeline 600x480 --offset 0x0 &
-python3 ~/gui/src/lowpy/live.py & #performs black cal on startup
-cd ~/gui && python3 src/main.py

@@ -529,7 +529,7 @@ class Main(QWidget, Ui_MainRH):
 			self.stopRecording()
 	
 	
-	#Invoked by hardware button, in ~/src/main.py.
+	#Invoked by hardware button, in ~/chronosGui2/main.py.
 	def publicToggleRecordingState(self, *_):
 		"""Switch the camera between 'not recording' and 'recording'."""
 		
