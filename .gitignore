@@ -16,6 +16,5 @@
 git_description
 
 # Ignore generated python content.
-/chronosGui2/generated/*.py
-/chronosGui2/generated/*.qrc
+/chronosGui2/generated/
 /chronosGui2/generated/assets
