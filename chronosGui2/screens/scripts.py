@@ -8,6 +8,7 @@ from PyQt5 import uic, QtWidgets, QtCore
 from PyQt5.QtCore import Qt, QItemSelectionModel
 from PyQt5.QtGui import QStandardItemModel, QStandardItem, QColor
 
+import chronosGui2.api as api
 from chronosGui2 import delay
 
 # Import the generated UI form.

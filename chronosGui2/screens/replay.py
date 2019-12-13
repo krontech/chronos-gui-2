@@ -3,6 +3,8 @@
 import os
 from PyQt5 import uic, QtWidgets, QtCore
 
+import chronosGui2.api as api
+
 # Import the generated UI form.
 if api.apiValues.get('cameraModel')[0:2] == 'TX':
 	from chronosGui2.generated.txpro import Ui_Replay

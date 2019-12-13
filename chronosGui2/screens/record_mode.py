@@ -8,7 +8,10 @@ import chronosGui2.settings as settings
 import chronosGui2.api as api
 
 # Import the generated UI form.
-from chronosGui2.generated.record_mode import Ui_RecordMode
+if api.apiValues.get('cameraModel')[0:2] == 'TX':
+	from chronosGui2.generated.txpro import Ui_RecordMode
+else:
+	from chronosGui2.generated.chronos import Ui_RecordMode
 
 
 class RecordMode(QtWidgets.QDialog, Ui_RecordMode):

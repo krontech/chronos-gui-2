@@ -31,8 +31,11 @@ __init__.py: $(filter-out $(addsuffix /%.ui, $(UIMOD)), $(UISRC))
 	@echo "Generating $@"
 	@echo $(^F:.ui=) | xargs -n1 printf "from chronosGui2.generated.$(*).%s import *\n" > $@
 
-# Generate dependencies for each of the UI modules.
-$(foreach modname, $(UIMOD), $(modname)/__init__.py: $(filter $(modname)/%.ui, $(UISRC)))
+# Define dependencies for each of the UI modules present.
+define uimod_init_deps
+$(eval $1/__init__.py: $$(filter $1/%.ui, $$(UISRC)))
+endef
+$(foreach modname, $(UIMOD), $(call uimod_init_deps, $(modname)))
 
 # Special rule to generate the module version dynamically, but
 # only if we happen to be in a git working tree. Otherwise, we

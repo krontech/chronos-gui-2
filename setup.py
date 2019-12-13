@@ -85,6 +85,8 @@ setup(
 		'chronosGui2/screens',
 		'chronosGui2/input_panels',
 		'chronosGui2/generated',
+		'chronosGui2/generated/chronos',
+		'chronosGui2/generated/txpro',
 	],
 	data_files=[('/etc/', ['util/chronos-gui2.conf'])],
 	license='GPLv3+',

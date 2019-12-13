@@ -5,8 +5,8 @@ from typing import Sequence
 
 from PyQt5 import uic, QtWidgets, QtCore
 
-import chronosGui2.api
-import chronosGui2.settings
+import chronosGui2.api as api
+import chronosGui2.settings as settings
 
 # Import the generated UI form.
 if api.apiValues.get('cameraModel')[0:2] == 'TX':
