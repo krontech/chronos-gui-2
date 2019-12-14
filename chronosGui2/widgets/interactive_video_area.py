@@ -12,7 +12,7 @@ try:
 	import chronosGui2.api as api
 except Exception:
 	#We don't want the lack of an API to fail us in Qt Designer. However, do warn.
-	import logging
+	import logging;
 	logging.getLogger('Chronos.api').warn('Unable to import api, DirectAPILinkPlugin disabled. (Some widgets will not have any effect when used.)')
 	api = None
 
@@ -69,13 +69,6 @@ class InteractiveVideoArea(QWidget):
 				'hres': max(200, min(self.width(), 800)),
 				'vres': max(200, min(self.height(), 480)),
 			})
-		
-		
-		def event(self, evt: QEvent):
-			if type(evt) is QGestureEvent:
-				log.debug(f'iva got gesture {evt.activeGestures()}')
-			
-			return super().event(evt)
 		
 		
 		def mousePressEvent(self, evt):
