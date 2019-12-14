@@ -49,7 +49,7 @@ class PlayAndSave(QtWidgets.QDialog, Ui_PlayAndSave):
 	def __init__(self, window):
 		super().__init__()
 		self.setupUi(self)
-		
+		self.video = api.video()
 		self._window = window
 		
 		self.recordedSegments = []
@@ -208,7 +208,7 @@ class PlayAndSave(QtWidgets.QDialog, Ui_PlayAndSave):
 		#self.uiSeekSlider.focusGeometryNudge = (0,0,0,0)
 		self.uiSeekSlider.touchMargins = lambda: { "top": 10, "left": 0, "bottom": 10, "right": 0, } #Report real margins.
 		self.uiSeekSlider.debounce.sliderMoved.connect(lambda frame: 
-			api.video.callSync('playback', {'position': frame}) )
+			self.video.callSync('playback', {'position': frame}) )
 		self.uiSeekSlider.debounce.sliderMoved.connect(lambda frame: 
 			self.uiCurrentFrame.setValue(frame) )
 		#last_perf = perf_counter()
@@ -262,7 +262,7 @@ class PlayAndSave(QtWidgets.QDialog, Ui_PlayAndSave):
 		api.signal.observe('eof', self.onEOF)
 		
 	def onShow(self):
-		status = api.video.callSync('status')
+		status = self.video.callSync('status')
 		
 		#Don't update the labels while hidden. But do show with accurate info when we start.
 		api.video.call('configure', {
@@ -685,7 +685,7 @@ class PlayAndSave(QtWidgets.QDialog, Ui_PlayAndSave):
 		self.uiSave.hide()
 		
 		#regions are like {'region id': 'aaaaaaag', 'hue': 390, 'mark end': 42587, 'mark start': 16716, 'saved': 0.0, 'highlight': 0, 'segment ids': ['KxIjG09V'], 'region name': 'Clip 7'},
-		api.video.callSync('recordfile', {
+		self.video.callSync('recordfile', {
 			'filename': roi['file'],
 			'format': {
 				'.mp4':'h264', 

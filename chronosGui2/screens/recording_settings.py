@@ -29,6 +29,9 @@ class RecordingSettings(QtWidgets.QDialog, Ui_RecordingSettings):
 		super().__init__()
 		self.setupUi(self)
 		self.window_ = window
+
+		# API init.
+		self.control = api.control()
 		
 		# Panel init.
 		self.setFixedSize(window.app.primaryScreen().virtualSize())
@@ -142,7 +145,7 @@ class RecordingSettings(QtWidgets.QDialog, Ui_RecordingSettings):
 	presets = []
 	for geometry_ in __potentialPresetGeometries: #Fix bug where this overrode the screen's geometry property, preventing any keyboard from opening.
 		hRes, vRes = geometry_[0], geometry_[1]
-		geometryTimingLimits = api.control.callSync('getResolutionTimingLimits', {'hRes':hRes, 'vRes':vRes})
+		geometryTimingLimits = api.control().callSync('getResolutionTimingLimits', {'hRes':hRes, 'vRes':vRes})
 		if 'error' not in geometryTimingLimits:
 			presets += [{
 				'hRes': hRes, 
@@ -380,7 +383,7 @@ class RecordingSettings(QtWidgets.QDialog, Ui_RecordingSettings):
 			#Shortcut. We can do this because the exposure values set below by the real call are not required when an API-driven update is fired, since the API-driven update will also update the exposure. I think. 🤞
 			limits = {'minFramePeriod': minFrameTime*1e9}
 		else:
-			limits = api.control.callSync('getResolutionTimingLimits', {
+			limits = self.control.callSync('getResolutionTimingLimits', {
 				'hRes': self.uiHRes.value(),
 				'vRes': self.uiVRes.value(),
 			})

@@ -14,9 +14,10 @@ TEST_ITERATIONS = 100
 app = QtWidgets.QApplication(sys.argv)
 
 t1 = time.perf_counter()
+controlAPI = api.control()
 print('test 1: simple calls to control api')
 for x in range(TEST_ITERATIONS):
-	api.control.callSync('get', ['batteryVoltage'])
+	controlAPI.callSync('get', ['batteryVoltage'])
 	print('.', end='', flush=True)
 print(f"""
 Time: {time.perf_counter()-t1}s total, {(time.perf_counter()-t1)/TEST_ITERATIONS*1000}ms per call.

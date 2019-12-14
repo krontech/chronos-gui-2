@@ -38,6 +38,9 @@ class Main(QWidget, Ui_Main2):
 		super().__init__()
 		self.setupUi(self)
 		
+		# API init.
+		self.control = api.control()
+
 		# Panel init.
 		self.setFixedSize(window.app.primaryScreen().virtualSize()) #This is not a responsive design.
 		self.setWindowFlags(QtCore.Qt.FramelessWindowHint)
@@ -1071,14 +1074,14 @@ class Main(QWidget, Ui_Main2):
 	def startRecording(self):
 		self.uiRecord.isRecording = False
 		self.uiRecord.update()
-		api.control.callSync('startRecording')
+		self.control.callSync('startRecording')
 	
 	def stopRecording(self):
 		self.uiRecord.isRecording = True
 		self.uiRecord.update()
 		self.uiRecord.setText(
 			self.uiRecordTemplateNoTime.format(state='Record') )
-		api.control.callSync('stopRecording')
+		self.control.callSync('stopRecording')
 	
 	
 	def showOptionOnTap(self, pos: QtCore.QModelIndex):

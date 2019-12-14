@@ -21,6 +21,9 @@ class Main(QWidget, Ui_MainRH):
 	def __init__(self, window):
 		super().__init__()
 		self.setupUi(self)
+
+		# API init.
+		self.control = api.control()
 		
 		# Panel init.
 		self.move(0, 0)
@@ -597,8 +600,8 @@ class Main(QWidget, Ui_MainRH):
 	
 	def startRecording(self):
 		self.uiRecord.setText('Stop') #Show feedback quick, the signal takes a noticable amount of time.
-		api.control.callSync('startRecording')
+		self.control.callSync('startRecording')
 	
 	def stopRecording(self):
 		self.uiRecord.setText('Rec')
-		api.control.callSync('stopRecording')
+		self.control.callSync('stopRecording')

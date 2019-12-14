@@ -14,6 +14,9 @@ class Test(QtWidgets.QWidget, Ui_TestWidget):
 	def __init__(self, window):
 		super().__init__()
 		self.setupUi(self)
+
+		# API init.
+		self.control = api.control()
 		
 		# Panel init.
 		self.setFixedSize(window.app.primaryScreen().virtualSize())
@@ -31,7 +34,7 @@ class Test(QtWidgets.QWidget, Ui_TestWidget):
 		#self.uiDebug.clicked.connect(lambda: self.decimalspinbox_3.availableUnits()) #"self" is needed here, won't be available otherwise.
 		self.uiBack.clicked.connect(window.back)
 		
-		rtl = api.control.callSync('getResolutionTimingLimits', api.getSync('resolution'))
+		rtl = self.control.callSync('getResolutionTimingLimits', api.getSync('resolution'))
 		self.uiSlider.setMaximum(rtl['exposureMax'])
 		self.uiSlider.setMinimum(rtl['exposureMin'])
 		

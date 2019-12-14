@@ -58,19 +58,48 @@ class apiBase():
 			log.error("Can not connect to D-Bus. Is D-Bus itself running?")
 			raise Exception("D-Bus Setup Error")
 		
+		self.name = type(self).__name__
 		self.iface = QDBusInterface(service, path, interface, bus)
 		
-		log.info("Connected to D-Bus %s API at %s", type(self).__name__, self.iface.path())
+		log.info("Connected to D-Bus %s API at %s", self.name, self.iface.path())
 
 		# Check for errors.
 		if not self.iface.isValid():
 			# Otherwise, an error occured.
 			log.error("Can not connect to %s D-Bus API at %s. (%s: %s)",
-				type(self).__name__, self.iface.service(),
+				self.name, self.iface.service(),
 				self.iface.lastError().name(),
 				self.iface.lastError().message())
 		else:
 			self.iface.setTimeout(API_TIMEOUT_MS)
+	
+	def callSync(self, *args, warnWhenCallIsSlow=True, **kwargs):
+		"""Call a camera DBus API. First arg is the function name.
+			
+			This is the synchronous version of the call() method. It
+			is much slower to call synchronously than asynchronously!
+		
+			See http://doc.qt.io/qt-5/qdbusabstractinterface.html#call for details about calling.
+			See https://github.com/krontech/chronos-cli/tree/master/src/api for implementation details about the API being called.
+			See README.md at https://github.com/krontech/chronos-cli/tree/master/src/daemon for API documentation.
+		"""
+		
+		#Unwrap D-Bus errors from message.
+		log.debug("%s.callSync %s", self.name, tuple(args))
+		
+		start = perf_counter()
+		msg = QDBusReply(self.iface.call(*args, **kwargs))
+		end = perf_counter()
+		if warnWhenCallIsSlow and (end - start > API_SLOW_WARN_MS / 1000):
+			log.warn(f'slow call: {self.name}.callSync{tuple(args)} took {(end-start)*1000:.0f}ms/{API_SLOW_WARN_MS}ms.')
+		
+		if msg.isValid():
+			return msg.value()
+		else:
+			if msg.error().name() == 'org.freedesktop.DBus.Error.NoReply':
+				raise DBusException(f"{self.name}.callSync{tuple(args)} timed out ({API_TIMEOUT_MS}ms)")
+			else:
+				raise DBusException("%s: %s" % (msg.error().name(), msg.error().message()))
 
 class DBusException(Exception):
 	"""Raised when something goes wrong with dbus. Message comes from dbus' msg.error().message()."""
@@ -303,35 +332,6 @@ class video(apiBase, metaclass=apiSingleton):
 			self._catches += [callback]
 			return self
 	
-	def callSync(*args, warnWhenCallIsSlow=True, **kwargs):
-		"""Call the camera video DBus API. First arg is the function name.
-			
-			This is the synchronous version of the call() method. It
-			is much slower to call synchronously than asynchronously!
-		
-			See http://doc.qt.io/qt-5/qdbusabstractinterface.html#call for details about calling.
-			See https://github.com/krontech/chronos-cli/tree/master/src/api for implementation details about the API being called.
-			See README.md at https://github.com/krontech/chronos-cli/tree/master/src/daemon for API documentation.
-		"""
-		
-		#Unwrap D-Bus errors from message.
-		log.debug(f'video.callSync{tuple(args)}')
-		
-		start = perf_counter()
-		msg = QDBusReply(video().iface.call(*args, **kwargs))
-		end = perf_counter()
-		if warnWhenCallIsSlow and (end - start > API_SLOW_WARN_MS / 1000):
-			log.warn(f'slow call: video.callSync{tuple(args)} took {(end-start)*1000:.0f}ms/{API_SLOW_WARN_MS}ms.')
-		
-		if msg.isValid():
-			return msg.value()
-		else:
-			if msg.error().name() == 'org.freedesktop.DBus.Error.NoReply':
-				raise DBusException(f"video.callSync{tuple(args)} timed out ({API_TIMEOUT_MS}ms)")
-			else:
-				raise DBusException("%s: %s" % (msg.error().name(), msg.error().message()))
-	
-	
 	def restart(*_):
 		"""Helper method to reboot the video pipeline.
 			
@@ -536,37 +536,6 @@ class control(apiBase, metaclass=apiSingleton):
 			assert not self._done, "Can't register new then() callback, call has already been resolved."
 			self._catches += [callback]
 			return self
-	
-	def callSync(*args, warnWhenCallIsSlow=True, **kwargs):
-		"""Call the camera control DBus API. First arg is the function name.
-			
-			This is the synchronous version of the call() method. It
-			is much slower to call synchronously than asynchronously!
-		
-			See http://doc.qt.io/qt-5/qdbusabstractinterface.html#call for details about calling.
-			See https://github.com/krontech/chronos-cli/tree/master/src/api for implementation details about the API being called.
-			See README.md at https://github.com/krontech/chronos-cli/tree/master/src/daemon for API documentation.
-		"""
-		
-		#Unwrap D-Bus errors from message.
-		log.debug(f'control.callSync{tuple(args)}')
-		
-		start = perf_counter()
-		msg = QDBusReply(control().iface.call(*args, **kwargs))
-		end = perf_counter()
-		if warnWhenCallIsSlow and (end - start > API_SLOW_WARN_MS / 1000):
-			log.warn(f'slow call: control.callSync{tuple(args)} took {(end-start)*1000:.0f}ms/{API_SLOW_WARN_MS}ms.')
-			
-		if msg.isValid():
-			return msg.value()
-		else:
-			if msg.error().name() == 'org.freedesktop.DBus.Error.NoReply':
-				raise DBusException(f"control.callSync{tuple(args)} timed out ({API_TIMEOUT_MS}ms)")
-			else:
-				raise DBusException("%s: %s" % (msg.error().name(), msg.error().message()))
-
-	
-
 
 def getSync(keyOrKeys):
 	"""Call the camera control DBus get method.
@@ -580,7 +549,7 @@ def getSync(keyOrKeys):
 		See control's `availableKeys` for a list of valid inputs.
 	"""
 	
-	valueList = control.callSync('get',
+	valueList = control().callSync('get',
 		[keyOrKeys] if isinstance(keyOrKeys, str) else keyOrKeys )
 	return valueList[keyOrKeys] if isinstance(keyOrKeys, str) else valueList
 
@@ -609,11 +578,11 @@ def setSync(*args):
 		Returns either a map of set values or the set
 			value, if the second form was used.
 	"""
-	
+	controlAPI = control()
 	if len(args) == 1:
-		return control.callSync('set', *args)
+		return controlAPI.callSync('set', *args)
 	elif len(args) == 2:
-		return control.callSync('set', {args[0]:args[1]})[args[0]]
+		return controlAPI.callSync('set', {args[0]:args[1]})[args[0]]
 	else:
 		raise valueError('bad args')
 
@@ -647,10 +616,11 @@ def set(*args):
 # Since this often crashes during development, the following line can be run to try getting each variable independently.
 #     for key in [k for k in control.callSync('availableKeys') if k not in {'dateTime', 'externalStorage'}]: print('getting', key); control.callSync('get', [key])
 __badKeys = {} #set of blacklisted keys - useful for when one is unretrievable during development.
-if control().iface.isValid():
-	_camState = control.callSync('get', [
+__controlAPI = control()
+if __controlAPI.iface.isValid():
+	_camState = __controlAPI.callSync('get', [
 		key
-		for key in control.callSync('availableKeys')
+		for key in __controlAPI.callSync('availableKeys')
 		if key not in __badKeys
 	], warnWhenCallIsSlow=False)
 	if(not _camState):
