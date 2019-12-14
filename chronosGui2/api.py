@@ -27,40 +27,50 @@ if USE_MOCK: #Resource accquisition is initialisation, here, so importing starts
 	log.warn(f"Using API mocks. ($USE_CHRONOS_API_MOCK={os.environ.get('USE_CHRONOS_API_MOCK')})")
 	import control_api_mock, video_api_mock; control_api_mock, video_api_mock
 
-# Set up d-bus interface. Connect to mock system buses. Check everything's working.
-if not QDBusConnection.systemBus().isConnected():
-	print("Error: Can not connect to D-Bus. Is D-Bus itself running?", file=sys.stderr)
-	raise Exception("D-Bus Setup Error")
+class apiSingleton(type):
+	"""Metaclass used to ensure only one D-Bus API class is instantiated"""
+	def __init__(cls, name, bases, attrs, *kwargs):
+		super().__init__(name, bases, attrs)
+		cls._instance = None
+	
+	def __call__(cls, *args, **kwargs):
+		if cls._instance is None:
+			cls._instance = super().__call__(*args, **kwargs)
+		return cls._instance
 
-cameraControlAPI = QDBusInterface(
-	f"ca.krontech.chronos.{'control_mock' if USE_MOCK else 'control'}", #Service
-	f"/ca/krontech/chronos/{'control_mock' if USE_MOCK else 'control'}", #Path
-	f"", #Interface
-	QDBusConnection.systemBus() )
-cameraVideoAPI = QDBusInterface(
-	f"ca.krontech.chronos.{'video_mock' if USE_MOCK else 'video'}", #Service
-	f"/ca/krontech/chronos/{'video_mock' if USE_MOCK else 'video'}", #Path
-	f"", #Interface
-	QDBusConnection.systemBus() )
+class apiBase():
+	"""Call the D-Bus camera APIs, asynchronously.
+		
+		Methods:
+			- call(function[, arg1[ ,arg2[, ...]]])
+				Call the remote function.
+			- get([value[, ...]])
+				Get the named values from the API.
+			- set({key: value[, ...]}])
+				Set the named values in the API.
+		
+		All methods return an A* promise-like, in that you use
+		`.then(cb(value))` and `.catch(cb(error))` to get the results
+		of calling the function.
+	"""
+	def __init__(self, service, path, interface="", bus=QDBusConnection.systemBus()):
+		if not QDBusConnection.systemBus().isConnected():
+			log.error("Can not connect to D-Bus. Is D-Bus itself running?")
+			raise Exception("D-Bus Setup Error")
+		
+		self.iface = QDBusInterface(service, path, interface, bus)
+		
+		log.info("Connected to D-Bus %s API at %s", type(self).__name__, self.iface.path())
 
-cameraControlAPI.setTimeout(API_TIMEOUT_MS) #Default is -1, which means 25000ms. 25 seconds is too long to go without some sort of feedback, and the only real long-running operation we have - saving - can take upwards of 5 minutes. Instead of setting the timeout to half an hour, we use events which are emitted as the task progresses. One frame (at 15fps) should be plenty of time for the API to respond, and also quick enough that we'll notice any slowness.
-cameraVideoAPI.setTimeout(API_TIMEOUT_MS)
-
-if not cameraControlAPI.isValid():
-	log.error("Error: Can not connect to control D-Bus API at %s. (%s: %s)" % (
-		cameraControlAPI.service(), 
-		cameraControlAPI.lastError().name(), 
-		cameraControlAPI.lastError().message(),
-	))
-
-if not cameraVideoAPI.isValid():
-	log.error("Error: Can not connect to video D-Bus API at %s. (%s: %s)" % (
-		cameraVideoAPI.service(), 
-		cameraVideoAPI.lastError().name(), 
-		cameraVideoAPI.lastError().message(),
-	))
-
-
+		# Check for errors.
+		if not self.iface.isValid():
+			# Otherwise, an error occured.
+			log.error("Can not connect to %s D-Bus API at %s. (%s: %s)",
+				type(self).__name__, self.iface.service(),
+				self.iface.lastError().name(),
+				self.iface.lastError().message())
+		else:
+			self.iface.setTimeout(API_TIMEOUT_MS)
 
 class DBusException(Exception):
 	"""Raised when something goes wrong with dbus. Message comes from dbus' msg.error().message()."""
@@ -83,7 +93,7 @@ class ControlReply():
 			return self.value
 
 
-class video():
+class video(apiBase, metaclass=apiSingleton):
 	"""Call the D-Bus video API, asynchronously.
 		
 		Methods:
@@ -98,6 +108,12 @@ class video():
 		`.then(cb(value))` and `.catch(cb(error))` to get the results
 		of calling the function.
 	"""
+
+	def __init__(self):
+		super().__init__(
+			f"ca.krontech.chronos.{'video_mock' if USE_MOCK else 'video'}", # Service
+			f"/ca/krontech/chronos/{'video_mock' if USE_MOCK else 'video'}" # Path
+		)
 	
 	_videoEnqueuedCalls = []
 	_videoCallInProgress = False
@@ -214,7 +230,7 @@ class video():
 			log.debug(f'starting async call: {self._args[0]}({self._args[1:]})')
 			self.performance['started'] = perf_counter()
 			self._watcherHolder = QDBusPendingCallWatcher(
-				cameraVideoAPI.asyncCallWithArgumentList(self._args[0], self._args[1:])
+				video().iface.asyncCallWithArgumentList(self._args[0], self._args[1:])
 			)
 			self._watcherHolder.finished.connect(self._asyncCallFinished)
 			video._activeCall = self
@@ -302,7 +318,7 @@ class video():
 		log.debug(f'video.callSync{tuple(args)}')
 		
 		start = perf_counter()
-		msg = QDBusReply(cameraVideoAPI.call(*args, **kwargs))
+		msg = QDBusReply(video().iface.call(*args, **kwargs))
 		end = perf_counter()
 		if warnWhenCallIsSlow and (end - start > API_SLOW_WARN_MS / 1000):
 			log.warn(f'slow call: video.callSync{tuple(args)} took {(end-start)*1000:.0f}ms/{API_SLOW_WARN_MS}ms.')
@@ -326,7 +342,7 @@ class video():
 		os.system('killall -HUP cam-pipeline')
 
 
-class control():
+class control(apiBase, metaclass=apiSingleton):
 	"""Call the D-Bus control API, asychronously.
 		
 		Methods:
@@ -341,7 +357,12 @@ class control():
 		`.then(cb(value))` and `.catch(cb(error))` to get the results
 		of calling the function.
 	"""
-	
+	def __init__(self):
+		super().__init__(
+			f"ca.krontech.chronos.{'control_mock' if USE_MOCK else 'control'}", #Service
+			f"/ca/krontech/chronos/{'control_mock' if USE_MOCK else 'control'}", #Path
+		)
+
 	_controlEnqueuedCalls = []
 	_controlCallInProgress = False
 	_activeCall = None
@@ -443,7 +464,7 @@ class control():
 			log.debug(f'starting async call: {self._args[0]}({self._args[1:]})')
 			self.performance['started'] = perf_counter()
 			self._watcherHolder = QDBusPendingCallWatcher(
-				cameraControlAPI.asyncCallWithArgumentList(self._args[0], self._args[1:])
+				control().iface.asyncCallWithArgumentList(self._args[0], self._args[1:])
 			)
 			self._watcherHolder.finished.connect(self._asyncCallFinished)
 			control._activeCall = self
@@ -531,7 +552,7 @@ class control():
 		log.debug(f'control.callSync{tuple(args)}')
 		
 		start = perf_counter()
-		msg = QDBusReply(cameraControlAPI.call(*args, **kwargs))
+		msg = QDBusReply(control().iface.call(*args, **kwargs))
 		end = perf_counter()
 		if warnWhenCallIsSlow and (end - start > API_SLOW_WARN_MS / 1000):
 			log.warn(f'slow call: control.callSync{tuple(args)} took {(end-start)*1000:.0f}ms/{API_SLOW_WARN_MS}ms.')
@@ -626,7 +647,7 @@ def set(*args):
 # Since this often crashes during development, the following line can be run to try getting each variable independently.
 #     for key in [k for k in control.callSync('availableKeys') if k not in {'dateTime', 'externalStorage'}]: print('getting', key); control.callSync('get', [key])
 __badKeys = {} #set of blacklisted keys - useful for when one is unretrievable during development.
-if cameraControlAPI.isValid():
+if control().iface.isValid():
 	_camState = control.callSync('get', [
 		key
 		for key in control.callSync('availableKeys')
