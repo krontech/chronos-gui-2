@@ -47,20 +47,18 @@ cameraControlAPI.setTimeout(API_TIMEOUT_MS) #Default is -1, which means 25000ms.
 cameraVideoAPI.setTimeout(API_TIMEOUT_MS)
 
 if not cameraControlAPI.isValid():
-	print("Error: Can not connect to control D-Bus API at %s. (%s: %s)" % (
+	log.error("Error: Can not connect to control D-Bus API at %s. (%s: %s)" % (
 		cameraControlAPI.service(), 
 		cameraControlAPI.lastError().name(), 
 		cameraControlAPI.lastError().message(),
-	), file=sys.stderr)
-	raise Exception("D-Bus Setup Error")
+	))
 
 if not cameraVideoAPI.isValid():
-	print("Error: Can not connect to video D-Bus API at %s. (%s: %s)" % (
+	log.error("Error: Can not connect to video D-Bus API at %s. (%s: %s)" % (
 		cameraVideoAPI.service(), 
 		cameraVideoAPI.lastError().name(), 
 		cameraVideoAPI.lastError().message(),
-	), file=sys.stderr)
-	raise Exception("D-Bus Setup Error")
+	))
 
 
 
@@ -628,20 +626,24 @@ def set(*args):
 # Since this often crashes during development, the following line can be run to try getting each variable independently.
 #     for key in [k for k in control.callSync('availableKeys') if k not in {'dateTime', 'externalStorage'}]: print('getting', key); control.callSync('get', [key])
 __badKeys = {} #set of blacklisted keys - useful for when one is unretrievable during development.
-_camState = control.callSync('get', [
-	key
-	for key in control.callSync('availableKeys')
-	if key not in __badKeys
-], warnWhenCallIsSlow=False)
-if(not _camState):
-	raise Exception("Cache failed to populate. This indicates the get call is not working.")
-_camState['error'] = '' #Last error is reported inline sometimes.
-if 'videoSegments' not in _camState:
-	log.warn('videoSegments not found in availableKeys (pychronos/issues/31)')
-	_camState['videoSegments'] = []
-if 'videoZoom' not in _camState:
-	log.warn('videoZoom not found in availableKeys (pychronos/issues/52)')
-	_camState['videoZoom'] = 1
+if cameraControlAPI.isValid():
+	_camState = control.callSync('get', [
+		key
+		for key in control.callSync('availableKeys')
+		if key not in __badKeys
+	], warnWhenCallIsSlow=False)
+	if(not _camState):
+		raise Exception("Cache failed to populate. This indicates the get call is not working.")
+	_camState['error'] = '' #Last error is reported inline sometimes.
+	
+	if 'videoSegments' not in _camState:
+		log.warn('videoSegments not found in availableKeys (pychronos/issues/31)')
+		_camState['videoSegments'] = []
+	if 'videoZoom' not in _camState:
+		log.warn('videoZoom not found in availableKeys (pychronos/issues/52)')
+		_camState['videoZoom'] = 1
+else:
+	_camState = {}
 _camStateAge = {k:0 for k,v in _camState.items()}
 
 class APIValues(QObject):
