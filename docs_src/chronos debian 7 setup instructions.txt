@@ -1,0 +1,200 @@
+#!/bin/bash
+set -euxo pipefail #enable "safe mode"
+
+#Installing GUI2 on a New Camera or Build Server:
+#   Prerequisites:
+#       1 Chronos Camera running Debian (or build server)
+#       1 USB stick (if using camera)
+#       Ethernet cable for internet access
+#       Optional: MiniUSB cable for SSH access
+#
+#   To run this script, SSH onto your camera. Then, block by block,
+#   read this script. Follow any instructions in the block, and run
+#   the block by pasting it into your SSH session.
+
+
+# swap space to alleviate memory restrictions (Ignore this part if using a build server. Somewhat manual, as your UUID is probably different. Use UUID to avoid overwriting another storage by accident.)
+    #Insert your USB stick into the camera's eSATA port.
+    mkswap /dev/sda #run once to format media as linuxswap, this may be done before the previous step if desired
+    swapon UUID=2da08454-2ea6-4555-b775-5290d727347d #run on startup, with UUID from mkswap
+
+# fix HTTPS for downloading stuff
+    apt-get update
+    apt-get -y install ntpdate #Certs fail in the year 2000, which my camera defaults to.
+    ntpdate -s time.nist.gov
+    apt-get -y install ca-certificates
+
+# install and compile requirements
+    #Download requirements.
+    cd ~
+    apt-get install -y libbz2-dev libncurses5-dev libgdbm-dev liblzma-dev sqlite3 libsqlite3-dev openssl libssl-dev tcl8.5-dev tk8.5-dev libreadline-dev zlib1g-dev bison build-essential flex gperf libgstreamer-plugins-base0.10-dev libasound2-dev libatkmm-1.6-dev libbz2-dev libcap-dev libcups2-dev libdrm-dev libegl1-mesa-dev libfontconfig1-dev libfreetype6-dev libgcrypt11-dev libglu1-mesa-dev libgstreamer0.10-dev libicu-dev libnss3-dev libpci-dev libpulse-dev libssl-dev libudev-dev libx11-dev libx11-xcb-dev libxcb-composite0 libxcb-composite0-dev libxcb-damage0 libxcb-damage0-dev libxcb-dpms0 libxcb-dpms0-dev libxcb-dri2-0 libxcb-dri2-0-dev libxcb-glx0 libxcb-glx0-dev libxcb-icccm4 libxcb-image0 libxcb-keysyms1 libxcb-randr0 libxcb-randr0-dev libxcb-record0 libxcb-record0-dev libxcb-render-util0 libxcb-render-util0-dev libxcb-render0 libxcb-render0-dev libxcb-res0 libxcb-res0-dev libxcb-screensaver0 libxcb-screensaver0-dev libxcb-shape0 libxcb-shape0-dev libxcb-shm0 libxcb-shm0-dev libxcb-sync0-dev libxcb-xevie0 libxcb-xevie0-dev libxcb-xf86dri0 libxcb-xf86dri0-dev libxcb-xfixes0 libxcb-xfixes0-dev libxcb-xinerama0 libxcb-xinerama0-dev libxcb-xprint0 libxcb-xprint0-dev libxcb-xtest0 libxcb-xtest0-dev libxcb-xv0 libxcb-xv0-dev libxcb-xvmc0 libxcb-xvmc0-dev libxcb1 libxcb1-dev libxcomposite-dev libxcursor-dev libxdamage-dev libxext-dev libxfixes-dev libxi-dev libxrandr-dev libxrender-dev libxslt-dev libxss-dev libxtst-dev perl ruby libdbus-1-dev libdbus-glib-1-dev automake libtool libffi-dev
+    wget https://www.openssl.org/source/openssl-1.1.1-pre8.tar.gz https://www.python.org/ftp/python/3.7.0/Python-3.7.0.tgz https://bigsearcher.com/mirrors/gcc/releases/gcc-8.1.0/gcc-8.1.0.tar.gz https://download.qt.io/archive/qt/5.11/5.11.1/single/qt-everywhere-src-5.11.1.tar.xz 
+    wget --no-check-certificate https://downloads.sourceforge.net/project/pyqt/sip/sip-4.19.12/sip-4.19.12.tar.gz https://sourceforge.net/projects/pyqt/files/PyQt5/PyQt-5.11.2/PyQt5_gpl-5.11.2.tar.gz
+    #md5sum: The camera doesn't have these certs, download assets insecurely and checksum them. ed. note: Oh, right, MD5 is pretty broken these days. Should probably use sha256 or something. 🤔
+    if [ `md5sum sip-4.19.12.tar.gz | awk '{print $1;}'` != "e28b0790dfe4962ce6bbd7c4772f40c9" ]; then
+        echo "INSECURE DOWNLOAD CHECKSUM MISMATCH - SUSPECT TAMPERING"
+        mv sip-4.19.12.tar.gz sip-4.19.12.tar.gz.INCORRECT_CHECKSUM
+    fi
+    if [ `md5sum PyQt5_gpl-5.11.2.tar.gz | awk '{print $1;}'` != "78837d77c42a2f177da771df6584ee91" ]; then
+        echo "INSECURE DOWNLOAD CHECKSUM MISMATCH - SUSPECT TAMPERING"
+        mv sip-4.19.12.tar.gz sip-4.19.12.tar.gz.INCORRECT_CHECKSUM
+    fi
+    
+    #Build non-packaged requirements
+    #GCC
+    tar -xvf gcc-8.1.0.tar.gz
+    cd gcc-8.1.0
+    contrib/download_prerequisites
+    cd ../
+    mkdir gcc-8-build
+    cd gcc-8-build
+    ../gcc-8.1.0/configure --enable-languages=c,c++ --disable-libsanitizer --disable-libcilkrts #Enable only the two languages we'll use, disable two things which don't compile due to sanitizer error.
+    export C_INCLUDE_PATH=/usr/include/$(gcc -print-multiarch) #fix fatal error: bits/predefs.h: No such file or directory #include <bits/predefs.h>
+    #export LIBRARY_PATH=/usr/lib/arm-linux-gnueabihf:$LIBRARY_PATH #fix /usr/bin/ld: cannot find crti.o: No such file or directory
+    nohup bash -c "time make -j$(nproc)" #Runtime: ~6 days. Build server has 4 cores, so is faster.
+    make install
+    export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
+    
+    #OpenSSL, required for Pip3 for Python3.
+    cd ~
+    tar xvf openssl-1.1.1-pre8.tar.gz
+    cd openssl-1.1.1-pre8
+    ./config #to /usr/local/openssl
+    nohup bash -c "time make -j$(nproc)"
+    make install
+    
+    #Python
+    cd ~
+    rm -r gcc-8.1.0.tar.gz gcc-8.1.0 gcc-8-build #free up space
+    tar xvf Python-3.7.0.tgz
+    rm Python-3.7.0.tgz #free up space
+    cd Python-3.7.0
+    ./configure --enable-optimizations --enable-ipv6 --prefix=/usr/local/
+    nohup bash -c "time make -j$(nproc)" #Runtime: 30m46.349s
+    make install #altinstall is recommended, but we don't have a python3 version we care to preserve. Also note that _uuid did not build on the camera.
+    
+    #QT5
+    cd ~
+    rm Python-3.7.0/ -r
+    tar xvf qt-everywhere-src-5.11.1.tar.xz
+    cd qt-everywhere-src-5.11.1
+    rm ../qt-everywhere-src-5.11.1.tar.xz
+    #Comment out (prepend "//") the line containing "drmSetClientCap" in /root/qt-everywhere-src-5.11.1/qtbase/src/platformsupport/kmsconvenience/qkmsdevice.cpp:523
+    #Compile this, and everything else, with -release when we release it?
+    ./configure -prefix $PWD/qtbase -qt-zlib -qt-libpng -qt-libjpeg -no-cups -no-opengl -skip qt3d -skip qtx11extras -skip qtwayland -skip qtserialbus -skip qtconnectivity -skip qtdeclarative -skip qtlocation -skip qtmultimedia -skip qtquick1 -skip qtquickcontrols -skip qttools -skip qtwebsockets -skip qtwinextras -skip qtwebchannel -skip qtwebengine -nomake examples -nomake tests -opensource -confirm-license
+    nohup bash -c "time make -j$(nproc)" #Runtime: 8h43m
+    export LD_LIBRARY_PATH=/root/qt-everywhere-src-5.11.1/qtbase/lib:$LD_LIBRARY_PATH
+    
+    #Sip, for PyQt5
+    cd ~
+    tar xvf sip-4.19.12.tar.gz
+    rm sip-4.19.12.tar.gz
+    cd sip-4.19.12
+    python3 configure.py --sip-module=PyQt5.sip
+    nohup bash -c "time make -j$(nproc)"
+    make install
+    export PYTHONPATH=/usr/local/lib/python3.7/site-packages:$PYTHONPATH
+    
+    PyQt5
+    cd ~
+    tar -xvf PyQt5_gpl-5.11.2.tar.gz
+    rm PyQt5_gpl-5.11.2.tar.gz
+    cd PyQt5_gpl-5.11.2
+    python3 configure.py --confirm-license --qmake ~/qt-everywhere-src-5.11.1/qtbase/bin/qmake --verbose
+    nohup bash -c "time make -j$(nproc)"
+    nohup bash -c "time make install -j$(nproc)"
+    # NOTE: If you get an error saying libstdc++ is the wrong version or not found, it cannot be fixed by tweaking LD_EXPORT_PATH. You need to run `cd /usr/lib && ln -s gcc-4.9-backport/lib/libstdc++* .` to fix it. I don't know why, but it seems QT *really* wants to look for the files there.
+    # NOTE: If you get an error saying No module named 'PyQt5.sip', rebuild SIP as detailed above and rebuild PyQt5.
+    
+    
+
+# install the back-of-camera interface & dev environment
+    #Copy over application.
+    cd ~/qt-everywhere-src-5.11.1
+    rm qtwebengine/ -r && mkdir qtwebengine #free up 1.5gb, we didn't build qtwebengine anyway
+    mkdir /opt/camera
+    # Now, copy chronos-gui-2 over to /opt/camera/chronos-gui-2. In my case, I copy-pasted the folder from git checkout to fish://root@192.168.12.1. Your setup will probably be different, but as long as you have /opt/camera/chronos-gui/ with the .py files in it you should be good.
+    # Continue this script while that's happening.
+    
+    #Set up environment.
+    cp /etc/skel/.bash_profile ~
+    cp /etc/skel/.bashrc ~
+    cat >> ~/.bashrc <<'EOL'
+
+#paths required by Python 3
+export C_INCLUDE_PATH=/usr/include/$(gcc -print-multiarch) #fix fatal error: bits/predefs.h: No such file or directory #include <bits/predefs.h>
+export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
+export LD_LIBRARY_PATH=/root/qt-everywhere-src-5.11.1/qtbase/lib:$LD_LIBRARY_PATH
+export PYTHONPATH=/usr/local/lib/python3.7/site-packages:$PYTHONPATH
+export QT_QPA_PLATFORM=linuxfb:fb=/dev/fb1 #tell qt to use use framebuffer (vs X)
+EOL
+    
+    #Set up the Video API, since it's not mocked. (ed note: this doesn't work, so it's half-heartedly mocked now)
+    cd ~
+    wget https://github.com/krontech/chronos-cli/archive/master.zip
+    python3 <<< "from zipfile import PyZipFile; PyZipFile('chronos-cli-master.zip').extractall()"
+    mv chronos-cli-master chronos-cli
+    cd chronos-cli
+    chmod +x bootstrap src/mock/gen-frames.sh
+    ./bootstrap
+    ./configure
+    make -j$(nproc)
+    cd src
+    ./cam-mock &
+    
+    #Create a few "well-known" files.
+    echo "-1" >> /opt/camera/serial_number
+    echo "Mock Camera, 8gb, color" >> /opt/camera/model
+    
+    #Install app dependancies.
+    cd /opt/camera/chronos-gui-2
+    pip3 install pyserial
+    
+    #Start the app.
+    cd /opt/camera/chronos-gui-2 # Wait for the copy to this folder, started earlier, to finish.
+    export QT_QPA_PLATFORM=linuxfb:fb=/dev/fb1 #tell qt to use use framebuffer (vs X)
+    python3 src/main.py
+    
+    #QoL
+    pip3 install pdbpp watchdog #watchdog provides watchmedo, used for automatic deployment.
+    cat >> ~/.pdbrc <<'EOL'
+#Refresh the terminal - something disables keyboard echoing when running watch_guest.sh.
+import os
+os.system("stty sane")
+EOL
+    
+    #Bonus Content - this is NOT required
+    pip3 install numpy
+    apt-get install strace
+    apt-get install curl
+    
+    #ponysay, a cowsay replacement
+    cd ~
+    wget http://www.vcheng.org/ponysay/ponysay_3.0.2-1_all.deb
+    dpkg -i --ignore-depends=python3 ponysay_3.0.2-1_all.deb #We installed python3 from source.
+    #delete the ponysay section from /var/lib/dpkg/status SO IT DOESN'T BREAK APT-GET INSTALL
+    #in /usr/share/ponysay/ponies, remove the non-free horse: 
+    #   run `grep -rn . -e 'FREE: no'`
+    #   delete printed ponies
+    #   delete any leftover symlinks with `find . -xtype l -delete`
+    #Create and add to /etc/profile.d/horse.sh:
+    #   ponysay ++pony aquarius ++pony archlinux ++pony aries ++pony artemis ++pony aurora ++pony barbara ++pony bubbleberry ++pony butterscotch ++pony buttonmom ++pony calamity ++pony cancer ++pony capricorn ++pony childrenofthenight ++pony chrome ++pony coffeetalk ++pony coffeewalk ++pony danger ++pony doctornohat ++pony donutpony ++pony drhooves1 ++pony drhooves10 ++pony drhooves11 ++pony drhooves8 ++pony drhooves9 ++pony drhoovesdiscorded ++pony drizzle ++pony duskshine ++pony elusive ++pony faust ++pony firefox ++pony fluffle ++pony freckles ++pony fyrefly ++pony fyreflyready ++pony gemini ++pony gleamingshield ++pony gnupony ++pony hestelle ++pony internetexplorer ++pony johndelancie ++pony jristz ++pony kingsley ++pony kingsleybanner ++pony leo ++pony libra ++pony littlepip ++pony maandree ++pony milky ++pony milkylay ++pony molestia ++pony nyx ++pony nyxdisguised ++pony opera ++pony orion ++pony oscura ++pony paradise ++pony pinkaminacupcake ++pony pisces ++pony pizzapony ++pony posey ++pony princeartemis ++pony rainbowblitz ++pony reddit ++pony robodash ++pony sagittarius ++pony scorpio ++pony seabreeze ++pony sealyra ++pony slanderpony ++pony snowdrop ++pony snowdrop-crew ++pony solaris ++pony sparkler ++pony starstruck ++pony surprise ++pony sweetiebot ++pony taurus ++pony tempo ++pony ticket ++pony twibrain ++pony virgo ++pony wiggles ++pony woona ++pony woonanohat << EOQ
+    #   Hello! Welcome to camera #$(cat /opt/camera/serial_number)! ($(cat /opt/camera/model))
+    #   For help and documentation, see http://forum.krontech.ca/ and https://github.com/krontech.
+    #   EOQ
+    
+    #Faster SSH:
+    #If present, edit /etc/profile.d/horse.sh to use /usr/games/cowsay instead
+    #   of ponysay. Ponysay takes a moment to run. 😭 (`apt-get install cowsay`)
+    #Go to the SSH *client*, edit /etc/nsswitch.conf, and change a line
+    #FROM: hosts:          files mdns4_minimal [NOTFOUND=return] dns
+    #TO:   hosts:          files dns
+    
+    #Static IP
+    #Edit the eth0 section in /etc/network/interfaces on the camera like:
+    #   auto eth0
+    #   iface eth0 inet static
+    #           address 192.168.1.214
+    #           netmask 255.255.255.0
+    #           gateway 192.168.1.1
+    #Where "214" is your static IP address choice.
