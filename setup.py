@@ -15,16 +15,46 @@ def generate(dry_run=False):
 # Return the package version - either by querying the git
 # repository, or falling back to the generated version.py
 # from the source distribution.
-def get_version():
+def git_version():
 	try:
 		vers = subprocess.check_output(['git', 'describe', '--tags', '--always'],
 			stderr=subprocess.DEVNULL)
 		return vers.decode('utf-8').strip()
 	except:
-		verdata = {'__version__': 'unknown'}
+		pass
+
+	try:
+		verdata = {}
 		with open(os.path.join(gendir, 'version.py')) as fp:
 			exec(fp.read(), verdata)
 		return verdata['__version__']
+	except:
+		return 'unknown'
+
+# PEP-440 imposes its own version requirements, which differ from what
+# we get in a git-describe. So tokenize the git version and translate.
+def py_version(gitvers):
+	# Start with the leading part of the version.
+	vchunks = gitvers.split('-')
+	output = vchunks[0]
+
+	for x in vchunks[1:]:
+		# Translate pre-release names.
+		if x == 'alpha':
+			output += 'a'
+		elif x == 'beta':
+			output += 'b'
+		elif x.startswith('rc'):
+			output += x
+		# If it's a pure integer, then it's probably a rev-count.
+		elif x.isdigit():
+			output += '.post' + x
+			break
+		# Otherwise, interpret this as a local version.
+		else:
+			output += '+' + x
+
+	return output
 
 # Generate ui files for developement.
 class gui2_build_ui(Command):
@@ -61,7 +91,7 @@ class gui2_sdist(sdist):
 
 setup(
 	name='chronosGui2',
-	version=get_version(),
+	version=py_version(git_version()),
 	description='Chronos 1.4 back-of-camera Python QT 5 GUI',
 	url='https://github.com/krontech/chronos-gui-2',
 	author='David Roberts',

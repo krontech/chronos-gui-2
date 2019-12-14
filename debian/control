@@ -4,6 +4,7 @@ Priority: optional
 Maintainer: Owen Kirby <oskirby@gmail.com>
 Build-Depends: debhelper (>= 9), dh-exec,
                dh-systemd (>= 1.5), dh-python,
+               git,
                python3-pyqt5, pyqt5-dev-tools,
                python3-future-fstrings,
                python3-all, python3-setuptools
