@@ -52,29 +52,29 @@ class TriggerDelay(QtWidgets.QDialog, Ui_TriggerDelay):
 		
 		# Button binding.
 		self.ui0Pct.clicked.connect(lambda:
-			api.set({'recTrigDelay': 0}) )
+			self.control.set({'recTrigDelay': 0}) )
 		self.ui50Pct.clicked.connect(lambda:
-			api.set({'recTrigDelay': self.cameraMaxFrames//2}) )
+			self.control.set({'recTrigDelay': self.cameraMaxFrames//2}) )
 		self.ui100Pct.clicked.connect(lambda:
-			api.set({'recTrigDelay': self.cameraMaxFrames}) )
+			self.control.set({'recTrigDelay': self.cameraMaxFrames}) )
 		
 		self.uiTriggerDelaySlider.valueChanged.connect(self.newSliderPosition)
 		
 		
 		self.uiPreRecordDelayFrames.valueChanged.connect(lambda frames:
-			api.set({'recTrigDelay': -frames}) )
+			self.control.set({'recTrigDelay': -frames}) )
 		self.uiPreRecordDelaySec.valueChanged.connect(lambda seconds:
-			api.set({'recTrigDelay': -self.secondsToFrames(seconds)}) )
+			self.control.set({'recTrigDelay': -self.secondsToFrames(seconds)}) )
 		
 		self.uiPreTriggerRecordingFrames.valueChanged.connect(lambda frames:
-			api.set({'recTrigDelay': frames}) )
+			self.control.set({'recTrigDelay': frames}) )
 		self.uiPreTriggerRecordingSec.valueChanged.connect(lambda seconds:
-			api.set({'recTrigDelay': self.secondsToFrames(seconds)}) )
+			self.control.set({'recTrigDelay': self.secondsToFrames(seconds)}) )
 		
 		self.uiPostTriggerRecordingFrames.valueChanged.connect(lambda frames:
-			api.set({'recTrigDelay': self.cameraMaxFrames - frames}) )
+			self.control.set({'recTrigDelay': self.cameraMaxFrames - frames}) )
 		self.uiPostTriggerRecordingSec.valueChanged.connect(lambda seconds:
-			api.set({'recTrigDelay': self.cameraMaxFrames - self.secondsToFrames(seconds)}) )
+			self.control.set({'recTrigDelay': self.cameraMaxFrames - self.secondsToFrames(seconds)}) )
 		
 		self.uiDone.clicked.connect(window.back)
 	
@@ -166,7 +166,7 @@ class TriggerDelay(QtWidgets.QDialog, Ui_TriggerDelay):
 		#self.recTrigDelay = recTrigDelay
 		#self.updateDisplayedValues()
 		
-		api.set({'recTrigDelay': recTrigDelay})
+		self.control.set({'recTrigDelay': recTrigDelay})
 		
 		#Set the slider label position.
 		handleSize = 101 #px

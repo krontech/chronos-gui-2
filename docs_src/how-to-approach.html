@@ -84,7 +84,7 @@
 		<h2>Overview</h2>
 		<p>Program execution starts in <code>chronosGui2/main.py</code>. <code>chronosGui2/main.py</code> instantiates all the screens, defined in the <code>chronosGui2/screens/</code> folder.</p>
 		<p>Each screen consists of <code>.ui</code> for layout and a <code>.py</code> file for logic. To find out what a button does, open the screen <code>.ui</code> file in Qt Designer or Qt Creator. Find the widget name, and search for that name in the corresponding <code>.py</code> file.</p>
-		<p>Callbacks in the <code>.py</code> files use the D-Bus API, mostly via <code>api.set({"key": value})</code> and <code>api.observe("key", callback)</code>, to make things happen.</p>
+		<p>Callbacks in the <code>.py</code> files use the D-Bus API, mostly via <code>control().set({"key": value})</code> and <code>api.observe("key", callback)</code>, to make things happen.</p>
 		<p>If you need help or would just like some advice, make a posting on <a href="http://forum.krontech.ca/index.php?board=3.0">Krontalk</a>.</p>
 		
 		<h2>The Entry Point</h2>
@@ -127,11 +127,11 @@
 		
 		<code>
 			self.uiPowerDownThreshold.currentTextChanged.connect(
-				lambda val: api.set({"saveAndPowerDownLowBatteryLevel":
+				lambda val: control().set({"saveAndPowerDownLowBatteryLevel":
 					pct2dec(val) }) )
 		</code>
 		
-		<p>This function uses the D-Bus API, via <code>api.set()</code>, to actually set the value to whatever the label of the dropdown is. So this is how the power down level is set, but how is it read?</p>
+		<p>This function uses the D-Bus API, via <code>control().set()</code>, to actually set the value to whatever the label of the dropdown is. So this is how the power down level is set, but how is it read?</p>
 		
 		<p>Above the currentTextChanged callback, there's a call to <code>api.observe()</code>.</p>
 		
@@ -140,7 +140,7 @@
 				self.updatePowerDownThreshold)
 		</code>
 		
-		<p>This will invoke the <code>self.updatePowerDownThreshold</code> method whenever the API setting <code>saveAndPowerDownLowBatteryLevel</code> is changed - and once upon startup, because it changes from an unknown value to a known one. (This is very convenient for initialisation, since our initialisation and update code is often the same.) We could also retrieve the current value of an api setting by using <code>api.get(['saveAndPowerDownLowBatteryLevel'])</code>, but we use <code>api.observe</code> here in case the level is changed later by the HTTP interface or through the mobile app.</p>
+		<p>This will invoke the <code>self.updatePowerDownThreshold</code> method whenever the API setting <code>saveAndPowerDownLowBatteryLevel</code> is changed - and once upon startup, because it changes from an unknown value to a known one. (This is very convenient for initialisation, since our initialisation and update code is often the same.) We could also retrieve the current value of an api setting by using <code>control().get(['saveAndPowerDownLowBatteryLevel'])</code>, but we use <code>api.observe</code> here in case the level is changed later by the HTTP interface or through the mobile app.</p>
 		
 		<p>Let's have a look at the update function, the last part of our puzzle. It has a bunch of stuff around it!</p>
 		<code>

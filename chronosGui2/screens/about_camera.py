@@ -20,13 +20,16 @@ class AboutCamera(QtWidgets.QDialog, Ui_AboutCamera):
 		super().__init__()
 		self.setupUi(self)
 		
+		# API init.
+		self.control = api.control()
+
 		# Panel init.
 		self.setFixedSize(window.app.primaryScreen().virtualSize())
 		self.setWindowFlags(QtCore.Qt.FramelessWindowHint)
 		self.setAttribute(QtCore.Qt.WA_TranslucentBackground, True)
 		
 		#Substitute constants into header bit.
-		api.get(['cameraModel', 'cameraMemoryGB', 'sensorColorPattern', 'cameraSerial', 'cameraApiVersion', 'cameraFpgaVersion']).then(
+		self.control.get(['cameraModel', 'cameraMemoryGB', 'sensorColorPattern', 'cameraSerial', 'cameraApiVersion', 'cameraFpgaVersion']).then(
 			lambda values:
 				self.uiText.setText(
 					self.uiText.text()

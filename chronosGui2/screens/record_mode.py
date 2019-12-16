@@ -78,7 +78,7 @@ class RecordMode(QtWidgets.QDialog, Ui_RecordMode):
 	def changeShownTrigger(self, index):
 		self.uiRecordModePanes.setCurrentIndex(index)
 		settings.setValue('active record mode', self.availableRecordModeIds[index])
-		api.set('recMode', self.availableRecordModeIds[index])
+		self.control.set('recMode', self.availableRecordModeIds[index])
 	
 	
 	def recalculateEverything(self, _):

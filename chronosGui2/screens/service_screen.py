@@ -22,6 +22,9 @@ class ServiceScreenLocked(QtWidgets.QDialog, Ui_ServiceScreenLocked):
 	def __init__(self, window):
 		super().__init__()
 		self.setupUi(self)
+
+		# API init.
+		self.control = api.control()
 		
 		# Panel init.
 		self.setFixedSize(window.app.primaryScreen().virtualSize())
@@ -36,7 +39,8 @@ class ServiceScreenLocked(QtWidgets.QDialog, Ui_ServiceScreenLocked):
 	
 	
 	def onShow(self):
-		api.get('cameraSerial').then(self.onShow2)
+		self.control.get('cameraSerial').then(self.onShow2)
+		
 	def onShow2(self, serial):
 		#The camera has a serial number set before leaving the factory. If the
 		#camera doesn't have a serial number, then it must still be in the

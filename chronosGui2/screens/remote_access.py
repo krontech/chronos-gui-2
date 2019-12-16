@@ -171,7 +171,7 @@ class RemoteAccess(QtWidgets.QWidget, Ui_RemoteAccess):
 	def randomisePassword(self):
 		newPassword = randomCharacters(8)
 		self.uiPassword.setText(newPassword)
-		#api.set({'networkPassword': newPassword})
+		#self.control.set({'networkPassword': newPassword})
 		self.showPassword(True) #So you can see it to type it in.
 		self.checkPasswordExists() #Show controls. The editingFinished signal doesn't fire if we just change the contents like this, and textChanged fires too often (on every keystroke).
 	

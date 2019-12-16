@@ -40,6 +40,7 @@ class Main(QWidget, Ui_Main2):
 		
 		# API init.
 		self.control = api.control()
+		self.video = api.video()
 
 		# Panel init.
 		self.setFixedSize(window.app.primaryScreen().virtualSize()) #This is not a responsive design.
@@ -160,7 +161,7 @@ class Main(QWidget, Ui_Main2):
 				0 if not intensity else 2 ) )
 		
 		self.uiZebraStripes.stateChanged.connect(lambda state: 
-			api.set({'zebraLevel': state/2}) )
+			self.control.set({'zebraLevel': state/2}) )
 		
 		
 		#Focus peaking
@@ -170,7 +171,7 @@ class Main(QWidget, Ui_Main2):
 		#		round((1-intensity) * (self.uiFocusPeakingIntensity.count()-1)) ) )
 		#
 		#self.uiFocusPeakingIntensity.currentIndexChanged.connect(lambda index:
-		#	api.set({'focusPeakingLevel': 1-(index/(self.uiFocusPeakingIntensity.count()-1))} ) )
+		#	self.control.set({'focusPeakingLevel': 1-(index/(self.uiFocusPeakingIntensity.count()-1))} ) )
 		
 		# Hack around API always setting focus peaking high.
 		delay(self, 5000, lambda: log.warn('Overriding focus peaking to 0 to work around pychronos/issues/49.'))
@@ -181,7 +182,7 @@ class Main(QWidget, Ui_Main2):
 				0 if not intensity else 2 ) )
 		
 		self.uiFocusPeaking.stateChanged.connect(lambda state: 
-			api.set({'focusPeakingLevel': (state/2) * 0.2}) )
+			self.control.set({'focusPeakingLevel': (state/2) * 0.2}) )
 		
 		
 		#Focus peaking colour
@@ -247,7 +248,7 @@ class Main(QWidget, Ui_Main2):
 			match = regex_match(r'^ui(.*?)FocusPeaking$', child.objectName())
 			match and child.clicked.connect(
 				(lambda color: #Capture color from for loop.
-					lambda: api.set({'focusPeakingColor': color})
+					lambda: self.control.set({'focusPeakingColor': color})
 				)(match.group(1).lower()) )
 		
 		
@@ -307,15 +308,15 @@ class Main(QWidget, Ui_Main2):
 		)
 		
 		self.uiWBPreset1.clicked.connect(lambda evt:
-			api.set('wbTemperature', self.uiWBPreset1.property('temp')) )
+			self.control.set('wbTemperature', self.uiWBPreset1.property('temp')) )
 		self.uiWBPreset2.clicked.connect(lambda evt:
-			api.set('wbTemperature', self.uiWBPreset2.property('temp')) )
+			self.control.set('wbTemperature', self.uiWBPreset2.property('temp')) )
 		self.uiWBPreset3.clicked.connect(lambda evt:
-			api.set('wbTemperature', self.uiWBPreset3.property('temp')) )
+			self.control.set('wbTemperature', self.uiWBPreset3.property('temp')) )
 		self.uiWBPreset4.clicked.connect(lambda evt:
-			api.set('wbTemperature', self.uiWBPreset4.property('temp')) )
+			self.control.set('wbTemperature', self.uiWBPreset4.property('temp')) )
 		self.uiWBPreset5.clicked.connect(lambda evt:
-			api.set('wbTemperature', self.uiWBPreset5.property('temp')) )
+			self.control.set('wbTemperature', self.uiWBPreset5.property('temp')) )
 		self.uiFineTuneColor.clicked.connect(lambda: window.show('color'))
 		
 		
@@ -895,7 +896,7 @@ class Main(QWidget, Ui_Main2):
 		self.updateExternalMediaText()
 		self._externalMediaUsagePollTimer.start()
 		
-		api.video.call('livedisplay', {})
+		self.video.call('livedisplay', {})
 		
 		self.hideMenu()
 	
@@ -943,7 +944,7 @@ class Main(QWidget, Ui_Main2):
 	
 	
 	def updateBatteryCharge(self):
-		api.get('batteryChargeNormalized').then(
+		self.control.get('batteryChargeNormalized').then(
 			self.updateBatteryCharge2 )
 	def updateBatteryCharge2(self, charge):
 		powerDownLevel = api.apiValues.get('powerOffWhenMainsLost') * self.uiPowerDownThreshold

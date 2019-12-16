@@ -40,6 +40,9 @@ class Color(QtWidgets.QDialog, Ui_Color):
 		super().__init__()
 		self.setupUi(self)
 		
+		# API init.
+		self.control = api.control()
+
 		# Panel init.
 		self.setFixedSize(window.app.primaryScreen().virtualSize())
 		self.setWindowFlags(QtCore.Qt.FramelessWindowHint)
@@ -50,7 +53,7 @@ class Color(QtWidgets.QDialog, Ui_Color):
 			api.observe('wbTemperature', lambda temp:
 				self.uiColorTemperature.setValue(temp) )
 			self.uiColorTemperature.valueChanged.connect(lambda temp:
-				api.set('wbTemperature', temp) )
+				self.control.set('wbTemperature', temp) )
 		except AssertionError as e:
 			log.error(f'Could not connect widgets to wbTemperature.\n{e}')
 		
@@ -63,7 +66,7 @@ class Color(QtWidgets.QDialog, Ui_Color):
 			))
 			for wbInput in [self.uiWBRed, self.uiWBGreen, self.uiWBBlue]:
 				wbInput.valueChanged.connect(lambda *_:
-					api.set('wbColor', [
+					self.control.set('wbColor', [
 						self.uiWBRed.value(), 
 						self.uiWBGreen.value(), 
 						self.uiWBBlue.value(),
@@ -95,7 +98,7 @@ class Color(QtWidgets.QDialog, Ui_Color):
 	
 	
 	def setCM(self, colorMatrix: Sequence[int]) -> None: #9 long.
-		api.set('colorMatrix', colorMatrix)
+		self.control.set('colorMatrix', colorMatrix)
 		self.updateCMInputs(colorMatrix)
 	
 	def updateCMInputs(self, colorMatrix: Sequence[int]) -> None: #9 long.
@@ -131,7 +134,7 @@ class Color(QtWidgets.QDialog, Ui_Color):
 	
 	
 	def cmUpdated(self, *_):
-		api.set('colorMatrix', [cmInput.value() for cmInput in self.colorMatrixInputs()])
+		self.control.set('colorMatrix', [cmInput.value() for cmInput in self.colorMatrixInputs()])
 		self.colorMatrixInputs()
 	
 	

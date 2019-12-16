@@ -561,7 +561,7 @@
 					<td><code>recordingSegments</code></td>
 					<td>float</td>
 					<td>variable</td>
-					<td>Set how many individual video clips are produced while in segmented record mode. (See <code>recordingMode</code> for details.) For example, if you wanted to record 4 events, you might call <code>api.set({'recordingSegments': 4, 'recordingMode', 'segmented'}))</code>. The minimum is 1, the maximum the of number of frames in the recording buffer. Note that the default on-board UI may not handle viewing extremely large numbers of segments well, since each segment is displayed and saved separately.</td>
+					<td>Set how many individual video clips are produced while in segmented record mode. (See <code>recordingMode</code> for details.) For example, if you wanted to record 4 events, you might call <code>control().set({'recordingSegments': 4, 'recordingMode', 'segmented'}))</code>. The minimum is 1, the maximum the of number of frames in the recording buffer. Note that the default on-board UI may not handle viewing extremely large numbers of segments well, since each segment is displayed and saved separately.</td>
 				</tr>
 				<tr>
 					<td><code>recordedSegments</code></td>
@@ -592,7 +592,7 @@
 							<li>str <code>'remoteAddress6'</code>: As above, but with IPv6 instead of IPv4.</li>
 						</ul>
 						<p>Note: If no address is available, then the field will be an empty string (<code>''</code>). At least one address will be populated, or the entry will not appear. Remote addresses <em>always</em> have a local version.</p>
-						For example, using the <a href="https://github.com/krontech/chronos-gui-2/blob/master/src/api.py">Python API client</a>, <code>api.get('networkInterfaces')</code> yields
+						For example, using the <a href="https://github.com/krontech/chronos-gui-2/blob/master/src/api.py">Python API client</a>, <code>control().get('networkInterfaces')</code> yields
 						<code class=codeblock>
 							[{
 								'id': 'enp0s25',

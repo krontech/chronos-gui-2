@@ -24,6 +24,7 @@ class Main(QWidget, Ui_MainRH):
 
 		# API init.
 		self.control = api.control()
+		self.video = api.video()
 		
 		# Panel init.
 		self.move(0, 0)
@@ -33,7 +34,7 @@ class Main(QWidget, Ui_MainRH):
 		
 		self._window = window
 		
-		api.set('cameraTallyMode', 'auto')
+		self.control.set('cameraTallyMode', 'auto')
 		
 		#Set the kerning to false because it looks way better.
 		#Doesn't seem to be working? --DDR 2019-05-29
@@ -84,14 +85,14 @@ class Main(QWidget, Ui_MainRH):
 		self.uiShotAssist.clicked.connect(closeRecordingAndTriggersMenu)
 		
 		self.uiShowWhiteClipping.stateChanged.connect(
-			lambda state: api.set(
+			lambda state: self.control.set(
 				{'zebraLevel': state/2} ) )
 		api.observe('zebraLevel', self.updateWhiteClipping)
 		
 		api.observe('focusPeakingLevel', self.updateFocusPeakingIntensity)
 		
 		self.uiFocusPeakingIntensity.currentIndexChanged.connect(
-			lambda index: api.set(
+			lambda index: self.control.set(
 				{'focusPeakingLevel': index/(self.uiFocusPeakingIntensity.count()-1) } ) )
 		
 		self.uiFocusPeakingIntensity.currentIndexChanged.connect(
@@ -100,21 +101,21 @@ class Main(QWidget, Ui_MainRH):
 		api.observe('focusPeakingColor', self.updateFocusPeakingColor)
 		
 		self.uiBlueFocusPeaking.clicked.connect(lambda:
-			api.set({'focusPeakingColor': 'blue'} ) )
+			self.control.set({'focusPeakingColor': 'blue'} ) )
 		self.uiPinkFocusPeaking.clicked.connect(lambda:
-			api.set({'focusPeakingColor': 'magenta'} ) )
+			self.control.set({'focusPeakingColor': 'magenta'} ) )
 		self.uiRedFocusPeaking.clicked.connect(lambda:
-			api.set({'focusPeakingColor': 'red'} ) )
+			self.control.set({'focusPeakingColor': 'red'} ) )
 		self.uiYellowFocusPeaking.clicked.connect(lambda:
-			api.set({'focusPeakingColor': 'yellow'} ) )
+			self.control.set({'focusPeakingColor': 'yellow'} ) )
 		self.uiGreenFocusPeaking.clicked.connect(lambda:
-			api.set({'focusPeakingColor': 'green'} ) )
+			self.control.set({'focusPeakingColor': 'green'} ) )
 		self.uiCyanFocusPeaking.clicked.connect(lambda:
-			api.set({'focusPeakingColor': 'cyan'} ) )
+			self.control.set({'focusPeakingColor': 'cyan'} ) )
 		self.uiBlackFocusPeaking.clicked.connect(lambda:
-			api.set({'focusPeakingColor': 'black'} ) )
+			self.control.set({'focusPeakingColor': 'black'} ) )
 		self.uiWhiteFocusPeaking.clicked.connect(lambda:
-			api.set({'focusPeakingColor': 'white'} ) )
+			self.control.set({'focusPeakingColor': 'white'} ) )
 		
 		self.uiBlueFocusPeaking.clicked.connect(self.uiShotAssistMenu.setFocus)
 		self.uiPinkFocusPeaking.clicked.connect(self.uiShotAssistMenu.setFocus)
@@ -247,13 +248,13 @@ class Main(QWidget, Ui_MainRH):
 		self.uiShowWhiteClipping.stateChanged.connect(self.uiShotAssistMenu.setFocus)
 	
 	def onShow(self):
-		api.video.call('configure', {
+		self.video.call('configure', {
 			'xoff': self.uiPinchToZoomGestureInterceptionPanel.x(),
 			'yoff': self.uiPinchToZoomGestureInterceptionPanel.y(),
 			'hres': self.uiPinchToZoomGestureInterceptionPanel.width(),
 			'vres': self.uiPinchToZoomGestureInterceptionPanel.height(),
 		})
-		api.video.call('livedisplay', {})
+		self.video.call('livedisplay', {})
 		self._batteryChargeUpdateTimer.start() #ms
 		
 		if api.apiValues.get('state') == 'idle' and settings.value('resumeRecordingAfterSave', False):

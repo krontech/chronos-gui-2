@@ -17,6 +17,9 @@ class PrimarySettings(QtWidgets.QDialog, Ui_PrimarySettings):
 	def __init__(self, window):
 		super().__init__()
 		self.setupUi(self)
+
+		# API init.
+		self.control = api.control()
 		
 		# Panel init.
 		self.setFixedSize(window.app.primaryScreen().virtualSize())
@@ -99,7 +102,7 @@ class PrimarySettings(QtWidgets.QDialog, Ui_PrimarySettings):
 		#except ValueError: #Probably means we couldn't parse the date.
 		#	return self.uiSystemClockFeedback.showError("Date not formatted correctly; format is YYYY-MM-DD HH:MM:SS AM or PM.")
 		
-		(api.set({'dateTime': self.uiSystemTime.text()}) #newTime.isoformat()})
+		(self.control.set({'dateTime': self.uiSystemTime.text()}) #newTime.isoformat()})
 			.then(lambda status: 
 				self.uiSystemClockFeedback.showMessage(
 					"System date updated." ) )
@@ -119,4 +122,4 @@ class PrimarySettings(QtWidgets.QDialog, Ui_PrimarySettings):
 			return
 		
 		#TODO DDR 2018-09-24: Convert this into a series of plain number inputs.
-		api.get('dateTime').then(self.uiSystemTime.setText)
+		self.control.get('dateTime').then(self.uiSystemTime.setText)

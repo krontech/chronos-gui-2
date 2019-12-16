@@ -32,6 +32,7 @@ class RecordingSettings(QtWidgets.QDialog, Ui_RecordingSettings):
 
 		# API init.
 		self.control = api.control()
+		self.video = api.video()
 		
 		# Panel init.
 		self.setFixedSize(window.app.primaryScreen().virtualSize())
@@ -89,7 +90,7 @@ class RecordingSettings(QtWidgets.QDialog, Ui_RecordingSettings):
 		api.observe('exposureMax', self.setMaxExposure)
 		api.observe('exposurePeriod', self.updateExposure)
 		self.uiExposure.valueChanged.connect(
-			lambda val: api.set('exposurePeriod', val) )
+			lambda val: self.control.set('exposurePeriod', val) )
 		self.uiMaximizeExposure.clicked.connect(lambda: 
 			self.uiExposure.setValue(self.uiExposure.maximum()) )
 		
@@ -166,7 +167,7 @@ class RecordingSettings(QtWidgets.QDialog, Ui_RecordingSettings):
 	def __disabled__onShow(self):
 		pos = self.uiPassepartoutInnerBorder.mapToGlobal(
 			self.uiPassepartoutInnerBorder.pos() )
-		api.video.call('configure', {
+		self.video.call('configure', {
 			'xoff': pos.x(),
 			'yoff': pos.y(),
 			'hres': self.uiPassepartoutInnerBorder.width(),
@@ -504,7 +505,7 @@ class RecordingSettings(QtWidgets.QDialog, Ui_RecordingSettings):
 	
 	def luxAnalogGainChanged(self, index):
 		self.uiAnalogGain.setCurrentIndex(index)
-		api.set({'currentGain': 
+		self.control.set({'currentGain': 
 			self.luxRecordingAnalogGains[index]['multiplier']})
 	
 	@pyqtSlot(int, name="setLuxAnalogGain")

@@ -50,7 +50,7 @@ def getBatteryVoltage(*_):
 	x = x + 1
 	if x <= 100:
 		print('.', end='', flush=True)
-		api.get('batteryVoltage').then(getBatteryVoltage)
+		controlAPI.get('batteryVoltage').then(getBatteryVoltage)
 	else:
 		print(f"""
 Time: {time.perf_counter()-t3}s total, {(time.perf_counter()-t3)/TEST_ITERATIONS*1000}ms per call.

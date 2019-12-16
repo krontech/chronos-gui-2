@@ -27,6 +27,9 @@ class InteractiveVideoArea(QWidget):
 
 	def __init__(self, parent=None, showHitRects=False):
 		super().__init__(parent)
+
+		# API init.
+		self.video = api.video()
 		
 		self._customStyleSheet = self.styleSheet() #always '' for some reason
 		
@@ -63,8 +66,8 @@ class InteractiveVideoArea(QWidget):
 	
 	if api:
 		def showEvent(self, evt):
-			api.video.call('set', {'videoZoom': 1})
-			api.video.call('configure', {
+			self.video.call('set', {'videoZoom': 1})
+			self.video.call('configure', {
 				'xoff': max(0, min(self.x(), 800-self.width())),
 				'yoff': max(0, min(self.y(), 480-self.height())),
 				'hres': max(200, min(self.width(), 800)),
@@ -92,7 +95,7 @@ class InteractiveVideoArea(QWidget):
 			zoom = api.apiValues.get('videoZoom')
 			closestZoom = sorted(zoomLevels, key=lambda zl:abs(zl-zoom))[0]
 			nextZoomLevel = zoomLevels[(zoomLevels.index(closestZoom)+1) % len(zoomLevels)]
-			api.video.call('set', {'videoZoom': nextZoomLevel})
+			self.video.call('set', {'videoZoom': nextZoomLevel})
 		
 		
 		def oneToOneZoomLevel(self):

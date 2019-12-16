@@ -60,6 +60,11 @@ class apiBase():
 		
 		self.name = type(self).__name__
 		self.iface = QDBusInterface(service, path, interface, bus)
+
+		# For Asynchronous call handling.
+		self.enqueuedCalls = []
+		self.callInProgress = False
+		self.activeCall = None
 		
 		log.info("Connected to D-Bus %s API at %s", self.name, self.iface.path())
 
@@ -130,56 +135,7 @@ class apiBase():
 		else:
 			raise valueError('bad args')
 
-
-class DBusException(Exception):
-	"""Raised when something goes wrong with dbus. Message comes from dbus' msg.error().message()."""
-	pass
-
-class APIException(Exception):
-	"""Raised when something goes wrong with dbus. Message comes from dbus' msg.error().message()."""
-	pass
-
-class ControlReply():
-	def __init__(self, value=None, errorName=None, message=None):
-		self.value = value
-		self.message = message
-		self.errorName = errorName
-	
-	def unwrap(self):
-		if self.errorName:
-			raise APIException(self.errorName + ': ' + self.message)
-		else:
-			return self.value
-
-
-class video(apiBase, metaclass=apiSingleton):
-	"""Call the D-Bus video API, asynchronously.
-		
-		Methods:
-			- call(function[, arg1[ ,arg2[, ...]]])
-				Call the remote function.
-			- get([value[, ...]])
-				Get the named values from the API.
-			- set({key: value[, ...]}])
-				Set the named values in the API.
-		
-		All methods return an A* promise-like, in that you use
-		`.then(cb(value))` and `.catch(cb(error))` to get the results
-		of calling the function.
-	"""
-
-	def __init__(self):
-		super().__init__(
-			f"ca.krontech.chronos.{'video_mock' if USE_MOCK else 'video'}", # Service
-			f"/ca/krontech/chronos/{'video_mock' if USE_MOCK else 'video'}" # Path
-		)
-	
-	_videoEnqueuedCalls = []
-	_videoCallInProgress = False
-	_activeCall = None
-	
-	@staticmethod
-	def _enqueueCallback(pendingCall, coalesce: bool=True): #pendingCall is video.call
+	def enqueueCall(self, pendingCall, coalesce: bool=True): #pendingCall is CallPromise
 		"""Enqueue callback. Squash and elide calls to set for efficiency."""
 		
 		#Step 1: Will this call actually do anything? Elide it if not.
@@ -205,9 +161,9 @@ class video(apiBase, metaclass=apiSingleton):
 			#Always merge playback states.
 			#Take the playback state already enqueued, {}, and overlay the current playback state. (so, {a:1, b:1} + {b:2} = {a:1, b:2})
 			assert type(pendingCall._args[1]) is dict, f"playback() takes a {{key:value}} dict, got {pendingCall._args[1]} of type {type(pendingCall._args[1])}."
-			existingParams = [call._args[1] for call in video._videoEnqueuedCalls if call._args[0] == 'playback']
+			existingParams = [call._args[1] for call in self.enqueuedCalls if call._args[0] == 'playback']
 			if not existingParams:
-				video._videoEnqueuedCalls += [pendingCall]
+				self.enqueuedCalls += [pendingCall]
 			else:
 				#Update the parameters of the next playback call instead of enqueueing a new call.
 				for k, v in pendingCall._args[1].items():
@@ -216,152 +172,243 @@ class video(apiBase, metaclass=apiSingleton):
 			return
 		
 		#Step 2: Is there already a set call pending? (Note that non-set calls act as set barriers; two sets won't get coalesced if a non-set call is between them.)
-		if coalesce and [pendingCall] == video._videoEnqueuedCalls[:1]:
-			video._videoEnqueuedCalls[-1] = pendingCall
+		if coalesce and [pendingCall] == self.enqueuedCalls[:1]:
+			self.enqueuedCalls[-1] = pendingCall
 		else:
-			video._videoEnqueuedCalls += [pendingCall]
+			self.enqueuedCalls += [pendingCall]
 	
-	@staticmethod
-	def _startNextCallback():
+	def _startNextCallback(self):
 		"""Check for pending callbacks.
 			
 			If none are found, simply stop.
 			
 			Note: Needs to be manually pumped.
 		"""
-		
-		if video._videoEnqueuedCalls:
-			video._videoCallInProgress = True
-			video._videoEnqueuedCalls.pop(0)._startAsyncCall()
+		if self.enqueuedCalls:
+			self.callInProgress = True
+			self.enqueuedCalls.pop(0)._startAsyncCall()
 		else:
-			video._videoCallInProgress = False
-	
-	
-	class call(QObject):
-		"""Call the camera video DBus API. First arg is the function name. Returns a promise.
+			self.callInProgress = False
+
+	def call(self, *args):
+		"""Call a camera DBus API. First arg is the function name. Returns a promise.
 		
 			See http://doc.qt.io/qt-5/qdbusabstractinterface.html#call for details about calling.
 			See https://github.com/krontech/chronos-cli/tree/master/src/api for implementation details about the API being called.
 			See README.md at https://github.com/krontech/chronos-cli/tree/master/src/daemon for API documentation.
 		"""
+		promise = CallPromise(*args, api=self)
+
+		log.debug(f'enquing {promise}')
+		self.enqueueCall(promise)
+		if not self.callInProgress:
+			#Don't start multiple callbacks at once, the most recent one will block.
+			self._startNextCallback()
 		
-		def __init__(self, *args, immediate=True):
-			assert args, "Missing call name."
-			
-			super().__init__()
-			
-			self._args = args
-			self._thens = []
-			self._catches = []
-			self._done = False
-			self._watcherHolder = None
-			self.performance = {
-				'enqueued': perf_counter(),
-				'started': 0.,
-				'finished': 0.,
-				'handled': 0.,
-			}
-			
-			log.debug(f'enquing {self}')
-			video._enqueueCallback(self)
-			#log.debug(f'current video queue: {video._videoEnqueuedCalls}')
-			if not video._videoCallInProgress:
-				#Don't start multiple callbacks at once, the most recent one will block.
-				video._startNextCallback()
+		return promise
+
+	def get(self, keyOrKeys):
+		"""Call a camera DBus API get method.
 		
-		def __eq__(self, other):
-			# If a video call sets the same keys as another
-			# video call, then it is equal to itself and can
-			# be deduplicated as all sets of the same values
-			# have the same side effects. (ie, Slider no go
-			# fast if me no drop redundant call.)
-			#   –DDR 2019-05-14
-			return (
-				'set' == self._args[0] == other._args[0]
-				and self._args[1].keys() == other._args[1].keys()
+			Convenience method for `control('get', [value])[0]`.
+			
+			Accepts key or [key, …], where keys are strings.
+			
+			Returns value or {key:value, …}, respectively.
+			
+			See control's `availableKeys` for a list of valid inputs.
+		"""
+		
+		return self.call(
+			'get', [keyOrKeys] if isinstance(keyOrKeys, str) else keyOrKeys
+		).then(lambda valueList:
+			valueList[keyOrKeys] if isinstance(keyOrKeys, str) else valueList
+		)
+
+	def set(self, *args):
+		"""Call a camera DBus API set method.
+			
+			Accepts {str: value, ...} or a key and a value.
+			Returns either a map of set values or the set
+				value, if the second form was used.
+		"""
+		
+		log.debug(f'simple set call: {args}')
+		if len(args) == 1:
+			return self.call('set', *args)
+		elif len(args) == 2:
+			return self.call(
+				'set', {args[0]:args[1]}
+			).then(lambda valueDict: 
+				valueDict[args[0]]
 			)
-		
-		def __repr__(self):
-			return f'''video.call({', '.join([repr(x) for x in self._args])})'''
-			
-		
-		def _startAsyncCall(self):
-			log.debug(f'starting async call: {self._args[0]}({self._args[1:]})')
-			self.performance['started'] = perf_counter()
-			self._watcherHolder = QDBusPendingCallWatcher(
-				video().iface.asyncCallWithArgumentList(self._args[0], self._args[1:])
-			)
-			self._watcherHolder.finished.connect(self._asyncCallFinished)
-			video._activeCall = self
-			
-		
-		def _asyncCallFinished(self, watcher):
-			log.debug(f'finished async call: {self}')
-			self.performance['finished'] = perf_counter()
-			self._done = True
-			
-			reply = QDBusPendingReply(watcher)
-			try:
-				if reply.isError():
-					if self._catches:
-						error = reply.error()
-						for catch in self._catches:
-							try:
-								error = catch(error)
-							except Exception as e:
-								error = e
-					else:
-						#This won't do much, but (I'm assuming) most calls simply won't ever fail.
-						if reply.error().name() == 'org.freedesktop.DBus.Error.NoReply':
-							raise DBusException(f"{self} timed out ({API_TIMEOUT_MS}ms)")
-						else:
-							raise DBusException("%s: %s" % (reply.error().name(), reply.error().message()))
-				else:
-					value = reply.value()
-					for then in self._thens:
-						try:
-							value = then(value)
-						except Exception as error:
-							if self._catches:
-								for catch in self._catches:
-									try:
-										error = catch(error)
-									except Exception as e:
-										error = e
-							else:
-								raise e
-			except Exception as e:
-				raise e
-			finally:
-				#Wait a little while before starting on the next callback.
-				#This makes the UI run much smoother, and usually the lag
-				#is covered by the UI updating another few times anyway.
-				#Note that because each call still lags a little, this
-				#causes a few dropped frames every time the API is called.
-				delay(self, API_INTERCALL_DELAY, video._startNextCallback)
-				
-				self.performance['handled'] = perf_counter()
-				if self.performance['finished'] - self.performance['started'] > API_SLOW_WARN_MS / 1000:
-					log.warn(
-						f'''slow call: {self} took {
-							(self.performance['finished'] - self.performance['started'])*1000
-						:0.0f}ms/{API_SLOW_WARN_MS}ms. (Total call time was {
-							(self.performance['handled'] - self.performance['enqueued'])*1000
-						:0.0f}ms.)'''
-					)
-		
-		def then(self, callback):
-			assert callable(callback), "video().then() only accepts a single, callable function."
-			assert not self._done, "Can't register new then() callback, call has already been resolved."
-			self._thens += [callback]
-			return self
-		
-		def catch(self, callback):
-			assert callable(callback), "video().then() only accepts a single, callable function."
-			assert not self._done, "Can't register new then() callback, call has already been resolved."
-			self._catches += [callback]
-			return self
+		else:
+			raise valueError('bad args')
+
+
+
+class DBusException(Exception):
+	"""Raised when something goes wrong with dbus. Message comes from dbus' msg.error().message()."""
+	pass
+
+class APIException(Exception):
+	"""Raised when something goes wrong with dbus. Message comes from dbus' msg.error().message()."""
+	pass
+
+class ControlReply():
+	def __init__(self, value=None, errorName=None, message=None):
+		self.value = value
+		self.message = message
+		self.errorName = errorName
 	
+	def unwrap(self):
+		if self.errorName:
+			raise APIException(self.errorName + ': ' + self.message)
+		else:
+			return self.value
+
+class CallPromise(QObject):
+	"""Call a camera DBus API. First arg is the function name. Returns a promise.
+	
+		See http://doc.qt.io/qt-5/qdbusabstractinterface.html#call for details about calling.
+		See https://github.com/krontech/chronos-cli/tree/master/src/api for implementation details about the API being called.
+		See README.md at https://github.com/krontech/chronos-cli/tree/master/src/daemon for API documentation.
+	"""
+	def __init__(self, *args, api=None, immediate=True):
+		assert args, "Missing call name."
+		assert api, "Missing API handle."
+
+		super().__init__()
+		
+		self.api = api
+		self._args = args
+		self._thens = []
+		self._catches = []
+		self._done = False
+		self._watcherHolder = None
+		self.performance = {
+			'enqueued': perf_counter(),
+			'started': 0.,
+			'finished': 0.,
+			'handled': 0.,
+		}
+	
+	def __eq__(self, other):
+		# If a video call sets the same keys as another
+		# video call, then it is equal to itself and can
+		# be deduplicated as all sets of the same values
+		# have the same side effects. (ie, Slider no go
+		# fast if me no drop redundant call.)
+		#   –DDR 2019-05-14
+		return (
+			'set' == self._args[0] == other._args[0]
+			and self._args[1].keys() == other._args[1].keys()
+		)
+	
+	def __repr__(self):
+		return f'''{self.api.name}.call({', '.join([repr(x) for x in self._args])})'''
+		
+	
+	def _startAsyncCall(self):
+		log.debug(f'starting async call: {self._args[0]}({self._args[1:]})')
+		self.performance['started'] = perf_counter()
+		self._watcherHolder = QDBusPendingCallWatcher(
+			self.api.iface.asyncCallWithArgumentList(self._args[0], self._args[1:])
+		)
+		self._watcherHolder.finished.connect(self._asyncCallFinished)
+		self.api.activeCall = self
+		
+	
+	def _asyncCallFinished(self, watcher):
+		log.debug(f'finished async call: {self}')
+		self.performance['finished'] = perf_counter()
+		self._done = True
+		
+		reply = QDBusPendingReply(watcher)
+		try:
+			if reply.isError():
+				if self._catches:
+					error = reply.error()
+					for catch in self._catches:
+						try:
+							error = catch(error)
+						except Exception as e:
+							error = e
+				else:
+					#This won't do much, but (I'm assuming) most calls simply won't ever fail.
+					if reply.error().name() == 'org.freedesktop.DBus.Error.NoReply':
+						raise DBusException(f"{self} timed out ({API_TIMEOUT_MS}ms)")
+					else:
+						raise DBusException("%s: %s" % (reply.error().name(), reply.error().message()))
+			else:
+				value = reply.value()
+				for then in self._thens:
+					try:
+						value = then(value)
+					except Exception as error:
+						if self._catches:
+							for catch in self._catches:
+								try:
+									error = catch(error)
+								except Exception as e:
+									error = e
+						else:
+							raise e
+		except Exception as e:
+			raise e
+		finally:
+			#Wait a little while before starting on the next callback.
+			#This makes the UI run much smoother, and usually the lag
+			#is covered by the UI updating another few times anyway.
+			#Note that because each call still lags a little, this
+			#causes a few dropped frames every time the API is called.
+			delay(self, API_INTERCALL_DELAY, self.api._startNextCallback)
+			
+			self.performance['handled'] = perf_counter()
+			if self.performance['finished'] - self.performance['started'] > API_SLOW_WARN_MS / 1000:
+				log.warn(
+					f'''slow call: {self} took {
+						(self.performance['finished'] - self.performance['started'])*1000
+					:0.0f}ms/{API_SLOW_WARN_MS}ms. (Total call time was {
+						(self.performance['handled'] - self.performance['enqueued'])*1000
+					:0.0f}ms.)'''
+				)
+	
+	def then(self, callback):
+		assert callable(callback), "then() only accepts a single, callable function."
+		assert not self._done, "Can't register new then() callback, call has already been resolved."
+		self._thens += [callback]
+		return self
+	
+	def catch(self, callback):
+		assert callable(callback), "catch() only accepts a single, callable function."
+		assert not self._done, "Can't register new catch() callback, call has already been resolved."
+		self._catches += [callback]
+		return self
+
+
+class video(apiBase, metaclass=apiSingleton):
+	"""Call the D-Bus video API, asynchronously.
+		
+		Methods:
+			- call(function[, arg1[ ,arg2[, ...]]])
+				Call the remote function.
+			- get([value[, ...]])
+				Get the named values from the API.
+			- set({key: value[, ...]}])
+				Set the named values in the API.
+		
+		All methods return an A* promise-like, in that you use
+		`.then(cb(value))` and `.catch(cb(error))` to get the results
+		of calling the function.
+	"""
+
+	def __init__(self):
+		super().__init__(
+			f"ca.krontech.chronos.{'video_mock' if USE_MOCK else 'video'}", # Service
+			f"/ca/krontech/chronos/{'video_mock' if USE_MOCK else 'video'}" # Path
+		)
+
 	def restart(*_):
 		"""Helper method to reboot the video pipeline.
 			
@@ -392,222 +439,6 @@ class control(apiBase, metaclass=apiSingleton):
 			f"ca.krontech.chronos.{'control_mock' if USE_MOCK else 'control'}", #Service
 			f"/ca/krontech/chronos/{'control_mock' if USE_MOCK else 'control'}", #Path
 		)
-
-	_controlEnqueuedCalls = []
-	_controlCallInProgress = False
-	_activeCall = None
-	
-	@staticmethod
-	def _enqueueCallback(pendingCall, coalesce: bool=True): #pendingCall is control.call
-		"""Enqueue callback. Squash and elide calls to set for efficiency."""
-		
-		#Step 1: Will this call actually do anything? Elide it if not.
-		anticipitoryUpdates = False #Emit update signals before sending the update to the API. Results in faster UI updates but poorer framerate.
-		if coalesce and pendingCall._args[0] == 'set':
-			#Elide this call if it would not change known state.
-			hasNewInformation = False
-			newItems = pendingCall._args[1].items()
-			for key, value in newItems:
-				if _camState[key] != value:
-					hasNewInformation = True
-					if not anticipitoryUpdates:
-						break
-					#Update known cam state in advance of state transition.
-					log.info(f'Anticipating {key} → {value}.')
-					_camState[key] = value
-					for callback in apiValues._callbacks[key]:
-						callback(value)
-			if not hasNewInformation:
-				return
-		
-		#Step 2: Is there already a set call pending? (Note that non-set calls act as set barriers; two sets won't get coalesced if a non-set call is between them.)
-		if coalesce and [pendingCall] == control._controlEnqueuedCalls[:1]:
-			control._controlEnqueuedCalls[-1] = pendingCall
-		else:
-			control._controlEnqueuedCalls += [pendingCall]
-	
-	@staticmethod
-	def _startNextCallback():
-		"""Check for pending callbacks.
-			
-			If none are found, simply stop.
-			
-			Note: Needs to be manually pumped.
-		"""
-		
-		if control._controlEnqueuedCalls:
-			control._controlCallInProgress = True
-			control._controlEnqueuedCalls.pop(0)._startAsyncCall()
-		else:
-			control._controlCallInProgress = False
-	
-	
-	class call(QObject):
-		"""Call the camera control DBus API. First arg is the function name. Returns a promise.
-		
-			See http://doc.qt.io/qt-5/qdbusabstractinterface.html#call for details about calling.
-			See https://github.com/krontech/chronos-cli/tree/master/src/api for implementation details about the API being called.
-			See README.md at https://github.com/krontech/chronos-cli/tree/master/src/daemon for API documentation.
-		"""
-		
-		def __init__(self, *args, immediate=True):
-			assert args, "Missing call name."
-			
-			super().__init__()
-			
-			self._args = args
-			self._thens = []
-			self._catches = []
-			self._done = False
-			self._watcherHolder = None
-			self.performance = {
-				'enqueued': perf_counter(),
-				'started': 0.,
-				'finished': 0.,
-				'handled': 0.,
-			}
-			
-			log.debug(f'enquing {self}')
-			control._enqueueCallback(self)
-			#log.debug(f'current control queue: {control._controlEnqueuedCalls}')
-			if not control._controlCallInProgress:
-				#Don't start multiple callbacks at once, the most recent one will block.
-				control._startNextCallback()
-		
-		def __eq__(self, other):
-			# If a control call sets the same keys as another
-			# control call, then it is equal to itself and can
-			# be deduplicated as all sets of the same values
-			# have the same side effects. (ie, Slider no go
-			# fast if me no drop redundant call.)
-			#   –DDR 2019-05-14
-			return (
-				'set' == self._args[0] == other._args[0]
-				and self._args[1].keys() == other._args[1].keys()
-			)
-		
-		def __repr__(self):
-			return f'''control.call({', '.join([repr(x) for x in self._args])})'''
-			
-		
-		def _startAsyncCall(self):
-			log.debug(f'starting async call: {self._args[0]}({self._args[1:]})')
-			self.performance['started'] = perf_counter()
-			self._watcherHolder = QDBusPendingCallWatcher(
-				control().iface.asyncCallWithArgumentList(self._args[0], self._args[1:])
-			)
-			self._watcherHolder.finished.connect(self._asyncCallFinished)
-			control._activeCall = self
-			
-		
-		def _asyncCallFinished(self, watcher):
-			log.debug(f'finished async call: {self}')
-			self.performance['finished'] = perf_counter()
-			self._done = True
-			
-			reply = QDBusPendingReply(watcher)
-			try:
-				if reply.isError():
-					if self._catches:
-						error = reply.error()
-						for catch in self._catches:
-							try:
-								error = catch(error)
-							except Exception as e:
-								error = e
-					else:
-						#This won't do much, but (I'm assuming) most calls simply won't ever fail.
-						if reply.error().name() == 'org.freedesktop.DBus.Error.NoReply':
-							raise DBusException(f"{self} timed out ({API_TIMEOUT_MS}ms)")
-						else:
-							raise DBusException("%s: %s" % (reply.error().name(), reply.error().message()))
-				else:
-					value = reply.value()
-					for then in self._thens:
-						try:
-							value = then(value)
-						except Exception as error:
-							if self._catches:
-								for catch in self._catches:
-									try:
-										error = catch(error)
-									except Exception as e:
-										error = e
-							else:
-								raise error
-			except Exception as e:
-				raise e
-			finally:
-				#Wait a little while before starting on the next callback.
-				#This makes the UI run much smoother, and usually the lag
-				#is covered by the UI updating another few times anyway.
-				#Note that because each call still lags a little, this
-				#causes a few dropped frames every time the API is called.
-				delay(self, API_INTERCALL_DELAY, control._startNextCallback)
-				
-				self.performance['handled'] = perf_counter()
-				if self.performance['finished'] - self.performance['started'] > API_SLOW_WARN_MS / 1000:
-					log.warn(
-						f'''slow call: {self} took {
-							(self.performance['finished'] - self.performance['started'])*1000
-						:0.0f}ms/{API_SLOW_WARN_MS}ms. (Total call time was {
-							(self.performance['handled'] - self.performance['enqueued'])*1000
-						:0.0f}ms.)'''
-					)
-		
-		def then(self, callback):
-			assert callable(callback), "control().then() only accepts a single, callable function."
-			assert not self._done, "Can't register new then() callback, call has already been resolved."
-			self._thens += [callback]
-			return self
-		
-		def catch(self, callback):
-			assert callable(callback), "control().then() only accepts a single, callable function."
-			assert not self._done, "Can't register new then() callback, call has already been resolved."
-			self._catches += [callback]
-			return self
-
-
-def get(keyOrKeys):
-	"""Call the camera control DBus get method.
-	
-		Convenience method for `control('get', [value])[0]`.
-		
-		Accepts key or [key, …], where keys are strings.
-		
-		Returns value or {key:value, …}, respectively.
-		
-		See control's `availableKeys` for a list of valid inputs.
-	"""
-	
-	return control.call(
-		'get', [keyOrKeys] if isinstance(keyOrKeys, str) else keyOrKeys
-	).then(lambda valueList:
-		valueList[keyOrKeys] if isinstance(keyOrKeys, str) else valueList
-	)
-
-def set(*args):
-	"""Call the camera control DBus set method.
-		
-		Accepts {str: value, ...} or a key and a value.
-		Returns either a map of set values or the set
-			value, if the second form was used.
-	"""
-	
-	log.debug(f'simple set call: {args}')
-	if len(args) == 1:
-		return control.call('set', *args)
-	elif len(args) == 2:
-		return control.call(
-			'set', {args[0]:args[1]}
-		).then(lambda valueDict: 
-			valueDict[args[0]]
-		)
-	else:
-		raise valueError('bad args')
-
-
-
 
 
 # State cache for observe(), so it doesn't have to query the status of a variable on each subscription.
@@ -672,7 +503,7 @@ class APIValues(QObject):
 	def __newValueIsEnqueued(self, key):
 		return True in [
 			key in call._args[1]
-			for call in control._controlEnqueuedCalls
+			for call in control().enqueuedCalls
 			if call._args[0] == 'set'
 		]
 	

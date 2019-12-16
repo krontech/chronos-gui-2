@@ -157,19 +157,19 @@ class PlayAndSave(QtWidgets.QDialog, Ui_PlayAndSave):
 				self.labelUpdateIdleDelayTimer.start()
 		self.labelUpdateIdleDelayTimer.timeout.connect(checkLastKnownFrame)
 		self.labelUpdateTimer.timeout.connect(lambda: #Now, the timer is not running, so we can't just stop it to stop this process. We may be waiting on the dbus call instead.
-			api.video.call('status').then(checkLastKnownFrame) )
+			self.video.call('status').then(checkLastKnownFrame) )
 		
 		self.uiCurrentFrame.suffixFormatString = self.uiCurrentFrame.suffix()
 		self.uiCurrentFrame.valueChanged.connect(lambda f: 
-			self.uiCurrentFrame.hasFocus() and api.video.call('playback', {'position':f}) )
+			self.uiCurrentFrame.hasFocus() and self.video.call('playback', {'position':f}) )
 		
 		self.seekRate = 60
 		self.uiSeekRate.setValue(self.seekRate)
 		
-		self.uiSeekBackward.pressed.connect( lambda: api.video.call('playback', {'framerate': -self.seekRate}))
-		self.uiSeekBackward.released.connect(lambda: api.video.call('playback', {'framerate': 0}))
-		self.uiSeekForward.pressed.connect(  lambda: api.video.call('playback', {'framerate': +self.seekRate}))
-		self.uiSeekForward.released.connect( lambda: api.video.call('playback', {'framerate': 0}))
+		self.uiSeekBackward.pressed.connect( lambda: self.video.call('playback', {'framerate': -self.seekRate}))
+		self.uiSeekBackward.released.connect(lambda: self.video.call('playback', {'framerate': 0}))
+		self.uiSeekForward.pressed.connect(  lambda: self.video.call('playback', {'framerate': +self.seekRate}))
+		self.uiSeekForward.released.connect( lambda: self.video.call('playback', {'framerate': 0}))
 		
 		self.uiSeekFaster.clicked.connect(self.seekFaster)
 		self.uiSeekSlower.clicked.connect(self.seekSlower)
@@ -266,7 +266,7 @@ class PlayAndSave(QtWidgets.QDialog, Ui_PlayAndSave):
 		status = self.video.callSync('status')
 		
 		#Don't update the labels while hidden. But do show with accurate info when we start.
-		api.video.call('configure', {
+		self.video.call('configure', {
 			'xoff': self.videoArea.x(),
 			'yoff': self.videoArea.y(),
 			'hres': self.videoArea.width(),
@@ -274,12 +274,12 @@ class PlayAndSave(QtWidgets.QDialog, Ui_PlayAndSave):
 		})
 		
 		if not status['filesave']:
-			api.video.call('playback', {'framerate':0})
+			self.video.call('playback', {'framerate':0})
 		
 		self.updateBatteryTimer.start()
 		self.updateBattery()
 		
-		self.recordedSegments = segmentData #api.get('recordedSegments')
+		self.recordedSegments = segmentData #self.control.get('recordedSegments')
 		
 		self.checkMarkedRegionsValid()
 		
@@ -442,7 +442,7 @@ class PlayAndSave(QtWidgets.QDialog, Ui_PlayAndSave):
 			"mark end": self.markedEnd,
 			"segment ids": [
 				segment['id']
-				for segment in segmentData#api.get('recordedSegments') 
+				for segment in segmentData #self.control.get('recordedSegments') 
 				if not (segment['start'] >= self.markedEnd or segment['end'] < self.markedStart)
 			],
 			"region name": f'Clip {len(self.markedRegions)+1}',
@@ -714,7 +714,7 @@ class PlayAndSave(QtWidgets.QDialog, Ui_PlayAndSave):
 		self.regionBeingSaved = None
 		self.saveCancelled = True
 		self.uiSeekSlider.setEnabled(True)
-		api.video.call('stop')
+		self.video.call('stop')
 		
 		#Set the UI back to seek mode.
 		self.uiSeekRate.setValue(self.seekRate)
@@ -760,7 +760,7 @@ class PlayAndSave(QtWidgets.QDialog, Ui_PlayAndSave):
 	
 	@pyqtSlot(str, float)
 	def onStateChangeWhenScreenActive(self, state): #Only fires when screen open. Fires once when opened.
-		api.video.call('status').then(self.onStateChangeWhenScreenActive2)
+		self.video.call('status').then(self.onStateChangeWhenScreenActive2)
 	def onStateChangeWhenScreenActive2(self, status):
 		#Filesave doesn't actually affect anything, just the transition to/from playback.
 		if status['filesave']:

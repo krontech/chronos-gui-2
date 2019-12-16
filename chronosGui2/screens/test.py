@@ -51,7 +51,7 @@ class Test(QtWidgets.QWidget, Ui_TestWidget):
 	
 	def onExposureChanged(self, newExposureNs):
 		#print(f'slider moved to {newExposureNs}')
-		api.set('exposurePeriod', newExposureNs)
+		self.control.set('exposurePeriod', newExposureNs)
 	
 	def afterAShortPeriodOftime(self):
 		return self.aShortPeriodOfTime.stop()
