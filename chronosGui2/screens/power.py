@@ -49,6 +49,9 @@ class Power(QtWidgets.QDialog, Ui_Power):
 		super().__init__()
 		self.setupUi(self)
 		
+		# API init.
+		self.control = api.control()
+
 		# Panel init.
 		self.setFixedSize(window.app.primaryScreen().virtualSize())
 		self.setWindowFlags(QtCore.Qt.FramelessWindowHint)
@@ -94,14 +97,14 @@ class Power(QtWidgets.QDialog, Ui_Power):
 	def updateLabels(self):
 		self.uiChargeLabel.setText(
 			self.uiChargeLabel.formatString.format(
-				api.getSync('batteryChargeNormalized')*100 ) )
+				self.control.getSync('batteryChargeNormalized')*100 ) )
 		self.uiVoltageLabel.setText(
 			self.uiVoltageLabel.formatString.format(
-				api.getSync('batteryVoltage') ) )
+				self.control.getSync('batteryVoltage') ) )
 		
 	def updateChartData(self):
 		"""Always update the chart data, even when hidden, so we can look at it later."""
-		cv = api.getSync(['batteryChargeNormalized', 'batteryVoltage'])
+		cv = self.control.getSync(['batteryChargeNormalized', 'batteryVoltage'])
 		charge, voltage = cv['batteryChargeNormalized'], cv['batteryVoltage']
 		
 		if charge < 0 or voltage < 0:

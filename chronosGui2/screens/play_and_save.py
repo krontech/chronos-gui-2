@@ -50,6 +50,7 @@ class PlayAndSave(QtWidgets.QDialog, Ui_PlayAndSave):
 		super().__init__()
 		self.setupUi(self)
 		self.video = api.video()
+		self.control = api.control()
 		self._window = window
 		
 		self.recordedSegments = []
@@ -666,7 +667,7 @@ class PlayAndSave(QtWidgets.QDialog, Ui_PlayAndSave):
 		self.uiSeekSlider.setEnabled(False)
 		
 		now = datetime.now()
-		res = api.getSync('resolution') #TODO DDR 2019-07-26 Get this from the segment metadata we don't have as of writing.
+		res = self.control.getSync('resolution') #TODO DDR 2019-07-26 Get this from the segment metadata we don't have as of writing.
 		roi['file'] = f'''{
 			partition['path'].decode('utf-8')
 		}/{
@@ -697,7 +698,7 @@ class PlayAndSave(QtWidgets.QDialog, Ui_PlayAndSave):
 			'length': roi['mark end'] - roi['mark start'],
 			'framerate': settings.value('savedFileFramerate', 30), #TODO DDR 2019-07-24 read this from recording settings
 			'bitrate': min(
-				res['hRes'] * res['vRes'] * api.getSync('frameRate') * settings.value('savedFileBPP', 0.7),
+				res['hRes'] * res['vRes'] * self.control.getSync('frameRate') * settings.value('savedFileBPP', 0.7),
 				settings.value('savedFileMaxBitrate', 40) * 1000000.0,
 			)
 		})
@@ -753,7 +754,7 @@ class PlayAndSave(QtWidgets.QDialog, Ui_PlayAndSave):
 		if state == 'recording' and (self.markedRegions or self.uiSeekSlider.value()):
 			self.markedRegions.clear()
 			self.updateMarkedRegions()
-			api.setSync('playbackPosition', 0)
+			self.control.setSync('playbackPosition', 0)
 			self.uiSeekSlider.setValue(0)
 	
 	

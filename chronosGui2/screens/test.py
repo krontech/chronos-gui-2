@@ -34,7 +34,7 @@ class Test(QtWidgets.QWidget, Ui_TestWidget):
 		#self.uiDebug.clicked.connect(lambda: self.decimalspinbox_3.availableUnits()) #"self" is needed here, won't be available otherwise.
 		self.uiBack.clicked.connect(window.back)
 		
-		rtl = self.control.callSync('getResolutionTimingLimits', api.getSync('resolution'))
+		rtl = self.control.callSync('getResolutionTimingLimits', self.control.getSync('resolution'))
 		self.uiSlider.setMaximum(rtl['exposureMax'])
 		self.uiSlider.setMinimum(rtl['exposureMin'])
 		

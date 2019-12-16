@@ -64,9 +64,9 @@ class RecordMode(QtWidgets.QDialog, Ui_RecordMode):
 			self.uiSegmentLengthInFrames.setValue(
 				int(sec * 1e9 / api.apiValues.get('framePeriod') * api.apiValues.get('recSegments')) ) )
 		self.uiSegmentLengthNumSegments.valueChanged.connect(lambda segments:
-			api.setSync('recSegments', segments) )
+			self.control.setSync('recSegments', segments) )
 		self.uiSegmentLengthInFrames.valueChanged.connect(lambda frames:
-			api.setSync('recMaxFrames', frames * api.apiValues.get('recSegments')) )
+			self.control.setSync('recMaxFrames', frames * api.apiValues.get('recSegments')) )
 		
 		self.uiDone.clicked.connect(window.back)
 		

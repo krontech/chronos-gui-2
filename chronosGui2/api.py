@@ -101,6 +101,36 @@ class apiBase():
 			else:
 				raise DBusException("%s: %s" % (msg.error().name(), msg.error().message()))
 
+	def getSync(self, keyOrKeys):
+		"""Call a camera API DBus get method synchronously.
+		
+			Convenience method for `getSync('get', [value])[0]`.
+			
+			Accepts key or [key, …], where keys are strings.
+			
+			Returns value or {key:value, …}, respectively.
+			
+			See control's `availableKeys` for a list of valid inputs.
+		"""	
+		valueList = self.callSync('get',
+			[keyOrKeys] if isinstance(keyOrKeys, str) else keyOrKeys )
+		return valueList[keyOrKeys] if isinstance(keyOrKeys, str) else valueList
+
+	def setSync(self, *args):
+		"""Call a camera API DBus set method synchronously.
+			
+			Accepts {str: value, ...} or a key and a value.
+			Returns either a map of set values or the set
+				value, if the second form was used.
+		"""
+		if len(args) == 1:
+			return self.callSync('set', *args)
+		elif len(args) == 2:
+			return self.callSync('set', {args[0]:args[1]})[args[0]]
+		else:
+			raise valueError('bad args')
+
+
 class DBusException(Exception):
 	"""Raised when something goes wrong with dbus. Message comes from dbus' msg.error().message()."""
 	pass
@@ -537,21 +567,6 @@ class control(apiBase, metaclass=apiSingleton):
 			self._catches += [callback]
 			return self
 
-def getSync(keyOrKeys):
-	"""Call the camera control DBus get method.
-	
-		Convenience method for `control('get', [value])[0]`.
-		
-		Accepts key or [key, …], where keys are strings.
-		
-		Returns value or {key:value, …}, respectively.
-		
-		See control's `availableKeys` for a list of valid inputs.
-	"""
-	
-	valueList = control().callSync('get',
-		[keyOrKeys] if isinstance(keyOrKeys, str) else keyOrKeys )
-	return valueList[keyOrKeys] if isinstance(keyOrKeys, str) else valueList
 
 def get(keyOrKeys):
 	"""Call the camera control DBus get method.
@@ -570,23 +585,6 @@ def get(keyOrKeys):
 	).then(lambda valueList:
 		valueList[keyOrKeys] if isinstance(keyOrKeys, str) else valueList
 	)
-
-def setSync(*args):
-	"""Call the camera control DBus set method.
-		
-		Accepts {str: value, ...} or a key and a value.
-		Returns either a map of set values or the set
-			value, if the second form was used.
-	"""
-	controlAPI = control()
-	if len(args) == 1:
-		return controlAPI.callSync('set', *args)
-	elif len(args) == 2:
-		return controlAPI.callSync('set', {args[0]:args[1]})[args[0]]
-	else:
-		raise valueError('bad args')
-
-
 
 def set(*args):
 	"""Call the camera control DBus set method.

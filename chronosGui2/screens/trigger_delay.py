@@ -40,7 +40,7 @@ class TriggerDelay(QtWidgets.QDialog, Ui_TriggerDelay):
 		# Value init.
 		self.availableDelayMultiplier = 1. #Used for "more" and "less" pre-record delay. Multiplies totalAvailableFrames.
 		
-		relevantValues = api.getSync(['cameraMaxFrames', 'framePeriod', 'recTrigDelay'] )
+		relevantValues = self.control.getSync(['cameraMaxFrames', 'framePeriod', 'recTrigDelay'] )
 		self.cameraMaxFrames = relevantValues['cameraMaxFrames']
 		self.framePeriod = relevantValues['framePeriod']
 		self.recTrigDelay = relevantValues['recTrigDelay']

@@ -15,7 +15,7 @@ def report(tag: str, data: dict):
 	assert "serial_number" not in data
 		
 	data["tag"] = tag
-	data["serial_number"] = api.getSync('cameraSerial')
+	data["serial_number"] = api.control().getSync('cameraSerial')
 	try:
 		urlopen(report_url, bytes(json.dumps(data), 'utf-8'), 0.1)
 	except Exception:

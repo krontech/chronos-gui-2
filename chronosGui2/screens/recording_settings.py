@@ -46,7 +46,7 @@ class RecordingSettings(QtWidgets.QDialog, Ui_RecordingSettings):
 		self.uiPresets.currentIndexChanged.connect(self.applyPreset)
 		
 		#Resolution & resolution preview
-		invariants = api.getSync([
+		invariants = self.control.getSync([
 			'sensorVMax', 'sensorVMin', 'sensorVIncrement',
 			'sensorHMax', 'sensorHMin', 'sensorHIncrement',
 		])
@@ -406,8 +406,8 @@ class RecordingSettings(QtWidgets.QDialog, Ui_RecordingSettings):
 		self.updateExposureLimits()
 	
 	
-	_sensorWidth = api.getSync('sensorHMax')
-	_sensorHeight = api.getSync('sensorVMax')
+	_sensorWidth = api.control().getSync('sensorHMax')
+	_sensorHeight = api.control().getSync('sensorVMax')
 	def updatePassepartout(self):
 		previewTop = 1
 		previewLeft = 1

@@ -87,11 +87,11 @@ class Main(QWidget, Ui_Main2):
 				self.uiRecord.update()
 		api.observe('state', updateRecordingStartTime)
 		
-		totalFrames = api.getSync('totalFrames')
+		totalFrames = self.control.getSync('totalFrames')
 		if totalFrames == 0: #Set the length of the recording to 0, if nothing has been recorded. Otherwise, calculate what we've recorded.
 			recordingStartTime = recordingEndTime
 		else:
-			recordingEndTime = recordingStartTime + totalFrames/api.getSync('frameRate')
+			recordingEndTime = recordingStartTime + totalFrames/self.control.getSync('frameRate')
 		
 		self.uiMenuBackground.hide()
 		self.uiMenuBackground.move(0,0)
@@ -174,7 +174,7 @@ class Main(QWidget, Ui_Main2):
 		
 		# Hack around API always setting focus peaking high.
 		delay(self, 5000, lambda: log.warn('Overriding focus peaking to 0 to work around pychronos/issues/49.'))
-		delay(self, 5000, lambda: api.setSync({'focusPeakingLevel': 0}))
+		delay(self, 5000, lambda: self.control.setSync({'focusPeakingLevel': 0}))
 		
 		api.observe('focusPeakingLevel', lambda intensity:
 			self.uiFocusPeaking.setCheckState(
@@ -751,7 +751,7 @@ class Main(QWidget, Ui_Main2):
 		uiPlayAndSaveTemplate = self.uiPlayAndSave.text()
 		self.uiPlayAndSave.setText("Play && Save\n-1s RAM\n-1s Avail.")
 		
-		playAndSaveData = api.getSync(['cameraMaxFrames', 'frameRate', 'recSegments'])
+		playAndSaveData = self.control.getSync(['cameraMaxFrames', 'frameRate', 'recSegments'])
 		def updatePlayAndSaveText(*_):
 			data = playAndSaveData
 			segmentMaxRecTime = data['cameraMaxFrames'] / data['frameRate'] / data['recSegments']
@@ -770,7 +770,7 @@ class Main(QWidget, Ui_Main2):
 		api.observe_future_only('cameraMaxFrames', updatePlayAndSaveText)
 		
 		def updatePlayAndSaveDataFrameRate(_):
-			playAndSaveData['frameRate'] = api.getSync('frameRate')
+			playAndSaveData['frameRate'] = self.control.getSync('frameRate')
 		api.observe_future_only('framePeriod', updatePlayAndSaveDataFrameRate)
 		api.observe_future_only('framePeriod', updatePlayAndSaveText)
 		
@@ -889,7 +889,7 @@ class Main(QWidget, Ui_Main2):
 	
 	
 	def onShow(self):
-		self.updateBatteryCharge2(api.getSync('batteryChargeNormalized'))
+		self.updateBatteryCharge2(self.control.getSync('batteryChargeNormalized'))
 		self._batteryPollTimer.start()
 		
 		self.updateExternalMediaText()
@@ -1037,7 +1037,7 @@ class Main(QWidget, Ui_Main2):
 		elif RECORDING_MODE == RECORDING_MODES['VIRTUAL_TRIGGER']:
 			virtuals = settings.value('virtually triggered actions', {})
 			if virtuals:
-				api.setSync('ioMapping', dump('new io mapping', {
+				self.control.setSync('ioMapping', dump('new io mapping', {
 					action: { 
 						'source': 'alwaysHigh' if state else 'none',
 						'invert': config['invert'],

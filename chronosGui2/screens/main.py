@@ -126,7 +126,7 @@ class Main(QWidget, Ui_MainRH):
 		
 		#Twiddle the calibration menu so it shows the right thing. It's pretty context-sensitive - you can't white-balance a black-and-white camera, and you can't do motion trigger calibration when there's no motion trigger set up.
 		#I think the sanest approach is to duplicate the button, one for each menu, since opening the menu is pretty complex and I don't want to try dynamically rebind menus.
-		if api.getSync('sensorColorPattern') == 'mono':
+		if self.control.getSync('sensorColorPattern') == 'mono':
 			self.uiCalibration = self.uiCalibrationOrBlackCal
 			self.uiBlackCal0 = Button(parent=self.uiCalibrationOrBlackCal.parent())
 			self.copyButton(src=self.uiCalibrationOrBlackCal, dest=self.uiBlackCal0)
@@ -236,7 +236,7 @@ class Main(QWidget, Ui_MainRH):
 		self._framerate = None
 		self._resolution = None
 		api.observe('exposurePeriod', lambda ns: 
-			setattr(self, '_framerate', api.getSync('frameRate')) )
+			setattr(self, '_framerate', self.control.getSync('frameRate')) )
 		api.observe('resolution', lambda res: 
 			setattr(self, '_resolution', res) )
 		api.observe('exposurePeriod', self.updateResolutionOverlay)
@@ -303,7 +303,7 @@ class Main(QWidget, Ui_MainRH):
 	
 	def updateExposureDependancies(self):
 		"""Update exposure text to match exposure slider, and sets the slider step so clicking the gutter always moves 1%."""
-		percent = api.getSync('exposurePercent')
+		percent = self.control.getSync('exposurePercent')
 		self.uiExposureOverlay.setText(
 			self.uiExposureOverlayTemplate.format(
 				self.uiExposureSlider.value()/1000,
@@ -567,7 +567,7 @@ class Main(QWidget, Ui_MainRH):
 		elif RECORDING_MODE == RECORDING_MODES['VIRTUAL_TRIGGER']:
 			virtuals = settings.value('virtually triggered actions', {})
 			if virtuals:
-				api.setSync('ioMapping', dump('new io mapping', {
+				self.control.setSync('ioMapping', dump('new io mapping', {
 					action: { 
 						'source': 'alwaysHigh' if state else 'none',
 						'invert': config['invert'],
