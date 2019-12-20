@@ -44,7 +44,7 @@ def constrain(low: float, n: float, high: float) -> float:
 
 
 class Power(QtWidgets.QDialog, Ui_Power):
-	uiPowerDownThreshold = 0.05 #Used to be in API as saveAndPowerDownLowBatteryLevelNormalized, but this got taken out December 2019.
+	powerDownThreshold = 0.05 #Used to be in API as saveAndPowerDownLowBatteryLevelNormalized, but this got taken out December 2019.
 	
 	def __init__(self, window):
 		super().__init__()
@@ -79,12 +79,6 @@ class Power(QtWidgets.QDialog, Ui_Power):
 		self.uiDimScreen.stateChanged.connect(lambda checked:
 			settings.setValue('dimScreenWhenNotInUse', bool(checked)) )
 		
-		#Store the original levels for updatePowerDownThreshold to use if it has to regenerate the list.
-		self.originalBatteryThresholdLevels = [
-			pct2dec(self.uiPowerDownThreshold.itemText(i))
-			for i in range(self.uiPowerDownThreshold.count())
-		]
-		
 		self.uiVoltageLabel.formatString = self.uiVoltageLabel.text()
 		self.uiChargeLabel.formatString = self.uiChargeLabel.text()
 		
@@ -97,26 +91,6 @@ class Power(QtWidgets.QDialog, Ui_Power):
 		
 	def onHide(self):
 		self.labelUpdateTimer.stop()
-	
-	@QtCore.pyqtSlot(float)
-	def updatePowerDownThreshold(self, threshold: float):
-		targetText = dec2pct(threshold)
-		textIndex = self.uiPowerDownThreshold.findText(targetText)
-		
-		if textIndex+1:
-			self.uiPowerDownThreshold.setCurrentIndex(textIndex)
-		else:
-			#Interleave the current value into the combo box items. (Note: `setCurrentText` has no effect if the text isn't in the combo box.)
-			#This allows us to reflect any value from the API, while still allowing change and change back. (At least for this session.)
-			self.uiPowerDownThreshold.clear()
-			self.uiPowerDownThreshold.addItems([
-				dec2pct(threshold)
-				for threshold in
-				sorted(self.originalBatteryThresholdLevels + [threshold], reverse=True)
-			])
-			self.uiPowerDownThreshold.setCurrentText(targetText)
-		
-		self.uiChart.update()
 	
 	def updateLabels(self):
 		self.uiChargeLabel.setText(
@@ -190,14 +164,13 @@ class Power(QtWidgets.QDialog, Ui_Power):
 			pen.setStyle(QtCore.Qt.DashLine)
 			p.setPen(pen)
 			p.setFont(tinyFont)
-			powerDownThreshold = pct2dec(self.uiPowerDownThreshold.currentText())
 			partial( #Work around lack of PEP-0448, introduced in python 3.5. #backport-from-5.11
 				p.drawLine,
-				*projectToPlotSpace(0, powerDownThreshold)
-			)(*projectToPlotSpace(chartLineWidth-(20 if powerDownThreshold < 0.15 or powerDownThreshold > 0.77 else 0), powerDownThreshold)), #Don't draw the line over the voltage labels.)
+				*projectToPlotSpace(0, self.powerDownThreshold)
+			)(*projectToPlotSpace(chartLineWidth-(20 if self.powerDownThreshold < 0.15 or self.powerDownThreshold > 0.77 else 0), self.powerDownThreshold)), #Don't draw the line over the voltage labels.)
 			p.drawText(
-				projectToPlotSpace(chartLineWidth, powerDownThreshold)[0] + 20,
-				projectToPlotSpace(chartLineWidth, powerDownThreshold)[1] + (-3 if powerDownThreshold < 0.90 else 12),
+				projectToPlotSpace(chartLineWidth, self.powerDownThreshold)[0] + 20,
+				projectToPlotSpace(chartLineWidth, self.powerDownThreshold)[1] + (-3 if self.powerDownThreshold < 0.90 else 12),
 				"Save & Power Down" )
 			p.setFont(normalFont)
 			pen.setStyle(QtCore.Qt.SolidLine)
