@@ -131,7 +131,7 @@ class Main(QWidget, Ui_Main2):
 		#############################
 		
 		#Debug buttons. (These are toggled on the factory settings screen.)
-		self.uiDebugA.clicked.connect(self.makeFailingCall)
+		self.uiDebugA.clicked.connect(self.screenshotAllScreens)
 		self.uiDebugB.clicked.connect(lambda: window.show('test'))
 		self.uiDebugC.setFocusPolicy(QtCore.Qt.TabFocus) #Break into debugger without loosing focus, so you can debug focus issues.
 		self.uiDebugC.clicked.connect(lambda: self and window and dbg()) #"self" is needed here, won't be available otherwise.
@@ -1105,3 +1105,13 @@ class Main(QWidget, Ui_Main2):
 			searchMatches = (search in data['name'].casefold() or search in data['synonyms'])
 			self.uiMenuScroll.setRowHidden(row,
 				not searchMatches if search else data['hidden'])
+	
+	def screenshotAllScreens(self):
+		for screen in self._window._availableScreens:
+			self._window.show(screen)
+			QtCore.QCoreApplication.processEvents()
+			os.system(f'cat /dev/fb0 | head --bytes=1536000 > {screen}.bgra')
+			#Use `scp cam:gui/\*.bgra /tmp` or whatever to get them off the camera.
+			#Then `convert -size 800x480 -depth 8 «filename».bgra «filename».png`, because mogrify is broken.
+			
+		self._window.show('main')
