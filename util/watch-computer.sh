@@ -20,7 +20,7 @@ while true; do
 			--exclude \"/.git\" \
 			--exclude \".mypy_cache\" \
 			--exclude \"util/stats_reported\" \
-			--exclude \"src/read_jog_wheel_encoder\" \
+			--exclude \"chronosGui2/read_jog_wheel_encoder\" \
 			--exclude \".directory\" \
 	" || true
 done
