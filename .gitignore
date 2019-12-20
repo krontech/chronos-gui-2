@@ -18,4 +18,3 @@ git_description
 # Ignore generated python content.
 /chronosGui2/generated/
 /chronosGui2/generated/assets
-/docs
