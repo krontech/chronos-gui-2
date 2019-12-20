@@ -45,7 +45,7 @@ def callback(evt):
 	global killingProcess
 	killingProcess and killingProcess.kill()
 	# SIGKILL is needed only on the camera, as pdb() does not respond to SIGTERM only on the camera.
-	killingProcess = subprocess.Popen(f"sleep {timeout} && pkill --signal SIGKILL --parent {sys.argv[1]} --full main.py", shell=True)
+	killingProcess = subprocess.Popen(f"sleep {timeout} && pkill --signal SIGKILL --parent {sys.argv[1]} --full chronosGui2/__main__.py", shell=True)
 	
 event_handler = PatternMatchingEventHandler(
 	patterns=["*.py","*.ui","*.svg","*.png"],
