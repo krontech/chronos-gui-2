@@ -255,17 +255,10 @@ class Main(QWidget, Ui_Main2):
 		
 		
 		#White Bal & Trigger/IO
-		try:
-			whiteBalanceTemplate = self.uiWhiteBalance.text()
-			api.observe('wbTemperature', lambda temp:
-				self.uiWhiteBalance.setText(
-					whiteBalanceTemplate.format(temp) ))
-			self.uiWhiteBalance.clicked.connect(lambda:
-				api.control.call('startCalibration', {
-					'startAutoWhiteBalance': True }) )
-		except AssertionError:
-			log.warn('Failed to observe wbTemperature. (Is it implemented yet?) Patching uiWhiteBalance…')
-			self.uiWhiteBalance.setText("White\nBalance")
+		whiteBalanceTemplate = self.uiWhiteBalance.text()
+		api.observe('wbTemperature', lambda temp:
+			self.uiWhiteBalance.setText(
+				whiteBalanceTemplate.format(temp) ))
 		
 		self.uiTriggers.clicked.connect(lambda:
 			window.show('triggers_and_io') )
