@@ -17,7 +17,7 @@ else:
 
 CAM_SERIAL_FILE_NAME = 'cameraSerial.txt'
 
-class UserSettings(QtWidgets.QDialog):
+class UserSettings(QtWidgets.QDialog, Ui_UserSettings):
 	def __init__(self, window):
 		super().__init__()
 		self.setupUi(self)

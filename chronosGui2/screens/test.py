@@ -11,7 +11,7 @@ if api.apiValues.get('cameraModel')[0:2] == 'TX':
 else:
 	from chronosGui2.generated.chronos import Ui_TestWidget
 
-class Test(QtWidgets.QWidget):
+class Test(QtWidgets.QWidget, Ui_TestWidget):
 	def __init__(self, window):
 		super().__init__()
 		self.setupUi(self)
