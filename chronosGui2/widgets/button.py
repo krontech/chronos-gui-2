@@ -80,7 +80,10 @@ class Button(ShowPaintRectsPlugin, TouchMarginPlugin, FocusablePlugin, QPushButt
 					color: {self.theme.dimText if self.fake_disability else self.theme.text};
 					background-color: {self.theme.background if self.hideBorder else self.theme.base};
 					
-					border: 1px solid {'transparent' if self.hideBorder else self.theme.border};
+					/* border: 1px solid {'transparent' if self.hideBorder else self.theme.border}; */
+					/* border-image: url(:/assets/images/{self.theme.checkbox.checked}); */
+					border-width: 5px;
+					border-image: url(:/assets/images/cornflakes/button-neutral.png) 5 stretch;
 					
 					/* Add some touch space so this widget is easier to press. */
 					margin-left: {self.clickMarginLeft*10}px;
@@ -91,6 +94,7 @@ class Button(ShowPaintRectsPlugin, TouchMarginPlugin, FocusablePlugin, QPushButt
 				
 				Button{'' if self.keepActiveLook or self.fake_disability else ':pressed'} {{ /*Look active if faking disability; gives a radio-button-esque feel to disabled buttons. ¯\\_(ツ)_/¯ */
 					background: {self.theme.baseActive};
+					border-image: url(:/assets/images/cornflakes/button-pressed.png);
 				}}
 			""" + self.originalStyleSheet())
 	
