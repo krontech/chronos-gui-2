@@ -13,6 +13,10 @@ while true; do
 			git describe --tags --always > git_description
 		fi
 		
+		cd chronosGui2/generated
+			touch assets.qrc && make
+		cd ../../
+		
 		#Use --times instead of --checksum because it means we can touch a file (ie, save it) and have the camera script restart. Checksum is more proper, and may take longer to run, but I haven't noticed any difference in my testing. Note that with --times, we redeploy the whole project when we switch computers, because we ran 'git checkout' at different times.
 		rsync --recursive --delete --links --inplace --times --itemize-changes \
 			./ \"${CAM_ADDRESS:-root@192.168.12.1}:~/gui/\" \
