@@ -26,6 +26,8 @@ from chronosGui2.main import Window
 def main():
 	# Do argument parsing to configure debug and logging.
 	parser = argparse.ArgumentParser(description="Chronos On-Camera GUI")
+	parser.add_argument('--info', default=[], action='append', nargs='?',
+			help="Enable info logging")
 	parser.add_argument('--debug', default=[], action='append', nargs='?',
 			help="Enable debug logging")
 	parser.add_argument('--pdb', default=False, action='store_true',
@@ -45,6 +47,12 @@ def main():
 			logging.getLogger().setLevel(logging.DEBUG)
 		else:
 			logging.getLogger(name).setLevel(logging.DEBUG)
+	
+	for name in parsed.info:
+		if (name == 'all'):
+			logging.getLogger().setLevel(logging.INFO)
+		else:
+			logging.getLogger(name).setLevel(logging.INFO)
 
 	# Install exception handlers for interactive debug on exception.
 	if parsed.pdb:
