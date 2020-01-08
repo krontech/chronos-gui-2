@@ -29,7 +29,7 @@ class ScrollListPlugin(QPyDesignerCustomWidgetPlugin):
 		return "Chronos"
 
 	def icon(self):
-		return QIcon(QPixmap(":/assets/qt_creator/scroll_list.svg"))
+		return QIcon(QPixmap("../../assets/qt_creator/scroll_list.svg"))
 
 	def toolTip(self):
 		return """A scrollable list of items."""

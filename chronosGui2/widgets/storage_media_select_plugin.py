@@ -32,7 +32,7 @@ class StorageMediaSelectPlugin(QPyDesignerCustomWidgetPlugin, FocusablePlugin):
 		return "Chronos"
 
 	def icon(self):
-		return QIcon(QPixmap(":/assets/qt_creator/storage_media_select.svg"))
+		return QIcon(QPixmap("../../assets/qt_creator/storage_media_select.svg"))
 
 	def toolTip(self):
 		return """Select a partition on an external drive."""

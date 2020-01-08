@@ -31,7 +31,7 @@ class LineEditPlugin(QPyDesignerCustomWidgetPlugin):
 		return "Chronos"
 
 	def icon(self):
-		return QIcon(QPixmap(":/assets/qt_creator/line_edit.svg"))
+		return QIcon(QPixmap("../../assets/qt_creator/line_edit.svg"))
 
 	def toolTip(self):
 		return """A line_edit with adjustable margins.

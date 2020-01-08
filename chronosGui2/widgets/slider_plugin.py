@@ -31,7 +31,7 @@ class SliderPlugin(QPyDesignerCustomWidgetPlugin):
 		return "Chronos"
 
 	def icon(self):
-		return QIcon(QPixmap(":/assets/qt_creator/slider.svg"))
+		return QIcon(QPixmap("../../assets/qt_creator/slider.svg"))
 
 	def toolTip(self):
 		return """A slider with adjustable margins.

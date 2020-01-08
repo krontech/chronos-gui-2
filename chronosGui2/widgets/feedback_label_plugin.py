@@ -31,7 +31,7 @@ class LabelPlugin(QPyDesignerCustomWidgetPlugin):
 		return "Chronos"
 
 	def icon(self):
-		return QIcon(QPixmap(":/assets/qt_creator/feedback_label.svg"))
+		return QIcon(QPixmap("../../assets/qt_creator/feedback_label.svg"))
 
 	def toolTip(self):
 		return """An feedback label in the Chronos style.

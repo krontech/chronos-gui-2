@@ -31,7 +31,7 @@ class ButtonPlugin(QPyDesignerCustomWidgetPlugin):
 		return "Chronos"
 
 	def icon(self):
-		return QIcon(QPixmap(":/assets/qt_creator/button.svg"))
+		return QIcon(QPixmap("../../assets/qt_creator/button.svg"))
 
 	def toolTip(self):
 		return """A button with adjustable margins.

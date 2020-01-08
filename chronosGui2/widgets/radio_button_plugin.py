@@ -31,7 +31,7 @@ class RadioButtonPlugin(QPyDesignerCustomWidgetPlugin):
 		return "Chronos"
 
 	def icon(self):
-		return QIcon(QPixmap(":/assets/qt_creator/radio_button.svg"))
+		return QIcon(QPixmap("../../assets/qt_creator/radio_button.svg"))
 
 	def toolTip(self):
 		return """A radio button with adjustable margins.
