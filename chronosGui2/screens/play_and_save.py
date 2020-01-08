@@ -670,7 +670,7 @@ class PlayAndSave(QtWidgets.QDialog, Ui_PlayAndSave):
 		roi['file'] = f'''{
 			partition['path'].decode('utf-8')
 		}/{
-			settings.value('savedVideoName', r'vid_%date%_%time%')
+			(settings.value('savedVideoName', '') or r'vid_%date%_%time%')
 				.replace(r'%region name%', str(roi['region name']))
 				.replace(r'%date%', now.strftime("%Y-%m-%d"))
 				.replace(r'%time%', now.strftime("%H-%M-%S"))
@@ -701,6 +701,7 @@ class PlayAndSave(QtWidgets.QDialog, Ui_PlayAndSave):
 				settings.value('savedFileMaxBitrate', 40) * 1000000.0,
 			)
 		})
+		dbg()
 		
 	def cancelSave(self, evt):
 		#Reset the region saved amount, since the file is now deleted.
