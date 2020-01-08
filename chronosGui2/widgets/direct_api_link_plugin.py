@@ -3,6 +3,9 @@
 from PyQt5.QtCore import pyqtProperty, pyqtSlot
 
 import logging; log = logging.getLogger('Chronos.gui')
+
+from chronosGui2.debugger import *; dbg
+
 #Importing API may fail in Qt Designer, since we may not have it set up on the designing machine.
 try:
 	import chronosGui2.api as api

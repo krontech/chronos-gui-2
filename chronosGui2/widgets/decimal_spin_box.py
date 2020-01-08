@@ -9,6 +9,7 @@ from chronosGui2 import signalTap
 import chronosGui2.settings as settings
 from theme import theme
 
+from chronosGui2.debugger import *; dbg
 from touch_margin_plugin import TouchMarginPlugin, MarginWidth
 from direct_api_link_plugin import DirectAPILinkPlugin
 from focusable_plugin import FocusablePlugin

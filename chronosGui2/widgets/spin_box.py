@@ -5,6 +5,7 @@ from random import randint
 from PyQt5.QtCore import Q_ENUMS, QTimer, QSize, Qt
 from PyQt5.QtWidgets import QSpinBox, QLineEdit
 
+from chronosGui2.debugger import *; dbg
 from chronosGui2 import signalTap
 import chronosGui2.settings as settings
 from theme import theme

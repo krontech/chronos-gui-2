@@ -7,6 +7,7 @@ from PyQt5.QtWidgets import QPushButton
 
 import chronosGui2.settings as settings
 
+from chronosGui2.debugger import *; dbg
 from show_paint_rect_plugin import ShowPaintRectsPlugin
 from touch_margin_plugin import TouchMarginPlugin, MarginWidth
 from focusable_plugin import FocusablePlugin

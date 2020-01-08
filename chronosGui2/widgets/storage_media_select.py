@@ -6,6 +6,7 @@ import logging; log = logging.getLogger('Chronos.gui')
 from PyQt5.QtCore import pyqtSlot
 
 from combo_box import ComboBox
+from chronosGui2.debugger import *; dbg
 try:
 	import chronosGui2.api as api
 except Exception:

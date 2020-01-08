@@ -7,6 +7,7 @@ from PyQt5.QtCore import Q_ENUMS, QTimer, QSize, Qt, pyqtProperty
 from PyQt5.QtGui import QPainter, QIcon
 from PyQt5.QtWidgets import QLineEdit, QToolButton
 
+from chronosGui2.debugger import *; dbg
 import chronosGui2.settings as settings
 from chronosGui2 import delay
 from theme import theme

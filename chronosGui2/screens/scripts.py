@@ -10,6 +10,7 @@ from PyQt5.QtGui import QStandardItemModel, QStandardItem, QColor
 
 import chronosGui2.api as api
 from chronosGui2 import delay
+from chronosGui2.debugger import *; dbg
 
 # Import the generated UI form.
 if api.apiValues.get('cameraModel')[0:2] == 'TX':

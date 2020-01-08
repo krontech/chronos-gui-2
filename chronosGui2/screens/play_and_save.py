@@ -10,6 +10,7 @@ from PyQt5.QtGui import QImage, QTransform, QPainter, QColor, QPainterPath, QBru
 import chronosGui2.api as api
 import chronosGui2.settings as settings
 from chronosGui2 import MenuToggle, delay
+from chronosGui2.debugger import *; dbg
 
 from line_edit import LineEdit
 from button import Button

@@ -3,6 +3,7 @@
 from PyQt5.QtCore import Qt, QSize, pyqtProperty, QItemSelectionModel
 from PyQt5.QtWidgets import QListView, QScroller, QComboBox, QStyleFactory
 
+from chronosGui2.debugger import *; dbg
 import chronosGui2.settings as settings
 from theme import theme
 from focusable_plugin import FocusablePlugin

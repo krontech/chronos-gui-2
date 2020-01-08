@@ -3,6 +3,7 @@
 from PyQt5.QtWidgets import QLabel
 from PyQt5.QtCore import QSize
 
+from chronosGui2.debugger import *; dbg
 import chronosGui2.settings as settings
 from theme import theme
 

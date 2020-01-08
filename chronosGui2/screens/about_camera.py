@@ -7,6 +7,7 @@ from PyQt5.QtWidgets import QScroller
 
 import chronosGui2.api as api
 import chronosGui2.settings as settings
+from chronosGui2.debugger import *; dbg
 from theme import theme
 
 # Import the generated UI form and app version.

@@ -5,6 +5,7 @@ from PyQt5.QtCore import Qt, QTimer, QPoint, QSize, QRect
 from sip import isdeleted
 
 from theme import theme
+from chronosGui2.debugger import *; dbg
 import chronosGui2.settings as settings
 
 

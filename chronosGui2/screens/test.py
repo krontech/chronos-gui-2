@@ -3,8 +3,8 @@ import os
 from PyQt5 import uic, QtWidgets, QtCore
 from PyQt5.QtCore import pyqtSlot
 
-from chronosGui2.debugger import *; dbg
 import chronosGui2.api as api
+from chronosGui2.debugger import *; dbg
 
 if api.apiValues.get('cameraModel')[0:2] == 'TX':
 	from chronosGui2.generated.txpro import Ui_TestWidget

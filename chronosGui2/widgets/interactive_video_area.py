@@ -5,6 +5,7 @@ from time import time
 from PyQt5.QtWidgets import QWidget, QLabel, QGestureEvent
 from PyQt5.QtCore import QSize, QEvent, Qt
 
+from chronosGui2.debugger import *; dbg
 import chronosGui2.settings as settings
 from theme import theme
 from chronosGui2 import delay

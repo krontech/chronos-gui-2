@@ -4,6 +4,8 @@ from typing import Union
 
 from PyQt5.QtCore import pyqtProperty
 
+from chronosGui2.debugger import *; dbg
+
 class SIUnitsPlugin():
 	"""A mixin for numeric widgets which gives them an SI unit value.
 		

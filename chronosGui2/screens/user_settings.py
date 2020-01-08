@@ -8,6 +8,7 @@ from time import sleep
 from PyQt5 import uic, QtWidgets, QtCore
 
 import chronosGui2.api as api
+from chronosGui2.debugger import *; dbg
 
 # Import the generated UI form.
 if api.apiValues.get('cameraModel')[0:2] == 'TX':

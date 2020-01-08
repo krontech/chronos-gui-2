@@ -5,6 +5,7 @@ from random import randint
 from PyQt5.QtCore import Q_ENUMS, QSize, Qt
 from PyQt5.QtWidgets import QRadioButton
 
+from chronosGui2.debugger import *; dbg
 import chronosGui2.settings as settings
 import logging; log = logging.getLogger('Chronos.gui')
 

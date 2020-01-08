@@ -4,6 +4,7 @@
 
 import sys
 from PyQt5 import uic, QtWidgets, QtCore, QtGui
+from chronosGui2.debugger import *; dbg
 
 # Import the generated UI form.
 if api.apiValues.get('cameraModel')[0:2] == 'TX':

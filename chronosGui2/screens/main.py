@@ -11,6 +11,7 @@ from PyQt5.QtWidgets import QWidget, QApplication
 from widgets.button import Button
 import chronosGui2.settings as settings
 import chronosGui2.api as api
+from chronosGui2.debugger import *; dbg
 
 from chronosGui2.generated.main_rh import Ui_MainRH
 

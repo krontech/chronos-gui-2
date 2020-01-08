@@ -6,6 +6,7 @@ from PyQt5.QtCore import Q_ENUMS, QSize, Qt
 from PyQt5.QtWidgets import QComboBox
 
 import chronosGui2.settings as settings
+from chronosGui2.debugger import *; dbg
 from theme import theme
 
 from scroll_list import ScrollList

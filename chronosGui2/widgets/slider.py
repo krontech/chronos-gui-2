@@ -7,6 +7,7 @@ from PyQt5.QtCore import QSize, Qt, pyqtSignal, QObject, QRect, QPoint
 from PyQt5.QtWidgets import QSlider
 from PyQt5.QtGui import QRegion, QPaintEvent
 
+from chronosGui2.debugger import *; dbg
 import chronosGui2.settings as settings
 from theme import theme
 
