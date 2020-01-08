@@ -1,11 +1,9 @@
 # -*- coding: future_fstrings -*-
-
-import os
 from collections import defaultdict
 import logging; log = logging.getLogger('Chronos.gui')
 from math import floor
 
-from PyQt5 import uic, QtWidgets, QtCore
+from PyQt5 import QtWidgets, QtCore
 from PyQt5.QtCore import pyqtSlot
 
 from chronosGui2.debugger import *; dbg

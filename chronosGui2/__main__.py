@@ -8,7 +8,7 @@ See readme.md for more details.
 """
 
 # General imports
-import sys, os, subprocess
+import sys, os
 import time
 import logging
 import argparse

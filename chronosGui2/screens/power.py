@@ -1,11 +1,9 @@
 # -*- coding: future_fstrings -*-
-
-import os
 from collections import deque
 from math import copysign
 from functools import partial
 
-from PyQt5 import uic, QtWidgets, QtCore, QtGui
+from PyQt5 import QtWidgets, QtCore, QtGui
 
 import chronosGui2.api as api
 import chronosGui2.settings as settings

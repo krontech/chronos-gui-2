@@ -7,7 +7,7 @@ from time import time
 import math
 from glob import iglob
 
-from PyQt5 import uic, QtCore
+from PyQt5 import QtCore
 from PyQt5.QtCore import QPoint, QSize, Qt
 from PyQt5.QtWidgets import QWidget, QApplication
 from PyQt5.QtGui import QPainter, QPen, QBrush, QColor, QStandardItemModel, QPainterPath, QPolygonF

@@ -1,11 +1,9 @@
 # -*- coding: future_fstrings -*-
-
-import os
 import subprocess
 from time import sleep
 #import logging; log = logging.getLogger('Chronos.gui')
 
-from PyQt5 import uic, QtWidgets, QtCore
+from PyQt5 import QtWidgets, QtCore
 
 import chronosGui2.api as api
 from chronosGui2.debugger import *; dbg

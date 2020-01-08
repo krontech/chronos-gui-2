@@ -1,10 +1,8 @@
 # -*- coding: future_fstrings -*-
-
-import os
 import math
 import logging; log = logging.getLogger('Chronos.gui')
 
-from PyQt5 import uic, QtCore
+from PyQt5 import QtCore
 from PyQt5.QtCore import pyqtSlot, QPropertyAnimation, QPoint
 from PyQt5.QtWidgets import QWidget, QApplication
 

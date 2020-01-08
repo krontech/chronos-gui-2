@@ -3,7 +3,7 @@
 # Run like `python3 screens/about_camera.minimal.py` in ~src/.
 
 import sys
-from PyQt5 import uic, QtWidgets, QtCore, QtGui
+from PyQt5 import QtWidgets, QtCore, QtGui
 from chronosGui2.debugger import *; dbg
 
 # Import the generated UI form.

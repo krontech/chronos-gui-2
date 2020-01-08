@@ -1,9 +1,8 @@
 # -*- coding: future_fstrings -*-
-import os
 from datetime import datetime
 import logging; log = logging.getLogger('Chronos.gui')
 
-from PyQt5 import uic, QtWidgets, QtCore
+from PyQt5 import QtWidgets, QtCore
 from PyQt5.QtCore import pyqtSlot
 
 import chronosGui2.api as api

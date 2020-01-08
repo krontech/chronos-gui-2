@@ -2,8 +2,8 @@
 
 from time import time
 
-from PyQt5.QtWidgets import QWidget, QLabel, QGestureEvent
-from PyQt5.QtCore import QSize, QEvent, Qt
+from PyQt5.QtWidgets import QWidget, QLabel #QGestureEvent doesn't work.
+from PyQt5.QtCore import QSize, Qt
 
 from chronosGui2.debugger import *; dbg
 import chronosGui2.settings as settings
@@ -13,7 +13,7 @@ try:
 	import chronosGui2.api as api
 except Exception:
 	#We don't want the lack of an API to fail us in Qt Designer. However, do warn.
-	import logging;
+	import logging
 	logging.getLogger('Chronos.api').warn('Unable to import api, DirectAPILinkPlugin disabled. (Some widgets will not have any effect when used.)')
 	api = None
 

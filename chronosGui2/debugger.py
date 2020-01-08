@@ -27,7 +27,7 @@ Example:
 	dbg()
 """
 
-import sys, pdb, pprint
+import pdb, pprint
 from os import system, popen
 
 from PyQt5 import QtCore
@@ -43,7 +43,7 @@ def dbg():
 	#Fix system not echoing keystrokes after first auto restart.
 	try:
 		system('stty sane')
-	except Exception as e:
+	except Exception:
 		pass
 	
 	pdb.set_trace()

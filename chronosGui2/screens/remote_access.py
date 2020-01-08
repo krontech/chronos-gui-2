@@ -6,9 +6,8 @@ import binascii
 import json
 import subprocess
 import re
-import os
 
-from PyQt5 import uic, QtWidgets, QtCore
+from PyQt5 import QtWidgets, QtCore
 from PyQt5.QtGui import QPixmap
 
 from chronosGui2.debugger import *; dbg

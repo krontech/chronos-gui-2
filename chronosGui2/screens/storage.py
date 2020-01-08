@@ -2,7 +2,7 @@
 import re
 import os
 
-from PyQt5 import uic, QtWidgets, QtCore
+from PyQt5 import QtWidgets, QtCore
 
 import chronosGui2.api as api
 from chronosGui2.external_process import run

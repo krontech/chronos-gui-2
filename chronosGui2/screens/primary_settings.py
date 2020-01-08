@@ -1,12 +1,7 @@
 # -*- coding: future_fstrings -*-
-
-import os
-from datetime import datetime
-
-from PyQt5 import uic, QtWidgets, QtCore
+from PyQt5 import QtWidgets, QtCore
 from PyQt5.QtGui import QPixmap
-from PyQt5.QtCore import pyqtSlot, Qt
-from PyQt5.QtGui import QStandardItemModel
+from PyQt5.QtCore import pyqtSlot
 
 import chronosGui2.settings as settings
 import chronosGui2.api as api

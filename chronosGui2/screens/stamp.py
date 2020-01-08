@@ -1,8 +1,5 @@
 # -*- coding: future_fstrings -*-
-
-import os
-from PyQt5 import uic, QtWidgets, QtCore
-# from PyQt5.QtCore import pyqtSlot
+from PyQt5 import QtWidgets, QtCore
 
 import chronosGui2.api as api
 from chronosGui2.debugger import *; dbg

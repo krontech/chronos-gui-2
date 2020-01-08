@@ -1,9 +1,8 @@
 # -*- coding: future_fstrings -*-
-import os
 import logging; log = logging.getLogger('Chronos.gui')
 from typing import Sequence
 
-from PyQt5 import uic, QtWidgets, QtCore
+from PyQt5 import QtWidgets, QtCore
 
 import chronosGui2.api as api
 import chronosGui2.settings as settings
@@ -53,7 +52,7 @@ class Color(QtWidgets.QDialog, Ui_Color):
 			self.uiColorTemperature.valueChanged.connect(lambda temp:
 				api.set('wbTemperature', temp) )
 		except AssertionError as e:
-			log.error(f'could not connect widgets to wbTemperature')
+			log.error(f'Could not connect widgets to wbTemperature.\n{e}')
 		
 		#White Balance Matrix
 		try:
@@ -70,7 +69,7 @@ class Color(QtWidgets.QDialog, Ui_Color):
 						self.uiWBBlue.value(),
 					]) )
 		except AssertionError as e:
-			log.error(f'could not connect widgets to wbColor')
+			log.error(f'Could not connect widgets to wbColor.\n{e}')
 		
 		#Color Matrix Preset
 		self.uiColorMatrixPreset.clear()

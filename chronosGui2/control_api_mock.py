@@ -29,16 +29,13 @@ from __future__ import unicode_literals
 import sys
 import random
 from typing import *
-from time import sleep
-from pathlib import Path
 import datetime
 
-from PyQt5.QtCore import pyqtSlot, QObject, QTimer, Qt, QByteArray
+from PyQt5.QtCore import pyqtSlot, QObject, QTimer
 from PyQt5.QtDBus import QDBusConnection, QDBusMessage, QDBusError
 
 
 from chronosGui2.debugger import *; dbg
-from chronosGui2 import delay
 
 # Set up d-bus interface. Connect to mock system buses. Check everything's working.
 if not QDBusConnection.systemBus().isConnected():
@@ -1195,7 +1192,7 @@ class ControlAPIMock(QObject):
 		retval = {}
 		
 		for key in keys:
-			if key[0] is '_' or not hasattr(state, key): # Don't allow querying of private variables.
+			if key[0] == '_' or not hasattr(state, key): # Don't allow querying of private variables.
 				#QDBusMessage.createErrorReply does not exist in PyQt5, and QDBusMessage.errorReply can't be sent. As far as I can tell, we simply can not emit D-Bus errors.
 				#Can't reply with a single string, either, since QVariantMap MUST be key:value pairs and we don't seem to have unions or anything.
 				#The type overloading, as detailed at http://pyqt.sourceforge.net/Docs/PyQt5/signals_slots.html#the-pyqtslot-decorator, simply does not work in this case. The last pyqtSlot will override the first pyqtSlot with its return type.
@@ -1211,7 +1208,7 @@ class ControlAPIMock(QObject):
 	def set(self, data: dict):
 		# Check all errors first to avoid partially applying an update.
 		for key, value in data.items():
-			if key[0] is '_' or not hasattr(state, key):  # Don't allow setting of private variables.
+			if key[0] == '_' or not hasattr(state, key):  # Don't allow setting of private variables.
 				# return self.sendError('unknownValue', f"The value '{key}' is not known.\nValid keys are: {[i for i in dir(state) if i[0] != '_']}")
 				return MockError('ValueError', (f"The value '{key}' is not a known key to set.\nValid keys are: {[i for i in dir(state) if i[0] != '_']}"))
 			if not isinstance(value, type(getattr(state, key))):

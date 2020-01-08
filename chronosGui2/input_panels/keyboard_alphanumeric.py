@@ -1,8 +1,7 @@
 # -*- coding: future_fstrings -*-
-import os
 from string import ascii_uppercase, digits
 
-from PyQt5 import uic, QtCore, QtGui
+from PyQt5 import QtCore, QtGui
 
 from chronosGui2.input_panels import KeyboardBase
 from button import Button

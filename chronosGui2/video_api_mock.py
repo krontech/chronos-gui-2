@@ -11,10 +11,9 @@
 """
 
 import sys
-#import random
 
-from PyQt5.QtCore import pyqtSlot, QObject, QTimer, Qt, QByteArray
-from PyQt5.QtDBus import QDBusConnection, QDBusMessage, QDBusError
+from PyQt5.QtCore import pyqtSlot, QObject
+from PyQt5.QtDBus import QDBusConnection#, QDBusMessage, QDBusError
 
 
 # Set up d-bus interface. Connect to mock system buses. Check everything's working.
@@ -38,7 +37,7 @@ pendingCallbacks = []
 
 
 def changeRecordingResolution(state):
-	print(f'Mock: changing recording resolution to xywh {recordingHOffset} {recordingVOffset} {recordingHRes} {recordingVRes}.')
+	print(f'Mock: changing recording resolution to xywh {state.recordingHOffset} {state.recordingVOffset} {state.recordingHRes} {state.recordingVRes}.')
 
 
 def notifyExposureChange(state):
@@ -84,16 +83,16 @@ class State():
 class VideoAPIMock(QObject):
 	"""Function calls of the video control D-Bus API."""
 
-	def emitControlSignal(self, name, value=None):
-		"""Emit an update signal, usually for indicating a value has changed."""
-		signal = QDBusMessage.createSignal('/ca/krontech/chronos/video_mock', 'ca.krontech.chronos.video_mock', name)
-		signal << getattr(state, name) if value is None else value
-		QDBusConnection.systemBus().send(signal)
-	
-	def emitError(self, message):
-		error = QDBusMessage.createError(QDBusError.Other, message)
-		QDBusConnection.systemBus().send(error)
-		return error
+	# def emitControlSignal(self, name, value=None):
+	# 	"""Emit an update signal, usually for indicating a value has changed."""
+	# 	signal = QDBusMessage.createSignal('/ca/krontech/chronos/video_mock', 'ca.krontech.chronos.video_mock', name)
+	# 	signal << getattr(state, name) if value is None else value
+	# 	QDBusConnection.systemBus().send(signal)
+	# 
+	# def emitError(self, message):
+	# 	error = QDBusMessage.createError(QDBusError.Other, message)
+	# 	QDBusConnection.systemBus().send(error)
+	# 	return error
 	
 	
 	@pyqtSlot('QVariantMap', result='QVariantMap')

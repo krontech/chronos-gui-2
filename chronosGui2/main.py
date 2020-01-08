@@ -8,7 +8,7 @@ See readme.md for more details.
 """
 
 # General imports
-import sys, os, subprocess
+import os, subprocess
 import time
 
 # QT-specific imports
@@ -17,7 +17,6 @@ from PyQt5 import QtWidgets, QtCore, QtGui
 from chronosGui2.stats import report
 from chronosGui2.debugger import *; dbg #imported for occasional use debugging, ignore "unused" warning
 from chronosGui2 import settings
-from chronosGui2 import Hardware
 from chronosGui2.widgets.focus_ring import FocusRing
 import logging
 

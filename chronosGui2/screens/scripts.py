@@ -4,7 +4,7 @@ from glob import iglob
 import os, subprocess, sys
 from fcntl import fcntl, F_GETFL, F_SETFL
 
-from PyQt5 import uic, QtWidgets, QtCore
+from PyQt5 import QtWidgets, QtCore
 from PyQt5.QtCore import Qt, QItemSelectionModel
 from PyQt5.QtGui import QStandardItemModel, QStandardItem, QColor
 

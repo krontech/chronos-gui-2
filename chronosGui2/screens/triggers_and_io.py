@@ -27,11 +27,10 @@
 		- add it to the "self.markStateDirty" callback list.
 		- set up a handler to propagate the changes to self.newIOMapping"""
 
-import os
 from functools import partial
 from collections import defaultdict
 
-from PyQt5 import uic, QtWidgets, QtCore, QtGui
+from PyQt5 import QtWidgets, QtCore, QtGui
 from PyQt5.QtCore import Qt, QItemSelection, QItemSelectionModel
 from PyQt5.QtGui import QStandardItemModel
 
