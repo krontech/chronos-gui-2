@@ -83,7 +83,7 @@ def breakIf(widget):
 	
 	if not widget:
 		print('\033[41mError: No widget supplied to breakIf.\033[m This is needed because we need to listen to key events in the app.')
-		return brk()
+		return dbg()
 	
 	def parents(item):
 		while item:
@@ -95,10 +95,10 @@ def breakIf(widget):
 		app = [i.app for i in parents(widget) if hasattr(i, 'app')][0]
 	except IndexError:
 		print('\033[41mError: Widget does not seem to be a part of the app.\033[m This is needed because we need to listen to key events in the app.')
-		return brk()
+		return dbg()
 	
 	if int(app.keyboardModifiers()) != QtCore.Qt.NoModifier: #33554432: #heck if I know
-		brk()
+		dbg()
 
 if hasattr(pdb, 'hideframe'):
 	breakIf = pdb.hideframe(breakIf)
