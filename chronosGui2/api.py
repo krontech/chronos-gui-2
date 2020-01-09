@@ -13,6 +13,8 @@ from collections import defaultdict
 from PyQt5.QtCore import pyqtSlot, QObject
 from PyQt5.QtDBus import QDBusConnection, QDBusInterface, QDBusReply, QDBusPendingCallWatcher, QDBusPendingReply
 
+from PyQt5.QtCore import pyqtWrapperType
+
 from chronosGui2.debugger import *; dbg
 from chronosGui2 import delay
 import logging; log = logging.getLogger('Chronos.api')
@@ -27,7 +29,7 @@ if USE_MOCK: #Resource accquisition is initialisation, here, so importing starts
 	log.warn(f"Using API mocks. ($USE_CHRONOS_API_MOCK={os.environ.get('USE_CHRONOS_API_MOCK')})")
 	import control_api_mock, video_api_mock; control_api_mock, video_api_mock
 
-class apiSingleton(type):
+class apiSingleton(pyqtWrapperType, type):
 	"""Metaclass used to ensure only one D-Bus API class is instantiated"""
 	def __init__(cls, name, bases, attrs, *kwargs):
 		super().__init__(name, bases, attrs)
@@ -38,7 +40,7 @@ class apiSingleton(type):
 			cls._instance = super().__call__(*args, **kwargs)
 		return cls._instance
 
-class apiBase():
+class apiBase(QObject):
 	"""Call the D-Bus camera APIs, asynchronously.
 		
 		Methods:
@@ -54,6 +56,8 @@ class apiBase():
 		of calling the function.
 	"""
 	def __init__(self, service, path, interface="", bus=QDBusConnection.systemBus()):
+		super(apiBase, self).__init__()
+
 		if not QDBusConnection.systemBus().isConnected():
 			log.error("Can not connect to D-Bus. Is D-Bus itself running?")
 			raise Exception("D-Bus Setup Error")
@@ -138,24 +142,6 @@ class apiBase():
 	def enqueueCall(self, pendingCall, coalesce: bool=True): #pendingCall is CallPromise
 		"""Enqueue callback. Squash and elide calls to set for efficiency."""
 		
-		#Step 1: Will this call actually do anything? Elide it if not.
-		anticipitoryUpdates = False #Emit update signals before sending the update to the API. Results in faster UI updates but poorer framerate.
-		if coalesce and pendingCall._args[0] == 'set':
-			#Elide this call if it would not change known state.
-			hasNewInformation = False
-			newItems = pendingCall._args[1].items()
-			for key, value in newItems:
-				if _camState[key] != value:
-					hasNewInformation = True
-					if not anticipitoryUpdates:
-						break
-					#Update known cam state in advance of state transition.
-					log.info(f'Anticipating {key} → {value}.')
-					_camState[key] = value
-					for callback in apiValues._callbacks[key]:
-						callback(value)
-			if not hasNewInformation:
-				return
 		
 		if coalesce and pendingCall._args[0] == 'playback':
 			#Always merge playback states.
@@ -440,45 +426,37 @@ class control(apiBase, metaclass=apiSingleton):
 			f"/ca/krontech/chronos/{'control_mock' if USE_MOCK else 'control'}", #Path
 		)
 
+		# State cache for observe(), so it doesn't have to query the status of a variable on each subscription.
+		# Since this often crashes during development, the following line can be run to try getting each variable independently.
+		#     for key in [k for k in control.callSync('availableKeys') if k not in {'dateTime', 'externalStorage'}]: print('getting', key); control.callSync('get', [key])
+		badKeys = {} #set of blacklisted keys - useful for when one is unretrievable during development.
+		if self.iface.isValid():
+			self.cache = self.callSync('get', [
+				key
+				for key in self.callSync('availableKeys')
+				if key not in badKeys
+			], warnWhenCallIsSlow=False)
+			if(not self.cache):
+				raise Exception("Cache failed to populate. This indicates the get call is not working.")
+			self.cache['error'] = '' #Last error is reported inline sometimes.
+			
+			if 'videoSegments' not in self.cache:
+				log.warn('videoSegments not found in availableKeys (pychronos/issues/31)')
+				self.cache['videoSegments'] = []
+			if 'videoZoom' not in self.cache:
+				log.warn('videoZoom not found in availableKeys (pychronos/issues/52)')
+				self.cache['videoZoom'] = 1
+		else:
+			self.cache = {}
+		self.cacheAge = {k:0 for k,v in self.cache.items()}
 
-# State cache for observe(), so it doesn't have to query the status of a variable on each subscription.
-# Since this often crashes during development, the following line can be run to try getting each variable independently.
-#     for key in [k for k in control.callSync('availableKeys') if k not in {'dateTime', 'externalStorage'}]: print('getting', key); control.callSync('get', [key])
-__badKeys = {} #set of blacklisted keys - useful for when one is unretrievable during development.
-__controlAPI = control()
-if __controlAPI.iface.isValid():
-	_camState = __controlAPI.callSync('get', [
-		key
-		for key in __controlAPI.callSync('availableKeys')
-		if key not in __badKeys
-	], warnWhenCallIsSlow=False)
-	if(not _camState):
-		raise Exception("Cache failed to populate. This indicates the get call is not working.")
-	_camState['error'] = '' #Last error is reported inline sometimes.
-	
-	if 'videoSegments' not in _camState:
-		log.warn('videoSegments not found in availableKeys (pychronos/issues/31)')
-		_camState['videoSegments'] = []
-	if 'videoZoom' not in _camState:
-		log.warn('videoZoom not found in availableKeys (pychronos/issues/52)')
-		_camState['videoZoom'] = 1
-else:
-	_camState = {}
-_camStateAge = {k:0 for k,v in _camState.items()}
-
-class APIValues(QObject):
-	"""Wrapper class for subscribing to API values in the chronos API."""
-	
-	def __init__(self):
-		super(APIValues, self).__init__()
-		
 		#The .connect call freezes if we don't do this, or if we do this twice.
 		QDBusConnection.systemBus().registerObject(
-			f"/ca/krontech/chronos/{'control_mock_hack' if USE_MOCK else 'control_hack'}", 
+			f"/ca/krontech/chronos/gui2/{os.getpid()}", 
 			self,
 		)
 		
-		self._callbacks = {value: [] for value in _camState}
+		self._callbacks = {value: [] for value in self.cache}
 		self._callbacks['all'] = [] #meta, watch everything
 		
 		QDBusConnection.systemBus().connect(
@@ -489,7 +467,30 @@ class APIValues(QObject):
 			self.__newKeyValue,
 		)
 	
-	def observe(self, key, callback):
+	def enqueueCall(self, pendingCall, coalesce: bool=True):
+		#Step 1: Will this call actually do anything? Elide it if not.
+		anticipitoryUpdates = False #Emit update signals before sending the update to the API. Results in faster UI updates but poorer framerate.
+		if coalesce and pendingCall._args[0] == 'set':
+			#Elide this call if it would not change known state.
+			hasNewInformation = False
+			newItems = pendingCall._args[1].items()
+			for key, value in newItems:
+				if self.cache[key] != value:
+					hasNewInformation = True
+					if not anticipitoryUpdates:
+						break
+					#Update known cam state in advance of state transition.
+					log.info(f'Anticipating {key} → {value}.')
+					self.cache[key] = value
+					for callback in self._callbacks[key]:
+						callback(value)
+			if not hasNewInformation:
+				return
+		
+		# Otherwise, enqueue it!
+		super().enqueueCall(pendingCall, coalesce)
+
+	def observe(self, key: str, callback: Callable[[Any], None]) -> None:
 		"""Add a function to get called when a value is updated."""
 		assert callable(callback), f"Callback is not callable. (Expected function, got {callback}.)"
 		assert key in self._callbacks, f"Unknown value, '{key}', to observe.\n\nAvailable keys are: \n{chr(10).join(self._callbacks.keys())}\n\nDid you mean to observe '{(get_close_matches(key, self._callbacks.keys(), n=1) or ['???'])[0]}' instead of '{key}'?\n"
@@ -509,26 +510,36 @@ class APIValues(QObject):
 	
 	@pyqtSlot('QDBusMessage')
 	def __newKeyValue(self, msg):
-		"""Update _camState and invoke any  registered observers."""
+		"""Update the cache and invoke any registered observers."""
 		newItems = msg.arguments()[0].items()
 		log.info(f'Received new information. {msg.arguments()[0] if len(str(msg.arguments()[0])) <= 45 else chr(10)+prettyFormat(msg.arguments()[0])}')
 		for key, value in newItems:
-			if _camState[key] != value and not self.__newValueIsEnqueued(key):
-				_camState[key] = value
-				_camStateAge[key] += 1
+			if self.cache[key] != value and not self.__newValueIsEnqueued(key):
+				self.cache[key] = value
+				self.cacheAge[key] += 1
 				for callback in self._callbacks[key]:
 					callback(value)
 				for callback in self._callbacks['all']:
 					callback(key, value)
 			else:
 				log.info(f'Ignoring {key} → {value}, stale.')
+
+# Horrible hacky glue
+class APIValues:
+	def __init__(self):
+		self.control = control()
 	
 	def get(self, key):
-		return _camState[key]
+		return self.control.cache[key]
+	
+	def observe(self, name: str, callback: Callable[[Any], None]) -> None:
+		return self.control.observe(name, callback)
+	
+	def unobserve(self, key, callback):
+		return self.control.unobserve(key, callback)
 
 apiValues = APIValues()
 del APIValues
-
 
 def observe(name: str, callback: Callable[[Any], None]) -> None:
 	"""Observe changes in a state value.
