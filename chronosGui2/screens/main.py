@@ -147,14 +147,14 @@ class Main(QWidget, Ui_MainRH):
 			self.uiWhiteBalance1.clicked.connect(self.closeCalibrationMenu)
 			self.uiWhiteBalance1.clicked.connect(self.closeShotAssistMenu)
 			self.uiWhiteBalance1.clicked.connect(self.closeRecordingAndTriggersMenu)
-			self.uiWhiteBalance1.clicked.connect(lambda: api.control.call('startAutoWhiteBalance', {}))
+			self.uiWhiteBalance1.clicked.connect(lambda: self.control.call('startAutoWhiteBalance', {}))
 			
 			self.uiBlackCal0.clicked.connect(self.closeCalibrationMenu)
 			self.uiBlackCal0.clicked.connect(lambda: 
-				api.control.call('startCalibration', {'blackCal': True}) ) #may time out if already in progress - check state is 'idle' before issuing call!
+				self.control.call('startCalibration', {'blackCal': True}) ) #may time out if already in progress - check state is 'idle' before issuing call!
 			self.uiBlackCal1.clicked.connect(self.closeCalibrationMenu)
 			self.uiBlackCal1.clicked.connect(lambda: 
-				api.control.call('startCalibration', {'blackCal': True}) )
+				self.control.call('startCalibration', {'blackCal': True}) )
 			
 			self.updateBaWTriggers()
 		else:
@@ -172,19 +172,19 @@ class Main(QWidget, Ui_MainRH):
 			#Calibration either opens the uiCalibrationMenu or the uiCalibrationMenuWithMotion [trigger button].
 			self.uiWhiteBalance1.clicked.connect(self.closeCalibrationMenu1)
 			self.uiWhiteBalance1.clicked.connect(self.closeCalibrationMenu2)
-			self.uiWhiteBalance1.clicked.connect(lambda: api.control.call('startAutoWhiteBalance', {}))
+			self.uiWhiteBalance1.clicked.connect(lambda: self.control.call('startAutoWhiteBalance', {}))
 			self.uiWhiteBalance2.clicked.connect(self.closeCalibrationMenu1)
 			self.uiWhiteBalance2.clicked.connect(self.closeCalibrationMenu2)
-			self.uiWhiteBalance2.clicked.connect(lambda: api.control.call('startAutoWhiteBalance', {}))
+			self.uiWhiteBalance2.clicked.connect(lambda: self.control.call('startAutoWhiteBalance', {}))
 			self.uiBlackCal1.clicked.connect(self.closeCalibrationMenu1)
 			self.uiBlackCal1.clicked.connect(self.closeCalibrationMenu2)
-			self.uiBlackCal1.clicked.connect(lambda: api.control.call('startCalibration', {'blackCal': True}))
+			self.uiBlackCal1.clicked.connect(lambda: self.control.call('startCalibration', {'blackCal': True}))
 			self.uiBlackCal2.clicked.connect(self.closeCalibrationMenu1)
 			self.uiBlackCal2.clicked.connect(self.closeCalibrationMenu2)
-			self.uiBlackCal2.clicked.connect(lambda: api.control.call('startCalibration', {'blackCal': True}))
+			self.uiBlackCal2.clicked.connect(lambda: self.control.call('startCalibration', {'blackCal': True}))
 			self.uiRecalibrateMotionTrigger.clicked.connect(self.closeCalibrationMenu1)
 			self.uiRecalibrateMotionTrigger.clicked.connect(self.closeCalibrationMenu2)
-			#self.uiRecalibrateMotionTrigger.clicked.connect(lambda: api.control('takeStillReferenceForMotionTriggering'))
+			#self.uiRecalibrateMotionTrigger.clicked.connect(lambda: self.control('takeStillReferenceForMotionTriggering'))
 			
 			#Close other menus and vice-versa when menu opened.
 			self.uiRecordingAndTriggers.clicked.connect(self.closeCalibrationMenu1)
@@ -265,7 +265,7 @@ class Main(QWidget, Ui_MainRH):
 	
 	
 	def updateBatteryCharge(self):
-		api.control.call(
+		self.control.call(
 			'get', ['batteryChargePercent']
 		).then(lambda data:
 			self.uiBattery.setText(
@@ -277,7 +277,7 @@ class Main(QWidget, Ui_MainRH):
 		#startTime = time.perf_counter()
 		linearRatio = (newExposureNs-self.uiExposureSlider.minimum()) / (self.uiExposureSlider.maximum()-self.uiExposureSlider.minimum())
 		log.debug(f'lr {linearRatio}')
-		api.control.call('set', {
+		self.control.call('set', {
 			'exposurePeriod': math.pow(linearRatio, 2) * self.uiExposureSlider.maximum(),
 		})
 	
@@ -512,7 +512,7 @@ class Main(QWidget, Ui_MainRH):
 		QWidget.setTabOrder(src, dest)
 	
 	def makeFailingCall(self):
-		api.control.call(
+		self.control.call(
 			'get', ['batteryChargePercentage']
 		).then(lambda data:
 			log.info(f'Test failed: Data ({data}) was returned.')

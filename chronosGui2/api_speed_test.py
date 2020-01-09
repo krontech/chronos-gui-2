@@ -41,7 +41,7 @@ Time: {time.perf_counter()-t2}s total, {(time.perf_counter()-t2)/TEST_ITERATIONS
 		getBatteryVoltage(-1)
 
 for x in range(TEST_ITERATIONS):
-	api.control.call('get', ['batteryVoltage']).then(configureValue)
+	controlAPI.call('get', ['batteryVoltage']).then(configureValue)
 
 t3 = 0
 x = 0

@@ -254,7 +254,7 @@ class Main(QWidget, Ui_Main2):
 		
 		#Black Cal
 		self.uiBlackCal.clicked.connect(lambda:
-			api.control.call('startCalibration', {
+			self.control.call('startCalibration', {
 				'blackCal': True }) )
 		
 		
@@ -332,7 +332,7 @@ class Main(QWidget, Ui_Main2):
 			
 			linearRatio = (newExposureNs-self.uiExposureSlider.minimum()) / (self.uiExposureSlider.maximum()-self.uiExposureSlider.minimum())
 			newExposureNs = math.pow(linearRatio, 2) * self.uiExposureSlider.maximum()
-			api.control.call('set', {'exposurePeriod': newExposureNs})
+			self.control.call('set', {'exposurePeriod': newExposureNs})
 			
 			#The signal takes too long to return, as it's masked by the new value the slider sets.
 			exposureNs = newExposureNs
@@ -909,7 +909,7 @@ class Main(QWidget, Ui_Main2):
 	def makeFailingCall(self):
 		"""Debug button A: place a test call to the API."""
 		
-		api.control.call(
+		self.control.call(
 			'get', ['batteryChargePercentage']
 		).then(lambda data:
 			log.info(f'Test failed: Data ({data}) was returned.')
