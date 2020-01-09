@@ -15,7 +15,4 @@ import chronosGui2.hardware as hardware
 # path out of our control, and we can't directly import them from a
 # subfolder like we can with the screens.
 import os, sys
-sys.path.append(os.path.dirname(os.path.abspath(__file__)) + '/widgets')
-
-# Import submodules.
-import chronosGui2.input_panels
+sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'widgets'))
