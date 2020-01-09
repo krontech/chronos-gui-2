@@ -22,6 +22,9 @@ class RecordMode(QtWidgets.QDialog, Ui_RecordMode):
 	def __init__(self, window):
 		super().__init__()
 		self.setupUi(self)
+
+		# API init.
+		self.control = api.control()
 		
 		# Panel init.
 		self.setFixedSize(window.app.primaryScreen().virtualSize())

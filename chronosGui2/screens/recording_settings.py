@@ -536,7 +536,7 @@ class RecordingSettings(QtWidgets.QDialog, Ui_RecordingSettings):
 			self._dirty = False
 			self.uiUnsavedChangesWarning.hide()
 			self.uiCancel.hide()
-			api.control.call('set', {
+			self.control.call('set', {
 				'resolution': {
 					#'vDarkRows': 0, #Don't reset what we don't show. That's annoying if you did manually set it.
 					'hRes': self.uiHRes.value(),

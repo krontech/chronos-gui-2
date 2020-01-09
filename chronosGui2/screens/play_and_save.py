@@ -312,7 +312,7 @@ class PlayAndSave(QtWidgets.QDialog, Ui_PlayAndSave):
 	
 	
 	def updateBattery(self):
-		api.control.call(
+		self.control.call(
 			'get', ['batteryChargePercent']
 		).then(lambda data:
 			self.uiBatteryReadout.setText(
