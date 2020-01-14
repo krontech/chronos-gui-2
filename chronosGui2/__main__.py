@@ -5,6 +5,15 @@
 Launch point for the Python QT back-of-camera interface.
 
 See readme.md for more details.
+
+Log levels are:
+	CRITICAL 50 Fatal error, the gui must restart.
+	ERROR    40 Nonfatal error. (an action has failed)
+	WARNING  30 Generally we always want to leave warnings on.
+	PRINT    25 For println-style debugging. Always temporary!
+	INFO     20 Messages for user actions that are short and specific. Non-repetitive.
+	DEBUG    10 Messages for the internal running of the camera, such as api calls.
+	NOTSET   00 Unused.
 """
 
 # General imports
@@ -35,7 +44,14 @@ def main():
 	parser.add_argument('args', nargs=argparse.REMAINDER,
 			help="Additional argument passed to Qt")
 	parsed = parser.parse_args()
-
+	
+	PRINT_LEVEL = 25
+	logging.addLevelName(PRINT_LEVEL, "PRINT")
+	def print_(self, message, *args, **kws):
+		if self.isEnabledFor(PRINT_LEVEL):
+			self._log(PRINT_LEVEL, message, args, **kws) 
+	logging.Logger.print = print_
+	
 	# Configure logging levels.
 	logging.basicConfig(
 		datefmt=None,
