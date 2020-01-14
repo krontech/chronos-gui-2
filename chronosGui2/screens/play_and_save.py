@@ -144,7 +144,10 @@ class PlayAndSave(QtWidgets.QDialog, Ui_PlayAndSave):
 					region = [r for r in self.markedRegions if r['region id'] == self.regionBeingSaved][:1]
 					if region: #Protect against resets in the middle of saving.
 						region = region[0]
-						region['saved'] = (lastKnownFrame - region['mark start']) / (region['mark end'] - region['mark start'])
+						region['saved'] = max( #We seem to get a few frames where we're incorrectly positioned before ending. Disallow negative progress.
+							region['saved'],
+							(lastKnownFrame - region['mark start']) / (region['mark end'] - region['mark start'])
+						)
 				
 				#Set the seek rate counter back to what the camera operator set it to.
 				if lastKnownFilesaveStatus:
@@ -660,8 +663,12 @@ class PlayAndSave(QtWidgets.QDialog, Ui_PlayAndSave):
 		
 		roi = [r for r in self.markedRegions if r['saved'] == 0][:1]
 		if not roi:
-			#No regions marked for saving.
-			raise type(self).NoRegionMarked()
+			self.markedStart = self.uiSeekSlider.minimum()
+			self.markedEnd = self.uiSeekSlider.maximum()
+			self.addMarkedRegion()
+			roi = [r for r in self.markedRegions if r['saved'] == 0][:1]
+			if not roi:
+				raise Exception()
 		roi = roi[0]
 		self.regionBeingSaved = roi['region id']
 		self.uiSeekSlider.setEnabled(False)
@@ -702,8 +709,8 @@ class PlayAndSave(QtWidgets.QDialog, Ui_PlayAndSave):
 				settings.value('savedFileMaxBitrate', 40) * 1000000.0,
 			)
 		})
-		dbg()
-		
+	
+	
 	def cancelSave(self, evt):
 		#Reset the region saved amount, since the file is now deleted.
 		region = [r for r in self.markedRegions if r['region id'] == self.regionBeingSaved][:1]
@@ -734,19 +741,8 @@ class PlayAndSave(QtWidgets.QDialog, Ui_PlayAndSave):
 	@pyqtSlot(str, float)
 	def onVideoStateChangeAlways(self, state): #Always fires, even when screen closed.
 		self.videoState = state
+		log.print(f'ovsca → {state}, {self.regionBeingSaved}')
 		
-		#If we were saving a region, progress to the next region.
-		if state == 'play' and self.regionBeingSaved:
-			region = [r for r in self.markedRegions if r['region id'] == self.regionBeingSaved][:1]
-			if region: #Protect against resets in the middle of saving.
-				region = region[0]
-				#{'region id': 'aaaaaaaa', 'hue': 240, 'mark end': 199, 'mark start': 130, 'saved': 0.0, 'highlight': 0, 'segment ids': ['KxIjG09V'], 'region name': 'Clip 1'},
-				region['saved'] = 1.0
-				try:
-					self.saveMarkedRegion()
-				except type(self).NoRegionMarked:
-					self.regionBeingSaved = None
-					self.uiSeekSlider.setEnabled(True)
 	
 	
 	@pyqtSlot(str, float)
@@ -805,18 +801,36 @@ class PlayAndSave(QtWidgets.QDialog, Ui_PlayAndSave):
 			self.uiSave.hide()
 		
 	def onEOF(self, state):
-		if state['filesave']: #Check event is relevant to saving.
-			self.regionBeingSaved = None
-			self.uiSeekSlider.setEnabled(True)
-			self.uiSave.show()
-			self.uiSaveCancel.hasFocus() and self.uiSave.setFocus()
-			self.uiSaveCancel.hide()
-			
-			#Close this screen and return to the main screen for more recording, now that we're done saving. [autosave]
+		log.print(f'onEOF {state}')
+		if state['filesave'] and not self.saveCancelled: #Check event is relevant to saving.
 			unsavedRegionsLeft = [r for r in self.markedRegions if r['saved'] == 0]
-			if not unsavedRegionsLeft and settings.value('resumeRecordingAfterSave', False) and not self.saveCancelled:
-				self._window.show('main')
-			self.saveCancelled = False
+			savedRegion = [r for r in self.markedRegions if r['region id'] == self.regionBeingSaved][:1]
+			if unsavedRegionsLeft: #Save the next region, so we don't have to sit and babysit a camera saving multiple events.
+				log.print(f'ovsca region {savedRegion}')
+				if savedRegion: #Protect against resets in the middle of saving.
+					savedRegion = savedRegion[0]
+					#{'region id': 'aaaaaaaa', 'hue': 240, 'mark end': 199, 'mark start': 130, 'saved': 0.0, 'highlight': 0, 'segment ids': ['KxIjG09V'], 'region name': 'Clip 1'},
+					savedRegion['saved'] = 1.0
+					try:
+						log.print(f'ovsca saving next {savedRegion}')
+						self.saveMarkedRegion()
+					except type(self).NoRegionMarked:
+						log.print(f'ovsca not saving next {savedRegion}')
+						self.regionBeingSaved = None
+						self.uiSeekSlider.setEnabled(True)
+			else: #Don't advance to next region, stop.
+				self.regionBeingSaved = None
+				self.saveCancelled = False
+				
+				self.uiSeekSlider.setEnabled(True)
+				self.uiSave.show()
+				self.uiSaveCancel.hasFocus() and self.uiSave.setFocus()
+				self.uiSaveCancel.hide()
+			
+				#Close this screen and return to the main screen for more recording, now that we're done saving. [autosave]
+				if settings.value('resumeRecordingAfterSave', False) and not self.saveCancelled:
+					self._window.show('main')
+			
 	
 	def onSaveClicked(self, evt):
 		try:
