@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>800</width>
-    <height>480</height>
+    <width>700</width>
+    <height>700</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -19,7 +19,7 @@
      <x>0</x>
      <y>0</y>
      <width>361</width>
-     <height>481</height>
+     <height>701</height>
     </rect>
    </property>
   </widget>
@@ -50,8 +50,8 @@
    <property name="geometry">
     <rect>
      <x>350</x>
-     <y>310</y>
-     <width>441</width>
+     <y>460</y>
+     <width>351</width>
      <height>61</height>
     </rect>
    </property>
@@ -63,7 +63,7 @@
    <property name="geometry">
     <rect>
      <x>360</x>
-     <y>370</y>
+     <y>520</y>
      <width>241</width>
      <height>21</height>
     </rect>
@@ -75,8 +75,8 @@
   <widget class="Label" name="label_2">
    <property name="geometry">
     <rect>
-     <x>540</x>
-     <y>370</y>
+     <x>450</x>
+     <y>520</y>
      <width>241</width>
      <height>21</height>
     </rect>
@@ -92,7 +92,7 @@
    <property name="geometry">
     <rect>
      <x>360</x>
-     <y>390</y>
+     <y>540</y>
      <width>241</width>
      <height>21</height>
     </rect>
@@ -104,8 +104,8 @@
   <widget class="Label" name="label_4">
    <property name="geometry">
     <rect>
-     <x>540</x>
-     <y>390</y>
+     <x>450</x>
+     <y>540</y>
      <width>241</width>
      <height>21</height>
     </rect>
@@ -169,8 +169,8 @@
   <widget class="Button" name="uiDone">
    <property name="geometry">
     <rect>
-     <x>620</x>
-     <y>400</y>
+     <x>520</x>
+     <y>620</y>
      <width>181</width>
      <height>81</height>
     </rect>
@@ -182,8 +182,8 @@
   <widget class="Button" name="button_2">
    <property name="geometry">
     <rect>
-     <x>340</x>
-     <y>400</y>
+     <x>160</x>
+     <y>460</y>
      <width>181</width>
      <height>81</height>
     </rect>
@@ -195,28 +195,28 @@
   <widget class="Backdrop" name="backdrop_2">
    <property name="geometry">
     <rect>
-     <x>290</x>
+     <x>360</x>
      <y>0</y>
-     <width>511</width>
-     <height>11</height>
+     <width>341</width>
+     <height>161</height>
     </rect>
    </property>
   </widget>
   <widget class="Backdrop" name="backdrop_3">
    <property name="geometry">
     <rect>
-     <x>290</x>
-     <y>310</y>
-     <width>511</width>
-     <height>171</height>
+     <x>360</x>
+     <y>460</y>
+     <width>341</width>
+     <height>241</height>
     </rect>
    </property>
   </widget>
   <widget class="Backdrop" name="backdrop_5">
    <property name="geometry">
     <rect>
-     <x>780</x>
-     <y>10</y>
+     <x>680</x>
+     <y>160</y>
      <width>20</width>
      <height>301</height>
     </rect>
