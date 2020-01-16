@@ -10,7 +10,7 @@ import chronosGui2.settings as settings
 from theme import theme
 from chronosGui2 import delay
 try:
-	import chronosGui2.api as api
+	import chronosGui2.api as api; api.apiValues.get('videoZoom') #DDR 2020-01-15: import and *test*, as Foobar's singleton refactor seems to have made this import but fail to populate.
 except Exception:
 	#We don't want the lack of an API to fail us in Qt Designer. However, do warn.
 	import logging
@@ -29,8 +29,6 @@ class InteractiveVideoArea(QWidget):
 		super().__init__(parent)
 
 		# API init.
-		self.video = api.video()
-		
 		self._customStyleSheet = self.styleSheet() #always '' for some reason
 		
 		if showHitRects:
@@ -66,8 +64,8 @@ class InteractiveVideoArea(QWidget):
 	
 	if api:
 		def showEvent(self, evt):
-			self.video.call('set', {'videoZoom': 1})
-			self.video.call('configure', {
+			api.video().call('set', {'videoZoom': 1})
+			api.video().call('configure', {
 				'xoff': max(0, min(self.x(), 800-self.width())),
 				'yoff': max(0, min(self.y(), 480-self.height())),
 				'hres': max(200, min(self.width(), 800)),
@@ -95,7 +93,7 @@ class InteractiveVideoArea(QWidget):
 			zoom = api.apiValues.get('videoZoom')
 			closestZoom = sorted(zoomLevels, key=lambda zl:abs(zl-zoom))[0]
 			nextZoomLevel = zoomLevels[(zoomLevels.index(closestZoom)+1) % len(zoomLevels)]
-			self.video.call('set', {'videoZoom': nextZoomLevel})
+			api.video().call('set', {'videoZoom': nextZoomLevel})
 		
 		
 		def oneToOneZoomLevel(self):
