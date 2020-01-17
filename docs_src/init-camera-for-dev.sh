@@ -1,26 +1,40 @@
 #!/bin/bash
-#Run this script on your camera to ready it for gui2 development.
-set -euxo pipefail #enable "safe mode"
+set -euo pipefail #enable bash's unofficial safe mode
+IFS=$'\n'
 
-#Some pre-installation set-up.
-    #We'll run our own gui, not camApp, so stop it.
-    #We use the util/watch-camera scripts for development so we can
-    #debug things when they go wrong.
-    systemctl disable chronos-gui.service
-    systemctl stop chronos-gui.service
+echo "Setting up camera for GUI development."
 
-    #Also, don't display legal when ssh'ing in.
-    touch ~/.hushlogin
+echo "Updating system packages."
+apt update && apt-get upgrade --yes
 
-# install deps
-    #Note: apt's python3-numpy python3-termcolor python3-dbus and pip3's python-periphery smbus2 are probably not needed.
-    apt update && apt-get upgrade --yes
-    apt install ca-certificates cowsay vim rsync curl python3-pip python3-pyqt5 python3-pyqt5.qtsvg python3-dbus udisks2 network-manager fonts-roboto fonts-noto-color-emoji qrencode --yes
-    #no longer required? pip3 install typing future-fstrings # python-periphery smbus2 #Required for gui2 and pychronos.
-    pip3 install --upgrade setuptools #required for pdbpp & watchdog
-    pip3 install pdbpp==0.10.0 watchdog==0.9.0 #Optional deps. "pdbpp" provides improvements to pdb. "watchdog" provides watchmedo, used for automatic deployment with util/watch-camera.
-  
-# install the back-of-camera interface & dev environment
+echo "Updating certs."
+apt install ca-certificates
+
+echo "Installing common utilities."
+apt install vim rsync curl
+
+if systemctl disable chronos-gui2; then
+    echo "Disabling chronos-gui2 autostart."
+else
+    echo "Failed to disable chronos-gui2 autostart. Make sure to stop the running UI before starting a new one!"
+fi
+
+read -p "Optional: Install watch script dependancies and nicer debugging? (This will upgrade Pip.) Y/n" -n 1 -r
+echo
+if [[ ! $REPLY =~ ^[Nn]$ ]]; then
+    echo "Installing."
+    apt install python3-pip
+    pip3 install --upgrade setuptools==41.0.1 #Required for pdbpp.
+    pip3 install pdbpp==0.10.0 watchdog==0.9.0 #Optional deps. "pdbpp" provides improvements to pdb, Python's interactive debugger. "watchdog" provides watchmedo, used for automatic reload with util/watch-camera.sh.
+    mkdir --parents ~/gui ~/web
+else
+    echo "Skipped."
+fi
+
+if [ -f ~/.pdbrc ]; then
+    echo "Skipping setting up .bashrc and .pdbrc; they already seem to be set up."
+else
+    echo "Setting up .bashrc and .pdbrc to provide environment for Python."
     cat >> ~/.bashrc <<'EOL'
 
 #env vars required by QT to run, display, and be touched:
@@ -38,41 +52,43 @@ export LC_CTYPE=en_US.utf8
 export USE_CHRONOS_API_MOCK='gui'
 export CHRONOS_SHOW_PAINT_RECTS='no'
 EOL
-  
+
     cat >> ~/.pdbrc <<'EOL'
 #Refresh the terminal - something disables keyboard echoing when running watch_guest.sh.
 import os
 os.system("stty sane")
 EOL
+fi
 
+echo "Reloading environment. (Run . ~/.bashrc if this fails?)"
+. ~/.bashrc
 
-exit #TODO: Figure out how to prompt for segments. For now, just comment stuff out. :p
-
-#Add in ca.krontech.chronos.conf from ~utils/
-
-#Optional Bonus Content
-    
-    #ponysay, a cowsay replacement
-    cd ~
-    wget http://www.vcheng.org/ponysay/ponysay_3.0.2-1_all.deb
-    dpkg -i ponysay_3.0.2-1_all.deb
-    rm ponysay_3.0.2-1_all.deb
-    cat > /etc/profile.d/horse.sh <<'EOS'
+read -p "Optional: Show a cow on SSH login to help with identification? y/N" -n 1 -r
+echo
+if [[ $REPLY =~ ^[Yy]$ ]]; then
+    echo "Setting up Cowsay."
+    apt install cowsay
+    cat > /etc/profile.d/cow.sh <<'EOS'
+/usr/games/cowsay << EOQ
+You have reached Chronos camera #$(gdbus call --system --dest ca.krontech.chronos.control --object-path /ca/krontech/chronos/control --method ca.krontech.chronos.control.get "['cameraSerial']" | grep --only-matching --perl-regexp '(?<=<'\'').*(?='\''>)' -), model $(gdbus call --system --dest ca.krontech.chronos.control --object-path /ca/krontech/chronos/control --method ca.krontech.chronos.control.get "['cameraModel']" | grep --only-matching --perl-regexp '(?<=<'\'').*(?='\''>)' -).
+For help and documentation, see http://forum.krontech.ca/ and https://github.com/krontech.
+EOQ
+EOS
+else
+    read -p "Well, how about a pony then? y/N" -n 1 -r
+    echo
+    if [[ $REPLY =~ ^[Yy]$ ]]; then
+        echo "Setting up Ponysay. You have good taste, my friend!" #And good patience, because this is slower than cowsay by a fair margin.
+        wget http://www.vcheng.org/ponysay/ponysay_3.0.2-1_all.deb
+        dpkg -i ponysay_3.0.2-1_all.deb
+        rm ponysay_3.0.2-1_all.deb
+        cat > /etc/profile.d/horse.sh <<'EOS'
 ponysay ++pony aquarius ++pony archlinux ++pony aries ++pony artemis ++pony aurora ++pony barbara ++pony bubbleberry ++pony butterscotch ++pony buttonmom ++pony calamity ++pony cancer ++pony capricorn ++pony childrenofthenight ++pony chrome ++pony coffeetalk ++pony coffeewalk ++pony danger ++pony doctornohat ++pony donutpony ++pony drhooves1 ++pony drhooves10 ++pony drhooves11 ++pony drhooves8 ++pony drhooves9 ++pony drhoovesdiscorded ++pony drizzle ++pony duskshine ++pony elusive ++pony faust ++pony firefox ++pony fluffle ++pony freckles ++pony fyrefly ++pony fyreflyready ++pony gemini ++pony gleamingshield ++pony gnupony ++pony hestelle ++pony internetexplorer ++pony johndelancie ++pony jristz ++pony kingsley ++pony kingsleybanner ++pony leo ++pony libra ++pony littlepip ++pony maandree ++pony milky ++pony milkylay ++pony molestia ++pony nyx ++pony nyxdisguised ++pony opera ++pony orion ++pony oscura ++pony paradise ++pony pinkaminacupcake ++pony pisces ++pony pizzapony ++pony posey ++pony princeartemis ++pony rainbowblitz ++pony reddit ++pony robodash ++pony sagittarius ++pony scorpio ++pony seabreeze ++pony sealyra ++pony slanderpony ++pony snowdrop ++pony snowdrop-crew ++pony solaris ++pony sparkler ++pony starstruck ++pony surprise ++pony sweetiebot ++pony taurus ++pony tempo ++pony ticket ++pony twibrain ++pony virgo ++pony wiggles ++pony woona ++pony woonanohat << EOQ
 You have reached Chronos camera #$(gdbus call --system --dest ca.krontech.chronos.control --object-path /ca/krontech/chronos/control --method ca.krontech.chronos.control.get "['cameraSerial']" | grep --only-matching --perl-regexp '(?<=<'\'').*(?='\''>)' -), model $(gdbus call --system --dest ca.krontech.chronos.control --object-path /ca/krontech/chronos/control --method ca.krontech.chronos.control.get "['cameraModel']" | grep --only-matching --perl-regexp '(?<=<'\'').*(?='\''>)' -).
 For help and documentation, see http://forum.krontech.ca/ and https://github.com/krontech.
 EOQ
 EOS
-    
-#Ponysay is slow. Use cowsay instead:
-    #If present, edit /etc/profile.d/horse.sh to use /usr/games/cowsay instead
-    #   of ponysay. Ponysay takes a *moment* to run. 😭
-    
-#Static IP
-    #Edit the eth0 section in /etc/network/interfaces on the camera like:
-    #   auto eth0
-    #   iface eth0 inet static
-    #           address 192.168.1.214
-    #           netmask 255.255.255.0
-    #           gateway 192.168.1.1
-    #Where "214" is your static IP address choice.
+    else
+        echo "Skipped custom banner."
+    fi
+fi
