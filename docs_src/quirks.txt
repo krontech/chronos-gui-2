@@ -1,0 +1,4 @@
+Quirks:
+- [DDR 2020-01-17] If you can't find the code to wire a widget to the api, it may have a directApiLink value set in the .ui file.
+- [DDR 2020-01-17] If you change code in the d-bus API client and it hangs on startup waiting on a lock, it's possible a workaround is being called less than or more than once.
+- [DDR 2020-01-17] The ui files are loaded, and then promptly mutilated by main.py to add in the jog wheel selector and keyboards. The selector has to go over top everything, so everything is reparented into a sub-pane. Generally, this has no ill effect, but it leads to an unexpected document-tree-equivalent.
