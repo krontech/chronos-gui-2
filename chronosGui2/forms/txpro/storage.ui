@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>800</width>
-    <height>480</height>
+    <width>700</width>
+    <height>700</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -18,8 +18,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>801</width>
-     <height>481</height>
+     <width>700</width>
+     <height>701</height>
     </rect>
    </property>
   </widget>
@@ -39,8 +39,8 @@
   <widget class="Button" name="uiDone">
    <property name="geometry">
     <rect>
-     <x>630</x>
-     <y>400</y>
+     <x>530</x>
+     <y>620</y>
      <width>171</width>
      <height>81</height>
     </rect>
@@ -64,9 +64,9 @@
    <widget class="LineEdit" name="uiNetworkStorageUsername">
     <property name="geometry">
      <rect>
-      <x>110</x>
+      <x>90</x>
       <y>90</y>
-      <width>291</width>
+      <width>257</width>
       <height>61</height>
      </rect>
     </property>
@@ -83,9 +83,9 @@
    <widget class="LineEdit" name="uiNetworkStoragePassoword">
     <property name="geometry">
      <rect>
-      <x>110</x>
+      <x>90</x>
       <y>150</y>
-      <width>291</width>
+      <width>257</width>
       <height>61</height>
      </rect>
     </property>
@@ -102,7 +102,7 @@
    <widget class="Label" name="label_6">
     <property name="geometry">
      <rect>
-      <x>30</x>
+      <x>10</x>
       <y>110</y>
       <width>91</width>
       <height>21</height>
@@ -118,7 +118,7 @@
    <widget class="Label" name="label_7">
     <property name="geometry">
      <rect>
-      <x>30</x>
+      <x>10</x>
       <y>160</y>
       <width>91</width>
       <height>21</height>
@@ -134,9 +134,9 @@
    <widget class="LineEdit" name="uiNetworkStorageAddress">
     <property name="geometry">
      <rect>
-      <x>110</x>
+      <x>90</x>
       <y>30</y>
-      <width>291</width>
+      <width>257</width>
       <height>61</height>
      </rect>
     </property>
@@ -150,7 +150,7 @@
    <widget class="Label" name="label_5">
     <property name="geometry">
      <rect>
-      <x>30</x>
+      <x>10</x>
       <y>60</y>
       <width>91</width>
       <height>21</height>
@@ -166,9 +166,9 @@
    <widget class="Button" name="uiTestNetworkStorage">
     <property name="geometry">
      <rect>
-      <x>110</x>
+      <x>90</x>
       <y>200</y>
-      <width>211</width>
+      <width>181</width>
       <height>71</height>
      </rect>
     </property>
@@ -182,7 +182,7 @@
    <widget class="Subheader" name="subheader_3">
     <property name="geometry">
      <rect>
-      <x>130</x>
+      <x>110</x>
       <y>20</y>
       <width>241</width>
       <height>21</height>
@@ -195,9 +195,9 @@
    <widget class="FeedbackLabel" name="uiNetworkStorageFeedback">
     <property name="geometry">
      <rect>
-      <x>130</x>
-      <y>260</y>
-      <width>261</width>
+      <x>110</x>
+      <y>250</y>
+      <width>241</width>
       <height>131</height>
      </rect>
     </property>
@@ -222,13 +222,17 @@
    <property name="geometry">
     <rect>
      <x>20</x>
-     <y>280</y>
+     <y>350</y>
      <width>591</width>
-     <height>201</height>
+     <height>351</height>
     </rect>
    </property>
    <property name="styleSheet">
     <string notr="true">
+					font-size: 16px;
+					background: transparent;
+					color: #fff;
+				
 			font-size: 16px;
 			background: transparent;
 			font-family: Monospace;
@@ -301,8 +305,8 @@ mmcblk0     179:0    0   7.4G  0 disk
   <widget class="Comment" name="comment">
    <property name="geometry">
     <rect>
-     <x>50</x>
-     <y>370</y>
+     <x>40</x>
+     <y>550</y>
      <width>231</width>
      <height>71</height>
     </rect>
@@ -315,7 +319,7 @@ mmcblk0     179:0    0   7.4G  0 disk
    <property name="geometry">
     <rect>
      <x>20</x>
-     <y>250</y>
+     <y>320</y>
      <width>241</width>
      <height>21</height>
     </rect>
@@ -357,8 +361,8 @@ will go here»</string>
   <widget class="Comment" name="comment_2">
    <property name="geometry">
     <rect>
-     <x>280</x>
-     <y>410</y>
+     <x>330</x>
+     <y>560</y>
      <width>161</width>
      <height>71</height>
     </rect>

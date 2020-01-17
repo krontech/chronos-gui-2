@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>800</width>
-    <height>480</height>
+    <width>700</width>
+    <height>700</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -18,8 +18,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>801</width>
-     <height>481</height>
+     <width>700</width>
+     <height>700</height>
     </rect>
    </property>
   </widget>
@@ -113,8 +113,8 @@
   <widget class="Button" name="uiDone">
    <property name="geometry">
     <rect>
-     <x>620</x>
-     <y>400</y>
+     <x>520</x>
+     <y>620</y>
      <width>181</width>
      <height>81</height>
     </rect>
