@@ -8,10 +8,10 @@ echo "Updating system packages."
 apt update && apt-get upgrade --yes
 
 echo "Updating certs."
-apt install ca-certificates
+apt install ca-certificates --yes
 
 echo "Installing common utilities."
-apt install vim rsync curl
+apt install vim rsync curl --yes
 
 if systemctl disable chronos-gui2; then
     echo "Disabling chronos-gui2 autostart."
@@ -23,7 +23,7 @@ read -p "Optional: Install watch script dependancies and nicer debugging? (This 
 echo
 if [[ ! $REPLY =~ ^[Nn]$ ]]; then
     echo "Installing."
-    apt install python3-pip
+    apt install python3-pip --yes
     pip3 install --upgrade setuptools==41.0.1 #Required for pdbpp.
     pip3 install pdbpp==0.10.0 watchdog==0.9.0 #Optional deps. "pdbpp" provides improvements to pdb, Python's interactive debugger. "watchdog" provides watchmedo, used for automatic reload with util/watch-camera.sh.
     mkdir --parents ~/gui ~/web
@@ -63,11 +63,11 @@ fi
 echo "Reloading environment. (Run . ~/.bashrc if this fails?)"
 . ~/.bashrc
 
-read -p "Optional: Show a cow on SSH login to help with identification? y/N" -n 1 -r
+read -p "Optional: Show a cow on SSH login to help with identification? y/N " -n 1 -r
 echo
 if [[ $REPLY =~ ^[Yy]$ ]]; then
     echo "Setting up Cowsay."
-    apt install cowsay
+    apt install cowsay --yes
     cat > /etc/profile.d/cow.sh <<'EOS'
 /usr/games/cowsay << EOQ
 You have reached Chronos camera #$(gdbus call --system --dest ca.krontech.chronos.control --object-path /ca/krontech/chronos/control --method ca.krontech.chronos.control.get "['cameraSerial']" | grep --only-matching --perl-regexp '(?<=<'\'').*(?='\''>)' -), model $(gdbus call --system --dest ca.krontech.chronos.control --object-path /ca/krontech/chronos/control --method ca.krontech.chronos.control.get "['cameraModel']" | grep --only-matching --perl-regexp '(?<=<'\'').*(?='\''>)' -).
@@ -75,7 +75,7 @@ For help and documentation, see http://forum.krontech.ca/ and https://github.com
 EOQ
 EOS
 else
-    read -p "Well, how about a pony then? y/N" -n 1 -r
+    read -p "Well, how about a pony then? y/N " -n 1 -r
     echo
     if [[ $REPLY =~ ^[Yy]$ ]]; then
         echo "Setting up Ponysay. You have good taste, my friend!" #And good patience, because this is slower than cowsay by a fair margin.
