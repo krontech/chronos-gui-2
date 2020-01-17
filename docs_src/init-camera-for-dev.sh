@@ -52,12 +52,14 @@ export LC_CTYPE=en_US.utf8
 export USE_CHRONOS_API_MOCK='gui'
 export CHRONOS_SHOW_PAINT_RECTS='no'
 EOL
-
+    
     cat >> ~/.pdbrc <<'EOL'
 #Refresh the terminal - something disables keyboard echoing when running watch_guest.sh.
 import os
 os.system("stty sane")
 EOL
+    
+    touch ~/.hushlogin
 fi
 
 echo "Reloading environment. (Run . ~/.bashrc if this fails?)"
