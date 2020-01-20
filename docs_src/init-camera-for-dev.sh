@@ -1,4 +1,8 @@
 #!/bin/bash
+
+#This script can be run on a debian installation to get it ready for Gui2 development.
+#–DDR 2020-01-20
+
 set -euo pipefail #enable bash's unofficial safe mode
 IFS=$'\n'
 
@@ -11,7 +15,7 @@ echo "Updating certs."
 apt install ca-certificates --yes
 
 echo "Installing common utilities."
-apt install vim rsync curl --yes
+apt install vim rsync curl chronos-pwrutil socat --yes
 
 if systemctl disable chronos-gui2; then
     echo "Disabling chronos-gui2 autostart."
@@ -59,6 +63,7 @@ import os
 os.system("stty sane")
 EOL
     
+    #Don't show the default Debian banner on login. It isn't useful.
     touch ~/.hushlogin
 fi
 
