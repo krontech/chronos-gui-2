@@ -20,7 +20,7 @@ Architecture: all
 Depends: ${python3:Depends}, ${misc:Depends},
          chronos-control,
          network-manager, udisks2,
-         fonts-roboto, fonts-noto-color-emoji,
+         fonts-roboto, ttf-ancient-fonts,
          python3-future-fstrings,
          python3-pyqt5,
          qrencode
