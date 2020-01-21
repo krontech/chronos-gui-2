@@ -53,7 +53,7 @@ export PYTHONIOENCODING=utf-8
 export LC_CTYPE=en_US.utf8
 
 #Set API into mock mode.
-export USE_CHRONOS_API_MOCK='gui'
+export USE_CHRONOS_API_MOCK='none'
 export CHRONOS_SHOW_PAINT_RECTS='no'
 EOL
     
