@@ -269,10 +269,10 @@ Sensor</string>
 					background: rgba(48,48,48,127); /* The background is drawn under the button borders, so they are opaque if the background is opaque. */
 					
 					/* use borders instead of margins so we can see what we're doing */
-					border-left:   11px solid rgba(160, 28, 210, 52);
-					border-right:  1px solid rgba(160, 28, 210, 52);
-					border-top:    21px solid rgba(160, 28, 210, 52);
-					border-bottom: 1px solid rgba(160, 28, 210, 52);
+					border-left:   11px solid rgba(217, 9, 245, 95);
+					border-right:  1px solid rgba(217, 9, 245, 95);
+					border-top:    21px solid rgba(217, 9, 245, 95);
+					border-bottom: 1px solid rgba(217, 9, 245, 95);
 				}
 				
 				CheckBox::indicator:checked {
@@ -580,10 +580,10 @@ Peaking</string>
 					color: #fff;
 					
 					/* use borders instead of margins so we can see what we're doing */
-					border-left:   1px solid rgba(32, 16, 199, 81);
-					border-right:  1px solid rgba(32, 16, 199, 81);
-					border-top:    21px solid rgba(32, 16, 199, 81);
-					border-bottom: 1px solid rgba(32, 16, 199, 81);
+					border-left:   1px solid rgba(10, 32, 239, 33);
+					border-right:  1px solid rgba(10, 32, 239, 33);
+					border-top:    21px solid rgba(10, 32, 239, 33);
+					border-bottom: 1px solid rgba(10, 32, 239, 33);
 				}
 			Button { background: #7a70f7 }</string>
     </property>
@@ -879,12 +879,24 @@ Peaking</string>
    </property>
    <property name="styleSheet">
     <string notr="true">
+					font-size: 16px;
+					background: transparent;
+					color: #fff;
+				
+					font-size: 16px;
+					background: transparent;
+					color: #fff;
+				
+					font-size: 16px;
+					background: transparent;
+					color: #fff;
+				
 			font-size: 16px;
 			background: #00b800;
 		</string>
    </property>
    <property name="pixmap">
-    <pixmap>:/assets/images/battery-light-charging.svg</pixmap>
+    <pixmap resource="../../../assets.qrc">:/assets/images/battery-charging.svg</pixmap>
    </property>
   </widget>
   <widget class="QWidget" name="uiExposureMenu" native="true">
@@ -1350,6 +1362,8 @@ Peaking</string>
   <tabstop>uiExposureSlider</tabstop>
   <tabstop>uiMenuBackground</tabstop>
  </tabstops>
- <resources/>
+ <resources>
+  <include location="../../../assets.qrc"/>
+ </resources>
  <connections/>
 </ui>
