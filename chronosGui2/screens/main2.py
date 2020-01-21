@@ -173,10 +173,6 @@ class Main(QWidget, Ui_Main2):
 		#self.uiFocusPeakingIntensity.currentIndexChanged.connect(lambda index:
 		#	self.control.set({'focusPeakingLevel': 1-(index/(self.uiFocusPeakingIntensity.count()-1))} ) )
 		
-		# Hack around API always setting focus peaking high.
-		delay(self, 5000, lambda: log.warn('Overriding focus peaking to 0 to work around pychronos/issues/49.'))
-		delay(self, 5000, lambda: self.control.setSync({'focusPeakingLevel': 0}))
-		
 		api.observe('focusPeakingLevel', lambda intensity:
 			self.uiFocusPeaking.setCheckState(
 				0 if not intensity else 2 ) )
