@@ -29,6 +29,10 @@ class TriggerDelay(QtWidgets.QDialog, Ui_TriggerDelay):
 		self.setWindowFlags(QtCore.Qt.FramelessWindowHint)
 		self.setAttribute(QtCore.Qt.WA_TranslucentBackground, True)
 		
+		# API init.
+		self.control = api.control()
+		self.video = api.video()
+		
 		self.uiTriggerDelaySlider.setStyleSheet( #If this turns out to be too expensive to set, just fill in the tip and draw a red rectangle underneath.
 			self.uiTriggerDelaySlider.styleSheet() + '\n' + """
 				Slider::groove {
