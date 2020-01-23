@@ -429,12 +429,12 @@ def connectHardwareEvents(app, hardware):
 	#hardware.subscribe('recordButtonUp', linkLightToRecordButton)
 	
 	hardware.subscribe('recordButtonDown', lambda:
-		window._screens['main'].publicToggleRecordingState() )
+		app.window._screens['main'].publicToggleRecordingState() )
 	
 	hardware.subscribe('recordButtonDown', lambda:
-		window._screens['main'].publicStartVirtualTrigger() )
+		app.window._screens['main'].publicStartVirtualTrigger() )
 	hardware.subscribe('recordButtonUp', lambda:
-		window._screens['main'].publicStopVirtualTrigger() )
+		app.window._screens['main'].publicStopVirtualTrigger() )
 	
 	def injectSelect():
 		app.postEvent(
