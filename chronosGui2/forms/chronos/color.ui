@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>700</width>
-    <height>700</height>
+    <width>800</width>
+    <height>480</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -19,10 +19,10 @@
    </property>
    <property name="geometry">
     <rect>
-     <x>390</x>
-     <y>80</y>
-     <width>291</width>
-     <height>191</height>
+     <x>30</x>
+     <y>260</y>
+     <width>331</width>
+     <height>201</height>
     </rect>
    </property>
   </widget>
@@ -42,8 +42,8 @@
   <widget class="Button" name="uiDone">
    <property name="geometry">
     <rect>
-     <x>530</x>
-     <y>620</y>
+     <x>630</x>
+     <y>400</y>
      <width>171</width>
      <height>81</height>
     </rect>
@@ -93,8 +93,8 @@
   <widget class="ComboBox" name="uiColorMatrixPreset">
    <property name="geometry">
     <rect>
-     <x>10</x>
-     <y>500</y>
+     <x>380</x>
+     <y>60</y>
      <width>231</width>
      <height>81</height>
     </rect>
@@ -103,8 +103,8 @@
   <widget class="Subheader" name="subheader_4">
    <property name="geometry">
     <rect>
-     <x>30</x>
-     <y>490</y>
+     <x>400</x>
+     <y>50</y>
      <width>181</width>
      <height>21</height>
     </rect>
@@ -116,8 +116,8 @@
   <widget class="Subheader" name="subheader_5">
    <property name="geometry">
     <rect>
-     <x>390</x>
-     <y>50</y>
+     <x>30</x>
+     <y>230</y>
      <width>241</width>
      <height>21</height>
     </rect>
@@ -126,11 +126,31 @@
     <string>Preview</string>
    </property>
   </widget>
+  <widget class="Backdrop" name="backdrop_3">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>460</y>
+     <width>361</width>
+     <height>21</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="Backdrop" name="backdrop_4">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>230</y>
+     <width>31</width>
+     <height>231</height>
+    </rect>
+   </property>
+  </widget>
   <widget class="QWidget" name="widget" native="true">
    <property name="geometry">
     <rect>
-     <x>20</x>
-     <y>250</y>
+     <x>390</x>
+     <y>130</y>
      <width>401</width>
      <height>241</height>
     </rect>
@@ -788,47 +808,27 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>391</width>
-     <height>711</height>
+     <width>801</width>
+     <height>261</height>
     </rect>
    </property>
   </widget>
   <widget class="Backdrop" name="backdrop_2">
    <property name="geometry">
     <rect>
-     <x>390</x>
-     <y>0</y>
-     <width>311</width>
-     <height>81</height>
+     <x>360</x>
+     <y>260</y>
+     <width>441</width>
+     <height>221</height>
     </rect>
    </property>
   </widget>
-  <widget class="Backdrop" name="backdrop_3">
-   <property name="geometry">
-    <rect>
-     <x>681</x>
-     <y>80</y>
-     <width>20</width>
-     <height>191</height>
-    </rect>
-   </property>
-  </widget>
-  <widget class="Backdrop" name="backdrop_4">
-   <property name="geometry">
-    <rect>
-     <x>390</x>
-     <y>270</y>
-     <width>311</width>
-     <height>431</height>
-    </rect>
-   </property>
-  </widget>
-  <zorder>backdrop_3</zorder>
-  <zorder>backdrop_4</zorder>
   <zorder>backdrop</zorder>
   <zorder>backdrop_2</zorder>
   <zorder>subheader_4</zorder>
   <zorder>widget</zorder>
+  <zorder>backdrop_4</zorder>
+  <zorder>backdrop_3</zorder>
   <zorder>interactivevideoarea</zorder>
   <zorder>headerlabel</zorder>
   <zorder>uiDone</zorder>
