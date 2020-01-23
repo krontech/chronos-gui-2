@@ -101,6 +101,9 @@ class Scripts(QtWidgets.QDialog, Ui_Scripts):
 	
 	
 	def showSelectedOutput(self, index: QtCore.QModelIndex):
+		if not self.scripts.rowCount():
+			return
+		
 		script = self.scripts.itemData(index)[Qt.UserRole]
 		
 		self.uiOutput.setModel(
@@ -111,6 +114,11 @@ class Scripts(QtWidgets.QDialog, Ui_Scripts):
 	
 	
 	def updateRunButton(self):
+		if not self.scripts.rowCount():
+			self.uiStop.hide()
+			self.uiRun.hide()
+			return
+		
 		script = self.uiScripts.selectionModel().currentIndex().data(Qt.UserRole)
 		
 		if script['process']:
