@@ -56,7 +56,7 @@ class Scripts(QtWidgets.QDialog, Ui_Scripts):
 		self.uiOutput.setModel(None)
 		
 		self.scripts.clear()
-		for file in iglob('/var/camera/scripts/*'):
+		for file in (i for it in (iglob('/var/camera/scripts/*'), iglob('/media/*/scripts/*')) for i in it):
 			entry = QStandardItem(file.split('/')[-1]) #File name.
 			executable = os.access(file, os.X_OK)
 			entry.setData({
