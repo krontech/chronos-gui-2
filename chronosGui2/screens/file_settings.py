@@ -90,6 +90,8 @@ class FileSettings(QtWidgets.QDialog, Ui_FileSettings):
 		self.uiDone.clicked.connect(window.back)
 	
 	
+		self.uiSafelyRemove.clicked.connect(lambda: window.show('storage'))
+
 	
 	def onShow(self):
 		#Try, _again_, to set the drop-down to the correct value. Since this widget is

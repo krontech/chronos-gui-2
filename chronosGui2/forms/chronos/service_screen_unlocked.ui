@@ -156,6 +156,45 @@
     <string>Calibrated on %Y-%m-%d %I:%M%p</string>
    </property>
   </widget>
+  <widget class="Button" name="uiExportCalData">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>320</y>
+     <width>181</width>
+     <height>81</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Export Cal Data</string>
+   </property>
+  </widget>
+  <widget class="Button" name="uiImportCalData">
+   <property name="geometry">
+    <rect>
+     <x>190</x>
+     <y>320</y>
+     <width>181</width>
+     <height>81</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Import Cal Data</string>
+   </property>
+  </widget>
+  <widget class="Label" name="label_3">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>310</y>
+     <width>251</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Factory Column Gain Calibration</string>
+   </property>
+  </widget>
   <zorder>backdrop</zorder>
   <zorder>headerlabel</zorder>
   <zorder>uiDone</zorder>
@@ -167,6 +206,9 @@
   <zorder>uiSerialNumber</zorder>
   <zorder>label_2</zorder>
   <zorder>uiCalibratedOn</zorder>
+  <zorder>uiExportCalData</zorder>
+  <zorder>uiImportCalData</zorder>
+  <zorder>label_3</zorder>
  </widget>
  <customwidgets>
   <customwidget>

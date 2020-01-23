@@ -68,7 +68,10 @@ class ServiceScreenUnlocked(QtWidgets.QDialog, Ui_ServiceScreenUnlocked):
 	def __init__(self, window):
 		super().__init__()
 		self.setupUi(self)
-		
+
+		# API init.
+		self.control = api.control()
+
 		# Panel init.
 		self.setFixedSize(window.app.primaryScreen().virtualSize())
 		self.setWindowFlags(QtCore.Qt.FramelessWindowHint)
@@ -80,6 +83,10 @@ class ServiceScreenUnlocked(QtWidgets.QDialog, Ui_ServiceScreenUnlocked):
 		self.uiSerialNumber.textChanged.connect(self.sendSerial)
 	
 		self.uiCal.clicked.connect(self.runCal)
+
+		self.uiExportCalData.clicked.connect(self.runExportCalData)
+
+		self.uiImportCalData.clicked.connect(self.runImportCalData)
 		
 		settings.observe('last factory cal', None, self.recieveFactoryCalDate)
 		
@@ -109,3 +116,9 @@ class ServiceScreenUnlocked(QtWidgets.QDialog, Ui_ServiceScreenUnlocked):
 			self.uiCalibratedOn.hide()
 		else:
 			self.uiCalibratedOn.setText(msg)
+
+	def runExportCalData(self):
+		self.control.call('exportCalData', {})
+
+	def runImportCalData(self):
+		self.control.call('importCalData', {})
