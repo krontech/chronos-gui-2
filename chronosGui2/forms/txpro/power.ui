@@ -88,39 +88,17 @@
     <string>Options</string>
    </property>
   </widget>
-  <widget class="CheckBox" name="uiDimScreen">
-   <property name="geometry">
-    <rect>
-     <x>20</x>
-     <y>440</y>
-     <width>301</width>
-     <height>71</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Dim screen</string>
-   </property>
-   <property name="clickMarginBottom" stdset="0">
-    <enum>CheckBox::half</enum>
-   </property>
-   <property name="linkedValueName" stdset="0">
-    <string>backlightEnabled</string>
-   </property>
-  </widget>
   <widget class="CheckBox" name="uiSafelyPowerDown">
    <property name="geometry">
     <rect>
      <x>20</x>
-     <y>510</y>
+     <y>440</y>
      <width>431</width>
-     <height>61</height>
+     <height>71</height>
     </rect>
    </property>
    <property name="text">
     <string>Save and power down when power disconnected</string>
-   </property>
-   <property name="clickMarginTop" stdset="0">
-    <enum>CheckBox::half</enum>
    </property>
    <property name="clickMarginBottom" stdset="0">
     <enum>CheckBox::half</enum>
@@ -133,7 +111,7 @@
    <property name="geometry">
     <rect>
      <x>20</x>
-     <y>570</y>
+     <y>510</y>
      <width>391</width>
      <height>71</height>
     </rect>
@@ -201,7 +179,6 @@
  </customwidgets>
  <tabstops>
   <tabstop>uiDone</tabstop>
-  <tabstop>uiDimScreen</tabstop>
   <tabstop>uiSafelyPowerDown</tabstop>
   <tabstop>uiStartWhenPowered</tabstop>
  </tabstops>

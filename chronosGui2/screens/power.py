@@ -77,10 +77,6 @@ class Power(QtWidgets.QDialog, Ui_Power):
 		#Avoid the chart redrawing just a little early, and not catching a changed power-down level. 
 		self.uiSafelyPowerDown.stateChanged.connect(self.uiChart.update)
 		
-		settings.observe('dimScreenWhenNotInUse', False, self.uiDimScreen.setChecked)
-		self.uiDimScreen.stateChanged.connect(lambda checked:
-			settings.setValue('dimScreenWhenNotInUse', bool(checked)) )
-		
 		self.uiVoltageLabel.formatString = self.uiVoltageLabel.text()
 		self.uiChargeLabel.formatString = self.uiChargeLabel.text()
 		
