@@ -1,5 +1,7 @@
 # -*- coding: future_fstrings -*-
 
+from math import floor
+
 from PyQt5.QtCore import QTimer, Qt, pyqtSignal
 from PyQt5.QtWidgets import QLabel, QWidget
 
@@ -17,6 +19,7 @@ class ToasterNotificationQueue(QWidget):
 	"""
 	
 	MESSAGE_HEIGHT = 15
+	MESSAGE_BORDER = 1
 	MESSAGE_LINE_HEIGHT = 20
 	screenHidden = pyqtSignal()
 	
@@ -59,7 +62,19 @@ class ToasterNotificationQueue(QWidget):
 			self.show()
 			
 		def refreshStyle(self):
-			pass
+			self.setStyleSheet(f"""
+				border: {ToasterNotificationQueue.MESSAGE_BORDER}px solid {self.theme.border};
+				border-radius: {
+					floor(ToasterNotificationQueue.MESSAGE_HEIGHT/2) + 
+					ToasterNotificationQueue.MESSAGE_BORDER*2 +
+					1
+				}; /*Can't use 50%, it just… doesn't work. 😑 Calculate it, nfi where the last 1 comes from but it results in a perfect lozenge at the moment.*/
+				padding-right: 0px;
+				padding-left: 10px;
+				font-size: 16px;
+				background: {self.theme.text};
+				color: {self.theme.base};
+			""")
 	
 	def notify(*args):
 		"""Pops up a little toaster notification near a
