@@ -39,15 +39,15 @@ class DirectAPILinkPlugin():
 			
 			if hasattr(self, 'setValue'): #Most inputs.
 				self.valueChanged.connect(
-					lambda val: self.control.set({
+					lambda val: api.control().set({
 						self._linkedValueName: self.realValue() }) )
 			elif hasattr(self, 'setChecked'): #Checkbox
 				self.stateChanged.connect(
-					lambda val: self.control.set({
+					lambda val: api.control().set({
 						self._linkedValueName: val != 0 }) )
 			elif hasattr(self, 'setText'): #Line edit
 				self.editingFinished.connect(
-					lambda: self.control.set({
+					lambda: api.control().set({
 						self._linkedValueName: self.text() }) )
 			else:
 				raise ValueError(f'Unknown type of widget to observe. (send on ${self})')
