@@ -18,6 +18,7 @@ from chronosGui2.stats import report
 from chronosGui2.debugger import *; dbg #imported for occasional use debugging, ignore "unused" warning
 from chronosGui2 import settings
 from chronosGui2.widgets.focus_ring import FocusRing
+from chronosGui2.widgets.toaster_notification import ToasterNotificationQueue
 import logging
 
 #App performance settings
@@ -198,7 +199,7 @@ class Window(QtCore.QObject):
 		# So, we want alpha blending, so we can have a drop-shadow for our
 		# keyboard. Great. Since we're not using a compositing window manager,
 		# we don't get that between windows. So we don't want put the keyboard
-		# in it's own window. (We could hack something together where the
+		# in its own window. (We could hack something together where the
 		# shadow is in one window, and the keyboard in the other. This seems
 		# rather confusing to me.) So, what we're going to do is to move all
 		# the children of the loaded screen into a widget the size of the
@@ -212,8 +213,9 @@ class Window(QtCore.QObject):
 			child.setParent(screenContents)
 		screen.screenContents = screenContents
 		
-		# Finally, add the screen's focus ring.
-		screen.focusRing = FocusRing(self._screens[screenName])
+		# Finally, add the screen's notification toaster and focus ring. (Focus ring on top.)
+		screen.toaster = ToasterNotificationQueue(screen)
+		screen.focusRing = FocusRing(screen)
 		
 		perfLog.info(f'screen ready duration, {screenName}, {time.perf_counter() - perf_start_time}')
 		
