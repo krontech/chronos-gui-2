@@ -139,6 +139,10 @@ class TriggersAndIO(QtWidgets.QDialog, Ui_TriggersAndIo):
 		self.setWindowFlags(QtCore.Qt.FramelessWindowHint)
 		self.setAttribute(QtCore.Qt.WA_TranslucentBackground, True)
 		
+		# API init.
+		self.control = api.control()
+		self.video = api.video()
+		
 		# State init, screen loads in superposition.
 		self.markStateClean()
 		#Only needed when trigger for action is set to Never, because the index changed event will never fire then and we'll be stuck with whatever index was set in the .ui file. Ideally, this would not be set in the .ui file in the first place, but realistically since it's set when we change "panels" with the little arrows at the top of the pane we're not gonna remember to clear it every time in the property editor and it'll just be a stupid recurring bug. So fix it here.
