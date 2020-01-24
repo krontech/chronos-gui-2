@@ -898,9 +898,9 @@ class Main(QWidget, Ui_Main2):
 		
 		self.hideMenu()
 		
-		self.toaster.notify('hello')
-		self.toaster.notify('notification', 'hello')
-		self.toaster.notify('warning', 2, 'hello')
+		#self.toaster.notify('hello')
+		#self.toaster.notify('notification', 'hello')
+		#self.toaster.notify('warning', 2, 'hello')
 	
 	def onHide(self):
 		self._batteryPollTimer.stop()
