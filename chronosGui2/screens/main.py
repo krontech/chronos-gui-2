@@ -86,7 +86,7 @@ class Main(QWidget, Ui_MainRH):
 		
 		self.uiShowWhiteClipping.stateChanged.connect(
 			lambda state: self.control.set(
-				{'zebraLevel': state/2} ) )
+				{'zebraLevel': state/200} ) )
 		api.observe('zebraLevel', self.updateWhiteClipping)
 		
 		api.observe('focusPeakingLevel', self.updateFocusPeakingIntensity)

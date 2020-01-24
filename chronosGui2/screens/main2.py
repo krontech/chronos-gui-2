@@ -161,7 +161,7 @@ class Main(QWidget, Ui_Main2):
 				0 if not intensity else 2 ) )
 		
 		self.uiZebraStripes.stateChanged.connect(lambda state: 
-			self.control.set({'zebraLevel': state/2}) )
+			self.control.set({'zebraLevel': state/200}) )
 		
 		
 		#Focus peaking
@@ -895,6 +895,10 @@ class Main(QWidget, Ui_Main2):
 		self.video.call('livedisplay', {})
 		
 		self.hideMenu()
+		
+		self.toaster.notify('hello')
+		self.toaster.notify('notification', 'hello')
+		self.toaster.notify('warning', 2, 'hello')
 	
 	def onHide(self):
 		self._batteryPollTimer.stop()
