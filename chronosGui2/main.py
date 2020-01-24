@@ -22,7 +22,7 @@ from chronosGui2.widgets.toaster_notification import ToasterNotificationQueue
 import logging
 
 #App performance settings
-PRECACHE_ALL_SCREENS = not settings.value('development mode', False) #Precached screens are faster to open the first time, but impact UI performance for a few seconds on startup. Since during development I usually want the only screen I'm working on -now-, I added this option to turn it off. --DDR 2019-05-30
+PRECACHE_ALL_SCREENS = not settings.value('debug controls enabled', False) #Precached screens are faster to open the first time, but impact UI performance for a few seconds on startup. Since during development I usually want the only screen I'm working on -now-, I added this option to turn it off. --DDR 2019-05-30
 
 guiLog = logging.getLogger('Chronos.gui')
 perfLog = logging.getLogger('Chronos.perf')
@@ -140,7 +140,7 @@ class Window(QtCore.QObject):
 		
 		#settings.setValue('current screen', 'widget_test')
 		
-		if settings.value('development mode', False):
+		if settings.value('debug controls enabled', False):
 			self.currentScreen = settings.value('current screen', 'main')
 		else:
 			self.currentScreen = 'main'
