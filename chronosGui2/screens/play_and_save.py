@@ -3,7 +3,7 @@ from random import sample
 from datetime import datetime
 
 from PyQt5 import QtWidgets, QtCore
-from PyQt5.QtCore import pyqtSlot, QByteArray, QRect
+from PyQt5.QtCore import pyqtSlot, QByteArray, QRect, Qt
 from PyQt5.QtGui import QImage, QTransform, QPainter, QColor, QPainterPath, QBrush, QStandardItemModel, QStandardItem, QIcon, QIconEngine
 
 import chronosGui2.api as api
@@ -306,6 +306,10 @@ class PlayAndSave(QtWidgets.QDialog, Ui_PlayAndSave):
 		
 		self.uiSeekSlider.setValue(status['position'])
 		self.uiCurrentFrame.setValue(status['position'])
+		
+		#Select and focus slider, to get the behaviour we had in camApp.
+		self.uiSeekSlider.setFocus(Qt.OtherFocusReason)
+		self.uiSeekSlider.jogWheelClick.emit()
 		
 		api.observe('state', self.onStateChangeWhenScreenActive)
 		

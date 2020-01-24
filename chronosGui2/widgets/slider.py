@@ -228,6 +228,7 @@ class Slider(ShowPaintRectsPlugin, FocusablePlugin, QSlider): #Must be in this o
 		if self.isFocused:
 			self.window().focusRing.focusIn()
 		else:
+			self.window().focusRing.show() #Make the focus ring show up on the play and save screen when clicking out, since we start focused there and only otherwise show the ring when moving it.
 			self.window().focusRing.focusOut()
 	
 	def tryRefocus(self, *_):
