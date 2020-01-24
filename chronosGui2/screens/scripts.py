@@ -143,7 +143,7 @@ class Scripts(QtWidgets.QDialog, Ui_Scripts):
 			stderr=sys.stdout, #Echo stderr to our logs, so they can be retrieved and watched for debugging.
 			shell=True,
 			cwd=self.path,
-			env={ 'GUI_PID': str(os.getpid()) } #Use this for SIGSTOP and SIGCONT, NOT SIGKILL. Run service stop chronos-gui2[-dev] for that. Note that $PPID is the parent *shell* we spawn, not the gui, which is why we provide the gui variable.
+			env=dict({('GUI_PID', str(os.getpid()))} | os.environ.items()) #Use this for SIGSTOP and SIGCONT, NOT SIGKILL. Run service stop chronos-gui2[-dev] for that. Note that $PPID is the parent *shell* we spawn, not the gui, which is why we provide the gui variable.
 		)
 		
 		script['process'] = proc
