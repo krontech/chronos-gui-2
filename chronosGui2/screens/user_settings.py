@@ -62,6 +62,7 @@ class UserSettings(QtWidgets.QDialog, Ui_UserSettings):
 			'/var/camera/cal', #Black/white calibration data. #TODO DDR 2019-06-26: Where are the cal files stored?
 			'/var/camera/userFPN', #User-generated calibration data.
 			'/var/camera/apiConfig.json', #D-Bus API configuration files. (Remember what the last camera settings were.)
+			'/var/camera/videoConfig.json', #D-Bus API configuration files.
 			'/root/.config/Krontech', #The settings for this Python script, the camera UI.
 		]) 
 		tar.communicate() #fill in .returncode
