@@ -10,5 +10,8 @@ ExecStart=/usr/bin/python3 -m chronosGui2
 StandardOutput=journal+console
 StandardError=inherit
 
+# Make the "close" debug button work on the main screen. Otherwise restart on crash.
+Restart=on-failure
+
 [Install]
 WantedBy=multi-user.target

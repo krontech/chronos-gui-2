@@ -10,7 +10,7 @@ ExecStart=/root/gui/chronosGui2/main.py
 StandardOutput=journal+console
 StandardError=inherit
 
-# Make the "close" debug button work on the main screen.
+# Make the "close" debug button work on the main screen. Otherwise restart on crash.
 Restart=on-failure
 
 [Install]
