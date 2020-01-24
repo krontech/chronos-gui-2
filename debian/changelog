@@ -1,18 +1,121 @@
-chronos-gui2 (0.4.0~alpha13) unstable; urgency=medium
+chronos-gui2 (0.4.0~alpha116) unstable; urgency=medium
 
+  * Install example scripts into /var/camera/scripts
+  * Added red x for main menu filter.
+  * Zebra level API call got inverted at some point. Fixes "oops all zebras".
+  * Fix scripts env being nearly empty. (We expect $PATH at least.)
+  * Fixed trigger screen not being able to save.
+  * Merge branch 'master' of github.com:krontech/chronos-gui-2
+  * Back up camera settings didn't save video api config.
+  * Try fixing UI not restarting on failure. Always try to save the footage.
+  * Scripts checks all external media for scripts now, not just on-board media.
+  * Fix battery icon to use Qt resource files.
+  * Removed stray debug toaster notifications on main screen.
+  * Fixed screen precache functionality not being used.
+  * Merge branch 'master' of github.com:krontech/chronos-gui-2
+  * Fix trigger delay screen not loading.
+  * Improved toaster notification style a bit. (It's still not good.)
+  * Added some example scripts for the scripts screen.
+  * Made scripts screen load if no scripts are available.
+  * Replaced incorrect color.ui screen.
+  * Merge branch 'master' of https://github.com/krontech/chronos-gui-2
+  * Implemented export and import cal data buttons, connected safely remove button.
+  * Fix physical record button not working.
+  * Added minimal viable toaster notifications.
+  * Fixed mis-invocation of api in direct_api_link_plugin.
+  * Removed dim screen while not in use, since it's not really supported.
+  * Added libqt5svg5 as an explicit dependency of chronos-gui-2.
+  * Remove unneeded hack around pychronos/issues/49.
+  * Changed pixmap on main screen.
+  * Setup: Don't use API mocks by default.
+  * The assets.qrc is now generated.
+  * Use different emoji font. Noto color emojis don't work.
+  * Removed setup scripts for debian 7 & 8, since they're no longer accurate.
+  * Added dev utilities chronos-pwrutil and socat to init script.
+  * init-camera-for-dev.sh: Always hush default login message.
+  * Tweaks to init-camera-for-dev.sh, fixing formatting and minimizing prompts.
+  * Merge branch 'master' of github.com:krontech/chronos-gui-2
+  * Added quirks.txt, containing the esoterica any new developer should know.
+  * Added new, better init script for camera called init-camera-for-dev.
+  * Updated several more screens to fit on the TX Pro.
+  * Fix interactive video area widget in Qt Creator.
+  * Updated several screens to fit on the TX Pro.
+  * Fixed bug where play and save wouldn't advance to next unsaved segment.
+  * Added log.print back in; it was handy for debugging and cleaning up after.
+  * Fix control API calling after async singleton refactor.
+  * Remove circular import between input_panels and widgets.
+  * Move async call handling into apiBase class.
+  * Move getSync and setSync into apiBase class.
+  * Move callSync into the apiBase class.
+  * Convert DBus interfaces into singleton classes.
+  * Removed many unused imports and a few unused caught exception references.
+  * Fixed some bugs in debugger where we were calling a nonexistent function.
+  * watch-camera: Drop into pdbpp on error, as we used to.
+  * Added `from debugger import *`s back into screen and widget files.
+  * Removed copy of color.ui from screens/ - it's in forms/*/ now.
+  * Removed unused coordinator api files. (This was apiV1.)
+  * Fix Qt Designer icons.
+  * Make Designer's default opening location to the new screens folder, forms.
+  * Camera watcher gained the ability to pass through args to Python.
+  * Fixed issue where blank filename did not default.
+  * Added info log level, for when you don't need all of debug.
+  * Make assets before rsyncing them while watching-computer.
+  * Fix watch-camera not working due to missing PYTHONPATH.
+  * Fix watch-computer removing jog wheel reader binary each change.
+  * Fix white balance button trying to start AWB procedure.
+  * Wrote a little function to screenshot all screens.
+  * Fixed watch-camera not being able to stop the UI process.
+  * Fixed error preventing power screen from loading.
+  * Fixed errors preventing test and user settings screens from loading.
+  * Built docs for github pages.
+  * Removed ~docs/ from gitignore, because — duh — that's how they're deployed.
+  * Updated watch-camera.sh with the new entry point.
+  * Added clarification to readme.txt wrt future-fstrings.
+  * Removed unused file, power_serial.py.
+  * Removed unused log.debug in interactive video area widget.
+  * Added flake8 configuration, so it is useful.
+  * Now that we've removed the docs folders files, we can ignore the folder.
+  * Add chronosGui2 module documentation generation.
+  * Move docs to docs_src; got Sphinx generating null documentation.
+  * Merge branch 'packaging' of github.com:krontech/chronos-gui-2 into packaging
+  * Allow API to be loaded even if it cannot connect.
+  * Translate git-version into something PEP-440 friendly.
+  * Updated some references to src/* to chronosGui2/*, since the folder moved.
+  * Fix generated folder contents being non-gitignored.
+  * Fix typo in setup.py preventing generating.
+  * Fix screen import errors after merge.
+  * Merge branch 'packaging'
+  * Fixed issue on triggers/io screen where it wasn't loading the right .ui.
+  * Move chronos-specific UI forms into its own UI module.
+  * Allow generation of nested UI forms modules.
+  * Fix AboutCamera screen to use generated version.
+  * Make app screens same size as the display, not just 800x480.
+  * Refined install so not running on raspberry pi framebuffer.
+  * Generate version number dynamically from git.
+  * Add Debian changelog generator script.
   * Add debian packaging files for version v0.4.0-alpha
   * Fix typo in UI generation makefile.
   * Add __init__.py to the generated content.
   * Move and rename forms to get rid of runtime UI generation.
   * Use generated UI files when loading screen classes.
   * Convert UI and asset generation into a Makefile.
+  * Ported improvements from watch-camera to watch-vm-guest.
+  * Added missing package to debian 8 setup instructions.
   * Use QResource lookup for graphical assets.
   * Add asset generation during build.
+  * Load appropriate UI for TX Pro or for Chronos.
+  * Mock: Return TX Pro mock string instead of Chronos one.
+  * Added install notes for the TX Pro mock on the raspberry pi.
   * Add setup.py for installation help.
   * Make the jog wheel input functional again.
+  * Initial layout for main screen of TX Pro UI.
+  * Add warning when using mocks; fix network interfaces error message.
+  * Added dependency on network-manager.
   * Convert __main__.py to hard tabs.
   * Convert project into chronosGui2 module.
+  * Deploy: Transfer files to target home, don't use sshpass.
+  * Got API mock into good enough shape to load main screen.
   * Fix gui2 wrt power off level being removed & power off changed.
   * Upstream release v0.4.0-alpha
 
- -- Owen Kirby <oskirby@gmail.com>  Thu, 12 Dec 2019 11:40:22 -0800
+ -- Owen Kirby <oskirby@gmail.com>  Thu, 23 Jan 2020 19:20:46 -0800

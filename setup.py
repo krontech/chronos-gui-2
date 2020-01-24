@@ -1,6 +1,6 @@
 import os
-import glob
 import subprocess
+from glob import glob
 from setuptools import setup
 from distutils.cmd import Command
 from distutils.command.build_py import build_py
@@ -119,7 +119,10 @@ setup(
 		'chronosGui2/generated/chronos',
 		'chronosGui2/generated/txpro',
 	],
-	data_files=[('/etc/', ['util/chronos-gui2.conf'])],
+	data_files=[
+		('/etc/', ['util/chronos-gui2.conf']),
+		('/var/camera/scripts/', glob('docs_src/example-scripts/*'))
+	],
 	license='GPLv3+',
 	# Command overrides
 	cmdclass={
