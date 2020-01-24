@@ -982,7 +982,7 @@ class Main(QWidget, Ui_Main2):
 				iconState = 'discharging'
 		
 		self.uiBatteryIcon.pixmap().load(
-			f"./assets/images/battery-{iconState}.svg" )
+			f":/assets/images/battery-{iconState}.svg" )
 		self.uiBatteryIcon.update()
 		
 	
