@@ -269,10 +269,10 @@ Sensor</string>
 					background: rgba(48,48,48,127); /* The background is drawn under the button borders, so they are opaque if the background is opaque. */
 					
 					/* use borders instead of margins so we can see what we're doing */
-					border-left:   11px solid rgba(217, 9, 245, 95);
-					border-right:  1px solid rgba(217, 9, 245, 95);
-					border-top:    21px solid rgba(217, 9, 245, 95);
-					border-bottom: 1px solid rgba(217, 9, 245, 95);
+					border-left:   11px solid rgba(182, 27, 148, 79);
+					border-right:  1px solid rgba(182, 27, 148, 79);
+					border-top:    21px solid rgba(182, 27, 148, 79);
+					border-bottom: 1px solid rgba(182, 27, 148, 79);
 				}
 				
 				CheckBox::indicator:checked {
@@ -580,10 +580,10 @@ Peaking</string>
 					color: #fff;
 					
 					/* use borders instead of margins so we can see what we're doing */
-					border-left:   1px solid rgba(10, 32, 239, 33);
-					border-right:  1px solid rgba(10, 32, 239, 33);
-					border-top:    21px solid rgba(10, 32, 239, 33);
-					border-bottom: 1px solid rgba(10, 32, 239, 33);
+					border-left:   1px solid rgba(8, 30, 220, 61);
+					border-right:  1px solid rgba(8, 30, 220, 61);
+					border-top:    21px solid rgba(8, 30, 220, 61);
+					border-bottom: 1px solid rgba(8, 30, 220, 61);
 				}
 			Button { background: #7a70f7 }</string>
     </property>
@@ -837,10 +837,27 @@ Peaking</string>
      <set>Qt::NoTextInteraction</set>
     </property>
    </widget>
+   <widget class="Button" name="uiMenuFilterX">
+    <property name="geometry">
+     <rect>
+      <x>250</x>
+      <y>-20</y>
+      <width>81</width>
+      <height>81</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>×</string>
+    </property>
+    <property name="customStyleSheet" stdset="0">
+     <string>Button { color: darkred; border-left: 1px solid transparent; }</string>
+    </property>
+   </widget>
    <zorder>uiMenuBackdrop</zorder>
    <zorder>uiMenuScroll</zorder>
    <zorder>uiMenuFilter</zorder>
    <zorder>uiMenuFilterIcon</zorder>
+   <zorder>uiMenuFilterX</zorder>
   </widget>
   <widget class="Comment" name="comment_3">
    <property name="geometry">
@@ -879,6 +896,10 @@ Peaking</string>
    </property>
    <property name="styleSheet">
     <string notr="true">
+					font-size: 16px;
+					background: transparent;
+					color: #fff;
+				
 					font-size: 16px;
 					background: transparent;
 					color: #fff;
@@ -1350,6 +1371,7 @@ Peaking</string>
   <tabstop>uiFocusPeakingColor</tabstop>
   <tabstop>uiMenuFilter</tabstop>
   <tabstop>uiMenuScroll</tabstop>
+  <tabstop>uiMenuFilterX</tabstop>
   <tabstop>uiRedFocusPeaking</tabstop>
   <tabstop>uiYellowFocusPeaking</tabstop>
   <tabstop>uiGreenFocusPeaking</tabstop>
@@ -1361,6 +1383,12 @@ Peaking</string>
   <tabstop>uiExposureInMs</tabstop>
   <tabstop>uiExposureSlider</tabstop>
   <tabstop>uiMenuBackground</tabstop>
+  <tabstop>uiWBPreset1</tabstop>
+  <tabstop>uiWBPreset2</tabstop>
+  <tabstop>uiWBPreset3</tabstop>
+  <tabstop>uiWBPreset4</tabstop>
+  <tabstop>uiWBPreset5</tabstop>
+  <tabstop>uiFineTuneColor</tabstop>
  </tabstops>
  <resources>
   <include location="../../../assets.qrc"/>

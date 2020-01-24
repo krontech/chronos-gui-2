@@ -598,6 +598,8 @@ class Main(QWidget, Ui_Main2):
 		self.uiMenuFilter.textChanged.connect(self.filterMenu)
 		self.filterMenu()
 		
+		self.uiMenuFilterX.clicked.connect(self.uiMenuFilter.clear)
+		
 		
 		#Battery
 		self._batteryCharge   = 1
