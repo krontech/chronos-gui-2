@@ -1097,7 +1097,7 @@ class Main(QWidget, Ui_Main2):
 	
 	def filterMenu(self):
 		model = self.uiMenuScroll.model()
-		search = self.uiMenuFilter.text().casefold()
+		search = self.uiMenuFilter.text().strip().casefold()
 		
 		for row in range(model.rowCount()):
 			data = model.data(model.index(row, 0), Qt.UserRole) #eg. {'name':"About Camera", 'open':lambda: window.show('about_camera'), 'synonyms':"kickstarter thanks me name"},
