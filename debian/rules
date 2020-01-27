@@ -11,6 +11,12 @@ export PYBUILD_NAME=chronos-gui2
 # Disable unit-tests, since they will try to boot the test-screens.
 override_dh_auto_test:
 
+override_dh_systemd_enable:
+	dh_systemd_enable --no-enable
+
+override_dh_systemd_start:
+	dh_systemd_start --no-start
+
 # If you need to rebuild the Sphinx documentation
 # Add spinxdoc to the dh --with line
 #override_dh_auto_build:

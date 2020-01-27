@@ -163,7 +163,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>1: Select the external storage device with &quot;camUpdate&quot; on it.</string>
+    <string>1: Select an external storage device to backup your configuration to.</string>
    </property>
   </widget>
   <widget class="Label" name="label_2">

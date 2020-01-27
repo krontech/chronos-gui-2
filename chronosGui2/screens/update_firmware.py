@@ -125,24 +125,14 @@ class UpdateFirmware(QtWidgets.QDialog, Ui_UpdateFirmware):
 		if bye.returncode:
 			raise Exception(f'system shutdown failed with code {bye.returncode}')
 		
-			
+
 	def applySoftwareUpdate(self):
-		if not self.uiMediaSelect.currentData():
-			self.uiApplyUpdateError.showError("Failed to start update: No readable external storage device detected.")
-			return
-		
-		file = self.uiMediaSelect.currentData()["path"] + b"/camUpdate"
-		
-		if not os.path.isfile(file):
-			log.error(f'Failed to start update: Could not find file at {file.decode("utf-8")}.')
-			self.uiApplyUpdateError.showError("Could not find update file.")
-			return
-		
-		self.uiApplyUpdateError.showMessage("Working…")
-		for _ in range(10): #DDR 2019-06-26: Repaint screen to show message, I don't know how else to trigger it.
-			QtCore.QCoreApplication.processEvents()
-		
-		try:
-			os.execle(file, os.environ)
-		except OSError as e:
-			self.uiApplyUpdateError.showError(f"Update failed: {e}")
+		# Start the chronos-update process to manage software updates.
+		update = subprocess.Popen(['service', 'chronos-update', 'start'])
+		update.communicate()
+		assert update.returncode is not None
+		if update.returncode:
+			raise Exception(f'Failed to start update service with code {update.returncode}')
+
+		# We should try to exit gracefully, though systemd will stop us anyways.
+		QApplication.closeAllWindows
