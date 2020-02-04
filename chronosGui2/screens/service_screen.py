@@ -3,7 +3,7 @@ from datetime import datetime
 import logging; log = logging.getLogger('Chronos.gui')
 
 from PyQt5 import QtWidgets, QtCore
-from PyQt5.QtCore import pyqtSlot
+from PyQt5.QtCore import pyqtSlot, QTimer
 
 import chronosGui2.api as api
 import chronosGui2.settings as settings
@@ -25,6 +25,12 @@ class ServiceScreenLocked(QtWidgets.QDialog, Ui_ServiceScreenLocked):
 
 		# API init.
 		self.control = api.control()
+
+		# Shipping mode timer init
+		self.shippingModeStatusTimer = QTimer()
+		self.shippingModeStatusTimer.timeout.connect(self.shippingModeStatus)
+		self.shippingModeStatusTimer.setInterval(1000)
+		self.shippingModeStatusTimer.start()
 		
 		# Panel init.
 		self.setFixedSize(window.app.primaryScreen().virtualSize())
@@ -34,7 +40,10 @@ class ServiceScreenLocked(QtWidgets.QDialog, Ui_ServiceScreenLocked):
 		
 		self.uiPassword.setText('') #Clear placeholder text.
 		self.uiPassword.textChanged.connect(self.checkPassword)
-		
+
+		self.uiShippingMode.setChecked(self.control.getSync('shippingMode'))
+		self.uiShippingMode.stateChanged.connect(self.setShippingMode)
+
 		self.uiDone.clicked.connect(window.back)
 	
 	
@@ -56,7 +65,16 @@ class ServiceScreenLocked(QtWidgets.QDialog, Ui_ServiceScreenLocked):
 	def checkPassword(self, guess):
 		if guess == self.unlockPassword:
 			self.unlock()
+
+	def setShippingMode(self, value):
+		self.control.setSync({'shippingMode' : bool(value)})
 	
+	def shippingModeStatus(self):
+		if (self.control.getSync('shippingMode')):
+			self.shippingModeMessage.showMessage('Shipping Mode Enabled\n\nOn the next restart, the AC adapter must be plugged in to turn the camera on.')
+		else:
+			self.shippingModeMessage.showMessage('Shipping Mode Disabled')
+
 	def unlock(self):
 		self.window_.show('service_screen.unlocked')
 		
@@ -98,7 +116,6 @@ class ServiceScreenUnlocked(QtWidgets.QDialog, Ui_ServiceScreenUnlocked):
 		self.uiDone.clicked.connect(lambda: window.show('main'))
 	
 	
-	
 	@pyqtSlot(int)
 	def recieveSerial(self, value):
 		self.uiSerialNumber.setText(value)
@@ -110,7 +127,7 @@ class ServiceScreenUnlocked(QtWidgets.QDialog, Ui_ServiceScreenUnlocked):
 		settings.setValue('last factory cal', 
 			datetime.now().strftime(self.uiCalibratedOnTemplate))
 		log.error("We don't have these routines in the API yet.")
-	
+
 	def recieveFactoryCalDate(self, msg):
 		if not msg:
 			self.uiCalibratedOn.hide()
@@ -119,6 +136,9 @@ class ServiceScreenUnlocked(QtWidgets.QDialog, Ui_ServiceScreenUnlocked):
 
 	def runExportCalData(self):
 		self.control.call('exportCalData', {})
+		self.uiFactoryCalStatus.showMessage('Exporting calibration data, please wait.')
+
 
 	def runImportCalData(self):
 		self.control.call('importCalData', {})
+		self.uiFactoryCalStatus.showMessage('Importing calibration data, please wait.')

@@ -91,7 +91,7 @@
   <widget class="Subheader" name="subheader">
    <property name="geometry">
     <rect>
-     <x>10</x>
+     <x>20</x>
      <y>70</y>
      <width>241</width>
      <height>21</height>
@@ -172,7 +172,7 @@
   <widget class="Button" name="uiImportCalData">
    <property name="geometry">
     <rect>
-     <x>190</x>
+     <x>180</x>
      <y>320</y>
      <width>181</width>
      <height>81</height>
@@ -195,6 +195,16 @@
     <string>Factory Column Gain Calibration</string>
    </property>
   </widget>
+  <widget class="FeedbackLabel" name="uiFactoryCalStatus">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>390</y>
+     <width>341</width>
+     <height>31</height>
+    </rect>
+   </property>
+  </widget>
   <zorder>backdrop</zorder>
   <zorder>headerlabel</zorder>
   <zorder>uiDone</zorder>
@@ -209,6 +219,7 @@
   <zorder>uiExportCalData</zorder>
   <zorder>uiImportCalData</zorder>
   <zorder>label_3</zorder>
+  <zorder>uiFactoryCalStatus</zorder>
  </widget>
  <customwidgets>
   <customwidget>
@@ -225,6 +236,11 @@
    <class>CheckBox</class>
    <extends>QCheckBox</extends>
    <header>check_box</header>
+  </customwidget>
+  <customwidget>
+   <class>FeedbackLabel</class>
+   <extends>QLabel</extends>
+   <header>feedback_label</header>
   </customwidget>
   <customwidget>
    <class>HeaderLabel</class>
