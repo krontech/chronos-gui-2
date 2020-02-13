@@ -1,6 +1,7 @@
 # -*- coding: future_fstrings -*-
 from datetime import datetime
 import logging; log = logging.getLogger('Chronos.gui')
+from smbus2 import SMBus
 
 from PyQt5 import QtWidgets, QtCore
 from PyQt5.QtCore import pyqtSlot, QTimer
@@ -98,7 +99,7 @@ class ServiceScreenUnlocked(QtWidgets.QDialog, Ui_ServiceScreenUnlocked):
 		
 		# Button binding.
 		api.observe('cameraSerial', self.recieveSerial)
-		self.uiSerialNumber.textChanged.connect(self.sendSerial)
+		self.uiSetSerialBtn.clicked.connect(self.sendSerial)
 	
 		self.uiCal.clicked.connect(self.runCal)
 
@@ -121,7 +122,22 @@ class ServiceScreenUnlocked(QtWidgets.QDialog, Ui_ServiceScreenUnlocked):
 		self.uiSerialNumber.setText(value)
 	
 	def sendSerial(self, value):
-		log.error("There is a command to set this, but it only works on Arago.")
+		SERIAL_NUMBER_MAX_LEN = 16
+		inputStr = self.uiSerialNumber.text()
+		serialNum = inputStr[:SERIAL_NUMBER_MAX_LEN]
+
+		try:
+			with SMBus(1) as bus:
+				# Set the write address MSB and LSB of the eeprom
+				bus.write_byte(0x54, 0)
+				bus.write_byte(0x54, 0)
+
+				data = [ord(character) for character in serialNum] # Convert input to ascii byte
+				data.insert(0,0) # The first byte written completes the LSB of the write address
+				bus.write_i2c_block_data(0x54, 0, data)
+
+		except Exception as e:
+			log.error(str(e))
 	
 	def runCal(self):
 		settings.setValue('last factory cal', 

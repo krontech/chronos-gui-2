@@ -205,6 +205,19 @@
     </rect>
    </property>
   </widget>
+  <widget class="Button" name="uiSetSerialBtn">
+   <property name="geometry">
+    <rect>
+     <x>170</x>
+     <y>110</y>
+     <width>131</width>
+     <height>81</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Set</string>
+   </property>
+  </widget>
   <zorder>backdrop</zorder>
   <zorder>headerlabel</zorder>
   <zorder>uiDone</zorder>
@@ -220,6 +233,7 @@
   <zorder>uiImportCalData</zorder>
   <zorder>label_3</zorder>
   <zorder>uiFactoryCalStatus</zorder>
+  <zorder>uiSetSerialBtn</zorder>
  </widget>
  <customwidgets>
   <customwidget>
