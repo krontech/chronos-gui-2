@@ -191,9 +191,9 @@
    <property name="geometry">
     <rect>
      <x>40</x>
-     <y>370</y>
-     <width>321</width>
-     <height>111</height>
+     <y>350</y>
+     <width>351</width>
+     <height>51</height>
     </rect>
    </property>
   </widget>
@@ -201,7 +201,7 @@
    <property name="geometry">
     <rect>
      <x>30</x>
-     <y>340</y>
+     <y>330</y>
      <width>321</width>
      <height>21</height>
     </rect>
@@ -220,7 +220,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>5</number>
+    <number>3</number>
    </property>
    <widget class="QWidget" name="uiNonePane"/>
    <widget class="QWidget" name="uiVirtualPane"/>
@@ -463,6 +463,10 @@ at 5 Volts</string>
      </property>
      <property name="styleSheet">
       <string notr="true">
+					font-size: 16px;
+					background: transparent;
+					color: #fff;
+				
 			font-size: 16px;
 			background: rgba(255,255,255,127);</string>
      </property>
@@ -613,6 +617,10 @@ at 5 Volts</string>
      </property>
      <property name="styleSheet">
       <string notr="true">
+					font-size: 16px;
+					background: transparent;
+					color: #fff;
+				
 			font-size: 16px;
 			background: rgba(255,255,255,127);</string>
      </property>
@@ -721,6 +729,88 @@ at 5 Volts</string>
     <string>Debug</string>
    </property>
   </widget>
+  <widget class="Subheader" name="uiIOStatusSubheader">
+   <property name="geometry">
+    <rect>
+     <x>30</x>
+     <y>400</y>
+     <width>321</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Status</string>
+   </property>
+  </widget>
+  <widget class="Label" name="uiIOStatLabel1">
+   <property name="geometry">
+    <rect>
+     <x>40</x>
+     <y>420</y>
+     <width>41</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>I/O 1:</string>
+   </property>
+  </widget>
+  <widget class="Label" name="uiUIStatLabel2">
+   <property name="geometry">
+    <rect>
+     <x>160</x>
+     <y>420</y>
+     <width>41</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>I/O 2:</string>
+   </property>
+  </widget>
+  <widget class="Label" name="uiIOStatLabel3">
+   <property name="geometry">
+    <rect>
+     <x>280</x>
+     <y>420</y>
+     <width>31</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>In 3:</string>
+   </property>
+  </widget>
+  <widget class="FeedbackLabel" name="uiIoStat1">
+   <property name="geometry">
+    <rect>
+     <x>90</x>
+     <y>430</y>
+     <width>61</width>
+     <height>21</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="FeedbackLabel" name="uiIoStat2">
+   <property name="geometry">
+    <rect>
+     <x>210</x>
+     <y>430</y>
+     <width>61</width>
+     <height>21</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="FeedbackLabel" name="uiIoStat3">
+   <property name="geometry">
+    <rect>
+     <x>320</x>
+     <y>430</y>
+     <width>61</width>
+     <height>21</height>
+    </rect>
+   </property>
+  </widget>
   <zorder>backdrop</zorder>
   <zorder>headerlabel</zorder>
   <zorder>uiUnsavedChangesWarning</zorder>
@@ -737,6 +827,13 @@ at 5 Volts</string>
   <zorder>uiPreview</zorder>
   <zorder>uiCancel</zorder>
   <zorder>uiDebug</zorder>
+  <zorder>uiIOStatusSubheader</zorder>
+  <zorder>uiIOStatLabel1</zorder>
+  <zorder>uiUIStatLabel2</zorder>
+  <zorder>uiIOStatLabel3</zorder>
+  <zorder>uiIoStat1</zorder>
+  <zorder>uiIoStat2</zorder>
+  <zorder>uiIoStat3</zorder>
  </widget>
  <customwidgets>
   <customwidget>
@@ -763,6 +860,11 @@ at 5 Volts</string>
    <class>DecimalSpinBox</class>
    <extends>QDoubleSpinBox</extends>
    <header>decimal_spin_box</header>
+  </customwidget>
+  <customwidget>
+   <class>FeedbackLabel</class>
+   <extends>QLabel</extends>
+   <header>feedback_label</header>
   </customwidget>
   <customwidget>
    <class>HeaderLabel</class>

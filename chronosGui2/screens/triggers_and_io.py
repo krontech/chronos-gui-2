@@ -31,7 +31,7 @@ from functools import partial
 from collections import defaultdict
 
 from PyQt5 import QtWidgets, QtCore, QtGui
-from PyQt5.QtCore import Qt, QItemSelection, QItemSelectionModel
+from PyQt5.QtCore import Qt, QItemSelection, QItemSelectionModel, QTimer
 from PyQt5.QtGui import QStandardItemModel
 
 import chronosGui2.settings as settings
@@ -207,6 +207,9 @@ class TriggersAndIO(QtWidgets.QDialog, Ui_TriggersAndIo):
 		
 		#TODO: Add little visualisation showing what connects and what is connected to the current action.
 		self.uiPreview.paintEvent = self.paintPreview
+
+		#WIP - Live IO status update timer init
+		self.updateLiveIoStatus
 	
 	def markStateClean(self, *_):
 		self.uiUnsavedChangesWarning.hide()
@@ -613,3 +616,10 @@ class TriggersAndIO(QtWidgets.QDialog, Ui_TriggersAndIo):
 				y += lineHeight + padding[1]
 		
 		p.drawPath(path)
+
+	def updateLiveIoStatus(self):
+		# WIP - Show the live status for all of the IO lines
+		ioStatus = api.apiValues.get('ioSourceStatus')
+		self.uiIoStat1.showMessage('LOW' if ioStatus['io1'] else 'HIGH')
+		self.uiIoStat2.showMessage('LOW' if ioStatus['io2'] else 'HIGH')
+		self.uiIoStat3.showMessage('LOW' if ioStatus['io3'] else 'HIGH')

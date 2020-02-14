@@ -269,10 +269,10 @@ Sensor</string>
 					background: rgba(48,48,48,127); /* The background is drawn under the button borders, so they are opaque if the background is opaque. */
 					
 					/* use borders instead of margins so we can see what we're doing */
-					border-left:   11px solid rgba(182, 27, 148, 79);
-					border-right:  1px solid rgba(182, 27, 148, 79);
-					border-top:    21px solid rgba(182, 27, 148, 79);
-					border-bottom: 1px solid rgba(182, 27, 148, 79);
+					border-left:   11px solid rgba(131, 28, 140, 37);
+					border-right:  1px solid rgba(131, 28, 140, 37);
+					border-top:    21px solid rgba(131, 28, 140, 37);
+					border-bottom: 1px solid rgba(131, 28, 140, 37);
 				}
 				
 				CheckBox::indicator:checked {
@@ -580,10 +580,10 @@ Peaking</string>
 					color: #fff;
 					
 					/* use borders instead of margins so we can see what we're doing */
-					border-left:   1px solid rgba(8, 30, 220, 61);
-					border-right:  1px solid rgba(8, 30, 220, 61);
-					border-top:    21px solid rgba(8, 30, 220, 61);
-					border-bottom: 1px solid rgba(8, 30, 220, 61);
+					border-left:   1px solid rgba(14, 10, 199, 86);
+					border-right:  1px solid rgba(14, 10, 199, 86);
+					border-top:    21px solid rgba(14, 10, 199, 86);
+					border-bottom: 1px solid rgba(14, 10, 199, 86);
 				}
 			Button { background: #7a70f7 }</string>
     </property>
@@ -912,12 +912,16 @@ Peaking</string>
 					background: transparent;
 					color: #fff;
 				
+					font-size: 16px;
+					background: transparent;
+					color: #fff;
+				
 			font-size: 16px;
 			background: #00b800;
 		</string>
    </property>
    <property name="pixmap">
-    <pixmap resource="../../../assets.qrc">:/assets/images/battery-charging.svg</pixmap>
+    <pixmap>:/assets/images/battery-charging.svg</pixmap>
    </property>
   </widget>
   <widget class="QWidget" name="uiExposureMenu" native="true">
@@ -1179,7 +1183,7 @@ Peaking</string>
      <enum>Button::none</enum>
     </property>
     <property name="temp" stdset="0">
-     <number>6500</number>
+     <number>5600</number>
     </property>
    </widget>
    <widget class="Button" name="uiWBPreset4">
