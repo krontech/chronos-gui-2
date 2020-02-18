@@ -24,7 +24,6 @@ Depends: ${python3:Depends}, ${misc:Depends},
          python3-future-fstrings,
          python3-pyqt5,
          libqt5svg5,
-         qrencode,
-         smbus2
+         qrencode
 Description: Chronos 1.4 Back-of-Camera GUI (Python3/Qt5)
 

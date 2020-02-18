@@ -1,7 +1,8 @@
 # -*- coding: future_fstrings -*-
 from datetime import datetime
 import logging; log = logging.getLogger('Chronos.gui')
-from smbus2 import SMBus
+import os
+import fcntl
 
 from PyQt5 import QtWidgets, QtCore
 from PyQt5.QtCore import pyqtSlot, QTimer
@@ -124,20 +125,23 @@ class ServiceScreenUnlocked(QtWidgets.QDialog, Ui_ServiceScreenUnlocked):
 	def sendSerial(self, value):
 		SERIAL_NUMBER_MAX_LEN = 16
 		inputStr = self.uiSerialNumber.text()
-		serialNum = inputStr[:SERIAL_NUMBER_MAX_LEN]
+		serialNum = inputStr[:SERIAL_NUMBER_MAX_LEN] + '\0'
+		fd = os.open("/dev/i2c-1", os.O_RDWR)
 
 		try:
-			with SMBus(1) as bus:
-				# Set the write address MSB and LSB of the eeprom
-				bus.write_byte(0x54, 0)
-				bus.write_byte(0x54, 0)
+			I2C_SLAVE = 0x0703 # From linux/i2c-dev.h
+			fcntl.ioctl(fd, I2C_SLAVE, 0x54)
 
-				data = [ord(character) for character in serialNum] # Convert input to ascii byte
-				data.insert(0,0) # The first byte written completes the LSB of the write address
-				bus.write_i2c_block_data(0x54, 0, data)
+			data = [ord(character) for character in serialNum] # Convert input to ascii byte
+			data.insert(0,0) # Set the write addr LSB of the eeprom
+			data.insert(0,0) # Set the write addr MSB of the eeprom
 
+			os.write(fd, bytearray(data))
+
+			os.close(fd)
 		except Exception as e:
-			log.error(str(e))
+			os.close(fd)
+			raise e
 	
 	def runCal(self):
 		settings.setValue('last factory cal', 
