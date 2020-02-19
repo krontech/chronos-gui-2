@@ -196,6 +196,11 @@
      <height>51</height>
     </rect>
    </property>
+   <property name="font">
+    <font>
+     <pointsize>12</pointsize>
+    </font>
+   </property>
   </widget>
   <widget class="Subheader" name="uiPreviewSubheader">
    <property name="geometry">
@@ -467,6 +472,10 @@ at 5 Volts</string>
 					background: transparent;
 					color: #fff;
 				
+					font-size: 16px;
+					background: transparent;
+					color: #fff;
+				
 			font-size: 16px;
 			background: rgba(255,255,255,127);</string>
      </property>
@@ -617,6 +626,10 @@ at 5 Volts</string>
      </property>
      <property name="styleSheet">
       <string notr="true">
+					font-size: 16px;
+					background: transparent;
+					color: #fff;
+				
 					font-size: 16px;
 					background: transparent;
 					color: #fff;
@@ -790,6 +803,14 @@ at 5 Volts</string>
      <height>21</height>
     </rect>
    </property>
+   <property name="font">
+    <font>
+     <pointsize>-1</pointsize>
+    </font>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+   </property>
   </widget>
   <widget class="FeedbackLabel" name="uiIoStat2">
    <property name="geometry">
@@ -800,6 +821,9 @@ at 5 Volts</string>
      <height>21</height>
     </rect>
    </property>
+   <property name="alignment">
+    <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+   </property>
   </widget>
   <widget class="FeedbackLabel" name="uiIoStat3">
    <property name="geometry">
@@ -809,6 +833,9 @@ at 5 Volts</string>
      <width>61</width>
      <height>21</height>
     </rect>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
    </property>
   </widget>
   <zorder>backdrop</zorder>

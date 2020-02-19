@@ -208,8 +208,11 @@ class TriggersAndIO(QtWidgets.QDialog, Ui_TriggersAndIo):
 		#TODO: Add little visualisation showing what connects and what is connected to the current action.
 		self.uiPreview.paintEvent = self.paintPreview
 
-		#WIP - Live IO status update timer init
-		self.updateLiveIoStatus
+		# Live IO status update timer
+		self.liveIoTimer = QTimer()
+		self.liveIoTimer.timeout.connect(self.updateLiveIoStatus)
+		self.liveIoTimer.setInterval(100)
+		self.liveIoTimer.start()
 	
 	def markStateClean(self, *_):
 		self.uiUnsavedChangesWarning.hide()
@@ -618,8 +621,8 @@ class TriggersAndIO(QtWidgets.QDialog, Ui_TriggersAndIo):
 		p.drawPath(path)
 
 	def updateLiveIoStatus(self):
-		# WIP - Show the live status for all of the IO lines
-		ioStatus = api.apiValues.get('ioSourceStatus')
+		# Show the live status for all of the IO lines
+		ioStatus = self.control.getSync('ioSourceStatus')
 		self.uiIoStat1.showMessage('LOW' if ioStatus['io1'] else 'HIGH')
 		self.uiIoStat2.showMessage('LOW' if ioStatus['io2'] else 'HIGH')
 		self.uiIoStat3.showMessage('LOW' if ioStatus['io3'] else 'HIGH')
