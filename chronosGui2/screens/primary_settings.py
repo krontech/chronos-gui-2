@@ -7,6 +7,8 @@ import chronosGui2.settings as settings
 import chronosGui2.api as api
 from chronosGui2.debugger import *; dbg
 
+import subprocess
+
 # Import the generated UI form.
 if api.apiValues.get('cameraModel')[0:2] == 'TX':
 	from chronosGui2.generated.txpro import Ui_PrimarySettings
@@ -92,25 +94,23 @@ class PrimarySettings(QtWidgets.QDialog, Ui_PrimarySettings):
 	@pyqtSlot(str, name="stopEditingDate")
 	def stopEditingDate(self, date: str=''):
 		self.editingSystemTime = False
-	
+		inputTime = self.uiSystemTime.text()
+
+		#Parse the input and attempt to set the RTC via systems's date command
+		try:
+			dateSetStr = inputTime.split('T')[0] + ' ' + (inputTime.split('T')[1]).split('.')[0]
+			try:
+				subprocess.check_call(["date", "-s", dateSetStr])
+				self.uiSystemClockFeedback.showMessage("System date updated.")	
+			except subprocess.CalledProcessError:
+				raise(subprocess.CalledProcessError)
+		except Exception as e:
+			self.uiSystemClockFeedback.showError("Date not formatted correctly; format is YYYY-MM-DD HH:MM:SS.")
+
 	def sysTimeFocusIn(self, *_):
 		self.editingSystemTime = True
 		
-	def sysTimeFocusOut(self, *_):
-		#try:
-		#	newTime = datetime.strptime(self.uiSystemTime.text(), "%Y-%m-%d %I:%M:%S %p")
-		#except ValueError: #Probably means we couldn't parse the date.
-		#	return self.uiSystemClockFeedback.showError("Date not formatted correctly; format is YYYY-MM-DD HH:MM:SS AM or PM.")
-		
-		(self.control.set({'dateTime': self.uiSystemTime.text()}) #newTime.isoformat()})
-			.then(lambda status: 
-				self.uiSystemClockFeedback.showMessage(
-					"System date updated." ) )
-			.catch(lambda error:
-				self.uiSystemClockFeedback.showError(
-					error ) )
-		)
-		
+	def sysTimeFocusOut(self, *_):		
 		self.stopEditingDate()
 		
 	def sysTimeBeingEdited(self):

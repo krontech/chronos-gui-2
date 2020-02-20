@@ -123,6 +123,7 @@ class RecordingSettings(QtWidgets.QDialog, Ui_RecordingSettings):
 		self.uiVOffset.valueChanged.connect(markDirty)
 	
 	__potentialPresetGeometries = [
+		[1920, 1080],
 		[1280, 1024],
 		[1280, 720],
 		[1280, 512],

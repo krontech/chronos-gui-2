@@ -132,6 +132,9 @@
      <height>81</height>
     </rect>
    </property>
+   <property name="inputMethodHints">
+    <set>Qt::ImhDate|Qt::ImhDigitsOnly|Qt::ImhTime</set>
+   </property>
    <property name="text">
     <string>2018-09-20 02:53:41 PM</string>
    </property>
