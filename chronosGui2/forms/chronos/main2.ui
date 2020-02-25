@@ -269,10 +269,10 @@ Sensor</string>
 					background: rgba(48,48,48,127); /* The background is drawn under the button borders, so they are opaque if the background is opaque. */
 					
 					/* use borders instead of margins so we can see what we're doing */
-					border-left:   11px solid rgba(131, 28, 140, 37);
-					border-right:  1px solid rgba(131, 28, 140, 37);
-					border-top:    21px solid rgba(131, 28, 140, 37);
-					border-bottom: 1px solid rgba(131, 28, 140, 37);
+					border-left:   11px solid rgba(242, 32, 133, 78);
+					border-right:  1px solid rgba(242, 32, 133, 78);
+					border-top:    21px solid rgba(242, 32, 133, 78);
+					border-bottom: 1px solid rgba(242, 32, 133, 78);
 				}
 				
 				CheckBox::indicator:checked {
@@ -580,10 +580,10 @@ Peaking</string>
 					color: #fff;
 					
 					/* use borders instead of margins so we can see what we're doing */
-					border-left:   1px solid rgba(14, 10, 199, 86);
-					border-right:  1px solid rgba(14, 10, 199, 86);
-					border-top:    21px solid rgba(14, 10, 199, 86);
-					border-bottom: 1px solid rgba(14, 10, 199, 86);
+					border-left:   1px solid rgba(31, 29, 201, 90);
+					border-right:  1px solid rgba(31, 29, 201, 90);
+					border-top:    21px solid rgba(31, 29, 201, 90);
+					border-bottom: 1px solid rgba(31, 29, 201, 90);
 				}
 			Button { background: #7a70f7 }</string>
     </property>
@@ -916,6 +916,10 @@ Peaking</string>
 					background: transparent;
 					color: #fff;
 				
+					font-size: 16px;
+					background: transparent;
+					color: #fff;
+				
 			font-size: 16px;
 			background: #00b800;
 		</string>
@@ -1223,7 +1227,7 @@ Peaking</string>
     </property>
     <property name="text">
      <string>Tungsten
-2300K</string>
+3200K</string>
     </property>
     <property name="clickMarginLeft" stdset="0">
      <enum>Button::none</enum>
@@ -1235,7 +1239,7 @@ Peaking</string>
      <enum>Button::none</enum>
     </property>
     <property name="temp" stdset="0">
-     <number>2300</number>
+     <number>3200</number>
     </property>
    </widget>
    <widget class="Button" name="uiFineTuneColor">
