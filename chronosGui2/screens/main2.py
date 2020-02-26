@@ -346,7 +346,7 @@ class Main(QWidget, Ui_Main2):
 		api.observe('exposureMax', updateExposureMax)
 		api.observe('exposureMin', updateExposureMin)
 		
-		exposureUnit = 'ms' #One of 'ms', 'deg', or 'pct'.
+		exposureUnit = 'µs' #One of 'µs', 'deg', or 'pct'.
 		exposureTemplate = self.uiExposure.text()
 		uiExposureInDegreesTemplate = self.uiExposureInDegrees.text()
 		uiExposureInMsTemplate = self.uiExposureInMs.text()
@@ -367,14 +367,14 @@ class Main(QWidget, Ui_Main2):
 			self.uiExposure.setText(
 				exposureTemplate.format(
 					name = {
-						'ms': 'Exposure',
+						'µs': 'Exposure',
 						'pct': 'Exposure',
 						'deg': 'Shutter Angle',
 					}[exposureUnit],
 					exposure = {
 						'deg': f'{exposureDeg:1.0f}°', #TODO DDR 2019-09-27: Is this actually the way to calculate shutter angle?
 						'pct': f'{exposurePct:1.1f}%',
-						'ms': f'{exposureMs:1.1f}ms',
+						'µs': f'{exposureMs:1.1f}µs',
 					}[exposureUnit],
 				)
 			)
@@ -463,7 +463,7 @@ class Main(QWidget, Ui_Main2):
 		
 		def uiExposureInMsClicked(*_):
 			nonlocal exposureUnit
-			exposureUnit = 'ms'
+			exposureUnit = 'µs'
 			updateExposureText()
 		self.uiExposureInMs.clicked.connect(
 			uiExposureInMsClicked )
