@@ -1077,7 +1077,7 @@ class Main(QWidget, Ui_Main2):
 	def startRecording(self):
 		self.uiRecord.isRecording = False
 		self.uiRecord.update()
-		self.control.callSync('startRecording')
+		self.control.callSync('startRecording', {})
 	
 	def stopRecording(self):
 		self.uiRecord.isRecording = True

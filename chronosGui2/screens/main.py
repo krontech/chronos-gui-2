@@ -601,7 +601,7 @@ class Main(QWidget, Ui_MainRH):
 	
 	def startRecording(self):
 		self.uiRecord.setText('Stop') #Show feedback quick, the signal takes a noticable amount of time.
-		self.control.callSync('startRecording')
+		self.control.callSync('startRecording', {})
 	
 	def stopRecording(self):
 		self.uiRecord.setText('Rec')
