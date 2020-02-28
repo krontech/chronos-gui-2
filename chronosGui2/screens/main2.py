@@ -251,7 +251,8 @@ class Main(QWidget, Ui_Main2):
 		#Black Cal
 		self.uiBlackCal.clicked.connect(lambda:
 			self.control.call('startCalibration', {
-				'blackCal': True }) )
+				'blackCal': True ,
+				'saveCal':  True }) )
 		
 		
 		#White Bal & Trigger/IO
