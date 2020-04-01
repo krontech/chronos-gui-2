@@ -507,21 +507,19 @@ class State():
 			>>> print(json.dumps(camera.externalStorage, indent=3))
 			{
 				\"mmcblk1p1\": {
-					\"available\": 27831008,
 					\"mount\": \"/media/mmcblk1p1\",
-					\"used\": 3323680,
 					\"device\": \"/dev/mmcblk1p1\",
-					\"size\": 31154688
+					\"fstype\": \"vfat\",
+					\"description\": \"SD/MMC Card Partition 1\"
 				}
 			}
 		"""
 		return {
 			"mmcblk1p1": {
-				"available": 27831008,
 				"mount": "/media/mmcblk1p1",
-				"used": 3323680,
 				"device": "/dev/mmcblk1p1",
-				"size": 31154688
+				"fstype": "vfat",
+				"description": "SD/MMC Card Partition 1"
 			}
 		}
 	

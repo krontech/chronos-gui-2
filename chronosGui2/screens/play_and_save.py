@@ -838,23 +838,6 @@ class PlayAndSave(QtWidgets.QDialog, Ui_PlayAndSave):
 			
 	
 	def onSaveClicked(self, evt):
-		minimumFreeSpace = 20000 #20,000 kB
-		errCount = 0
-		errMsg = ''
-		availableSavePaths = self.control.getSync('externalStorage');
-
-		for path in availableSavePaths:
-			if(availableSavePaths[path]['available'] < minimumFreeSpace):
-				errMsg += 'Insufficient storage space on /dev/' + path + '\n'
-				errCount += 1
-
-		if (errCount == len(availableSavePaths)): #if there's less than 10 MB on all devices detected, abort the save.
-			confirmation = QtWidgets.QMessageBox.warning(self, "Storage Warning", errMsg) #TODO: Style this messagebox.
-			return
-		elif (errCount > 0):
-			errMsg += '\nPlease select another save destination and try again.'
-			confirmation = QtWidgets.QMessageBox.warning(self, "Storage Warning", errMsg) #TODO: Style this messagebox.
-			
 		try:
 			self.saveMarkedRegion()
 		except Exception as e:
